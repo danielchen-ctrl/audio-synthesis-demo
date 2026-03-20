@@ -68,6 +68,7 @@ root_allowlist:
   - project_guard_report.md
 
 root_allow_dirs:
+  - .git
   - src
   - config
   - .claude

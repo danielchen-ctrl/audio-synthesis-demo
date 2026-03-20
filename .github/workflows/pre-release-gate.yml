@@ -1,0 +1,74 @@
+﻿name: Pre-release Gate
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - feature/**
+      - fix/**
+      - release/**
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 1 * * *"
+
+jobs:
+  pre-release-gate:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          if (Test-Path requirements.txt) {
+            python -m pip install -r requirements.txt
+          } else {
+            Write-Host "No requirements.txt found, skip dependency install."
+          }
+
+      - name: Run pre-release CI gate
+        id: gate
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          python scripts/run_pre_release_ci_gate.py
+
+      - name: Publish gate summary
+        if: always()
+        shell: pwsh
+        run: |
+          $report = 'reports/pre_release_gate/latest.md'
+          if (Test-Path $report) {
+            Get-Content $report | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          } else {
+            "# Pre-release CI Gate Report`n`n- No report file was generated." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          }
+
+      - name: Upload gate artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-release-gate-report
+          path: |
+            reports/pre_release_gate/
+            runtime/temp/repo_daily_checks/
+          if-no-files-found: warn
+
+      - name: Enforce gate result
+        if: always()
+        shell: pwsh
+        run: |
+          if ('${{ steps.gate.outcome }}' -ne 'success') {
+            Write-Host 'Primary gate step returned a non-zero exit code. Enforcing via latest report...'
+          }
+          python scripts/enforce_pre_release_ci_gate.py --report reports/pre_release_gate/latest.json --max-age-hours 24

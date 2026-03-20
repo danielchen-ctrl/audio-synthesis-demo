@@ -1,0 +1,14 @@
+﻿name: Project Reminder
+
+on:
+  workflow_dispatch:
+
+jobs:
+  reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Project checklist reminder
+        run: |
+          echo "确认 PR 是否关联 Issue"
+          echo "确认 Issue 是否已加入 GitHub Project"
+          echo "确认目标版本与优先级是否已填写"
