@@ -23,6 +23,11 @@ CASES = [
         "title": "multilingual_japanese_embedded_smoke",
         "core_content": "requirements clarification; rollback owner assigned; acceptance gate explicit",
         "voice_prefix": "ja-JP",
+        "required_snippets": [
+            "\u3044\u3061\u3070\u3093\u91cd\u8981\u306a\u306e\u306f\u3001<<Core:",
+            "\u3044\u307e\u4e00\u756a\u8a70\u307e\u3063\u3066\u3044\u308b\u8ad6\u70b9\u306f\u3069\u3053\u3067\u3059\u304b\u3002",
+        ],
+        "forbidden_fragments": ["Professional", "Counterpart", "Coordinator", "您好", "我会认真思考这个问题", "这个问题是从什么时候开始的？"],
     },
     {
         "language": "Spanish",
@@ -30,6 +35,11 @@ CASES = [
         "title": "multilingual_spanish_embedded_smoke",
         "core_content": "requirements clarification; rollback owner assigned; acceptance gate explicit",
         "voice_prefix": "es-ES",
+        "required_snippets": [
+            "Lo m\u00e1s importante es: <<Core:",
+            "\u00bfCu\u00e1l es ahora mismo el principal punto de bloqueo?",
+        ],
+        "forbidden_fragments": ["Professional", "Counterpart", "Coordinator", "您好", "我理解了，能否给我一些时间整理一下思路？", "这个问题是从什么时候开始的？"],
     },
     {
         "language": "Cantonese",
@@ -37,6 +47,11 @@ CASES = [
         "title": "multilingual_cantonese_embedded_smoke",
         "core_content": "requirements clarification; rollback owner assigned; acceptance gate explicit",
         "voice_prefix": "zh-HK",
+        "required_snippets": [
+            "\u6700\u91cd\u8981\u5605\u4fc2\uff1a<<Core:",
+            "\u4f60\u800c\u5bb6\u6700\u5361\u4f4f\u5605\u4f4d\u4fc2\u908a\u5ea6\uff1f",
+        ],
+        "forbidden_fragments": ["Professional", "Counterpart", "Coordinator", "您好", "我理解了，能否给我一些时间整理一下思路？"],
     },
 ]
 
@@ -112,6 +127,12 @@ def _run_case(session: requests.Session, base_url: str, case: dict[str, str]) ->
     dialogue_id = text_payload["dialogue_id"]
     text_path = Path(text_payload["text_path"])
     _assert(text_path.exists(), f"text output missing for {case['language']}: {text_path}")
+    text_body = text_path.read_text(encoding="utf-8", errors="ignore")
+    preview = "\n".join(text_body.splitlines()[:8])
+    for snippet in case.get("required_snippets", []):
+        _assert(snippet in preview, f"missing naturalness snippet for {case['language']}: {snippet}")
+    for fragment in case.get("forbidden_fragments", []):
+        _assert(fragment not in preview, f"unexpected leaked fragment for {case['language']}: {fragment}")
 
     text_result = {
         "language": case["language"],
@@ -126,6 +147,7 @@ def _run_case(session: requests.Session, base_url: str, case: dict[str, str]) ->
         "basename": text_payload.get("basename"),
         "dialogue_id": dialogue_id,
         "text_path": str(text_path),
+        "text_preview": preview,
         "expected_text_backend": "EmbeddedServer",
     }
 

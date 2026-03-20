@@ -8,11 +8,13 @@ import json
 import mimetypes
 import os
 import re
+import secrets
 import shutil
 import socket
 import sys
 import tempfile
 import urllib.parse
+from datetime import datetime
 from importlib._bootstrap_external import _code_to_timestamp_pyc
 from pathlib import Path
 from typing import Any
@@ -24,6 +26,12 @@ from tornado.web import HTTPError, RequestHandler
 
 
 ROOT = Path(__file__).resolve().parent
+SRC_DIR = ROOT / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from demo_app.multilingual_naturalness import polish_generated_lines
+
 RUNTIME_CACHE = ROOT / "runtime" / "cache" / "embedded_bundle"
 MODULE_CACHE = RUNTIME_CACHE / "modules"
 ASSET_CACHE = RUNTIME_CACHE / "assets"
@@ -166,6 +174,111 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _safe_profile(payload: dict[str, Any]) -> dict[str, str]:
+    profile = payload.get("profile") or {}
+    return {
+        "job_function": str(profile.get("job_function") or "unknown_job_function").strip() or "unknown_job_function",
+        "work_content": str(profile.get("work_content") or "unknown_work_content").strip() or "unknown_work_content",
+        "seniority": str(profile.get("seniority") or "unknown_level").strip() or "unknown_level",
+        "use_case": str(profile.get("use_case") or "general_use_case").strip() or "general_use_case",
+    }
+
+
+def _safe_int(value: Any, default: int) -> int:
+    try:
+        return int(value)
+    except Exception:
+        return default
+
+
+def _new_dialogue_id() -> str:
+    alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
+    return "".join(secrets.choice(alphabet) for _ in range(8))
+
+
+def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[str, Any]:
+    profile = _safe_profile(payload)
+    scenario = str(payload.get("scenario") or "").strip()
+    core_content = str(payload.get("core_content") or "").strip()
+    people_count = max(2, min(10, _safe_int(payload.get("people_count"), 3)))
+    word_count = max(300, _safe_int(payload.get("word_count"), 1000))
+    language = _canonical_language(str(payload.get("audio_language") or payload.get("language") or "Chinese"))
+    title = str(payload.get("title") or f"{profile['job_function']}_{profile['seniority']}").strip()
+
+    lines, rewrite_info = bundle_server._generate_dialogue_lines(
+        profile,
+        scenario,
+        core_content,
+        people_count,
+        word_count,
+        language,
+    )
+    dialogue_text = _render_dialogue_text(bundle_server, lines)
+    normalized_lines = _normalize_lines(bundle_server, lines)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    dialogue_id = _new_dialogue_id()
+    basename = bundle_server.generate_basename(profile, language, timestamp)
+    save_dir = ROOT / "demo" / timestamp
+    save_dir.mkdir(parents=True, exist_ok=True)
+    text_path = save_dir / f"{basename}.txt"
+    text_path.write_text(dialogue_text, encoding="utf-8")
+
+    manifest = {
+        "dialogue_id": dialogue_id,
+        "timestamp": timestamp,
+        "basename": basename,
+        "title": title,
+        "scenario": scenario,
+        "core_content": core_content,
+        "profile": profile,
+        "people_count": people_count,
+        "word_count": word_count,
+        "audio_language": language,
+        "save_dir": str(save_dir),
+        "text_path": str(text_path),
+        "audio_path": "",
+        "voice_map": {},
+        "edited_text": False,
+    }
+    _write_json(save_dir / "manifest.json", manifest)
+
+    debug_payload = {
+        "generator_version": "embedded_server.generate_text/v2",
+        "naturalness_applied": bool((rewrite_info or {}).get("naturalness_applied")),
+        "naturalness_language": (rewrite_info or {}).get("naturalness_language"),
+        "naturalness_rewrites": (rewrite_info or {}).get("naturalness_rewrites", 0),
+        "from_v2": (rewrite_info or {}).get("from_v2"),
+        "is_from_v2": (rewrite_info or {}).get("is_from_v2"),
+        "source_v2_fallback": (rewrite_info or {}).get("source_v2_fallback"),
+        "param_debug": {
+            "normalized_echo": {
+                "scenario": scenario,
+                "core_content": core_content,
+                "people_count": people_count,
+                "word_count": word_count,
+                "audio_language": language,
+                "profile": profile,
+            }
+        },
+        "raw_rewrite_info": rewrite_info or {},
+    }
+
+    return {
+        "ok": True,
+        "dialogue_id": dialogue_id,
+        "timestamp": timestamp,
+        "basename": basename,
+        "text_path": str(text_path),
+        "dialogue_text": dialogue_text,
+        "text": dialogue_text,
+        "lines": normalized_lines,
+        "debug": debug_payload,
+        "debug_info": debug_payload,
+        "text_download_url": _download_url(dialogue_id, "text"),
+    }
 
 
 def _find_manifest(dialogue_id: str) -> tuple[Path, dict[str, Any]]:
@@ -369,15 +482,19 @@ async def _synthesize_audio_from_lines(
 
         segments: list[dict[str, Any]] = []
         cursor_sec = 0.0
+        fallback_voice_map: dict[str, str] = {}
         for idx, (speaker, text) in enumerate(lines, start=1):
             duration = max(1.2, min(6.0, len(text) / 8.0))
+            voice = _voice_for_speaker(language, speaker)
+            speaker_id = str(_speaker_numeric_id(speaker))
+            fallback_voice_map[speaker_id] = voice
             segments.append(
                 {
                     "speaker": speaker,
                     "start_sec": round(cursor_sec, 3),
                     "end_sec": round(cursor_sec + duration, 3),
                     "text": text,
-                    "voice": "synthetic_fallback",
+                    "voice": f"synthetic_fallback:{voice}",
                     "line_index": idx - 1,
                 }
             )
@@ -396,13 +513,21 @@ async def _synthesize_audio_from_lines(
         vtt_path.write_text("\n".join(vtt_lines), encoding="utf-8")
 
         debug_path = save_dir / "tts_input_debug.txt"
-        debug_path.write_text("\n".join([f"{speaker}\tsynthetic_fallback\t{text}" for speaker, text in lines]), encoding="utf-8")
+        debug_path.write_text(
+            "\n".join(
+                [
+                    f"{speaker}\tsynthetic_fallback:{_voice_for_speaker(language, speaker)}\t{text}"
+                    for speaker, text in lines
+                ]
+            ),
+            encoding="utf-8",
+        )
 
         return {
             "audio_file_path": str(mp3_path),
             "mp3_path": str(mp3_path),
             "wav_path": str(wav_path),
-            "voice_map": {},
+            "voice_map": fallback_voice_map,
             "segments_json_path": str(segments_path),
             "transcript_vtt_path": str(vtt_path),
             "tts_debug_file": str(debug_path),
@@ -637,6 +762,59 @@ def load_bundle_server():
     module.STATIC_DIR = active_static_dir()
     module.DEMO_DIR = ROOT / "demo"
     module.DEMO_DIR.mkdir(parents=True, exist_ok=True)
+
+    if not getattr(module, "_embedded_naturalness_patched", False):
+        original_generate_dialogue_lines = module._generate_dialogue_lines
+
+        def _patched_generate_dialogue_lines(
+            profile: dict,
+            scenario: str,
+            core: str,
+            people: int,
+            target_len: int,
+            language: str = "中文",
+            payment_mode: bool = None,
+            context_pack: dict = None,
+        ):
+            lines, rewrite_info = original_generate_dialogue_lines(
+                profile,
+                scenario,
+                core,
+                people,
+                target_len,
+                language,
+                payment_mode,
+                context_pack,
+            )
+            try:
+                polished_lines, naturalness = polish_generated_lines(lines, language)
+                if naturalness.get("rewrite_count"):
+                    lines = polished_lines
+                    rewrite_info = dict(rewrite_info or {})
+                    rewrite_info["naturalness_applied"] = True
+                    rewrite_info["naturalness_language"] = naturalness.get("language")
+                    rewrite_info["naturalness_rewrites"] = naturalness.get("rewrite_count")
+            except Exception as exc:
+                rewrite_info = dict(rewrite_info or {})
+                rewrite_info["naturalness_error"] = f"{type(exc).__name__}:{exc}"
+            return lines, rewrite_info
+
+        module._generate_dialogue_lines = _patched_generate_dialogue_lines
+        module._embedded_naturalness_patched = True
+
+    if not getattr(module, "_embedded_generate_text_handler_patched", False):
+        def _patched_generate_text_post(self):
+            try:
+                payload = json.loads(self.request.body.decode("utf-8") or "{}")
+            except Exception as exc:
+                raise HTTPError(400, reason=f"Invalid JSON body: {exc}") from exc
+
+            response = _generate_text_payload(module, payload)
+            self.set_header("Content-Type", "application/json; charset=utf-8")
+            self.finish(json.dumps(response, ensure_ascii=False))
+
+        module.GenerateTextHandler.post = _patched_generate_text_post
+        module._embedded_generate_text_handler_patched = True
 
     _BUNDLE_SERVER = module
     return module
