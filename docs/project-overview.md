@@ -51,3 +51,7 @@
    - Web 可启动
    - 关键脚本可用
    - README 与变更说明同步更新
+
+如果当前工作涉及对外演示或把 Demo 分享给其他人使用，请同步维护：
+
+- `docs/demo-startup-sharing-guide.md`

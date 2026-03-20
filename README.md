@@ -52,6 +52,10 @@ start_demo.bat
 - `http://127.0.0.1:8899/`
 - `http://localhost:8899/`
 
+如果需要分享给其他电脑使用，请查看：
+
+- `docs/demo-startup-sharing-guide.md`
+
 ### 日常检查
 
 仓库日常检查：
@@ -74,6 +78,20 @@ GitHub Actions 中对应的工作流：
 ### 调试垃圾清理
 
 - `scripts\clean_debug_artifacts.bat`
+
+## Demo 启动、分享与排障
+
+如果你要把 Demo 分享给别人使用，推荐优先阅读：
+
+- `docs/demo-startup-sharing-guide.md`
+
+这份文档覆盖：
+
+- 一键启动方式
+- 局域网分享方式
+- 文本编辑后继续合成音频
+- 文本/音频下载
+- 防火墙、端口占用、构建包缺失等常见问题排查
 
 ## 开发流程
 
