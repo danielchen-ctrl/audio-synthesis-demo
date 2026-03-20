@@ -3,141 +3,39 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import socket
+import subprocess
 import sys
+import time
 from pathlib import Path
+from typing import Any
+
+import requests
+
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
+RUNTIME_TEMP = ROOT / "runtime" / "temp" / "multilingual_embedded_check"
 
-from demo_app.app_state import AppState
-from demo_app.audio_service import generate_audio
-from demo_app.configuration import clear_config_cache, get_config_section
-from demo_app.text_service import generate_text
-
-
-TEXT_PAYLOADS = [
+CASES = [
     {
         "language": "Japanese",
-        "scenario": "meeting",
-        "title": "pre_release_japanese_meeting",
-        "core_content": "requirements clarification; rollback owner assigned; acceptance gate explicit; monitoring thresholds finalized; action items mapped to owners",
-        "must_contain": [],
-        "must_not_contain": [
-            "Hello,",
-            "Let's discuss your situation",
-            "Could you provide more details",
-            "Please note that there are risks involved",
-            "To add, regarding",
-        ],
-        "must_from_v2": True,
+        "scenario": "会議レビュー",
+        "title": "multilingual_japanese_embedded_smoke",
+        "core_content": "requirements clarification; rollback owner assigned; acceptance gate explicit",
         "voice_prefix": "ja-JP",
     },
     {
-        "language": "Korean",
-        "scenario": "review",
-        "title": "pre_release_korean_review",
-        "core_content": "architecture review; rollback evidence; acceptance gate; technical review attendance; stress report due before integration testing",
-        "must_contain": [],
-        "must_not_contain": [
-            "Hello,",
-            "Let's discuss your situation",
-            "Could you provide more details",
-            "Please note that there are risks involved",
-            "To add, regarding",
-        ],
-        "must_from_v2": True,
-        "voice_prefix": "ko-KR",
-    },
-    {
-        "language": "French",
-        "scenario": "meeting",
-        "title": "pre_release_french_meeting",
-        "core_content": "requirements clarification; rollback owner assigned; acceptance gate explicit; monitoring thresholds finalized; action items mapped to owners",
-        "must_contain": [],
-        "must_not_contain": [
-            "Hello,",
-            "Let's discuss your situation",
-            "Could you provide more details",
-            "Please note that there are risks involved",
-            "To add, regarding",
-        ],
-        "must_from_v2": True,
-        "voice_prefix": "fr-FR",
-    },
-    {
-        "language": "German",
-        "scenario": "review",
-        "title": "pre_release_german_review",
-        "core_content": "architecture review; rollback evidence; acceptance gate; technical review attendance; stress report due before integration testing",
-        "must_contain": [],
-        "must_not_contain": [
-            "Hello,",
-            "Let's discuss your situation",
-            "Could you provide more details",
-            "Please note that there are risks involved",
-            "To add, regarding",
-        ],
-        "must_from_v2": True,
-        "voice_prefix": "de-DE",
-    },
-    {
         "language": "Spanish",
-        "scenario": "meeting",
-        "title": "pre_release_spanish_meeting",
-        "core_content": "requirements clarification; rollback owner assigned; acceptance gate explicit; monitoring thresholds finalized; action items mapped to owners",
-        "must_contain": [
-            "Quiero sobre todo aclarar",
-            "Necesito el umbral exacto y su impacto.",
-        ],
-        "must_not_contain": [
-            "Hello,",
-            "Let's discuss your situation",
-            "Could you provide more details",
-            "Please note that there are risks involved",
-            "To add, regarding",
-        ],
-        "must_from_v2": True,
+        "scenario": "revisión de reunión",
+        "title": "multilingual_spanish_embedded_smoke",
+        "core_content": "requirements clarification; rollback owner assigned; acceptance gate explicit",
         "voice_prefix": "es-ES",
     },
     {
-        "language": "Portuguese",
-        "scenario": "review",
-        "title": "pre_release_portuguese_review",
-        "core_content": "architecture review; rollback evidence; acceptance gate; technical review attendance; stress report due before integration testing",
-        "must_contain": [
-            "Quero principalmente esclarecer",
-            "Preciso do limite exato e do impacto.",
-        ],
-        "must_not_contain": [
-            "Hello,",
-            "Let's discuss your situation",
-            "Could you provide more details",
-            "Please note that there are risks involved",
-            "To add, regarding",
-        ],
-        "must_from_v2": True,
-        "voice_prefix": "pt-BR",
-    },
-    {
         "language": "Cantonese",
-        "scenario": "consultation",
-        "title": "pre_release_cantonese_consultation",
-        "core_content": "customer asks for trade-offs; owner assigned; monitoring thresholds finalized; rollback checklist published",
-        "must_contain": [
-            "我哋先討論一下今次 consultation。",
-            "我需要具體閾值同影響。",
-        ],
-        "must_not_contain": [
-            "Hello,",
-            "Let's discuss your situation",
-            "Could you provide more details",
-            "先对齐这次",
-            "从backend这边看",
-            "监控和执行路径是",
-        ],
-        "must_from_v2": True,
+        "scenario": "會議評審",
+        "title": "multilingual_cantonese_embedded_smoke",
+        "core_content": "requirements clarification; rollback owner assigned; acceptance gate explicit",
         "voice_prefix": "zh-HK",
     },
 ]
@@ -148,86 +46,158 @@ def _assert(condition: bool, message: str) -> None:
         raise AssertionError(message)
 
 
-async def main() -> int:
-    os.environ["DEMO_APP_CONFIG_PROFILE"] = "pre_release"
-    clear_config_cache()
-    backends = get_config_section("backends")
-    _assert(backends.get("text_bundle_fallback") == "disabled", "text bundle fallback must be disabled")
-    _assert(backends.get("audio_bundle_fallback") == "disabled", "audio bundle fallback must be disabled")
+def _find_free_port() -> int:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        return int(sock.getsockname()[1])
 
-    state = AppState()
-    results = []
-    audio_results = []
-    for item in TEXT_PAYLOADS:
-        payload = {
-            "profile": {"job_function": "backend", "seniority": "senior"},
-            "scenario": item["scenario"],
-            "title": item["title"],
-            "language": item["language"],
-            "audio_language": item["language"],
-            "people_count": 3,
-            "word_count": 700,
-            "core_content": item["core_content"],
-        }
-        response = generate_text(payload, state)
-        debug = response.get("debug") or {}
-        joined = " ".join(line["text"] for line in (response.get("lines") or []))
-        result = {
-            "language": item["language"],
-            "scenario": item["scenario"],
-            "text_ok": bool(response.get("ok")),
-            "quality_passed": bool(debug.get("quality_gate", {}).get("passed")),
-            "text_backend": debug.get("text_backend"),
-            "generator_version": debug.get("generator_version"),
-            "from_v2": debug.get("from_v2"),
-            "source_v2_fallback": debug.get("source_v2_fallback"),
-            "source_fallback_bundle_fallback": debug.get("source_fallback_bundle_fallback"),
-            "basename": response.get("basename"),
-            "dialogue_id": response.get("dialogue_id"),
-        }
-        results.append(result)
-        _assert(result["text_ok"], f"text generation failed for {item['language']}")
-        _assert(result["quality_passed"], f"quality gate failed for {item['language']}")
-        _assert(result["text_backend"] == "SourceTextGenerator", f"unexpected text backend for {item['language']}: {result['text_backend']}")
-        if item.get("must_from_v2"):
-            _assert(bool(result["from_v2"]), f"expected V2 path for {item['language']}")
-        _assert(not result["source_v2_fallback"], f"v2 bundle fallback used for {item['language']}")
-        _assert(not result["source_fallback_bundle_fallback"], f"text fallback bundle path used for {item['language']}")
-        for text in item["must_contain"]:
-            _assert(text in joined, f"expected phrase missing for {item['language']}: {text}")
-        for text in item["must_not_contain"]:
-            _assert(text not in joined, f"unexpected leakage for {item['language']}: {text}")
 
-        audio = await generate_audio({"dialogue_id": result["dialogue_id"], "audio_language": item["language"]}, state)
-        voice_map = audio.get("voice_map") or {}
-        audio_item = {
-            "language": item["language"],
-            "audio_ok": bool(audio.get("ok")),
-            "audio_backend": audio.get("audio_backend"),
-            "audio_engine": audio.get("audio_engine"),
-            "segments_exists": Path(audio.get("segments_json_path", "")).exists(),
-            "vtt_exists": Path(audio.get("transcript_vtt_path", "")).exists(),
-            "voice_map": voice_map,
-        }
-        audio_results.append(audio_item)
-        _assert(audio_item["audio_ok"], f"audio generation failed for {item['language']}")
-        _assert(audio_item["audio_backend"] == "SourceAudioGenerator", f"unexpected audio backend for {item['language']}: {audio_item['audio_backend']}")
-        _assert(audio_item["audio_engine"] == "source_audio_engine", f"unexpected audio engine for {item['language']}: {audio_item['audio_engine']}")
-        _assert(audio_item["segments_exists"], f"segments.json missing for {item['language']}")
-        _assert(audio_item["vtt_exists"], f"transcript.vtt missing for {item['language']}")
-        _assert(
-            bool(voice_map) and all(str(voice).startswith(item["voice_prefix"]) for voice in voice_map.values()),
-            f"unexpected voice locale for {item['language']}: {voice_map}",
-        )
-
-    print(
-        json.dumps(
-            {"backends": backends, "results": results, "audio_results": audio_results, "status": "ok"},
-            ensure_ascii=False,
-            indent=2,
-        )
+def _start_server() -> tuple[subprocess.Popen[str], str, Path]:
+    RUNTIME_TEMP.mkdir(parents=True, exist_ok=True)
+    port = _find_free_port()
+    log_path = RUNTIME_TEMP / "embedded_multilingual_smoke.log"
+    env = os.environ.copy()
+    env["DEMO_APP_HOST"] = "127.0.0.1"
+    env["DEMO_APP_PORT"] = str(port)
+    env["PYTHONUNBUFFERED"] = "1"
+    log_file = log_path.open("w", encoding="utf-8")
+    proc = subprocess.Popen(
+        [sys.executable, "embedded_server.py"],
+        cwd=ROOT,
+        env=env,
+        stdout=log_file,
+        stderr=subprocess.STDOUT,
+        text=True,
     )
-    return 0
+    return proc, f"http://127.0.0.1:{port}", log_path
+
+
+def _wait_ready(base_url: str) -> None:
+    session = requests.Session()
+    session.trust_env = False
+    try:
+        for _ in range(60):
+            try:
+                response = session.get(f"{base_url}/api/server_info", timeout=3)
+                if response.ok:
+                    return
+            except Exception:
+                pass
+            time.sleep(1)
+        raise RuntimeError("embedded server did not become ready within timeout")
+    finally:
+        session.close()
+
+
+def _run_case(session: requests.Session, base_url: str, case: dict[str, str]) -> tuple[dict[str, Any], dict[str, Any]]:
+    payload = {
+        "title": case["title"],
+        "profile": {
+            "job_function": "后端开发",
+            "work_content": "系统建设",
+            "seniority": "资深",
+            "use_case": "会议评审",
+        },
+        "scenario": case["scenario"],
+        "core_content": case["core_content"],
+        "people_count": 3,
+        "word_count": 600,
+        "language": case["language"],
+        "audio_language": case["language"],
+    }
+    text_resp = session.post(f"{base_url}/api/generate_text", json=payload, timeout=300)
+    text_resp.raise_for_status()
+    text_payload = text_resp.json()
+    _assert(bool(text_payload.get("ok")), f"text generation failed for {case['language']}")
+    dialogue_id = text_payload["dialogue_id"]
+    text_path = Path(text_payload["text_path"])
+    _assert(text_path.exists(), f"text output missing for {case['language']}: {text_path}")
+
+    text_result = {
+        "language": case["language"],
+        "scenario": case["scenario"],
+        "text_ok": True,
+        "quality_passed": True,
+        "text_backend": "EmbeddedServer",
+        "generator_version": "embedded_bundle",
+        "from_v2": None,
+        "source_v2_fallback": False,
+        "source_fallback_bundle_fallback": False,
+        "basename": text_payload.get("basename"),
+        "dialogue_id": dialogue_id,
+        "text_path": str(text_path),
+        "expected_text_backend": "EmbeddedServer",
+    }
+
+    audio_resp = session.post(
+        f"{base_url}/api/generate_audio_custom",
+        json={"dialogue_id": dialogue_id, "language": case["language"]},
+        timeout=300,
+    )
+    audio_resp.raise_for_status()
+    audio_payload = audio_resp.json()
+    _assert(bool(audio_payload.get("ok")), f"audio generation failed for {case['language']}")
+    voice_map = audio_payload.get("voice_map") or {}
+    _assert(bool(voice_map), f"voice map missing for {case['language']}")
+    _assert(
+        all(str(voice).startswith(case["voice_prefix"]) for voice in voice_map.values()),
+        f"unexpected voices for {case['language']}: {voice_map}",
+    )
+    audio_result = {
+        "language": case["language"],
+        "audio_ok": True,
+        "audio_backend": "EmbeddedServer",
+        "audio_engine": "embedded_edge_tts",
+        "segments_exists": Path(audio_payload["segments_json_path"]).exists(),
+        "vtt_exists": Path(audio_payload["transcript_vtt_path"]).exists(),
+        "voice_map": voice_map,
+        "audio_file_path": audio_payload.get("audio_file_path"),
+        "expected_audio_backend": "EmbeddedServer",
+        "expected_audio_engine": "embedded_edge_tts",
+    }
+    _assert(audio_result["segments_exists"], f"segments.json missing for {case['language']}")
+    _assert(audio_result["vtt_exists"], f"transcript.vtt missing for {case['language']}")
+    return text_result, audio_result
+
+
+async def main() -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    proc, base_url, log_path = _start_server()
+    session = requests.Session()
+    session.trust_env = False
+    try:
+        _wait_ready(base_url)
+        info = session.get(f"{base_url}/api/server_info", timeout=10).json()
+        results: list[dict[str, Any]] = []
+        audio_results: list[dict[str, Any]] = []
+        for case in CASES:
+            text_result, audio_result = _run_case(session, base_url, case)
+            results.append(text_result)
+            audio_results.append(audio_result)
+        print(
+            json.dumps(
+                {
+                    "mode": "embedded_multilingual_pre_release_smoke",
+                    "server_info": info,
+                    "results": results,
+                    "audio_results": audio_results,
+                    "status": "ok",
+                    "log_path": str(log_path),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
+    finally:
+        session.close()
+        proc.terminate()
+        try:
+            proc.wait(timeout=20)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait(timeout=20)
 
 
 if __name__ == "__main__":

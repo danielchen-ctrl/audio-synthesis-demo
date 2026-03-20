@@ -66,6 +66,17 @@ start_demo.bat
 
 - `scripts\run_multilingual_quality_checks.bat`
 
+执行后会固定产出：
+
+- `reports/multilingual_quality_checks/latest.json`
+- `reports/multilingual_quality_checks/latest.md`
+
+报告中包含：
+
+- 总体状态与检查摘要
+- 失败摘要（按语言 / 场景 / 组件拆分）
+- 建议动作（便于人工排查和后续自动化消费）
+
 发布前门禁检查：
 
 - `python scripts/run_pre_release_ci_gate.py`

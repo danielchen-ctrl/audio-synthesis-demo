@@ -47,7 +47,13 @@
 4. 日常先运行：
    - `scripts\run_repo_daily_check.bat`
    - `scripts\run_multilingual_quality_checks.bat`
-5. 发布前确认：
+5. 多语言质量报告固定查看：
+   - `reports/multilingual_quality_checks/latest.json`
+   - `reports/multilingual_quality_checks/latest.md`
+6. 如果质量检查失败，优先查看：
+   - `failure_summary`
+   - `suggested_actions`
+7. 发布前确认：
    - Web 可启动
    - 关键脚本可用
    - README 与变更说明同步更新

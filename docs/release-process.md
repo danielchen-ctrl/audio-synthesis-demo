@@ -56,6 +56,18 @@ scripts/release_tag.ps1 v0.1.0
 - `reports/pre_release_gate/latest.md`
 - `reports/multilingual_quality_checks/latest.md`
 
+其中多语言质量报告建议重点检查：
+
+- `summary`
+- `failure_summary`
+- `suggested_actions`
+
+这样在 release note 里可以明确说明：
+
+- 哪些语言 / 场景已通过
+- 是否存在失败摘要
+- 发布前还需要补哪些动作
+
 ## 如何回滚到历史版本
 
 推荐方式：
