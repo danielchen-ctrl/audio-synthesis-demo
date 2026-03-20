@@ -430,12 +430,19 @@ class JsonHandler(RequestHandler):
 class ServerInfoHandler(JsonHandler):
     def get(self) -> None:
         port = self.request.connection.stream.socket.getsockname()[1]
+        urls = local_urls(port)
+        preferred_share_url = next(
+            (item for item in urls if "127.0.0.1" not in item and "localhost" not in item),
+            urls[0] if urls else f"http://127.0.0.1:{port}/",
+        )
         self.write_json(
             {
                 "ok": True,
                 "listen_host": os.environ.get("DEMO_APP_HOST", "0.0.0.0"),
                 "port": port,
-                "local_urls": local_urls(port),
+                "local_urls": urls,
+                "localhost_url": f"http://127.0.0.1:{port}/",
+                "preferred_share_url": preferred_share_url,
                 "share_hint": "同一局域网内的其他电脑可通过上面的 IP 地址访问。如果访问失败，先放行 Windows 防火墙的 8899 端口。",
             }
         )

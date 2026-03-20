@@ -1,4 +1,4 @@
-﻿const STORAGE_KEY = "demo_app_web_state_v2";
+const STORAGE_KEY = "demo_app_web_state_v3";
 
 const profileOptions = {
   job_function: ["后端开发", "产品经理", "运营管理", "零售行业", "金融服务", "法律服务", "医疗健康", "人工智能/科技", "其他"],
@@ -10,13 +10,19 @@ const profileOptions = {
 const state = {
   dialogueId: "",
   originalDialogueText: "",
+  audioSourceText: "",
   textPath: "",
   audioPath: "",
+  textSavedAt: "",
+  audioSavedAt: "",
   serverInfo: null,
   progressTimer: null
 };
 
 const el = {
+  sharePrimaryLink: document.getElementById("sharePrimaryLink"),
+  copyShareBtn: document.getElementById("copyShareBtn"),
+  shareHint: document.getElementById("shareHint"),
   serverInfo: document.getElementById("serverInfo"),
   jobFunction: document.getElementById("jobFunction"),
   workContent: document.getElementById("workContent"),
@@ -34,7 +40,15 @@ const el = {
   progressFill: document.getElementById("progressFill"),
   progressText: document.getElementById("progressText"),
   outputMeta: document.getElementById("outputMeta"),
-  dialogueEditor: document.getElementById("dialogueEditor")
+  dialogueEditor: document.getElementById("dialogueEditor"),
+  editStatus: document.getElementById("editStatus"),
+  editHint: document.getElementById("editHint"),
+  audioStatus: document.getElementById("audioStatus"),
+  audioHint: document.getElementById("audioHint"),
+  textArtifactName: document.getElementById("textArtifactName"),
+  textArtifactMeta: document.getElementById("textArtifactMeta"),
+  audioArtifactName: document.getElementById("audioArtifactName"),
+  audioArtifactMeta: document.getElementById("audioArtifactMeta")
 };
 
 function fillSelect(selectEl, options) {
@@ -63,6 +77,43 @@ function initProfileOptions() {
   }
 }
 
+function normalizeText(value) {
+  return String(value || "").replace(/\r\n/g, "\n").trim();
+}
+
+function currentDialogueText() {
+  return normalizeText(el.dialogueEditor.value);
+}
+
+function hasUnsavedDialogueEdits() {
+  return Boolean(state.dialogueId) && currentDialogueText() !== normalizeText(state.originalDialogueText);
+}
+
+function isAudioOutdated() {
+  if (!state.dialogueId) return false;
+  if (!state.audioPath) return false;
+  return currentDialogueText() !== normalizeText(state.audioSourceText);
+}
+
+function basenameFromPath(filePath) {
+  if (!filePath) return "";
+  const normalized = String(filePath).replace(/\\/g, "/");
+  const parts = normalized.split("/");
+  return parts[parts.length - 1] || "";
+}
+
+function formatTimestamp(isoString) {
+  if (!isoString) return "未记录时间";
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return isoString;
+  return date.toLocaleString("zh-CN", { hour12: false });
+}
+
+function buildDownloadUrl(kind) {
+  if (!state.dialogueId) return "";
+  return `/api/download?dialogue_id=${encodeURIComponent(state.dialogueId)}&kind=${kind}&t=${Date.now()}`;
+}
+
 function startProgress(message) {
   clearInterval(state.progressTimer);
   let progress = 0;
@@ -84,7 +135,7 @@ function finishProgress(message) {
 }
 
 function setMeta(message, isError = false) {
-  el.outputMeta.style.color = isError ? "#c5221f" : "";
+  el.outputMeta.classList.toggle("is-error", Boolean(isError));
   el.outputMeta.textContent = message;
 }
 
@@ -103,17 +154,64 @@ function persistState() {
     dialogueId: state.dialogueId,
     originalDialogueText: state.originalDialogueText,
     currentDialogueText: el.dialogueEditor.value,
+    audioSourceText: state.audioSourceText,
     textPath: state.textPath,
-    audioPath: state.audioPath
+    audioPath: state.audioPath,
+    textSavedAt: state.textSavedAt,
+    audioSavedAt: state.audioSavedAt
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
 }
 
 function syncActionButtons() {
-  const hasDialogue = Boolean(state.dialogueId && el.dialogueEditor.value.trim());
+  const hasDialogue = Boolean(state.dialogueId && currentDialogueText());
   el.generateAudioBtn.disabled = !hasDialogue;
   el.downloadTextBtn.disabled = !hasDialogue;
-  el.downloadAudioBtn.disabled = !Boolean(state.dialogueId && state.audioPath);
+  el.downloadAudioBtn.disabled = !hasDialogue;
+}
+
+function syncStatusPanels() {
+  if (!state.dialogueId) {
+    el.editStatus.textContent = "未生成文本";
+    el.editHint.textContent = "先生成一段对话，再在下方编辑。";
+    el.audioStatus.textContent = "未生成音频";
+    el.audioHint.textContent = "文本生成后即可合成或下载音频。";
+  } else if (hasUnsavedDialogueEdits()) {
+    el.editStatus.textContent = "文本已修改，尚未保存";
+    el.editHint.textContent = "点击“下载文本”会先保存；点击“生成 mp3 音频”会先保存并基于当前内容合成。";
+    el.audioStatus.textContent = state.audioPath ? "音频不是最新版本" : "还没有音频文件";
+    el.audioHint.textContent = "当前文本与已保存/已合成版本不一致，继续下载音频会自动重新生成。";
+  } else {
+    el.editStatus.textContent = state.textPath ? "文本已保存，可直接分享或下载" : "文本已生成";
+    el.editHint.textContent = state.textPath
+      ? `当前文本文件：${basenameFromPath(state.textPath)}`
+      : "可继续修改文本，再重新合成音频。";
+    if (!state.audioPath) {
+      el.audioStatus.textContent = "还没有音频文件";
+      el.audioHint.textContent = "点击“生成 mp3 音频”或“下载音频”即可生成。";
+    } else if (isAudioOutdated()) {
+      el.audioStatus.textContent = "音频不是最新版本";
+      el.audioHint.textContent = "文本最近已更新，下载音频时会自动重新生成。";
+    } else {
+      el.audioStatus.textContent = "音频已同步，可直接下载";
+      el.audioHint.textContent = `当前音频文件：${basenameFromPath(state.audioPath)}`;
+    }
+  }
+
+  el.textArtifactName.textContent = state.textPath ? basenameFromPath(state.textPath) : "未生成";
+  el.textArtifactMeta.textContent = state.textPath
+    ? `最近保存：${formatTimestamp(state.textSavedAt)}`
+    : "生成文本后会显示文件名与保存时间。";
+
+  el.audioArtifactName.textContent = state.audioPath ? basenameFromPath(state.audioPath) : "未生成";
+  el.audioArtifactMeta.textContent = state.audioPath
+    ? `最近更新：${formatTimestamp(state.audioSavedAt)}`
+    : "生成音频后会显示文件名与更新时间。";
+}
+
+function refreshUi() {
+  syncActionButtons();
+  syncStatusPanels();
 }
 
 function restoreState() {
@@ -131,10 +229,13 @@ function restoreState() {
     el.wordCount.value = cached.wordCount || "1000";
     state.dialogueId = cached.dialogueId || "";
     state.originalDialogueText = cached.originalDialogueText || "";
+    state.audioSourceText = cached.audioSourceText || "";
     state.textPath = cached.textPath || "";
     state.audioPath = cached.audioPath || "";
+    state.textSavedAt = cached.textSavedAt || "";
+    state.audioSavedAt = cached.audioSavedAt || "";
     el.dialogueEditor.value = cached.currentDialogueText || "";
-    syncActionButtons();
+    refreshUi();
   } catch (error) {
     console.warn("恢复缓存失败", error);
   }
@@ -168,21 +269,61 @@ async function fetchJson(url, options = {}) {
   return payload;
 }
 
+function renderShareBox(payload) {
+  const preferred = payload.preferred_share_url || payload.local_urls?.[0] || "";
+  state.serverInfo = payload;
+  el.sharePrimaryLink.textContent = preferred || "未获取到可分享地址";
+  el.sharePrimaryLink.href = preferred || "#";
+  el.copyShareBtn.disabled = !preferred;
+  el.shareHint.textContent = payload.share_hint || "可把局域网地址发给同一网络中的其他电脑使用。";
+
+  const otherLinks = (payload.local_urls || []).filter((item) => item !== preferred);
+  el.serverInfo.innerHTML = otherLinks.length
+    ? otherLinks.map((url) => `<a href="${url}" target="_blank" rel="noreferrer">${url}</a>`).join("")
+    : `<span>本机地址：${payload.localhost_url || "未提供"}</span>`;
+}
+
 async function loadServerInfo() {
   try {
     const payload = await fetchJson("/api/server_info");
-    state.serverInfo = payload;
-    el.serverInfo.innerHTML = payload.local_urls
-      .map((url) => `<a href="${url}" target="_blank" rel="noreferrer">${url}</a>`)
-      .join("");
+    renderShareBox(payload);
   } catch (error) {
-    el.serverInfo.textContent = `获取访问地址失败: ${error.message}`;
+    el.sharePrimaryLink.textContent = "获取访问地址失败";
+    el.sharePrimaryLink.href = "#";
+    el.shareHint.textContent = `获取访问地址失败：${error.message}`;
+    el.serverInfo.textContent = "请确认服务已正常启动。";
   }
+}
+
+async function copyShareLink() {
+  const link = state.serverInfo?.preferred_share_url || "";
+  if (!link) return;
+  try {
+    await navigator.clipboard.writeText(link);
+    setMeta(`已复制分享链接：${link}`);
+  } catch (error) {
+    setMeta(`复制失败，请手动复制：${link}`, true);
+  }
+}
+
+function applyTextPayload(payload, source = "generate") {
+  state.dialogueId = payload.dialogue_id || state.dialogueId;
+  state.originalDialogueText = payload.dialogue_text || payload.text || "";
+  state.textPath = payload.text_path || state.textPath;
+  state.textSavedAt = payload.saved_at || new Date().toISOString();
+  if (source === "generate") {
+    state.audioPath = "";
+    state.audioSavedAt = "";
+    state.audioSourceText = "";
+  }
+  el.dialogueEditor.value = state.originalDialogueText;
+  persistState();
+  refreshUi();
 }
 
 async function saveEditedDialogue() {
   if (!state.dialogueId) return null;
-  const dialogueText = el.dialogueEditor.value.trim();
+  const dialogueText = currentDialogueText();
   if (!dialogueText) {
     throw new Error("当前对话文本为空，无法保存");
   }
@@ -194,12 +335,16 @@ async function saveEditedDialogue() {
       dialogue_text: dialogueText
     })
   });
-  state.originalDialogueText = payload.dialogue_text;
-  state.textPath = payload.text_path;
-  el.dialogueEditor.value = payload.dialogue_text;
-  persistState();
-  syncActionButtons();
+  applyTextPayload(payload, "save");
   return payload;
+}
+
+function applyAudioPayload(payload) {
+  state.audioPath = payload.audio_file_path || payload.mp3_path || payload.wav_path || "";
+  state.audioSavedAt = payload.generated_at || new Date().toISOString();
+  state.audioSourceText = currentDialogueText();
+  persistState();
+  refreshUi();
 }
 
 async function generateText() {
@@ -211,14 +356,8 @@ async function generateText() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(buildGenerateTextPayload())
     });
-    state.dialogueId = payload.dialogue_id;
-    state.originalDialogueText = payload.dialogue_text || payload.text || "";
-    state.textPath = payload.text_path || "";
-    state.audioPath = "";
-    el.dialogueEditor.value = state.originalDialogueText;
-    syncActionButtons();
-    persistState();
-    setMeta(`文本已生成：${state.textPath}`);
+    applyTextPayload(payload, "generate");
+    setMeta(`文本已生成：${basenameFromPath(state.textPath) || state.textPath}`);
     finishProgress("文本生成完成");
   } catch (error) {
     setMeta(`文本生成失败：${error.message}`, true);
@@ -239,13 +378,11 @@ async function generateAudio() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         dialogue_id: state.dialogueId,
-        dialogue_text: el.dialogueEditor.value
+        dialogue_text: currentDialogueText()
       })
     });
-    state.audioPath = payload.audio_file_path || payload.mp3_path || payload.wav_path || "";
-    syncActionButtons();
-    persistState();
-    setMeta(`音频已生成：${state.audioPath}`);
+    applyAudioPayload(payload);
+    setMeta(`音频已生成：${basenameFromPath(state.audioPath) || state.audioPath}`);
     finishProgress("音频生成完成");
   } catch (error) {
     setMeta(`音频生成失败：${error.message}`, true);
@@ -260,7 +397,8 @@ async function downloadText() {
   try {
     startProgress("保存文本后准备下载...");
     await saveEditedDialogue();
-    window.location.href = `/api/download?dialogue_id=${encodeURIComponent(state.dialogueId)}&kind=text&t=${Date.now()}`;
+    window.location.href = buildDownloadUrl("text");
+    setMeta(`正在下载文本：${basenameFromPath(state.textPath) || "最新文本"}`);
     finishProgress("文本下载开始");
   } catch (error) {
     setMeta(`文本下载失败：${error.message}`, true);
@@ -271,13 +409,14 @@ async function downloadText() {
 async function downloadAudio() {
   if (!state.dialogueId) return;
   try {
-    if (!state.audioPath || el.dialogueEditor.value.trim() !== state.originalDialogueText.trim()) {
+    if (!state.audioPath || isAudioOutdated()) {
       await generateAudio();
     }
     if (!state.audioPath) {
       throw new Error("当前还没有可下载的音频文件");
     }
-    window.location.href = `/api/download?dialogue_id=${encodeURIComponent(state.dialogueId)}&kind=audio&t=${Date.now()}`;
+    window.location.href = buildDownloadUrl("audio");
+    setMeta(`正在下载音频：${basenameFromPath(state.audioPath) || "最新音频"}`);
   } catch (error) {
     setMeta(`音频下载失败：${error.message}`, true);
   }
@@ -287,8 +426,11 @@ function resetAll() {
   localStorage.removeItem(STORAGE_KEY);
   state.dialogueId = "";
   state.originalDialogueText = "";
+  state.audioSourceText = "";
   state.textPath = "";
   state.audioPath = "";
+  state.textSavedAt = "";
+  state.audioSavedAt = "";
   el.jobFunction.selectedIndex = 0;
   el.workContent.selectedIndex = 0;
   el.seniority.selectedIndex = 0;
@@ -299,7 +441,7 @@ function resetAll() {
   el.peopleCount.value = "3";
   el.dialogueEditor.value = "";
   setMeta("已重置");
-  syncActionButtons();
+  refreshUi();
 }
 
 function bindEvents() {
@@ -314,17 +456,22 @@ function bindEvents() {
     el.wordCount,
     el.dialogueEditor
   ].forEach((node) => {
-    node.addEventListener("input", persistState);
-    node.addEventListener("change", persistState);
+    node.addEventListener("input", () => {
+      persistState();
+      refreshUi();
+    });
+    node.addEventListener("change", () => {
+      persistState();
+      refreshUi();
+    });
   });
-
-  el.dialogueEditor.addEventListener("input", syncActionButtons);
 
   el.generateTextBtn.addEventListener("click", generateText);
   el.generateAudioBtn.addEventListener("click", generateAudio);
   el.downloadTextBtn.addEventListener("click", downloadText);
   el.downloadAudioBtn.addEventListener("click", downloadAudio);
   el.resetBtn.addEventListener("click", resetAll);
+  el.copyShareBtn.addEventListener("click", copyShareLink);
 }
 
 function init() {
@@ -332,7 +479,7 @@ function init() {
   restoreState();
   bindEvents();
   loadServerInfo();
-  syncActionButtons();
+  refreshUi();
 }
 
 init();

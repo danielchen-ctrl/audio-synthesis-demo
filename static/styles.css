@@ -66,10 +66,50 @@ body {
   margin-bottom: 10px;
 }
 
+.share-primary-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.share-primary-link {
+  flex: 1;
+  display: inline-block;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--primary);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.share-copy-btn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+}
+
+.share-hint {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
 .share-links a {
   display: block;
   color: var(--primary);
   margin-bottom: 6px;
+  word-break: break-all;
+}
+
+.share-links span {
+  display: block;
+  color: var(--muted);
   word-break: break-all;
 }
 
@@ -173,6 +213,10 @@ button.secondary {
   line-height: 1.6;
 }
 
+.output-meta.is-error {
+  color: #c5221f;
+}
+
 .editor-header {
   display: flex;
   justify-content: space-between;
@@ -184,13 +228,53 @@ button.secondary {
   margin-bottom: 14px;
 }
 
+.status-grid,
+.artifact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.status-card,
+.artifact-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  background: #fbfcff;
+}
+
+.status-label,
+.artifact-title {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.status-value,
+.artifact-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.status-hint,
+.artifact-meta {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
+  word-break: break-word;
+}
+
 @media (max-width: 900px) {
   .hero {
     flex-direction: column;
   }
 
   .grid,
-  .grid.compact {
+  .grid.compact,
+  .status-grid,
+  .artifact-grid {
     grid-template-columns: 1fr;
   }
 
@@ -210,5 +294,10 @@ button.secondary {
   .editor-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .share-primary-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
