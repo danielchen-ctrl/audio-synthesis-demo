@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>场景对话 Demo</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <div>
+          <h1>场景对话 Demo</h1>
+          <p>生成对话文本，手动修改后继续合成音频，并支持远程下载文本与音频。</p>
+        </div>
+        <div class="share-box">
+          <div class="share-title">局域网访问地址</div>
+          <div id="serverInfo" class="share-links">加载中...</div>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2>人物画像</h2>
+        <div class="grid">
+          <label class="field">
+            <span>职业</span>
+            <select id="jobFunction"></select>
+          </label>
+          <label class="field">
+            <span>工作内容</span>
+            <select id="workContent"></select>
+          </label>
+          <label class="field">
+            <span>职级</span>
+            <select id="seniority"></select>
+          </label>
+          <label class="field">
+            <span>使用场景</span>
+            <select id="useCase"></select>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>对话设置</h2>
+        <div class="field">
+          <span>场景说明</span>
+          <textarea id="scenario" rows="4" placeholder="例如：会议评审、客户访谈、项目复盘"></textarea>
+        </div>
+        <div class="field">
+          <span>对话核心内容</span>
+          <textarea id="coreContent" rows="4" placeholder="请输入需要重点覆盖的内容"></textarea>
+        </div>
+        <div class="grid compact">
+          <label class="field">
+            <span>人物数量（含 Owner）</span>
+            <select id="peopleCount"></select>
+          </label>
+          <label class="field">
+            <span>字数限制</span>
+            <input id="wordCount" type="number" min="100" max="3000" value="1000" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="actions">
+          <button id="generateTextBtn" class="primary">生成场景对话文本</button>
+          <button id="generateAudioBtn" class="primary" disabled>生成 mp3 音频</button>
+          <button id="downloadTextBtn" class="secondary" disabled>下载文本</button>
+          <button id="downloadAudioBtn" class="secondary" disabled>下载音频</button>
+          <button id="resetBtn" class="secondary">重置</button>
+        </div>
+        <div class="progress-bar">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div id="progressText" class="progress-text">等待开始</div>
+        <div id="outputMeta" class="output-meta"></div>
+      </section>
+
+      <section class="card">
+        <div class="editor-header">
+          <h2>生成结果</h2>
+          <div class="hint">可直接修改文本。点击“生成 mp3 音频”时，会优先使用当前编辑内容。</div>
+        </div>
+        <textarea id="dialogueEditor" class="dialogue-editor" placeholder="生成后的对话会显示在这里，可手动修改"></textarea>
+      </section>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

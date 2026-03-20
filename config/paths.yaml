@@ -1,0 +1,16 @@
+﻿paths:
+  static_dir: src/demo_app/assets/static
+  audio_assets_dir: src/demo_app/assets/audio
+  template_bank_dir: src/demo_app/assets/template_bank
+  template_data_pack_dir: src/demo_app/assets/template_data_pack
+  domain_kb_dir: src/demo_app/domains/domain_kb
+  payment_dir: src/demo_app/domains/payment
+  quality_upgrade_dir: src/demo_app/domains/quality_upgrade
+  demo_dir: demo
+  reports_dir: reports
+  output_dir: output
+  logs_dir: runtime/logs
+  cache_dir: runtime/cache
+  temp_dir: runtime/temp
+  autogate_config: .autogate/autogate_config.json
+  ffmpeg_dir: bin

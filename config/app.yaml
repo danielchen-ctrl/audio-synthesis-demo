@@ -1,0 +1,7 @@
+﻿app:
+  name: demo_app
+  host: 127.0.0.1
+  port: 8899
+  gui_title: Scene Dialogue Demo
+  gui_width: 1200
+  gui_height: 860

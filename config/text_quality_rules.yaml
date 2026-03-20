@@ -1,0 +1,881 @@
+persona_rules:
+  QA:
+    keywords:
+      zh:
+      - 验证
+      - 验收
+      - 准入
+      - 阻断
+      - No-Go
+      - 必须
+      - 强制
+      en:
+      - validate
+      - validation
+      - acceptance
+      - entry criteria
+      - block
+      - no-go
+      - must
+      ja:
+      - 検証
+      - 受け入れ
+      - 基準
+      - No-Go
+      - ブロック
+      - 必須
+      - フォールバック
+      ko:
+      - 검증
+      - 수용
+      - 기준
+      - 차단
+      - no-go
+      - 반드시
+      - 폴백
+      fr:
+      - validation
+      - acceptation
+      - critères d'entrée
+      - blocage
+      - no-go
+      - obligatoire
+      - repli
+      de:
+      - validierung
+      - abnahme
+      - eingangskriterien
+      - block
+      - no-go
+      - muss
+      - fallback
+      es:
+      - validación
+      - aceptación
+      - criterios de entrada
+      - bloqueo
+      - no-go
+      - obligatorio
+      - fallback
+      - qa
+      pt:
+      - validação
+      - aceitação
+      - critérios de entrada
+      - bloqueio
+      - no-go
+      - obrigatório
+      - fallback
+      - qa
+      yue:
+      - 驗證
+      - 驗收
+      - 準入
+      - 阻擋
+      - No-Go
+      - 一定
+    min_keyword_count: 2
+  PM:
+    keywords:
+      zh:
+      - 进度
+      - 体验
+      - 目标
+      - 权衡
+      - 优先级
+      en:
+      - schedule
+      - timeline
+      - goal
+      - trade-off
+      - priority
+      - experience
+      ja:
+      - 進捗
+      - 期限
+      - 目標
+      - 優先度
+      - トレードオフ
+      - スケジュール
+      ko:
+      - 일정
+      - 타임라인
+      - 목표
+      - 우선순위
+      - 트레이드오프
+      - 일정 압박
+      fr:
+      - calendrier
+      - délai
+      - objectif
+      - priorité
+      - arbitrage
+      de:
+      - zeitplan
+      - frist
+      - ziel
+      - priorität
+      - abwägung
+      - zeitdruck
+      es:
+      - calendario
+      - plazo
+      - objetivo
+      - prioridad
+      - entrega
+      pt:
+      - cronograma
+      - prazo
+      - objetivo
+      - prioridade
+      - entrega
+      yue:
+      - 進度
+      - 時間表
+      - 目標
+      - 優先級
+      - 交付
+    min_keyword_count: 1
+  Backend:
+    keywords:
+      zh:
+      - 成本
+      - 复杂度
+      - 实现
+      - 技术
+      - 架构
+      - 回滚
+      - 风险
+      en:
+      - cost
+      - complexity
+      - implementation
+      - technical
+      - architecture
+      - rollback
+      - risk
+      ja:
+      - コスト
+      - 複雑
+      - 実装
+      - 技術
+      - アーキテクチャ
+      - ロールバック
+      - リスク
+      ko:
+      - 비용
+      - 복잡도
+      - 구현
+      - 기술
+      - 아키텍처
+      - 롤백
+      - 리스크
+      fr:
+      - coût
+      - complexité
+      - implémentation
+      - technique
+      - architecture
+      - rollback
+      - risque
+      de:
+      - kosten
+      - komplexität
+      - implementierung
+      - technisch
+      - architektur
+      - rollback
+      - risiko
+      es:
+      - coste
+      - complejidad
+      - implementación
+      - técnico
+      - arquitectura
+      - rollback
+      - riesgo
+      pt:
+      - custo
+      - complexidade
+      - implementação
+      - técnico
+      - arquitetura
+      - rollback
+      - risco
+      yue:
+      - 成本
+      - 複雜度
+      - 實現
+      - 技術
+      - 架構
+      - 回滾
+      - 風險
+    min_keyword_count: 1
+    must_raise_concern: true
+    concern_keywords:
+      zh:
+      - 成本
+      - 复杂度
+      - 不可行
+      - 困难
+      - 风险
+      - 问题
+      - 但是
+      - 不过
+      - 回滚
+      en:
+      - cost
+      - complex
+      - not feasible
+      - difficult
+      - risk
+      - issue
+      - however
+      - but
+      - cannot
+      - can't
+      - rollback
+      ja:
+      - コスト
+      - 困難
+      - リスク
+      - 問題
+      - しかし
+      - ただ
+      - ロールバック
+      ko:
+      - 비용
+      - 어렵
+      - 리스크
+      - 문제
+      - 하지만
+      - 그러나
+      - 롤백
+      fr:
+      - coût
+      - difficile
+      - risque
+      - problème
+      - mais
+      - cependant
+      - rollback
+      de:
+      - kosten
+      - schwierig
+      - risiko
+      - problem
+      - aber
+      - jedoch
+      - rollback
+      es:
+      - coste
+      - difícil
+      - riesgo
+      - problema
+      - pero
+      - sin embargo
+      - rollback
+      pt:
+      - custo
+      - difícil
+      - risco
+      - problema
+      - mas
+      - porém
+      - rollback
+      yue:
+      - 成本
+      - 困難
+      - 風險
+      - 問題
+      - 但係
+      - 不過
+      - 回滾
+  Client:
+    keywords:
+      zh:
+      - 交互
+      - 体验
+      - 提示
+      - 状态
+      - 用户
+      en:
+      - interaction
+      - experience
+      - status
+      - user
+      - prompt
+      ja:
+      - 操作
+      - 体験
+      - 表示
+      - 状態
+      - ユーザー
+      ko:
+      - 사용자
+      - 경험
+      - 상태
+      - 안내
+      - 인터랙션
+      fr:
+      - interaction
+      - expérience
+      - statut
+      - utilisateur
+      - message
+      de:
+      - interaktion
+      - erlebnis
+      - status
+      - nutzer
+      - hinweis
+      es:
+      - usuario
+      - experiencia
+      - estado
+      - mensaje
+      - interacción
+      pt:
+      - usuário
+      - experiência
+      - estado
+      - mensagem
+      - interação
+      yue:
+      - 用戶
+      - 體驗
+      - 狀態
+      - 提示
+      - 互動
+    min_keyword_count: 1
+  Ops:
+    keywords:
+      zh:
+      - 流程
+      - 投诉
+      - 策略
+      - 执行
+      - 运营
+      en:
+      - process
+      - complaint
+      - policy
+      - execution
+      - operations
+      ja:
+      - 運用
+      - 手順
+      - ポリシー
+      - 実行
+      - 対応
+      ko:
+      - 운영
+      - 절차
+      - 정책
+      - 실행
+      - 대응
+      fr:
+      - processus
+      - politique
+      - exécution
+      - opérations
+      - traitement
+      de:
+      - prozess
+      - richtlinie
+      - ausführung
+      - betrieb
+      - ablauf
+      es:
+      - proceso
+      - política
+      - ejecución
+      - operaciones
+      - tratamiento
+      pt:
+      - processo
+      - política
+      - execução
+      - operações
+      - tratamento
+      yue:
+      - 流程
+      - 策略
+      - 執行
+      - 營運
+      - 處理
+    min_keyword_count: 1
+  Risk:
+    keywords:
+      zh:
+      - 合规
+      - 风险
+      - 舆情
+      - 底线
+      - 红线
+      en:
+      - compliance
+      - risk
+      - exposure
+      - baseline
+      - red line
+      ja:
+      - コンプライアンス
+      - リスク
+      - 露出
+      - 基準
+      - レッドライン
+      ko:
+      - 컴플라이언스
+      - 리스크
+      - 노출
+      - 기준선
+      - 레드라인
+      fr:
+      - conformité
+      - risque
+      - exposition
+      - ligne rouge
+      - référence
+      de:
+      - compliance
+      - risiko
+      - exposition
+      - rote linie
+      - basislinie
+      es:
+      - cumplimiento
+      - riesgo
+      - exposición
+      - línea roja
+      - base
+      pt:
+      - compliance
+      - risco
+      - exposição
+      - linha vermelha
+      - referência
+      yue:
+      - 合規
+      - 風險
+      - 曝光
+      - 紅線
+      - 底線
+    min_keyword_count: 1
+persona_prefixes:
+  en:
+    QA: 'From QA validation, the acceptance gate and no-go criteria are still not
+      explicit. '
+    PM: 'From the product goal and schedule side, '
+    Backend: 'From the engineering side, the implementation risk and rollback cost
+      are still high. '
+  zh:
+    QA: 从QA验证角度看，准入条件和No-Go标准还不够清楚。
+    PM: 从产品目标和进度侧看，
+    Backend: 从技术实现侧看，当前实现成本和回滚风险都偏高。
+  ja:
+    QA: QA検証の観点では、受け入れ条件とNo-Go基準がまだ十分に明確ではありません。
+    PM: プロダクトと進行管理の観点では、
+    Backend: 技術観点では、実装コストとロールバックリスクがまだ高いです。
+  ko:
+    QA: 'QA 관점에서는 수용 기준과 No-Go 기준이 아직 충분히 명확하지 않습니다. '
+    PM: '제품과 일정 관점에서 보면, '
+    Backend: '기술 관점에서 보면 구현 비용과 롤백 리스크가 아직 높습니다. '
+  fr:
+    QA: 'Côté QA, les critères d''acceptation et le no-go ne sont pas encore assez
+      explicites. '
+    PM: 'Du point de vue produit et delivery, '
+    Backend: 'Sur le plan technique, le coût d''implémentation et le risque de rollback
+      restent élevés. '
+  de:
+    QA: 'Aus QA-Perspektive sind die Abnahmekriterien und No-Go-Bedingungen noch nicht
+      klar genug. '
+    PM: 'Aus Produkt- und Lieferperspektive, '
+    Backend: 'Technisch betrachtet sind Implementierungskosten und Rollback-Risiko
+      weiterhin hoch. '
+  es:
+    QA: 'Desde la perspectiva de QA, los criterios de aceptación y el no-go todavía
+      no están lo bastante claros. '
+    PM: 'Desde la perspectiva de producto y entrega, '
+    Backend: 'Desde una perspectiva técnica, el coste de implementación y el riesgo
+      de rollback siguen siendo altos. '
+  pt:
+    QA: 'Na perspectiva de QA, os critérios de aceitação e o no-go ainda não estão
+      suficientemente claros. '
+    PM: 'Na perspectiva de produto e entrega, '
+    Backend: 'Sob a perspectiva técnica, o custo de implementação e o risco de rollback
+      continuam altos. '
+  yue:
+    QA: 從 QA 角度睇，驗收條件同 No-Go 標準仲未夠清楚。
+    PM: 從產品同交付角度睇，
+    Backend: 從技術角度睇，實現成本同回滾風險仲係偏高。
+additional_role_hints:
+  QA:
+  - qa
+  - validation
+  - acceptance
+  - 検証
+  - 受け入れ
+  - 검증
+  - 수용
+  - qualité
+  - validierung
+  - abnahme
+  - validación
+  - aceptación
+  - validação
+  - aceitação
+  - 驗證
+  - 驗收
+  PM:
+  - product
+  - delivery
+  - schedule
+  - プロダクト
+  - 進捗
+  - 제품
+  - 일정
+  - produit
+  - calendrier
+  - produkt
+  - zeitplan
+  - producto
+  - entrega
+  - produto
+  - entrega
+  - 產品
+  - 交付
+  - 時間表
+  Backend:
+  - engineering
+  - technical
+  - rollback
+  - 技術
+  - 実装
+  - 엔지니어링
+  - 구현
+  - technique
+  - implémentation
+  - technisch
+  - implementierung
+  - técnico
+  - implementación
+  - técnico
+  - implementação
+  - 技術
+  - 實現
+  - 回滾
+  Risk:
+  - compliance
+  - risk
+  - conformité
+  - risque
+  - risiko
+  - コンプライアンス
+  - 리스크
+  - cumplimiento
+  - riesgo
+  - compliance
+  - risco
+  - 合規
+  - 風險
+  Ops:
+  - operations
+  - process
+  - 運用
+  - 운영
+  - processus
+  - betrieb
+  - operaciones
+  - processo
+  - 營運
+  - 流程
+  Client:
+  - client
+  - user
+  - customer
+  - 顧客
+  - ユーザー
+  - 고객
+  - utilisateur
+  - kunde
+  - cliente
+  - usuário
+  - 客戶
+  - 用戶
+conflict_keywords_by_locale:
+  zh:
+  - 但是
+  - 不过
+  - 不同意
+  - 反对
+  - 不行
+  - 不能
+  - 问题
+  - 风险
+  - 我觉得
+  - 我认为
+  - 其实
+  - 实际上
+  - 准入
+  - 阻塞
+  - 回滚
+  en:
+  - but
+  - however
+  - disagree
+  - do not agree
+  - don't agree
+  - cannot
+  - can't
+  - problem
+  - risk
+  - issue
+  - not ready
+  - no-go
+  - rollback
+  - sign off
+  - blocker
+  - concern
+  ja:
+  - しかし
+  - ただ
+  - 同意できません
+  - 反対
+  - 承認できません
+  - 問題
+  - リスク
+  - 未解決
+  - No-Go
+  - ロールバック
+  ko:
+  - 하지만
+  - 그러나
+  - 동의하기 어렵
+  - 반대
+  - 승인할 수 없
+  - 문제
+  - 리스크
+  - 미해결
+  - no-go
+  - 롤백
+  fr:
+  - mais
+  - cependant
+  - je ne suis pas d'accord
+  - refuse
+  - je ne peux pas
+  - problème
+  - risque
+  - ouvert
+  - no-go
+  - rollback
+  de:
+  - aber
+  - jedoch
+  - ich stimme nicht zu
+  - ich kann nicht
+  - freigeben
+  - blockiere
+  - problem
+  - risiko
+  - offen
+  - no-go
+  - rollback
+  es:
+  - pero
+  - sin embargo
+  - no estoy de acuerdo
+  - no puedo
+  - problema
+  - riesgo
+  - abierto
+  - no-go
+  - rollback
+  pt:
+  - mas
+  - porém
+  - não concordo
+  - não posso
+  - problema
+  - risco
+  - aberto
+  - no-go
+  - rollback
+  yue:
+  - 但係
+  - 不過
+  - 唔同意
+  - 未可以
+  - 問題
+  - 風險
+  - 未收口
+  - No-Go
+  - 回滾
+conflict_context_hints_by_locale:
+  zh:
+  - risk
+  - problem
+  - rollback
+  - gate
+  - acceptance
+  - launch
+  - decision
+  - 准入
+  - 验收
+  - 回滚
+  - 风险
+  - 问题
+  - 上线
+  - 决策
+  en:
+  - risk
+  - problem
+  - rollback
+  - gate
+  - acceptance
+  - launch
+  - decision
+  - 准入
+  - 验收
+  - 回滚
+  - 风险
+  - 问题
+  - 上线
+  - 决策
+  ja:
+  - リスク
+  - 問題
+  - ロールバック
+  - 受け入れ
+  - ゲート
+  - リリース
+  - 判断
+  ko:
+  - 리스크
+  - 문제
+  - 롤백
+  - 수용
+  - 게이트
+  - 출시
+  - 결정
+  fr:
+  - risque
+  - problème
+  - rollback
+  - acceptation
+  - gate
+  - mise en production
+  - décision
+  de:
+  - risiko
+  - problem
+  - rollback
+  - abnahme
+  - gate
+  - release
+  - entscheidung
+  es:
+  - riesgo
+  - problema
+  - rollback
+  - aceptación
+  - gate
+  - lanzamiento
+  - decisión
+  pt:
+  - risco
+  - problema
+  - rollback
+  - aceitação
+  - gate
+  - lançamento
+  - decisão
+  yue:
+  - 風險
+  - 問題
+  - 回滾
+  - 驗收
+  - 準入
+  - 上線
+  - 決策
+conflict_prefix_sets_by_locale:
+  zh:
+  - - 但是我现在不能签字，核心问题是：
+    - 我理解进度压力，不过我不同意按当前假设直接推进：
+    - 我还是认为这里有风险，在回滚和验收证据明确前不能放行：
+  - - 问题还没有收口，我反对现在把这个点当成已解决：
+    - 我听到了方案，不过这个风险不能按默认可接受处理：
+    - 实际上我不会签字，除非准入条件和兜底动作已经写清：
+  en:
+  - - 'But I cannot sign off yet because the core issue is still open: '
+    - 'I understand the schedule pressure, but I do not agree with moving forward
+      on the current assumption: '
+    - 'However, I still see release risk here, and I cannot approve it before rollback
+      and acceptance evidence are clear: '
+  - - 'The problem is not closed yet, so I disagree with treating this item as resolved: '
+    - 'I hear the plan, but that risk cannot be accepted as-is: '
+    - 'Actually, I will not sign off unless the entry gate and fallback actions are
+      explicit: '
+  ja:
+  - - '今は承認できません。核心的な問題がまだ未解決です。 '
+    - 'スケジュールの圧力は理解していますが、今の前提のまま進める段階ではありません。 '
+    - 'まだリリースリスクが残っており、ロールバックと受け入れ証跡がそろうまでは承認できません。 '
+  - - 'この問題はまだ未解決で、解決済みとは見なせません。 '
+    - '計画は理解していますが、このリスクはそのままでは受け入れられません。 '
+    - '受け入れ条件とフォールバック対応が明確になるまでは承認できません。 '
+  ko:
+  - - '지금은 승인할 수 없습니다. 핵심 이슈가 아직 열려 있습니다. '
+    - '일정 압박은 이해하지만, 현재 가정으로 바로 진행할 단계는 아닙니다. '
+    - '여전히 출시 리스크가 남아 있어 롤백과 수용 증거가 명확해지기 전에는 승인할 수 없습니다. '
+  - - '이 문제는 아직 열려 있으므로 해결된 것으로 보기 어렵습니다. '
+    - '계획은 이해하지만 이 리스크는 지금 상태로 받아들이기 어렵습니다. '
+    - '진입 기준과 폴백 조치가 명확해지기 전까지는 승인할 수 없습니다. '
+  fr:
+  - - 'Je ne peux pas encore valider cela, car le point central n''est pas encore
+      résolu. '
+    - 'Je comprends la pression du calendrier, mais l''hypothèse actuelle n''est pas
+      prête à avancer. '
+    - 'Je vois encore un risque de mise en production, et je ne peux pas approuver
+      cela avant que le rollback et les preuves d''acceptation soient clairs. '
+  - - 'Ce point est encore ouvert, je ne le considère donc pas comme réglé. '
+    - 'Je comprends le plan, mais ce risque n''est pas acceptable en l''état. '
+    - 'Je ne peux pas valider tant que les critères d''entrée et les actions de repli
+      ne sont pas explicites. '
+  de:
+  - - 'Ich kann das noch nicht freigeben, weil der Kernpunkt noch offen ist. '
+    - 'Ich verstehe den Zeitdruck, aber unter der aktuellen Annahme ist das noch nicht
+      entscheidungsreif. '
+    - 'Ich sehe hier weiterhin ein Release-Risiko und kann das nicht freigeben, bevor
+      Rollback und Abnahmebelege klar sind. '
+  - - 'Dieser Punkt ist noch offen; ich sehe ihn nicht als erledigt an. '
+    - 'Ich verstehe den Plan, aber dieses Risiko ist so nicht akzeptabel. '
+    - 'Ich kann erst freigeben, wenn Eingangskriterien und Fallback-Maßnahmen klar
+      sind. '
+  es:
+  - - 'No puedo aprobar esto todavía porque el punto central sigue abierto. '
+    - 'Entiendo la presión del calendario, pero la hipótesis actual todavía no está
+      lista para avanzar. '
+    - 'Sigo viendo riesgo de salida y no puedo aprobarlo hasta que el rollback y la
+      evidencia de aceptación estén claros. '
+  - - 'Este punto sigue abierto, así que no lo considero resuelto. '
+    - 'Entiendo el plan, pero ese riesgo no es aceptable tal como está. '
+    - 'No puedo aprobarlo hasta que los criterios de entrada y las acciones de fallback
+      estén explícitos. '
+  pt:
+  - - 'Ainda não posso aprovar isso porque o ponto central continua em aberto. '
+    - 'Entendo a pressão do cronograma, mas a hipótese atual ainda não está pronta
+      para avançar. '
+    - 'Ainda vejo risco de release e não posso aprovar enquanto rollback e evidências
+      de aceitação não estiverem claros. '
+  - - 'Esse ponto ainda está em aberto, então não o considero resolvido. '
+    - 'Entendo o plano, mas esse risco não é aceitável do jeito atual. '
+    - 'Não posso aprovar enquanto os critérios de entrada e as ações de fallback não
+      estiverem explícitos. '
+  yue:
+  - - 我而家未可以批，核心問題仲未收口。
+    - 我明白進度壓力，但而家個假設仲未到可以直接推進嘅程度。
+    - 我仲係見到上線風險，回滾同驗收證據未清楚之前都唔可以批。
+  - - 呢個問題仲未收口，我唔會當佢已經解決。
+    - 我明白個方案，但呢個風險而家仲未可以接受。
+    - 準入條件同 fallback 動作未寫清楚之前，我都唔會批。

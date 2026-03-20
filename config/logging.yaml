@@ -1,0 +1,6 @@
+﻿logging:
+  app_log: runtime/logs/app.log
+  server_log: runtime/logs/server.log
+  server_error_log: runtime/logs/server.error.log
+  startup_log: runtime/logs/startup.log
+  debug_log: runtime/logs/debug.log

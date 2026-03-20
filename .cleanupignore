@@ -1,0 +1,24 @@
+﻿# core entrypoints
+app.py
+server.py
+run.py
+project_guard.py
+cleanup_tool.py
+sitecustomize.py
+
+# core modules
+runtime_patches.py
+resource_path_utils.py
+dialogue_*
+template_*
+
+# do not reorganize these directories
+src/
+config/
+docs/
+scripts/
+tools/
+runtime/
+archive/
+reports/
+output/

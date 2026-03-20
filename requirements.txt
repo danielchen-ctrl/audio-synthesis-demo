@@ -1,0 +1,25 @@
+﻿# Scene Dialogue Demo - Python Dependencies
+
+# Web Framework
+tornado>=6.1
+
+# Data Processing
+numpy>=1.21.0
+
+# Translation
+deep-translator>=1.9.0
+
+# Text-to-Speech
+edge-tts>=6.0.0
+
+# Audio Processing
+pydub>=0.25.1
+
+# GUI Framework
+pywebview>=3.6
+
+# HTTP Client
+requests>=2.26.0
+
+# Configuration
+PyYAML>=6.0

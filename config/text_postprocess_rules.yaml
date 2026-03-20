@@ -1,0 +1,587 @@
+english_cjk_term_rewrites:
+  项目负责人: project lead
+  需求澄清: requirements clarification
+  技术负责人: technical lead
+  测试负责人: QA lead
+  风险评审: risk review
+  联调: integration testing
+  回滚: rollback
+  验收: acceptance
+generic_english_meeting_intro: Hello, I am the project lead. Let us discuss this meeting.
+english_opening_variants:
+- pattern: ^I cannot sign off\b
+  ignore_case: true
+  variants:
+  - I cannot sign off
+  - I am not ready to sign off
+  - I cannot approve this
+- pattern: ^I understand\b
+  ignore_case: true
+  variants:
+  - I understand
+  - I see
+  - I understand the point
+- pattern: ^I still see release risk here\b
+  ignore_case: true
+  variants:
+  - I still see release risk here
+  - I still see material release risk here
+  - I still see unresolved release risk here
+multilingual_fact_summary_prefix:
+  English: 'Let me anchor on the key facts: '
+  Japanese: まず重要な事実を整理します：
+  Korean: '먼저 핵심 사실을 정리하겠습니다: '
+  French: 'Je récapitule d''abord les faits clés : '
+  German: 'Ich halte zuerst die Kernfakten fest: '
+  Spanish: 'Primero voy a fijar los hechos clave: '
+  Portuguese: 'Primeiro, vou fixar os fatos-chave: '
+  Cantonese: 我先講清楚幾個關鍵事實：
+language_term_rewrites:
+  Japanese:
+    项目负责人: プロジェクト責任者
+    需求澄清: 要件整理
+    技术负责人: 技術責任者
+    测试负责人: QA責任者
+    风险评审: リスクレビュー
+    联调: 結合テスト
+    回滚: ロールバック
+    验收: 受け入れ
+    project lead: プロジェクト責任者
+    requirements clarification: 要件整理
+    to owners: 担当者割当
+    before integration testing: 結合テスト前
+    specific arrangements: 具体的な対応
+  Korean:
+    项目负责人: 프로젝트 책임자
+    需求澄清: 요건 정리
+    技术负责人: 기술 책임자
+    测试负责人: QA 책임자
+    风险评审: 리스크 리뷰
+    联调: 통합 테스트
+    回滚: 롤백
+    验收: 수용 검증
+    project lead: 프로젝트 책임자
+    requirements clarification: 요건 정리
+    to owners: 담당자 할당
+    before integration testing: 통합 테스트 전
+    specific arrangements: 구체적 대응
+  French:
+    项目负责人: responsable du projet
+    需求澄清: clarification des exigences
+    技术负责人: responsable technique
+    测试负责人: responsable QA
+    风险评审: revue des risques
+    联调: tests d'intégration
+    回滚: rollback
+    验收: acceptation
+    project lead: responsable du projet
+    requirements clarification: clarification des exigences
+    to owners: responsables assignés
+    before integration testing: avant les tests d'intégration
+    specific arrangements: mesures concrètes
+  German:
+    项目负责人: Projektverantwortliche
+    需求澄清: Anforderungsabstimmung
+    技术负责人: technische Leitung
+    测试负责人: QA-Verantwortliche
+    风险评审: Risikoreview
+    联调: Integrationstest
+    回滚: Rollback
+    验收: Abnahme
+    project lead: Projektverantwortliche
+    requirements clarification: Anforderungsabstimmung
+    to owners: zugewiesene Verantwortliche
+    before integration testing: vor dem Integrationstest
+    specific arrangements: konkrete Maßnahmen
+  Spanish:
+    项目负责人: responsable del proyecto
+    需求澄清: aclaración de requisitos
+    技术负责人: responsable técnico
+    测试负责人: responsable de QA
+    风险评审: revisión de riesgos
+    联调: pruebas de integración
+    回滚: rollback
+    验收: aceptación
+    project lead: responsable del proyecto
+    requirements clarification: aclaración de requisitos
+    release risk: riesgo de lanzamiento
+    riesgo de salida: riesgo de lanzamiento
+    to owners: responsables asignados
+    before integration testing: antes de las pruebas de integración
+    specific arrangements: medidas concretas
+  Portuguese:
+    项目负责人: responsável pelo projeto
+    需求澄清: clareza de requisitos
+    技术负责人: responsável técnico
+    测试负责人: responsável de QA
+    风险评审: revisão de riscos
+    联调: testes de integração
+    回滚: rollback
+    验收: aceitação
+    project lead: responsável pelo projeto
+    requirements clarification: clareza de requisitos
+    release risk: risco de lançamento
+    risco de release: risco de lançamento
+    to owners: responsáveis definidos
+    before integration testing: antes dos testes de integração
+    specific arrangements: medidas concretas
+  Cantonese:
+    项目负责人: 項目負責人
+    需求澄清: 需求釐清
+    技术负责人: 技術負責人
+    测试负责人: QA負責人
+    风险评审: 風險評審
+    联调: 聯調
+    回滚: 回滾
+    验收: 驗收
+    trade-offs: 取捨
+multilingual_meeting_intro:
+  Japanese: こんにちは、私はプロジェクト責任者です。この会議について話しましょう。
+  Korean: 안녕하세요, 저는 프로젝트 책임자입니다. 이번 회의를 논의해 보겠습니다.
+  French: Bonjour, je suis le responsable du projet. Parlons de cette réunion.
+  German: Hallo, ich bin für das Projekt verantwortlich. Lassen Sie uns dieses Meeting
+    besprechen.
+  Spanish: Hola, soy el responsable del proyecto. Hablemos de esta reunión.
+  Portuguese: Olá, sou o responsável pelo projeto. Vamos discutir esta reunião.
+  Cantonese: 你好，我係項目負責人。我哋先討論一下這個會議。
+multilingual_filler_rewrites:
+  Japanese:
+  - - ^はい。\s*(主に確認したいのは)
+    - \1
+  - - ^状況に基づいてこの進め方をお勧めします。具体的には、\s*
+    - ''
+  - - ^ご注意ください、リスクがあります。$
+    - 主なリスクは、実装とロールバックの不確実性がまだ残っていることです。
+  - - 追加すると、スケジュールについてはX日必要です。これは確認済みです。
+    - 具体的な期限と担当者を明確にする必要があります。
+  - - 追加すると、スケジュールについてはY項目必要です。準備済みです。
+    - 具体的な期限と担当者を明確にする必要があります。
+  - - 'Hello,\s*I(?:[''’]m| am)\s*[\u4e00-\u9fff]{2,4},\s*[\u30a1-\u30ff\u4e00-\u9fffA-Za-z
+      ]+\.\s*Let(?: us|''s)\s+discuss\s+your\s+situation\s+regarding\s+[A-Za-z]+\.\s*'
+    - 'こんにちは、私はプロジェクト責任者です。今回の話を整理しましょう。 '
+  - - Yes,\s*[\u4e00-\u9fff]{2,4}\.\s*I mainly want to understand\s+[\u30a1-\u30ff\u4e00-\u9fffA-Za-z
+      ]+\.
+    - 主に確認したいのは要件整理です。
+  - - I mainly want to understand\s+[\u30a1-\u30ff\u4e00-\u9fffA-Za-z ]+\.
+    - 主に確認したいのは要件整理です。
+  - - What(?:'s| is) the specific amount or number\?
+    - 具体的な閾値と影響が必要です。
+  - - To add,\s*regarding [A-Za-z ]+,\s*we need [^.]+\.\s*(?:I will coordinate|Already
+      prepared|This is confirmed)\.
+    - 具体的な期限と担当者を明確にする必要があります。
+  - &id001
+    - Based on your situation,\s*I recommend this approach\.\s*Specifically,\s*
+    - ''
+  - - Please note that there are risks involved(?:, including [A-Za-z ]+)?\.
+    - 主なリスクは、実装とロールバックの不確実性がまだ残っていることです。
+  - &id002
+    - \bCould you provide more details\?\s*
+    - ''
+  - &id003
+    - \bThe situation is quite specific\.\s*
+    - ''
+  Korean:
+  - - ^네\.\s*(제가 주로 확인하고 싶은 것은)
+    - \1
+  - - ^현재 상황을 기준으로 이 접근을 권장합니다\. 구체적으로는\s*
+    - ''
+  - - ^유의해 주세요, 리스크가 있습니다\.$
+    - 핵심 리스크는 구현과 롤백 불확실성이 아직 남아 있다는 점입니다.
+  - - 추가로 일정 측면에서는 X일이 필요합니다\. 확인되었습니다\.
+    - 구체적인 일정과 담당자를 명확히 해야 합니다.
+  - - 추가로 절차 측면에서는 Y개 항목이 필요합니다\. 준비되었습니다\.
+    - 구체적인 일정과 담당자를 명확히 해야 합니다.
+  - - 'Hello,\s*I(?:[''’]m| am)\s*[\u4e00-\u9fff]{2,4},\s*[\uac00-\ud7a3\u4e00-\u9fffA-Za-z
+      ]+\.\s*Let(?: us|''s)\s+discuss\s+your\s+situation\s+regarding\s+[A-Za-z]+\.\s*'
+    - '안녕하세요, 저는 프로젝트 책임자입니다. 이번 이야기를 정리해 보겠습니다. '
+  - - Yes,\s*[\u4e00-\u9fff]{2,4}\.\s*I mainly want to understand\s+[\uac00-\ud7a3\u4e00-\u9fffA-Za-z
+      ]+\.
+    - 제가 주로 확인하고 싶은 것은 요건 정리입니다.
+  - - I mainly want to understand\s+[\uac00-\ud7a3\u4e00-\u9fffA-Za-z ]+\.
+    - 제가 주로 확인하고 싶은 것은 요건 정리입니다.
+  - - What(?:'s| is) the specific amount or number\?
+    - 정확한 임계값과 영향 범위가 필요합니다.
+  - - To add,\s*regarding [A-Za-z ]+,\s*we need [^.]+\.\s*(?:I will coordinate|Already
+      prepared|This is confirmed)\.
+    - 구체적인 일정과 담당자를 명확히 해야 합니다.
+  - *id001
+  - - Please note that there are risks involved(?:, including [A-Za-z ]+)?\.
+    - 핵심 리스크는 구현과 롤백 불확실성이 아직 남아 있다는 점입니다.
+  - *id002
+  - *id003
+  French:
+  - - ^Oui\.\s*(Je veux surtout clarifier)
+    - \1
+  - - ^Compte tenu de votre situation, je recommande cette approche\. Plus précisément,\s*
+    - ''
+  - - ^Veuillez noter qu'il existe des risques\.$
+    - Le risque principal reste l'incertitude sur l'implémentation et le rollback.
+  - - En complément, pour le calendrier, il nous faut X jours\. C'est confirmé\.
+    - Nous avons encore besoin d'un calendrier précis et d'un responsable nommé.
+  - - En complément, pour la procédure, il nous faut Y éléments\. C'est prêt\.
+    - Nous avons encore besoin d'un calendrier précis et d'un responsable nommé.
+  - - 'Hello,\s*I(?:[''’]m| am)\s*[\u4e00-\u9fff]{2,4},\s*[\u00C0-\u017F\u4e00-\u9fffA-Za-z''
+      -]+\.\s*Let(?: us|''s)\s+discuss\s+your\s+situation\s+regarding\s+[A-Za-z]+\.\s*'
+    - 'Bonjour, je suis le responsable du projet. Regardons ce sujet ensemble. '
+  - - Yes,\s*[\u4e00-\u9fff]{2,4}\.\s*I mainly want to understand\s+[\u00C0-\u017F\u4e00-\u9fffA-Za-z'
+      -]+\.
+    - Je veux surtout clarifier clarification des exigences.
+  - - I mainly want to understand\s+[\u00C0-\u017F\u4e00-\u9fffA-Za-z' -]+\.
+    - Je veux surtout clarifier clarification des exigences.
+  - - What(?:'s| is) the specific amount or number\?
+    - J'ai besoin du seuil exact et de son impact.
+  - - To add,\s*regarding [A-Za-z ]+,\s*we need [^.]+\.\s*(?:I will coordinate|Already
+      prepared|This is confirmed)\.
+    - Nous avons encore besoin d'un calendrier précis et d'un responsable nommé.
+  - *id001
+  - - Please note that there are risks involved(?:, including [A-Za-z ]+)?\.
+    - Le risque principal reste l'incertitude sur l'implémentation et le rollback.
+  - *id002
+  - *id003
+  German:
+  - - ^Ja\.\s*(Ich möchte vor allem)
+    - \1
+  - - ^Auf Basis Ihrer Situation empfehle ich diesen Ansatz\. Genauer gesagt,\s*
+    - ''
+  - - ^Bitte beachten Sie, dass Risiken bestehen\.$
+    - Das Hauptrisiko liegt weiterhin in der Umsetzungs- und Rollback-Unsicherheit.
+  - - Zusätzlich brauchen wir für den Zeitplan X Tage\. Das ist bestätigt\.
+    - Wir brauchen noch einen konkreten Zeitplan und eine benannte verantwortliche
+      Person.
+  - - Zusätzlich brauchen wir für das Vorgehen Y Punkte\. Das ist vorbereitet\.
+    - Wir brauchen noch einen konkreten Zeitplan und eine benannte verantwortliche
+      Person.
+  - - 'Hello,\s*I(?:[''’]m| am)\s*[\u4e00-\u9fff]{2,4},\s*[\u00C0-\u017F\u4e00-\u9fffA-Za-z''
+      -]+\.\s*Let(?: us|''s)\s+discuss\s+your\s+situation\s+regarding\s+[A-Za-z]+\.\s*'
+    - 'Hallo, ich bin für das Projekt verantwortlich. Lassen Sie uns dieses Thema
+      durchgehen. '
+  - - Yes,\s*[\u4e00-\u9fff]{2,4}\.\s*I mainly want to understand\s+[\u00C0-\u017F\u4e00-\u9fffA-Za-z'
+      -]+\.
+    - Ich möchte vor allem Anforderungsabstimmung klären.
+  - - I mainly want to understand\s+[\u00C0-\u017F\u4e00-\u9fffA-Za-z' -]+\.
+    - Ich möchte vor allem Anforderungsabstimmung klären.
+  - - What(?:'s| is) the specific amount or number\?
+    - Ich brauche den genauen Schwellenwert und die Auswirkung.
+  - - To add,\s*regarding [A-Za-z ]+,\s*we need [^.]+\.\s*(?:I will coordinate|Already
+      prepared|This is confirmed)\.
+    - Wir brauchen noch einen konkreten Zeitplan und eine benannte verantwortliche
+      Person.
+  - *id001
+  - - Please note that there are risks involved(?:, including [A-Za-z ]+)?\.
+    - Das Hauptrisiko liegt weiterhin in der Umsetzungs- und Rollback-Unsicherheit.
+  - *id002
+  - *id003
+  Spanish:
+  - - ^Sí\.\s*(Quiero sobre todo aclarar)
+    - \1
+  - - ^Dada tu situación, recomiendo este enfoque\. En concreto,\s*
+    - ''
+  - - ^Ten en cuenta que aquí hay riesgos\.$
+    - El riesgo principal sigue siendo la incertidumbre sobre la implementación y
+      el rollback.
+  - - Como complemento, para el calendario necesitamos X días\. Está confirmado\.
+    - Todavía necesitamos un plazo concreto y un responsable asignado.
+  - - Como complemento, para el proceso necesitamos Y puntos\. Ya está preparado\.
+    - Todavía necesitamos un plazo concreto y un responsable asignado.
+  - - 'Hello,\s*I(?:[''’]m| am)\s*[\u4e00-\u9fff]{2,4},\s*responsable del proyecto\.\s*Let(?:
+      us|''s)\s+discuss\s+your\s+situation\s+regarding\s+meeting\.\s*'
+    - 'Hola, soy el responsable del proyecto. Hablemos de esta reunión. '
+  - - Yes,\s*[\u4e00-\u9fff]{2,4}\.\s*I mainly want to understand\s+aclaración de
+      requisitos\.
+    - Quiero sobre todo aclarar aclaración de requisitos.
+  - - I mainly want to understand\s+aclaración de requisitos\.
+    - Quiero sobre todo aclarar aclaración de requisitos.
+  - - What(?:'s| is) the specific amount or number\?
+    - Necesito el umbral exacto y su impacto.
+  - - To add,\s*regarding(?:\s+[A-Za-z]+)?\s*,\s*we need [A-Za-z0-9+_-]+\s+(?:days?|items?|steps?|arrangements?)\.\s*(?:I
+      will coordinate|Already prepared|This is confirmed)\.
+    - Todavía necesitamos un plazo concreto y un responsable asignado.
+  - - To add,\s*regarding [A-Za-z ]+,\s*we need [^.]+\.\s*(?:I will coordinate|Already
+      prepared|This is confirmed)\.
+    - Todavía necesitamos un plazo concreto y un responsable asignado.
+  - *id001
+  - - Please note that there are risks involved(?:, including [A-Za-z ]+)?\.
+    - El riesgo principal sigue siendo la incertidumbre sobre la implementación y
+      el rollback.
+  - *id002
+  - *id003
+  Portuguese:
+  - - ^Sim\.\s*(Quero principalmente esclarecer)
+    - \1
+  - - ^Considerando a situação, recomendo este caminho\. Especificamente,\s*
+    - ''
+  - - ^É importante notar que ainda existem riscos\.$
+    - O principal risco continua sendo a incerteza sobre implementação e rollback.
+  - - Além disso, para o cronograma precisamos de X dias\. Está confirmado\.
+    - Ainda precisamos de um prazo concreto e de um responsável definido.
+  - - Além disso, para o processo precisamos de Y itens\. Já está preparado\.
+    - Ainda precisamos de um prazo concreto e de um responsável definido.
+  - - 'Hello,\s*I(?:[''’]m| am)\s*[\u4e00-\u9fff]{2,4},\s*responsável pelo projeto\.\s*Let(?:
+      us|''s)\s+discuss\s+your\s+situation\s+regarding\s+(?:meeting|review)\.\s*'
+    - 'Olá, sou o responsável pelo projeto. Vamos discutir esta reunião. '
+  - - Yes,\s*[\u4e00-\u9fff]{2,4}\.\s*I mainly want to understand\s+clareza de requisitos\.
+    - Quero principalmente esclarecer clareza de requisitos.
+  - - I mainly want to understand\s+clareza de requisitos\.
+    - Quero principalmente esclarecer clareza de requisitos.
+  - - What(?:'s| is) the specific amount or number\?
+    - Preciso do limite exato e do impacto.
+  - - To add,\s*regarding(?:\s+[A-Za-z]+)?\s*,\s*we need [A-Za-z0-9+_-]+\s+(?:days?|items?|steps?|arrangements?)\.\s*(?:I
+      will coordinate|Already prepared|This is confirmed)\.
+    - Ainda precisamos de um prazo concreto e de um responsável definido.
+  - - To add,\s*regarding [A-Za-z ]+,\s*we need [^.]+\.\s*(?:I will coordinate|Already
+      prepared|This is confirmed)\.
+    - Ainda precisamos de um prazo concreto e de um responsável definido.
+  - *id001
+  - - Please note that there are risks involved(?:, including [A-Za-z ]+)?\.
+    - O principal risco continua sendo a incerteza sobre implementação e rollback.
+  - *id002
+  - *id003
+  Cantonese:
+  - - ^\u4fc2\u3002\s*(\u6211\u4e3b\u8981\u60f3\u78ba\u8a8d)
+    - \1
+  - - ^\u6309\u800c\u5bb6\u60c5\u6cc1\uff0c\u6211\u5efa\u8b70\u5481\u6a23\u505a\u3002\u5177\u9ad4\u569f\u8b1b\uff0c\s*
+    - ''
+  - - ^\u8981\u7559\u610f\uff0c\u9019\u5ea6\u6709\u98a8\u96aa\u3002$
+    - 主要風險仍然係實現同回滾的不確定性未收口。
+  - - \u88dc\u5145\u4e00\u53e5\uff0c\u6642\u9593\u8868\u9700\u8981X\u65e5\u3002\u9019\u500b\u5df2\u7d93\u78ba\u8a8d\u3002
+    - 而家還需要一個具體時間表同執行負責人。
+  - - \u88dc\u5145\u4e00\u53e5\uff0c\u6d41\u7a0b\u4e0a\u9700\u8981Y\u500b\u9805\u76ee\u3002\u5df2\u7d93\u6e96\u5099\u597d\u3002
+    - 而家還需要一個具體時間表同執行負責人。
+  - - 'Hello,\s*I(?:[''’]m| am)\s*[\u4e00-\u9fff]{2,4},\s*[\u4e00-\u9fff]{2,8}\.\s*Let(?:
+      us|''s)\s+discuss\s+your\s+situation\s+regarding\s+([A-Za-z]+)\.\s*'
+    - 你好，我係項目負責人。我哋先討論一下今次 \1。
+  - - Yes,\s*[\u4e00-\u9fff]{2,4}\.\s*I mainly want to understand\s+[\u4e00-\u9fffA-Za-z
+      ]+\.
+    - 我主要想確認需求釐清。
+  - - I mainly want to understand\s+[\u4e00-\u9fffA-Za-z ]+\.
+    - 我主要想確認需求釐清。
+  - - What(?:'s| is) the specific amount or number\?
+    - 我需要具體閾值同影響。
+  - - To add,\s*regarding [A-Za-z ]+,\s*we need [^.]+\.\s*(?:I will coordinate|Already
+      prepared|This is confirmed)\.
+    - 而家仲需要一個具體時間表同執行負責人。
+  - *id001
+  - - Please note that there are risks involved(?:, including [A-Za-z ]+)?\.
+    - 主要風險仍然係實現同回滾未完全收口。
+  - *id002
+  - *id003
+  - - 先对齐这次([A-Za-z]+)的目标：我们要在下一个发布窗口前把结论定下来。
+    - 我哋先對齊今次 \1 嘅目標：要喺下一個發布窗口前定好結論。
+  - - 从backend这边看，当前方案的关键事实是：
+    - 從 backend 角度睇，而家方案嘅關鍵事實係：
+  - - 我先把风险摊开说：
+    - 我先攤開風險嚟講：
+  - - 如果准入门槛不清楚，我不会放行。请把决策条件再确认一遍：
+    - 如果準入門檻未講清楚，我唔會放行。請再確認一次決策條件：
+  - - 监控和执行路径是：告警阈值和监控看板。回退方案按人工回滾到上一稳定版本处理。
+    - 監控同執行路徑係：告警閾值同監控看板，因為要及早發現風險，再手動回滾到上一個穩定版本。
+  - - 我的结论是有条件通过，只有在(.+?)明确后才能推进。
+    - 我嘅結論係可以有條件通過，只有喺 \1 講清楚之後先可以推進。
+  - - 为了避免口径偏差，术语统一按这些点执行：负责人、驗收、回滾。
+    - 為咗避免口徑偏差，術語先按呢幾點統一：負責人、驗收、回滾。
+  - - 行动项1：(.+?)。负责人：backend。时间：下一个检查点前完成。
+    - 行動項1：\1。負責人：backend。時間：下一個檢查點之前完成。
+multilingual_tone_rewrites:
+  Japanese:
+  - - ^しかし、今は承認できません。核心的な問題は未解決です：
+    - 今は承認できません。核心的な問題がまだ未解決です。
+  - - ^スケジュールの圧力は理解していますが、現在の前提でそのまま進めることには同意できません：
+    - スケジュールの圧力は理解していますが、今の前提のまま進める段階ではありません。
+  - - ^実際には、受け入れ条件とフォールバック対応が明確になるまで承認できません：
+    - 受け入れ条件とフォールバック対応が明確になるまで承認できません。
+  - - ^この問題はまだクローズしていないため、解決済みとは見なせません。$
+    - この問題はまだ未解決で、解決済みとは見なせません。
+  Korean:
+  - - '^하지만 지금은 승인할 수 없습니다. 핵심 이슈는 아직 닫히지 않았습니다:'
+    - 지금은 승인할 수 없습니다. 핵심 이슈가 아직 열려 있습니다.
+  - - '^일정 압박은 이해하지만, 현재 가정으로 바로 진행하는 데는 동의하기 어렵습니다:'
+    - 일정 압박은 이해하지만, 현재 가정으로 바로 진행할 단계는 아닙니다.
+  - - '^실제로는 진입 기준과 폴백 조치가 명확해지기 전까지 승인할 수 없습니다:'
+    - 진입 기준과 폴백 조치가 명확해지기 전까지는 승인할 수 없습니다.
+  - - ^이 문제는 아직 닫히지 않았으므로 해결된 것으로 보기 어렵습니다\.$
+    - 이 문제는 아직 열려 있으므로 해결된 것으로 보기 어렵습니다.
+  French:
+  - - ^Mais je ne peux pas encore valider cela, car le point central n'est pas encore
+      résolu\s*:\s*
+    - 'Je ne peux pas encore valider cela, car le point central n''est pas encore
+      résolu. '
+  - - '^Je comprends la pression du calendrier, mais je ne suis pas d''accord pour
+      avancer sur l''hypothèse actuelle : '
+    - 'Je comprends la pression du calendrier, mais l''hypothèse actuelle n''est pas
+      prête à avancer. '
+  - - '^En réalité, je ne peux pas valider tant que les critères d''entrée et les
+      actions de repli ne sont pas explicites : '
+    - 'Je ne peux pas valider tant que les critères d''entrée et les actions de repli
+      ne sont pas explicites. '
+  - - ^Ce point n'est pas clos, je refuse donc de le considérer comme réglé\.$
+    - Ce point est encore ouvert, je ne le considère donc pas comme réglé.
+  German:
+  - - '^Aber ich kann das noch nicht freigeben, weil der Kernpunkt noch offen ist: '
+    - 'Ich kann das noch nicht freigeben, weil der Kernpunkt noch offen ist. '
+  - - '^Ich verstehe den Zeitdruck, aber ich stimme nicht zu, unter der aktuellen
+      Annahme direkt weiterzugehen: '
+    - 'Ich verstehe den Zeitdruck, aber unter der aktuellen Annahme ist das noch nicht
+      entscheidungsreif. '
+  - - '^Tatsächlich kann ich erst freigeben, wenn Eingangskriterien und Fallback-Maßnahmen
+      klar sind: '
+    - 'Ich kann erst freigeben, wenn Eingangskriterien und Fallback-Maßnahmen klar
+      sind. '
+  - - ^Dieser Punkt ist noch nicht geschlossen, daher sehe ich ihn nicht als erledigt
+      an\.$
+    - Dieser Punkt ist noch offen; ich sehe ihn nicht als erledigt an.
+  Spanish:
+  - - ^Pero no puedo aprobar esto todavía porque el punto central sigue abierto:\s*
+    - 'No puedo aprobar esto todavía porque el punto central sigue abierto. '
+  - - ^Entiendo la presión del calendario, pero no estoy de acuerdo con avanzar con
+      la suposición actual:\s*
+    - 'Entiendo la presión del calendario, pero la suposición actual todavía no está
+      lista para avanzar. '
+  - - ^En realidad, no puedo aprobarlo hasta que los criterios de entrada y las acciones
+      de fallback estén explícitos:\s*
+    - 'No puedo aprobarlo hasta que los criterios de entrada y las acciones de fallback
+      estén explícitos. '
+  - - ^Este punto no está cerrado, así que no lo considero resuelto\.$
+    - Este punto sigue abierto, así que no lo considero resuelto.
+  Portuguese:
+  - - ^Mas ainda não posso aprovar isso porque o ponto central continua em aberto:\s*
+    - 'Ainda não posso aprovar isso porque o ponto central continua em aberto. '
+  - - ^Entendo a pressão do cronograma, mas não concordo em avançar com a hipótese
+      atual:\s*
+    - 'Entendo a pressão do cronograma, mas a hipótese atual ainda não está pronta
+      para avançar. '
+  - - ^Na prática, não posso aprovar enquanto os critérios de entrada e as ações de
+      fallback não estiverem explícitos:\s*
+    - 'Não posso aprovar enquanto os critérios de entrada e as ações de fallback não
+      estiverem explícitos. '
+  - - ^Esse ponto não está encerrado, então não o considero resolvido\.$
+    - Esse ponto ainda está em aberto, então não o considero resolvido.
+  Cantonese:
+  - - ^\u4f46\u4fc2\u6211\u800c\u5bb6\u672a\u53ef\u4ee5\u6279\uff0c\u6838\u5fc3\u554f\u984c\u4ecd\u7136\u672a\u6536\u53e3\uff1a
+    - 我而家未可以批，核心問題仍然未收口。
+  - - ^\u6211\u660e\u767d\u9032\u5ea6\u58d3\u529b\uff0c\u4f46\u7167\u800c\u5bb6\u5047\u8a2d\u76f4\u63a5\u63a8\u9032\u6211\u5514\u540c\u610f\uff1a
+    - 我明白進度壓力，但而家個假設還未到可以直接推進嘅程度。
+  - - ^\u5be6\u969b\u4e0a\uff0c[\u51c6\u6e96]\u5165\u689d\u4ef6\u540c fallback \u52d5\u4f5c\u672a\u660e\u78ba\u4e4b\u524d\u6211(?:\u90fd)?\u5514\u6703\u6279\uff1a
+    - 準入條件同 fallback 動作未明確之前，我唔會批。
+  - - ^\u9019\u500b\u554f\u984c\u4ecd\u7136\u672a\u6536\u53e3\uff0c\u6240\u4ee5\u6211\u5514\u6703\u7576\u4f62\u5df2\u7d93\u89e3\u6c7a\u3002$
+    - 這個問題仍然未收口，我唔會當佢已經解決。
+multilingual_role_rewrites:
+  Japanese:
+    Backend:
+    - - 技術面から見ると、
+      - 技術観点では、
+    PM:
+    - - プロダクト目標と進行の観点では、
+      - プロダクトと進行管理の観点では、
+    QA:
+    - - QA検証の観点では、
+      - QA観点では、
+  Korean:
+    Backend:
+    - - 기술 측면에서 보면,?
+      - 기술 관점에서 보면,
+    PM:
+    - - 제품 목표와 일정 측면에서 보면,?
+      - 제품과 일정 관점에서 보면,
+    QA:
+    - - QA 검증 관점에서 보면,?
+      - QA 관점에서 보면,
+  French:
+    Backend:
+    - - Du point de vue technique,
+      - Sur le plan technique,
+    PM:
+    - - Du point de vue produit et calendrier,
+      - Du point de vue produit et delivery,
+    QA:
+    - - Du point de vue QA,
+      - Côté QA,
+  German:
+    Backend:
+    - - Aus technischer Sicht,
+      - Technisch betrachtet,
+    PM:
+    - - Aus Produkt- und Zeitplansicht,
+      - Aus Produkt- und Lieferperspektive,
+    QA:
+    - - Aus QA-Sicht,
+      - Aus QA-Perspektive,
+  Spanish:
+    Backend:
+    - - Desde el lado técnico,
+      - Desde una perspectiva técnica,
+    PM:
+    - - Desde el lado de producto y calendario,
+      - Desde la perspectiva de producto y entrega,
+    QA:
+    - - Desde QA,
+      - Desde la perspectiva de QA,
+  Portuguese:
+    Backend:
+    - - Do lado técnico,
+      - Sob a perspectiva técnica,
+    PM:
+    - - Do lado de produto e cronograma,
+      - Na perspectiva de produto e entrega,
+    QA:
+    - - Do lado de QA,
+      - Na perspectiva de QA,
+  Cantonese:
+    Backend:
+    - - \u7531\u6280\u8853\u89d2\u5ea6\u7747\uff0c
+      - 從技術角度睇，
+    PM:
+    - - \u7531\u7522\u54c1\u76ee\u6a19\u540c\u9032\u5ea6\u89d2\u5ea6\u7747\uff0c
+      - 從產品同 delivery 角度睇，
+    QA:
+    - - \u7531 QA \u89d2\u5ea6\u7747\uff0c
+      - 從 QA 角度睇，
+multilingual_opening_variants:
+  Japanese:
+  - pattern: ^今は承認できません
+    ignore_case: false
+    variants:
+    - 今は承認できません
+    - 現時点では承認できません
+    - この段階では承認できません
+  Korean:
+  - pattern: ^지금은 승인할 수 없습니다
+    ignore_case: false
+    variants:
+    - 지금은 승인할 수 없습니다
+    - 현 시점에서는 승인하기 어렵습니다
+    - 이 단계에서는 승인할 수 없습니다
+  French:
+  - pattern: ^Je ne peux pas encore valider
+    ignore_case: true
+    variants:
+    - Je ne peux pas encore valider
+    - Je ne suis pas encore en mesure de valider
+    - Je ne peux pas approuver cela pour l'instant
+  German:
+  - pattern: ^Ich kann das noch nicht freigeben
+    ignore_case: true
+    variants:
+    - Ich kann das noch nicht freigeben
+    - Ich bin noch nicht bereit, das freizugeben
+    - Ich kann das im Moment noch nicht genehmigen
+  Spanish:
+  - pattern: ^No puedo aprobar
+    ignore_case: true
+    variants:
+    - No puedo aprobar
+    - Todavía no estoy en condiciones de aprobar
+    - Por ahora no puedo validar esto
+  Portuguese:
+  - pattern: ^Ainda não posso aprovar
+    ignore_case: true
+    variants:
+    - Ainda não posso aprovar
+    - Ainda não estou pronto para aprovar
+    - Neste momento eu não posso validar isso
+  Cantonese:
+  - pattern: ^\u6211\u800c\u5bb6\u672a\u53ef\u4ee5\u6279
+    ignore_case: false
+    variants:
+    - 我而家未可以批
+    - 現階段我還唔會批
+    - 而家這個點我未可以放行

@@ -1,0 +1,10 @@
+﻿runtime:
+  defaults:
+    ROLE_KPI_SOFT: '0'
+    ROLE_KPI_VERBOSE: '0'
+    V2_EXPANSION_TEST: '0'
+backends:
+  text: source_first
+  audio: source_policy
+  text_bundle_fallback: enabled
+  audio_bundle_fallback: enabled

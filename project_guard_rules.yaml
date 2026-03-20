@@ -1,0 +1,282 @@
+﻿# ===============================
+# Project Guard Rules Configuration
+# ===============================
+
+version: 1.0
+
+# --------------------------------
+# Files that must never be moved
+# --------------------------------
+protected_files:
+  - app.py
+  - server.py
+  - run.py
+  - embedded_server.py
+  - runtime_patches.py
+  - resource_path_utils.py
+  - template_retriever.py
+  - pack_adapter.py
+  - project_guard.py
+  - project_guard_rules.yaml
+  - cleanup_tool.py
+  - .cleanupignore
+  - README.md
+  - requirements.txt
+  - start_demo.bat
+
+# --------------------------------
+# Protected filename patterns
+# --------------------------------
+protected_patterns:
+  - "dialogue_*"
+  - "template_*"
+  - "core_*"
+  - "generate_*"
+  - "industry_*"
+  - "src/**"
+  - "config/**"
+  - "docs/**"
+  - "scripts/**"
+  - "tools/**"
+  - "runtime/**"
+  - "archive/**"
+  - "reports/**"
+  - "output/**"
+
+# --------------------------------
+# Allowed files in root directory
+# Everything else should be moved
+# --------------------------------
+root_allowlist:
+  - README.md
+  - requirements.txt
+  - run.py
+  - app.py
+  - server.py
+  - cleanup_tool.py
+  - cleanup_report_template.md
+  - project_guard.py
+  - project_guard_rules.yaml
+  - .cleanupignore
+  - .gitignore
+  - pyproject.toml
+  - sitecustomize.py
+  - embedded_server.py
+  - start_demo.bat
+  - cleanup_report.md
+  - migration_notes.md
+  - project_guard_report.md
+
+root_allow_dirs:
+  - src
+  - config
+  - .claude
+  - .github
+  - demo
+  - scripts
+  - static
+  - tools
+  - docs
+  - runtime
+  - archive
+  - reports
+  - output
+  - tests
+  - training
+  - build
+  - dist
+  - bin
+  - .autogate
+
+# --------------------------------
+# Temporary script patterns
+# --------------------------------
+temp_script_patterns:
+  - "__tmp_*.py"
+  - "tmp_*.py"
+  - "probe_*.py"
+  - "debug_*.py"
+  - "inspect_*.py"
+  - "check_*.py"
+  - "*_compat*.py"
+  - "*_loader_test.py"
+
+temp_script_keywords:
+  - probe
+  - verify
+  - inspect
+  - compat
+  - debug
+  - loader
+  - tmp
+  - check
+  - test_probe
+
+# --------------------------------
+# Files that should be archived
+# --------------------------------
+archive_patterns:
+  - "*_failed"
+  - "*_legacy"
+  - "*_corrupted"
+  - "*.bak"
+  - "*.old"
+  - "*.backup"
+
+archive_target:
+  deprecated_scripts: "archive/deprecated/debug_scripts"
+  deprecated_images: "archive/deprecated/debug_images"
+  failed_artifacts: "archive/failed_artifacts"
+  root_artifacts: "docs/archive/root_artifacts"
+
+# --------------------------------
+# Root-level historical artifacts
+# --------------------------------
+root_archive_patterns:
+  - "CLAUDE.md"
+  - "re-summarize-*.html"
+  - "re-summarize-*.md"
+  - "re-summarize-*.txt"
+
+# --------------------------------
+# Temporary debug images
+# --------------------------------
+temp_image_patterns:
+  - "*.png"
+  - "*.jpg"
+  - "*.jpeg"
+  - "*.webp"
+  - "*.gif"
+
+temp_image_keywords:
+  - test
+  - debug
+  - current
+  - after
+  - blank
+  - partial
+  - progress
+  - ready
+  - scratch
+  - sample
+  - state
+  - mindmap
+  - whiteboard
+  - doc
+
+temp_image_root_only: true
+
+# --------------------------------
+# Logs
+# --------------------------------
+log_patterns:
+  - "*.log"
+
+log_target_dir: "runtime/logs"
+
+remove_empty_logs: true
+deduplicate_logs: false
+
+# --------------------------------
+# Cache and build artifacts
+# --------------------------------
+delete_patterns:
+  - "*.pyc"
+  - "*.pyo"
+  - "*.tmp"
+
+delete_dirs:
+  - "__pycache__"
+
+cache_target_dir: "runtime/cache"
+temp_target_dir: "runtime/temp"
+
+# --------------------------------
+# Asset folders
+# --------------------------------
+asset_dirs:
+  - audio
+  - template_bank
+  - template_data_pack
+
+asset_target_dir: "src/demo_app/assets"
+
+# --------------------------------
+# Domain modules
+# --------------------------------
+domain_dirs:
+  - payment
+  - domain_kb
+  - quality_upgrade
+
+domain_target_dir: "src/demo_app/domains"
+
+# --------------------------------
+# Core application modules
+# --------------------------------
+core_module_patterns:
+  - "app.py"
+  - "server.py"
+  - "runtime_patches.py"
+  - "resource_path_utils.py"
+  - "template_retriever.py"
+  - "pack_adapter.py"
+  - "ssml_builder.py"
+
+core_module_target: "src/demo_app"
+
+# --------------------------------
+# Debug tools
+# --------------------------------
+debug_tool_patterns:
+  - "probe_*.py"
+  - "inspect_*.py"
+  - "debug_*.py"
+
+debug_tool_target: "tools/debug"
+
+# --------------------------------
+# Documentation
+# --------------------------------
+doc_patterns:
+  - "*.md"
+
+doc_target: "docs"
+
+doc_archive_target: "docs/archive"
+
+# --------------------------------
+# Runtime artifacts
+# --------------------------------
+runtime_artifact_patterns:
+  - "voice_cache"
+  - "training_outputs_*"
+
+runtime_artifact_target: "runtime"
+
+# --------------------------------
+# Safety settings
+# --------------------------------
+safety:
+  allow_delete_python: false
+  archive_before_delete: true
+  warn_on_root_python: true
+  prevent_import_breakage: true
+
+# --------------------------------
+# Watch mode
+# --------------------------------
+watch:
+  enabled: true
+  interval_seconds: 60
+  safe_mode: true
+
+# --------------------------------
+# Reporting
+# --------------------------------
+report:
+  enabled: true
+  report_file: "project_guard_report.md"
+  include_actions: true
+  include_warnings: true
+  include_statistics: true

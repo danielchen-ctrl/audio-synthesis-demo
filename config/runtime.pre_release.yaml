@@ -1,0 +1,3 @@
+backends:
+  text_bundle_fallback: disabled
+  audio_bundle_fallback: disabled
