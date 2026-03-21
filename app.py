@@ -1,17 +1,16 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pathlib import Path
-import sys
+"""Legacy desktop entrypoint kept as a thin compatibility wrapper.
 
-ROOT = Path(__file__).resolve().parent
-SRC = ROOT / 'src'
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
+The previous `app.py -> src/demo_app/app.py` chain no longer exists in this
+checkout. We keep this file so older local habits and shortcuts still work,
+but route everything to the current embedded demo server implementation.
+"""
 
-from demo_app.app import *  # noqa: F401,F403
-from demo_app.app import main
+from embedded_server import *  # noqa: F401,F403
+from embedded_server import main
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
