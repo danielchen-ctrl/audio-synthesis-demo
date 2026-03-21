@@ -8,7 +8,7 @@
 - 在 Web 端手动修改生成文本
 - 基于当前文本继续合成音频
 - 下载文本、音频、字幕与分段文件
-- 运行多语言质量检查与 source-only 回归
+- 运行多语言质量检查与 pre-release 门禁回归
 
 ## 目录结构说明
 
@@ -147,6 +147,12 @@ GitHub Actions 中对应的工作流：
 
 - `scripts/release_tag.ps1`
 - `scripts/release_tag.sh`
+
+发布前建议依次查看：
+
+- `docs/release-process.md`
+- `docs/release-checklist.md`
+- `docs/release-notes-template.md`
 
 详细流程见：
 

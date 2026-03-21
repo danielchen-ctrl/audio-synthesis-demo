@@ -11,6 +11,39 @@ if ([string]::IsNullOrWhiteSpace($Version)) {
     exit 1
 }
 
+if ($Version -notmatch '^v\d+\.\d+\.\d+$') {
+    Write-Host "[ERROR] 版本号格式不合法。请使用类似 v0.1.0 的语义化版本号。"
+    exit 1
+}
+
+$CurrentBranch = (git branch --show-current).Trim()
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "[ERROR] 无法获取当前分支。"
+    exit $LASTEXITCODE
+}
+
+if ($CurrentBranch -ne 'main') {
+    Write-Host "[ERROR] 当前分支为 '$CurrentBranch'。请切换到 main 后再打 tag。"
+    exit 1
+}
+
+$WorktreeStatus = git status --porcelain
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "[ERROR] 无法检查工作区状态。"
+    exit $LASTEXITCODE
+}
+
+if (-not [string]::IsNullOrWhiteSpace($WorktreeStatus)) {
+    Write-Host "[ERROR] 当前工作区不干净，请先提交或清理改动后再打 tag。"
+    exit 1
+}
+
+git rev-parse --verify --quiet "refs/tags/$Version" | Out-Null
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "[ERROR] 标签 $Version 已存在，请使用新的版本号。"
+    exit 1
+}
+
 Write-Host "[INFO] 创建标签: $Version"
 git tag $Version
 if ($LASTEXITCODE -ne 0) {

@@ -4,19 +4,25 @@
 
 推荐流程：
 
-1. 在 `dev` 完成集成和回归
-2. 确认关键脚本可用
-3. 执行发布前门禁检查
-4. 确认 README、流程文档、变更说明已更新
-5. 从 `dev` 发起到 `main` 的 PR
-6. 审核通过后合并到 `main`
+1. 在 `dev` 完成集成和回归。
+2. 确认关键脚本可用。
+3. 执行发布前门禁检查。
+4. 确认 README、流程文档、变更说明已更新。
+5. 从 `dev` 发起到 `main` 的 PR。
+6. 审核通过后合并到 `main`。
 
 建议执行：
 
 ```powershell
 python scripts/run_pre_release_ci_gate.py
 python scripts/enforce_pre_release_ci_gate.py --report reports/pre_release_gate/latest.json
+scripts\run_multilingual_quality_checks.bat
 ```
+
+发布前请同时核对：
+
+- `docs/release-checklist.md`
+- `docs/release-notes-template.md`
 
 ## 如何打 tag
 
@@ -34,14 +40,25 @@ python scripts/enforce_pre_release_ci_gate.py --report reports/pre_release_gate/
 示例：
 
 ```powershell
-scripts/release_tag.ps1 v0.1.0
+powershell -ExecutionPolicy Bypass -File scripts/release_tag.ps1 v0.1.0
 ```
 
 ```bash
 ./scripts/release_tag.sh v0.1.0
 ```
 
+脚本会校验：
+
+- 版本号格式是否符合 `v主版本.次版本.修订号`
+- 当前分支是否为 `main`
+- 工作区是否干净
+- 本地是否已存在同名 tag
+
 ## 如何准备 release note
+
+建议以以下文件作为标准模板：
+
+- `docs/release-notes-template.md`
 
 建议至少包含：
 
@@ -72,10 +89,10 @@ scripts/release_tag.ps1 v0.1.0
 
 推荐方式：
 
-1. 找到目标 tag 或 commit
-2. 在本地验证该版本可用
+1. 找到目标 tag 或 commit。
+2. 在本地验证该版本可用。
 3. 根据情况：
-   - 新建修复分支
-   - 或将 `main` 回退到某个 tag 后再发布
+   - 新建修复分支；
+   - 或将 `main` 回退到某个 tag 后再发布。
 
 如果需要改写远程历史，属于高风险操作，应先确认团队影响范围。
