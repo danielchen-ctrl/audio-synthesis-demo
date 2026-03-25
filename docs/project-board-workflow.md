@@ -45,7 +45,8 @@
    - `Backlog` -> `Todo` -> `In Progress` -> `Review` -> `Done`
 5. 开发时从 Issue 创建分支或手动关联分支
 6. PR 中关联 Issue
-7. 合并后把 Project 卡片移到 `Done`
+7. PR 合并后把 Project 卡片移到 `Done`
+8. 本地正式目录通过 `git pull origin main` 同步 GitHub 最新代码
 
 ## Issue、PR、Project Card 的关联方式
 
@@ -55,6 +56,11 @@
 2. Project Card 反映当前状态
 3. PR 通过 `Closes #123` 或 `Refs #123` 关联 Issue
 4. 发布时用 Milestone 统一归类版本范围
+5. 推荐让团队日常只盯 4 个入口：
+   - `Projects`：看进度
+   - `Issues`：看任务说明
+   - `Pull requests`：看变更和合并情况
+   - `Code / Actions`：看代码现状和检查结果
 
 ## 适合当前仓库的建议
 
