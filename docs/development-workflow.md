@@ -32,27 +32,43 @@
 
 - `main`
   - 保持可演示、可发布
+  - 不直接开发，所有改动通过 PR 合并进入
 - `dev`
   - 日常集成分支
+- `docs/*`
+  - 文档与说明调整
 - `feature/*`
   - 新功能开发
 - `fix/*`
   - 问题修复
+- `ci/*`
+  - CI、门禁、自动化脚本调整
+- `chore/*`
+  - 仓库治理与杂项维护
 - `release/*`
   - 发布准备（如需要）
 
 ## 提交与 PR 流程
 
 1. 从 Issue 开始
-2. 在对应分支开发
-3. 自测通过后提交
-4. 推送并发起 PR
-5. 在 PR 中说明：
+2. 创建独立分支，分支前缀使用：
+   - `docs/`
+   - `feature/`
+   - `fix/`
+   - `ci/`
+   - `chore/`
+   - 若由 Codex 自动创建，分支会带工具前缀，例如 `codex/docs/...`
+3. 在对应分支开发
+4. 自测通过后提交
+5. 推送并发起 PR
+6. 在 PR 中说明：
    - 变更目的
    - 主要改动
    - 测试情况
    - 风险与回滚
    - 关联 Issue
+7. PR 合并到 `main` 后，在本地正式目录执行：
+   - `git pull origin main`
 
 ## Codex 接入方式
 
@@ -72,8 +88,11 @@ Codex 进入仓库后建议顺序：
    - `task`
 3. 如果使用 GitHub Project，将 Issue 加入看板
 4. 创建分支，例如：
+   - `docs/startup-sharing-guide`
    - `feature/share-download`
    - `fix/audio-fallback`
+   - `ci/pre-release-gate`
+   - `chore/repo-cleanup`
 5. 开发完成后提交 PR 并关联 Issue
 
 ## 发布前门禁

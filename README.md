@@ -114,9 +114,10 @@ GitHub Actions 中对应的工作流：
    - `docs/project-overview.md`
    - `docs/architecture.md`
 2. 从 GitHub Issue 开始任务
-3. 建立分支开发
+3. 建立独立分支开发
 4. 本地自测与脚本检查
 5. 提交代码并发起 PR
+6. PR 合并后，在本地正式目录执行 `git pull origin main`
 
 建议在提交前至少执行一次：
 
@@ -129,10 +130,13 @@ GitHub Actions 中对应的工作流：
 
 ## 分支策略
 
-- `main`：始终保持可演示、可发布
+- `main`：始终保持可演示、可发布，不直接开发
 - `dev`：日常集成
+- `docs/*`：文档与说明调整
 - `feature/*`：单功能开发
 - `fix/*`：缺陷修复
+- `ci/*`：CI、门禁、自动化脚本调整
+- `chore/*`：仓库治理与杂项维护
 - `release/*`：发布准备（如需要）
 
 ## 版本发布方式
@@ -169,7 +173,8 @@ GitHub Actions 中对应的工作流：
    - `task`
 3. Issue 加入 GitHub Project
 4. PR 关联 Issue
-5. 任务状态按 `Backlog / Todo / In Progress / Review / Done` 流转
+5. PR 合并后，再通过 `git pull origin main` 同步到本地正式目录
+6. 任务状态按 `Backlog / Todo / In Progress / Review / Done` 流转
 
 详细说明见：
 
@@ -191,3 +196,17 @@ Codex 进入仓库后，默认应先阅读：
 - 当前工作是否有对应 Issue / Task
 
 如果涉及高风险操作，例如大规模删除、改 Git 历史、改核心发布流程，需要先确认。
+
+### 日常只需要关注的 4 个入口
+
+后续如果按标准 GitHub 流程协作，你日常主要看这 4 个地方即可：
+
+1. `Projects`
+   - 看任务现在在 `Todo / In Progress / Review / Done` 的哪个阶段
+2. `Issues`
+   - 看任务目标、范围、验收标准和补充说明
+3. `Pull requests`
+   - 看每次改了什么、关联了哪个 Issue、是否已经合并
+4. `Code / Actions`
+   - `Code` 看当前主分支最新代码
+   - `Actions` 看 CI 和 pre-release gate 是否通过
