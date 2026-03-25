@@ -67,6 +67,8 @@ VOICE_CATALOG = {
     "Cantonese": ["zh-HK-HiuGaaiNeural", "zh-HK-WanLungNeural", "zh-HK-HiuMaanNeural"],
 }
 
+MAX_AUDIO_TEXT_CHARS = 12000
+
 
 def active_static_dir() -> Path:
     if (LOCAL_STATIC_DIR / "index.html").exists() and (LOCAL_STATIC_DIR / "app.js").exists():
@@ -225,6 +227,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     save_dir.mkdir(parents=True, exist_ok=True)
     text_path = save_dir / f"{basename}.txt"
     text_path.write_text(dialogue_text, encoding="utf-8")
+    updated_at = datetime.now().isoformat(timespec="seconds")
 
     manifest = {
         "dialogue_id": dialogue_id,
@@ -239,6 +242,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         "audio_language": language,
         "save_dir": str(save_dir),
         "text_path": str(text_path),
+        "text_updated_at": updated_at,
         "audio_path": "",
         "voice_map": {},
         "edited_text": False,
@@ -268,10 +272,13 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
 
     return {
         "ok": True,
+        "success": True,
         "dialogue_id": dialogue_id,
         "timestamp": timestamp,
         "basename": basename,
         "text_path": str(text_path),
+        "file_name": text_path.name,
+        "updated_at": updated_at,
         "dialogue_text": dialogue_text,
         "text": dialogue_text,
         "lines": normalized_lines,
@@ -323,6 +330,13 @@ def _dialogue_lines_from_text(dialogue_text: str) -> list[tuple[str, str]]:
     return lines
 
 
+def _normalize_dialogue_text_for_storage(dialogue_text: str) -> str:
+    normalized = str(dialogue_text or "").replace("\r\n", "\n").strip()
+    if not normalized:
+        raise ValueError("当前对话文本为空，无法保存")
+    return normalized
+
+
 def _render_dialogue_text(bundle_server: Any, lines: list[tuple[str, str]]) -> str:
     return bundle_server._render_dialogue_text(lines)
 
@@ -336,25 +350,34 @@ def _save_dialogue_edit(bundle_server: Any, dialogue_id: str, dialogue_text: str
     save_dir = Path(manifest.get("save_dir") or manifest_path.parent)
     save_dir.mkdir(parents=True, exist_ok=True)
 
-    lines = _dialogue_lines_from_text(dialogue_text)
-    rendered_text = _render_dialogue_text(bundle_server, lines)
+    rendered_text = _normalize_dialogue_text_for_storage(dialogue_text)
     text_path = Path(manifest.get("text_path") or save_dir / f"{manifest.get('basename', dialogue_id)}.txt")
     text_path.write_text(rendered_text, encoding="utf-8")
+    updated_at = datetime.now().isoformat(timespec="seconds")
 
     manifest["text_path"] = str(text_path)
     manifest["edited_text"] = True
-    manifest["edited_at"] = __import__("datetime").datetime.now().isoformat(timespec="seconds")
+    manifest["edited_at"] = updated_at
+    manifest["text_updated_at"] = updated_at
     _write_json(manifest_path, manifest)
+
+    try:
+        line_tuples = _dialogue_lines_from_text(rendered_text)
+        normalized_lines = _normalize_lines(bundle_server, line_tuples)
+    except Exception:
+        line_tuples = None
+        normalized_lines = []
 
     return {
         "dialogue_id": dialogue_id,
         "manifest_path": str(manifest_path),
         "save_dir": str(save_dir),
         "text_path": str(text_path),
+        "updated_at": updated_at,
         "dialogue_text": rendered_text,
-        "lines": _normalize_lines(bundle_server, lines),
+        "lines": normalized_lines,
         "manifest": manifest,
-        "line_tuples": lines,
+        "line_tuples": line_tuples,
     }
 
 
@@ -400,10 +423,7 @@ async def _synthesize_audio_from_lines(
     if ffmpeg:
         AudioSegment.converter = ffmpeg
 
-    tmp_dir = save_dir / "_edited_tts_tmp"
-    if tmp_dir.exists():
-        shutil.rmtree(tmp_dir)
-    tmp_dir.mkdir(parents=True, exist_ok=True)
+    tmp_dir = Path(tempfile.mkdtemp(prefix="_edited_tts_tmp_", dir=save_dir))
 
     combined = AudioSegment.silent(duration=120)
     segments: list[dict[str, Any]] = []
@@ -563,6 +583,7 @@ class ServerInfoHandler(JsonHandler):
         self.write_json(
             {
                 "ok": True,
+                "success": True,
                 "listen_host": os.environ.get("DEMO_APP_HOST", "0.0.0.0"),
                 "port": port,
                 "local_urls": urls,
@@ -588,8 +609,11 @@ class UpdateDialogueHandler(JsonHandler):
         self.write_json(
             {
                 "ok": True,
+                "success": True,
                 "dialogue_id": dialogue_id,
                 "text_path": result["text_path"],
+                "file_name": Path(result["text_path"]).name,
+                "updated_at": result["updated_at"],
                 "dialogue_text": result["dialogue_text"],
                 "lines": result["lines"],
                 "text_download_url": _download_url(dialogue_id, "text"),
@@ -607,19 +631,26 @@ class GenerateAudioCustomHandler(JsonHandler):
         bundle_server = load_bundle_server()
         dialogue_text = str(payload.get("dialogue_text", "")).strip()
         if dialogue_text:
-            result = _save_dialogue_edit(bundle_server, dialogue_id, dialogue_text)
+            normalized_text = _normalize_dialogue_text_for_storage(dialogue_text)
+            if len(normalized_text) > MAX_AUDIO_TEXT_CHARS:
+                raise HTTPError(400, reason=f"文本过长，请缩短到 {MAX_AUDIO_TEXT_CHARS} 个字符以内后再生成音频")
+            result = _save_dialogue_edit(bundle_server, dialogue_id, normalized_text)
             manifest = result["manifest"]
-            line_tuples = result["line_tuples"]
             save_dir = Path(result["save_dir"])
+            line_tuples = _dialogue_lines_from_text(normalized_text)
         else:
             manifest_path, manifest = _find_manifest(dialogue_id)
             save_dir = Path(manifest.get("save_dir") or manifest_path.parent)
             text_path = Path(manifest["text_path"])
-            line_tuples = _dialogue_lines_from_text(text_path.read_text(encoding="utf-8"))
+            normalized_text = _normalize_dialogue_text_for_storage(text_path.read_text(encoding="utf-8"))
+            if len(normalized_text) > MAX_AUDIO_TEXT_CHARS:
+                raise HTTPError(400, reason=f"文本过长，请缩短到 {MAX_AUDIO_TEXT_CHARS} 个字符以内后再生成音频")
+            line_tuples = _dialogue_lines_from_text(normalized_text)
 
         basename = manifest.get("basename", dialogue_id)
         language = str(payload.get("language") or manifest.get("audio_language") or "中文")
         audio_result = await _synthesize_audio_from_lines(line_tuples, language, save_dir, basename, bundle_server)
+        generated_at = datetime.now().isoformat(timespec="seconds")
 
         audio_file = audio_result["audio_file_path"]
         manifest["audio_path"] = audio_file
@@ -628,13 +659,18 @@ class GenerateAudioCustomHandler(JsonHandler):
         manifest["audio_warning"] = audio_result["warning"]
         manifest["segments_json_path"] = audio_result["segments_json_path"]
         manifest["transcript_vtt_path"] = audio_result["transcript_vtt_path"]
+        manifest["audio_updated_at"] = generated_at
         _write_json(Path(manifest.get("save_dir") or save_dir) / "manifest.json", manifest)
 
         self.write_json(
             {
                 "ok": True,
+                "success": True,
                 "dialogue_id": dialogue_id,
                 "audio_file_path": audio_file,
+                "file_name": Path(audio_file).name,
+                "generated_at": generated_at,
+                "updated_at": generated_at,
                 "mp3_path": audio_result["mp3_path"],
                 "wav_path": audio_result["wav_path"],
                 "voice_map": audio_result["voice_map"],

@@ -157,6 +157,11 @@ textarea,
   min-height: 420px;
 }
 
+.dialogue-editor[readonly] {
+  background: #f4f7fc;
+  color: var(--muted);
+}
+
 .actions {
   display: flex;
   gap: 16px;
