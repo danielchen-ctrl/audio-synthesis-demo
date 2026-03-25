@@ -61,6 +61,7 @@ jobs:
           name: pre-release-gate-report
           path: |
             reports/pre_release_gate/
+            reports/multilingual_quality_checks/
             runtime/temp/repo_daily_checks/
           if-no-files-found: warn
 

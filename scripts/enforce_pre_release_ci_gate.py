@@ -39,6 +39,7 @@ def main(argv: list[str] | None = None) -> int:
     _assert(checks.get('yaml_parse', {}).get('status') == 'ok', 'YAML parse check failed')
     _assert(checks.get('python_compile', {}).get('status') == 'ok', 'Python compile check failed')
     _assert(checks.get('repo_daily_check', {}).get('status') == 'ok', 'repo daily check failed')
+    _assert(checks.get('multilingual_quality_check', {}).get('status') == 'ok', 'multilingual quality check failed')
     embedded = checks.get('embedded_demo_smoke', {})
     _assert(embedded.get('status') in {'ok', 'skipped'}, f"unexpected embedded smoke status: {embedded.get('status')}")
 

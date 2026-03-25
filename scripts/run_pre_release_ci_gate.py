@@ -16,6 +16,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORT_DIR = ROOT / 'reports' / 'pre_release_gate'
+MULTILINGUAL_REPORT_DIR = ROOT / 'reports' / 'multilingual_quality_checks'
 RUNTIME_TEMP = ROOT / 'runtime' / 'temp' / 'pre_release_gate'
 
 REQUIRED_PATHS = [
@@ -29,8 +30,10 @@ REQUIRED_PATHS = [
     ROOT / 'static' / 'app.js',
     ROOT / 'scripts' / 'start_server.py',
     ROOT / 'scripts' / 'run_repo_daily_check.py',
+    ROOT / 'scripts' / 'run_multilingual_quality_checks.py',
     ROOT / '.github' / 'workflows' / 'ci.yml',
     ROOT / '.github' / 'workflows' / 'project-reminder.yml',
+    ROOT / '.github' / 'workflows' / 'pre-release-gate.yml',
 ]
 
 PYTHON_COMPILE_TARGETS = [
@@ -39,12 +42,15 @@ PYTHON_COMPILE_TARGETS = [
     ROOT / 'run.py',
     ROOT / 'scripts' / 'start_server.py',
     ROOT / 'scripts' / 'run_repo_daily_check.py',
+    ROOT / 'scripts' / 'run_multilingual_quality_checks.py',
+    ROOT / 'scripts' / 'run_multilingual_pre_release_source_only_check.py',
 ]
 
 YAML_TARGETS = [
     ROOT / 'project_guard_rules.yaml',
     ROOT / '.github' / 'workflows' / 'ci.yml',
     ROOT / '.github' / 'workflows' / 'project-reminder.yml',
+    ROOT / '.github' / 'workflows' / 'pre-release-gate.yml',
 ]
 
 BUNDLE_TARGETS = [
@@ -61,6 +67,17 @@ def _run(command: list[str], *, cwd: Path) -> subprocess.CompletedProcess[str]:
         text=True,
         encoding='utf-8',
     )
+
+
+def _decode_json_stdout(stdout: str) -> dict[str, Any] | None:
+    stdout = (stdout or '').strip()
+    if not stdout:
+        return None
+    try:
+        payload = json.loads(stdout)
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, dict) else None
 
 
 def _find_free_port() -> int:
@@ -123,12 +140,21 @@ def _run_repo_daily(report_dir: Path) -> dict[str, Any]:
     completed = _run([sys.executable, 'scripts/run_repo_daily_check.py', '--report-dir', str(report_dir)], cwd=ROOT)
     stdout = (completed.stdout or '').strip()
     stderr = (completed.stderr or '').strip()
-    payload: dict[str, Any] | None = None
-    if stdout:
-        try:
-            payload = json.loads(stdout)
-        except json.JSONDecodeError:
-            payload = None
+    payload = _decode_json_stdout(stdout)
+    return {
+        'status': 'ok' if completed.returncode == 0 else 'error',
+        'exit_code': completed.returncode,
+        'stdout': stdout,
+        'stderr': stderr,
+        'payload': payload,
+    }
+
+
+def _run_multilingual_quality(report_dir: Path) -> dict[str, Any]:
+    completed = _run([sys.executable, 'scripts/run_multilingual_quality_checks.py', '--report-dir', str(report_dir)], cwd=ROOT)
+    stdout = (completed.stdout or '').strip()
+    stderr = (completed.stderr or '').strip()
+    payload = _decode_json_stdout(stdout)
     return {
         'status': 'ok' if completed.returncode == 0 else 'error',
         'exit_code': completed.returncode,
@@ -246,6 +272,7 @@ def _markdown_report(payload: dict[str, Any]) -> str:
         f"- YAML parse: `{payload['checks']['yaml_parse']['status']}`",
         f"- Python compile: `{payload['checks']['python_compile']['status']}`",
         f"- Repo daily check: `{payload['checks']['repo_daily_check']['status']}`",
+        f"- Multilingual quality check: `{payload['checks']['multilingual_quality_check']['status']}`",
         f"- Embedded smoke: `{payload['checks']['embedded_demo_smoke']['status']}`",
         '',
     ]
@@ -259,6 +286,22 @@ def _markdown_report(payload: dict[str, Any]) -> str:
         for item in payload['warnings']:
             lines.append(f"- {item}")
         lines.append('')
+
+    multilingual = payload['checks']['multilingual_quality_check']
+    if multilingual.get('payload'):
+        summary = multilingual['payload'].get('summary', {})
+        lines.extend([
+            '## Multilingual Quality Summary',
+            '',
+            f"- Overall status: `{multilingual.get('status')}`",
+            f"- Errors: `{summary.get('error_count', 0)}`",
+            f"- Warnings: `{summary.get('warning_count', 0)}`",
+            f"- Scripted languages: `{summary.get('scripted_language_count', 0)}`",
+            f"- Source-only text languages: `{summary.get('source_text_language_count', 0)}`",
+            f"- Source-only audio languages: `{summary.get('source_audio_language_count', 0)}`",
+            '',
+        ])
+
     smoke = payload['checks']['embedded_demo_smoke']
     if smoke.get('status') == 'ok':
         lines.extend([
@@ -301,6 +344,8 @@ def _write_reports(payload: dict[str, Any], report_dir: Path) -> dict[str, str]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(description='Run pre-release CI gate aligned to the current embedded demo repository.')
     parser.add_argument('--report-dir', default=str(DEFAULT_REPORT_DIR), help='Directory for gate reports.')
     args = parser.parse_args(argv)
@@ -309,6 +354,7 @@ def main(argv: list[str] | None = None) -> int:
     yaml_parse = _check_yaml_files()
     python_compile = _check_python_compile()
     repo_daily_check = _run_repo_daily(RUNTIME_TEMP / 'repo_daily_checks')
+    multilingual_quality_check = _run_multilingual_quality(MULTILINGUAL_REPORT_DIR)
     embedded_demo_smoke = _run_embedded_smoke()
 
     blocking_failures: list[str] = []
@@ -324,6 +370,12 @@ def main(argv: list[str] | None = None) -> int:
             blocking_failures.append(f"python compile failed for {item['file']}: {item['error']}")
     if repo_daily_check['status'] != 'ok':
         blocking_failures.append('repo daily check failed')
+    if multilingual_quality_check['status'] != 'ok':
+        details = multilingual_quality_check.get('payload', {}).get('summary', {}) if multilingual_quality_check.get('payload') else {}
+        blocking_failures.append(
+            'multilingual quality check failed'
+            + (f" (errors={details.get('error_count', 'unknown')}, warnings={details.get('warning_count', 'unknown')})" if details else '')
+        )
     if embedded_demo_smoke['status'] == 'error':
         blocking_failures.append(f"embedded smoke failed: {embedded_demo_smoke.get('reason', 'unknown error')}")
     elif embedded_demo_smoke['status'] == 'skipped':
@@ -337,6 +389,7 @@ def main(argv: list[str] | None = None) -> int:
             'yaml_parse': yaml_parse,
             'python_compile': python_compile,
             'repo_daily_check': repo_daily_check,
+            'multilingual_quality_check': multilingual_quality_check,
             'embedded_demo_smoke': embedded_demo_smoke,
         },
         'blocking_failures': blocking_failures,
