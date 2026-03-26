@@ -72,6 +72,8 @@ VOICE_CATALOG = {
 }
 
 MAX_AUDIO_TEXT_CHARS = 12000
+PRESET_TOPIC_FILE = ROOT / "demo" / "预置对话情景参数.txt"
+PRESET_BLOCK_RE = re.compile(r"(?ms)^\s*(\d+)[）\)]\s*(.+?)(?=^\s*\d+[）\)]\s*|\Z)")
 
 
 def active_static_dir() -> Path:
@@ -236,6 +238,182 @@ def _safe_int(value: Any, default: int) -> int:
         return default
 
 
+def _safe_str_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    result: list[str] = []
+    for item in value:
+        normalized = str(item or "").strip()
+        if normalized and normalized not in result:
+            result.append(normalized)
+    return result
+
+
+def _compact_multiline_text(value: str) -> str:
+    cleaned: list[str] = []
+    for raw_line in str(value or "").splitlines():
+        line = raw_line.strip()
+        if not line or line == ">":
+            continue
+        line = re.sub(r"^<Core[:：]?", "", line).strip()
+        line = line.rstrip(">").strip()
+        line = re.sub(r"^[\-\*•\d\.、\)\(]+", "", line).strip()
+        if line:
+            cleaned.append(line)
+    return " ".join(cleaned).strip()
+
+
+def _extract_section(block: str, start_tokens: list[str], stop_tokens: list[str]) -> str:
+    start_index = -1
+    matched_token = ""
+    for token in start_tokens:
+        idx = block.find(token)
+        if idx != -1 and (start_index == -1 or idx < start_index):
+            start_index = idx
+            matched_token = token
+    if start_index == -1:
+        return ""
+
+    section = block[start_index + len(matched_token):]
+    if section.startswith(("：", ":")):
+        section = section[1:]
+
+    stop_index = len(section)
+    for token in stop_tokens:
+        idx = section.find(token)
+        if idx != -1:
+            stop_index = min(stop_index, idx)
+
+    return _compact_multiline_text(section[:stop_index])
+
+
+def _extract_word_count(block: str) -> int:
+    range_match = re.search(r"target_words\s*=\s*(\d+)\s*[~～\-]\s*(\d+)", block, flags=re.IGNORECASE)
+    if range_match:
+        low = int(range_match.group(1))
+        high = int(range_match.group(2))
+        return max(100, int(round((low + high) / 2)))
+    single_match = re.search(r"target_words\s*=\s*(\d+)", block, flags=re.IGNORECASE)
+    if single_match:
+        return max(100, int(single_match.group(1)))
+    return 1000
+
+
+def _guess_template_label(title: str, scenario: str) -> str:
+    match = re.search(r"[（(]([^()（）]{1,20})[)）]", title)
+    if match:
+        return match.group(1).strip()
+
+    combined = f"{title} {scenario}"
+    if "问诊" in combined or ("医生" in combined and "病" in combined):
+        return "问诊"
+    if "战略周会" in combined or "周会" in combined:
+        return "战略周会"
+    if "访谈" in combined:
+        return "访谈"
+    if "销售" in combined or "洽谈" in combined or "客户" in combined:
+        return "客户访谈"
+    if "决策" in combined:
+        return "方案决策"
+    if "排查" in combined or "异常" in combined:
+        return "问题排查"
+    if "评审" in combined or "准入" in combined or "Go / No-Go" in combined or "Go/No-Go" in combined:
+        return "评审会"
+    return "会议讨论"
+
+
+def _preset_topic_text(title: str) -> str:
+    source = title.split("｜", 1)[1].strip() if "｜" in title else title.strip()
+    source = re.sub(r"[（(].*?[)）]", "", source).strip() or title.strip()
+    return source
+
+
+def _preset_display_title(topic_text: str) -> str:
+    compact = re.sub(r"\s+", "", topic_text)
+    return compact[:20] if len(compact) > 20 else compact
+
+
+def _preset_profile(title: str, topic_text: str, template_label: str) -> dict[str, str]:
+    industry = title.split("｜", 1)[0].strip() if "｜" in title else template_label or "在线生成音频"
+    return {
+        "job_function": industry or template_label or "在线生成音频",
+        "work_content": topic_text or template_label or "场景对话",
+        "seniority": "资深",
+        "use_case": template_label or "会议讨论",
+    }
+
+
+def _load_preset_topics() -> list[dict[str, Any]]:
+    if not PRESET_TOPIC_FILE.exists():
+        return []
+
+    raw_text = PRESET_TOPIC_FILE.read_text(encoding="utf-8")
+    presets: list[dict[str, Any]] = []
+
+    for match in PRESET_BLOCK_RE.finditer(raw_text):
+        preset_id = match.group(1)
+        block = match.group(2).strip()
+        title = next((line.strip() for line in block.splitlines() if line.strip()), "")
+        if not title:
+            continue
+
+        scenario = _extract_section(
+            block,
+            ["场景对话设置（升级版）", "场景对话设置"],
+            ["对话生成参数", "**参数", "参数：", "参数:", "对话核心内容", "核心内容", "全新情景对话", "全新对话", "对话节选"],
+        )
+        core_content = _extract_section(
+            block,
+            ["对话核心内容（红色标注）", "对话核心内容", "核心内容"],
+            ["全新情景对话", "全新对话", "对话节选", "Action Items"],
+        )
+        topic_text = _preset_topic_text(title)
+        template_label = _guess_template_label(title, scenario)
+        people_match = re.search(r"people_count\s*=\s*(\d+)", block, flags=re.IGNORECASE)
+        language_match = re.search(r"language\s*=\s*([^\s｜|]+)", block, flags=re.IGNORECASE)
+
+        presets.append(
+            {
+                "id": preset_id,
+                "source_title": title,
+                "topic_text": topic_text,
+                "display_title": _preset_display_title(topic_text),
+                "scenario": scenario or topic_text,
+                "core_content": core_content,
+                "template_label": template_label,
+                "people_count": max(2, min(10, _safe_int(people_match.group(1) if people_match else None, 3))),
+                "word_count": min(3000, max(100, _extract_word_count(block))),
+                "language": _canonical_language(language_match.group(1) if language_match else "Chinese"),
+                "profile": _preset_profile(title, topic_text, template_label),
+            }
+        )
+
+    return presets
+
+
+def _keyword_in_text(text: str, keyword: str) -> bool:
+    return keyword.casefold() in text.casefold()
+
+
+def _enforce_keywords_in_lines(lines: list[tuple[str, str]], keywords: list[str], language: str) -> tuple[list[tuple[str, str]], list[str]]:
+    normalized_keywords = [item.strip() for item in keywords if item and item.strip()]
+    if not normalized_keywords:
+        return lines, []
+
+    rendered_text = "\n".join(f"{speaker}: {content}" for speaker, content in lines)
+    missing_keywords = [keyword for keyword in normalized_keywords if not _keyword_in_text(rendered_text, keyword)]
+    if not missing_keywords:
+        return lines, []
+
+    speaker_label = lines[0][0] if lines else "Speaker 1"
+    canonical_language = _canonical_language(language)
+    if canonical_language == "English":
+        appended_text = f"We also need to explicitly cover these keywords: {', '.join(missing_keywords)}."
+    else:
+        appended_text = f"我们这次讨论还需要明确提到这些关键词：{'、'.join(missing_keywords)}。"
+    return [*lines, (speaker_label, appended_text)], missing_keywords
+
+
 def _new_dialogue_id() -> str:
     alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
     return "".join(secrets.choice(alphabet) for _ in range(8))
@@ -246,11 +424,12 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     scenario = str(payload.get("scenario") or "").strip()
     core_content = str(payload.get("core_content") or "").strip()
     people_count = max(2, min(10, _safe_int(payload.get("people_count"), 3)))
-    word_count = max(300, _safe_int(payload.get("word_count"), 1000))
+    word_count = min(3000, max(100, _safe_int(payload.get("word_count"), 1000)))
     language = _canonical_language(str(payload.get("audio_language") or payload.get("language") or "Chinese"))
     title = str(payload.get("title") or f"{profile['job_function']}_{profile['seniority']}").strip()
     template_label = str(payload.get("template_label") or "").strip()
     tags = payload.get("tags") or []
+    keyword_terms = _safe_str_list(payload.get("keyword_terms"))
     folder = str(payload.get("folder") or "默认目录").strip() or "默认目录"
 
     lines, rewrite_info = bundle_server._generate_dialogue_lines(
@@ -261,6 +440,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         word_count,
         language,
     )
+    lines, injected_keywords = _enforce_keywords_in_lines(lines, keyword_terms, language)
     dialogue_text = _render_dialogue_text(bundle_server, lines)
     normalized_lines = _normalize_lines(bundle_server, lines)
 
@@ -286,6 +466,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         "audio_language": language,
         "template_label": template_label,
         "tags": tags,
+        "keyword_terms": keyword_terms,
         "folder": folder,
         "source_mode": str(payload.get("source_mode") or "llm").strip() or "llm",
         "save_dir": str(save_dir),
@@ -313,8 +494,10 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
                 "word_count": word_count,
                 "audio_language": language,
                 "profile": profile,
+                "keyword_terms": keyword_terms,
             }
         },
+        "keywords_enforced": injected_keywords,
         "raw_rewrite_info": rewrite_info or {},
     }
 
@@ -757,6 +940,17 @@ class ServerInfoHandler(JsonHandler):
         )
 
 
+class PresetTopicsHandler(JsonHandler):
+    def get(self) -> None:
+        self.write_json(
+            {
+                "ok": True,
+                "success": True,
+                "presets": _load_preset_topics(),
+            }
+        )
+
+
 class UpdateDialogueHandler(JsonHandler):
     def post(self) -> None:
         payload = self.read_json()
@@ -1058,6 +1252,7 @@ def make_app():
         r".*$",
         [
             (r"/api/server_info", ServerInfoHandler),
+            (r"/api/preset_topics", PresetTopicsHandler),
             (r"/api/create_dialogue_from_text", CreateDialogueFromTextHandler),
             (r"/api/update_dialogue", UpdateDialogueHandler),
             (r"/api/generate_audio_custom", GenerateAudioCustomHandler),

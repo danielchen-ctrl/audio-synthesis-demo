@@ -1,5 +1,6 @@
-const STORAGE_KEY = "online_audio_generation_demo_v1";
+const STORAGE_KEY = "online_audio_generation_demo_v2";
 const AUDIO_TEXT_MAX_CHARS = 12000;
+const DEFAULT_WORD_COUNT = "1000";
 const SPEAKER_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4", "#84CC16", "#F97316", "#EC4899", "#6B7280"];
 
 const LANGUAGE_OPTIONS = [
@@ -17,15 +18,16 @@ const LANGUAGE_OPTIONS = [
   { label: "印度尼西亚语", backend: "Indonesian", code: "id" }
 ];
 
-const TEMPLATE_OPTIONS = [
+const BASE_TEMPLATE_OPTIONS = [
   { value: "meeting", label: "会议讨论" },
   { value: "interview", label: "访谈" },
   { value: "medical", label: "问诊" },
-  { value: "review", label: "会议评审" },
+  { value: "review", label: "评审会" },
   { value: "customer", label: "客户访谈" },
   { value: "internal", label: "内部会议" },
   { value: "decision", label: "方案决策" },
   { value: "troubleshooting", label: "问题排查" },
+  { value: "strategy", label: "战略周会" },
   { value: "other", label: "其他" },
   { value: "custom", label: "自定义" }
 ];
@@ -88,11 +90,13 @@ const VOICE_LIBRARY = {
 function createDefaultFormState() {
   return {
     mode: "llm",
+    topicInputMode: "manual",
     llmTopic: "",
-    template: TEMPLATE_OPTIONS[0].value,
+    selectedPresetId: "",
+    template: BASE_TEMPLATE_OPTIONS[0].value,
     customPrompt: "",
     llmLanguage: LANGUAGE_OPTIONS[0].backend,
-    targetDuration: "60",
+    wordCountLimit: DEFAULT_WORD_COUNT,
     keywords: [],
     manualTopic: "",
     manualLanguage: LANGUAGE_OPTIONS[0].backend,
@@ -100,6 +104,7 @@ function createDefaultFormState() {
     speakerCount: 2,
     previewText: "",
     dialogueId: "",
+    generatedTextFileName: "",
     voiceAssignments: { "1": "", "2": "" },
     outputFormat: "MP3",
     preciseDuration: "",
@@ -116,6 +121,8 @@ function createDefaultFormState() {
 const state = {
   serverInfo: null,
   modalOpen: true,
+  presetTopics: [],
+  templateOptions: [...BASE_TEMPLATE_OPTIONS],
   form: createDefaultFormState(),
   tasks: []
 };
@@ -140,12 +147,21 @@ const el = {
   manualSection: document.getElementById("manualSection"),
   generateTextRow: document.getElementById("generateTextRow"),
   previewSection: document.getElementById("previewSection"),
+  topicModeCardManual: document.getElementById("topicModeCardManual"),
+  topicModeCardPreset: document.getElementById("topicModeCardPreset"),
+  topicModeManual: document.getElementById("topicModeManual"),
+  topicModePreset: document.getElementById("topicModePreset"),
+  topicManualGroup: document.getElementById("topicManualGroup"),
+  topicPresetGroup: document.getElementById("topicPresetGroup"),
+  presetTopicResolvedGroup: document.getElementById("presetTopicResolvedGroup"),
   llmTopic: document.getElementById("llmTopic"),
+  presetTopicSelect: document.getElementById("presetTopicSelect"),
+  presetTopicResolved: document.getElementById("presetTopicResolved"),
   templateSelect: document.getElementById("templateSelect"),
   customPromptGroup: document.getElementById("customPromptGroup"),
   customPrompt: document.getElementById("customPrompt"),
   llmLanguage: document.getElementById("llmLanguage"),
-  targetDuration: document.getElementById("targetDuration"),
+  wordCountLimit: document.getElementById("wordCountLimit"),
   keywordWrap: document.getElementById("keywordWrap"),
   keywordInput: document.getElementById("keywordInput"),
   manualTopic: document.getElementById("manualTopic"),
@@ -155,6 +171,8 @@ const el = {
   generateTextBtn: document.getElementById("generateTextBtn"),
   regenTextBtn: document.getElementById("regenTextBtn"),
   previewText: document.getElementById("previewText"),
+  previewKeywordGroup: document.getElementById("previewKeywordGroup"),
+  previewKeywordHighlight: document.getElementById("previewKeywordHighlight"),
   voiceLanguageLabel: document.getElementById("voiceLanguageLabel"),
   speakerVoiceRows: document.getElementById("speakerVoiceRows"),
   voiceWarning: document.getElementById("voiceWarning"),
@@ -199,20 +217,67 @@ function escapeHtml(text) {
     .replace(/'/g, "&#39;");
 }
 
+function escapeRegExp(text) {
+  return String(text || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function languageOptionByBackend(backend) {
   return LANGUAGE_OPTIONS.find((item) => item.backend === backend) || LANGUAGE_OPTIONS[0];
 }
 
 function templateOptionByValue(value) {
-  return TEMPLATE_OPTIONS.find((item) => item.value === value) || TEMPLATE_OPTIONS[0];
+  return state.templateOptions.find((item) => item.value === value) || state.templateOptions[0] || BASE_TEMPLATE_OPTIONS[0];
+}
+
+function templateOptionByLabel(label) {
+  return state.templateOptions.find((item) => item.label === label) || null;
+}
+
+function dynamicTemplateValue(label) {
+  const code = Array.from(String(label || "其他"))
+    .map((char) => char.codePointAt(0).toString(16))
+    .join("")
+    .slice(0, 24);
+  return `dynamic_${code || "template"}`;
+}
+
+function ensureTemplateOption(label) {
+  const normalized = String(label || "").trim();
+  if (!normalized) {
+    return state.templateOptions[0]?.value || BASE_TEMPLATE_OPTIONS[0].value;
+  }
+  const existing = templateOptionByLabel(normalized);
+  if (existing) return existing.value;
+  const next = { value: dynamicTemplateValue(normalized), label: normalized };
+  state.templateOptions = [...state.templateOptions, next];
+  return next.value;
+}
+
+function presetTopicById(id) {
+  return state.presetTopics.find((item) => item.id === id) || null;
+}
+
+function currentPresetTopic() {
+  return presetTopicById(state.form.selectedPresetId || el.presetTopicSelect.value);
 }
 
 function currentMode() {
-  return state.form.mode;
+  return state.form.mode === "manual" ? "manual" : "llm";
+}
+
+function currentTopicInputMode() {
+  return state.form.topicInputMode === "preset" ? "preset" : "manual";
 }
 
 function setMode(mode) {
   state.form.mode = mode === "manual" ? "manual" : "llm";
+  renderAll();
+}
+
+window.setMode = setMode;
+
+function setTopicInputMode(mode) {
+  state.form.topicInputMode = mode === "preset" ? "preset" : "manual";
   renderAll();
 }
 
@@ -224,8 +289,15 @@ function currentLanguageLabel() {
   return languageOptionByBackend(currentLanguageBackend()).label;
 }
 
+function resolvedLlmTopic() {
+  if (currentTopicInputMode() === "preset") {
+    return currentPresetTopic()?.topic_text || "";
+  }
+  return el.llmTopic.value.trim();
+}
+
 function currentTitle() {
-  return currentMode() === "llm" ? el.llmTopic.value.trim() : el.manualTopic.value.trim();
+  return currentMode() === "llm" ? resolvedLlmTopic() : el.manualTopic.value.trim();
 }
 
 function currentWorkingText() {
@@ -235,11 +307,6 @@ function currentWorkingText() {
 function speakerCountValue() {
   const parsed = Number(el.speakerCount.value || state.form.speakerCount || 2);
   return Math.min(10, Math.max(1, parsed || 2));
-}
-
-function mapTargetDurationToWordCount(seconds) {
-  const normalized = Number(seconds || 60);
-  return Math.max(300, Math.min(3000, Math.round(normalized * 12)));
 }
 
 function activeVoiceOptions() {
@@ -303,11 +370,13 @@ function resetForm() {
 
 function readFormFromDom() {
   state.form.mode = el.modeManual.checked ? "manual" : "llm";
+  state.form.topicInputMode = el.topicModePreset.checked ? "preset" : "manual";
   state.form.llmTopic = el.llmTopic.value;
+  state.form.selectedPresetId = el.presetTopicSelect.value;
   state.form.template = el.templateSelect.value;
   state.form.customPrompt = el.customPrompt.value;
   state.form.llmLanguage = el.llmLanguage.value;
-  state.form.targetDuration = el.targetDuration.value;
+  state.form.wordCountLimit = el.wordCountLimit.value;
   state.form.manualTopic = el.manualTopic.value;
   state.form.manualLanguage = el.manualLanguage.value;
   state.form.manualText = el.manualText.value;
@@ -322,11 +391,15 @@ function readFormFromDom() {
 function syncFormToDom() {
   el.modeLlm.checked = state.form.mode === "llm";
   el.modeManual.checked = state.form.mode === "manual";
+  el.topicModeManual.checked = currentTopicInputMode() === "manual";
+  el.topicModePreset.checked = currentTopicInputMode() === "preset";
   el.llmTopic.value = state.form.llmTopic || "";
-  el.templateSelect.value = state.form.template || TEMPLATE_OPTIONS[0].value;
+  el.presetTopicSelect.value = state.form.selectedPresetId || "";
+  el.presetTopicResolved.value = currentPresetTopic()?.topic_text || "";
+  el.templateSelect.value = templateOptionByValue(state.form.template).value;
   el.customPrompt.value = state.form.customPrompt || "";
   el.llmLanguage.value = state.form.llmLanguage || LANGUAGE_OPTIONS[0].backend;
-  el.targetDuration.value = state.form.targetDuration || "60";
+  el.wordCountLimit.value = state.form.wordCountLimit || DEFAULT_WORD_COUNT;
   el.manualTopic.value = state.form.manualTopic || "";
   el.manualLanguage.value = state.form.manualLanguage || LANGUAGE_OPTIONS[0].backend;
   el.manualText.value = state.form.manualText || "";
@@ -406,12 +479,16 @@ function addKeyword(value) {
   });
   state.form.keywords = merged;
   renderTagEditor(el.keywordWrap, el.keywordInput, state.form.keywords, removeKeyword);
+  renderKeywordHighlightPreview();
+  renderSubmitState();
   persistState();
 }
 
 function removeKeyword(index) {
   state.form.keywords = state.form.keywords.filter((_, itemIndex) => itemIndex !== index);
   renderTagEditor(el.keywordWrap, el.keywordInput, state.form.keywords, removeKeyword);
+  renderKeywordHighlightPreview();
+  renderSubmitState();
   persistState();
 }
 
@@ -449,17 +526,25 @@ function handleTagInputBlur(event, addHandler) {
 }
 
 function renderTemplates() {
-  el.templateSelect.innerHTML = TEMPLATE_OPTIONS.map(
-    (option) => `<option value="${option.value}">${option.label}</option>`
-  ).join("");
+  el.templateSelect.innerHTML = state.templateOptions
+    .map((option) => `<option value="${option.value}">${option.label}</option>`)
+    .join("");
 }
 
 function renderLanguages() {
-  const options = LANGUAGE_OPTIONS.map(
-    (option) => `<option value="${option.backend}">${option.label}</option>`
-  ).join("");
+  const options = LANGUAGE_OPTIONS.map((option) => `<option value="${option.backend}">${option.label}</option>`).join("");
   el.llmLanguage.innerHTML = options;
   el.manualLanguage.innerHTML = options;
+}
+
+function renderPresetTopics() {
+  const options = [
+    `<option value="">请选择预置文本主题</option>`,
+    ...state.presetTopics.map(
+      (preset) => `<option value="${preset.id}">${escapeHtml(preset.display_title || preset.topic_text || preset.source_title)}</option>`
+    )
+  ];
+  el.presetTopicSelect.innerHTML = options.join("");
 }
 
 function ensureVoiceAssignmentsShape() {
@@ -482,6 +567,7 @@ function renderVoiceRows() {
   for (let speaker = 1; speaker <= speakerCountValue(); speaker += 1) {
     const row = document.createElement("div");
     row.className = "speaker-row";
+
     const badge = document.createElement("div");
     badge.className = "speaker-badge";
     badge.style.background = SPEAKER_COLORS[speaker - 1] || "#6B7280";
@@ -510,13 +596,47 @@ function renderVoiceRows() {
 function renderModeUi() {
   readFormFromDom();
   const isLlm = currentMode() === "llm";
+  const isPresetTopic = currentTopicInputMode() === "preset";
+  const hasPreviewText = Boolean(normalizeText(el.previewText.value));
+
   el.modeCardLlm.classList.toggle("selected", isLlm);
   el.modeCardManual.classList.toggle("selected", !isLlm);
   el.llmSection.classList.toggle("hidden", !isLlm);
   el.manualSection.classList.toggle("hidden", isLlm);
   el.generateTextRow.classList.toggle("hidden", !isLlm);
-  el.previewSection.classList.toggle("hidden", !(isLlm && normalizeText(el.previewText.value)));
+  el.previewSection.classList.toggle("hidden", !(isLlm && hasPreviewText));
   el.customPromptGroup.classList.toggle("hidden", el.templateSelect.value !== "custom");
+
+  el.topicModeCardManual.classList.toggle("selected", !isPresetTopic);
+  el.topicModeCardPreset.classList.toggle("selected", isPresetTopic);
+  el.topicManualGroup.classList.toggle("hidden", !isLlm || isPresetTopic);
+  el.topicPresetGroup.classList.toggle("hidden", !isLlm || !isPresetTopic);
+  el.presetTopicResolvedGroup.classList.toggle("hidden", !isLlm || !isPresetTopic);
+  el.presetTopicSelect.disabled = state.presetTopics.length === 0;
+}
+
+function highlightKeywordsHtml(text, keywords) {
+  const normalized = normalizeText(text);
+  if (!normalized) return "";
+
+  let html = escapeHtml(normalized).replace(/\n/g, "<br>");
+  const uniqueKeywords = [...new Set((keywords || []).map((item) => String(item || "").trim()).filter(Boolean))].sort(
+    (left, right) => right.length - left.length
+  );
+
+  uniqueKeywords.forEach((keyword) => {
+    const pattern = new RegExp(escapeRegExp(escapeHtml(keyword)), "gi");
+    html = html.replace(pattern, `<span class="keyword-highlight">$&</span>`);
+  });
+
+  return html;
+}
+
+function renderKeywordHighlightPreview() {
+  const previewText = normalizeText(el.previewText.value);
+  const shouldShow = currentMode() === "llm" && Boolean(previewText) && state.form.keywords.length > 0;
+  el.previewKeywordGroup.classList.toggle("hidden", !shouldShow);
+  el.previewKeywordHighlight.innerHTML = shouldShow ? highlightKeywordsHtml(previewText, state.form.keywords) : "";
 }
 
 function renderSubmitState() {
@@ -527,7 +647,7 @@ function renderSubmitState() {
   el.cancelModalBtn.disabled = busy;
   el.closeModalBtn.disabled = busy;
   el.voiceWarning.classList.toggle("hidden", allVoicesSelected());
-  el.generateTextBtn.textContent = "✨ 根据以上配置生成文本";
+  el.generateTextBtn.textContent = state.form.isGeneratingText ? "正在生成文本..." : "✨ 根据以上配置生成文本";
 }
 
 function renderModalVisibility() {
@@ -543,7 +663,9 @@ function statusBadgeClass(status) {
 
 function renderTasks() {
   const tasks = [...state.tasks].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-  el.taskTableBody.innerHTML = tasks.map((task) => `
+  el.taskTableBody.innerHTML = tasks
+    .map(
+      (task) => `
     <tr>
       <td>
         <span class="task-title">${escapeHtml(task.title || "未命名任务")}</span>
@@ -554,19 +676,21 @@ function renderTasks() {
       <td><span class="status-badge ${statusBadgeClass(task.status)}">${escapeHtml(task.status)}</span></td>
       <td>
         <div class="row-actions">
-          <button class="btn btn-secondary btn-sm" type="button" data-action="download-text" data-id="${task.id}" ${task.textDownloadUrl ? "" : "disabled"}>
-            下载文本
-          </button>
-          <button class="btn btn-secondary btn-sm" type="button" data-action="download-audio" data-id="${task.id}" ${task.audioDownloadUrl && task.status === "生成成功" ? "" : "disabled"}>
-            下载音频
-          </button>
-          <button class="btn btn-secondary btn-sm" type="button" data-action="show-error" data-id="${task.id}" ${task.status === "生成失败" ? "" : "disabled"}>
-            查看原因
-          </button>
+          <button class="btn btn-secondary btn-sm" type="button" data-action="download-text" data-id="${task.id}" ${
+            task.textDownloadUrl ? "" : "disabled"
+          }>下载文本</button>
+          <button class="btn btn-secondary btn-sm" type="button" data-action="download-audio" data-id="${task.id}" ${
+            task.audioDownloadUrl && task.status === "生成成功" ? "" : "disabled"
+          }>下载音频</button>
+          <button class="btn btn-secondary btn-sm" type="button" data-action="show-error" data-id="${task.id}" ${
+            task.status === "生成失败" ? "" : "disabled"
+          }>查看原因</button>
         </div>
       </td>
     </tr>
-  `).join("");
+  `
+    )
+    .join("");
   el.taskEmpty.classList.toggle("hidden", tasks.length > 0);
 }
 
@@ -575,15 +699,19 @@ function renderShareBox(payload) {
   el.sharePrimaryLink.textContent = primary || "未获取到可访问地址";
   el.sharePrimaryLink.href = primary || "#";
   el.copyShareBtn.disabled = !primary;
-  el.shareHint.textContent = payload.share_hint || "可把地址发送给同一局域网内的其他电脑使用。";
+  el.shareHint.textContent = payload.share_hint || "可把地址发给同一局域网内的其他电脑使用。";
 }
 
 function renderAll() {
+  renderTemplates();
+  renderLanguages();
+  renderPresetTopics();
   syncFormToDom();
   renderTagEditor(el.keywordWrap, el.keywordInput, state.form.keywords, removeKeyword);
   renderTagEditor(el.tagWrap, el.tagInput, state.form.tags, removeTag);
   renderModeUi();
   renderVoiceRows();
+  renderKeywordHighlightPreview();
   renderSubmitState();
   renderTasks();
   renderModalVisibility();
@@ -612,7 +740,6 @@ function extractSpeakerNumbers(text) {
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index].trim();
     if (!line) continue;
-
     const match = line.match(/^Speaker\s*(\d+)\s*[:：]\s*(.+)$/i);
     if (match) {
       const speakerNumber = Number(match[1]);
@@ -623,7 +750,6 @@ function extractSpeakerNumbers(text) {
       hasSpeakerLine = true;
       continue;
     }
-
     if (!hasSpeakerLine) {
       return { error: `第 ${index + 1} 行格式无效，请使用“Speaker N: 内容”`, speakerNumbers: [] };
     }
@@ -652,16 +778,40 @@ function validateSpeakerConsistency(text) {
   return "";
 }
 
+function missingKeywordTerms(text) {
+  const normalized = normalizeText(text).toLocaleLowerCase();
+  if (!normalized) {
+    return [...state.form.keywords];
+  }
+  return state.form.keywords.filter((keyword) => !normalized.includes(String(keyword || "").trim().toLocaleLowerCase()));
+}
+
 function validateLlmBeforeGenerateText() {
-  if (!el.llmTopic.value.trim()) return "请先填写文本主题";
-  if (!el.templateSelect.value) return "请选择主题模板";
-  if (el.templateSelect.value === "custom" && !normalizeText(el.customPrompt.value)) {
+  const topicMode = currentTopicInputMode();
+  const topic = resolvedLlmTopic();
+  const templateValue = el.templateSelect.value;
+  const wordCount = Number(el.wordCountLimit.value || 0);
+
+  if (topicMode === "preset" && !el.presetTopicSelect.value) {
+    return "请选择预置文本主题";
+  }
+  if (!topic) {
+    return "请先填写文本主题";
+  }
+  if (!templateValue) {
+    return "请选择主题模板";
+  }
+  if (templateValue === "custom" && !normalizeText(el.customPrompt.value)) {
     return "选择自定义模板后，请填写自定义 Prompt";
   }
-  if (!el.llmLanguage.value) return "请选择文本语言";
-  const duration = Number(el.targetDuration.value || 0);
-  if (!Number.isFinite(duration) || duration < 10 || duration > 43200) {
-    return "目标对话时长需在 10 到 43200 秒之间";
+  if (!el.llmLanguage.value) {
+    return "请选择文本语言";
+  }
+  if (speakerCountValue() < 2) {
+    return "LLM 生成对话时，说话人数至少需要 2 人";
+  }
+  if (!Number.isInteger(wordCount) || wordCount < 100 || wordCount > 3000) {
+    return "字数限制需在 100 到 3000 之间";
   }
   return "";
 }
@@ -670,7 +820,6 @@ function validateBeforeSubmit() {
   if (!allVoicesSelected()) {
     return "请为所有说话人选择音色";
   }
-
   if (!el.outputFormat.value) {
     return "请选择音频输出格式";
   }
@@ -678,9 +827,20 @@ function validateBeforeSubmit() {
   if (currentMode() === "llm") {
     const llmError = validateLlmBeforeGenerateText();
     if (llmError) return llmError;
+
     const previewText = normalizeText(el.previewText.value);
-    if (!previewText) return "请先根据以上配置生成文本";
-    return validateSpeakerConsistency(previewText);
+    if (!previewText) {
+      return "请先根据以上配置生成文本";
+    }
+
+    const speakerError = validateSpeakerConsistency(previewText);
+    if (speakerError) return speakerError;
+
+    const missingKeywords = missingKeywordTerms(previewText);
+    if (missingKeywords.length) {
+      return `以下关键词尚未体现在文本中：${missingKeywords.join("、")}`;
+    }
+    return "";
   }
 
   if (!el.manualTopic.value.trim()) return "请先填写文本主题";
@@ -689,44 +849,96 @@ function validateBeforeSubmit() {
   return validateSpeakerConsistency(el.manualText.value);
 }
 
-function buildProfileFromTemplate(templateLabel) {
+function buildProfileFromTemplate(templateLabel, topic) {
+  const normalizedTemplate = String(templateLabel || "通用对话").trim() || "通用对话";
+  const normalizedTopic = String(topic || "在线生成音频").trim() || "在线生成音频";
   return {
-    job_function: templateLabel,
-    work_content: currentMode() === "llm" ? "在线生成音频" : "直接输入",
+    job_function: normalizedTemplate,
+    work_content: normalizedTopic,
     seniority: "标准",
-    use_case: templateLabel
+    use_case: normalizedTemplate
   };
+}
+
+function buildManualTopicScenario(templateLabel, topic) {
+  const normalizedTemplate = String(templateLabel || "通用对话").trim() || "通用对话";
+  const normalizedTopic = String(topic || "").trim();
+  if (!normalizedTopic) {
+    return `${normalizedTemplate}场景对话`;
+  }
+  return `${normalizedTemplate}：围绕“${normalizedTopic}”展开真实自然的多轮场景对话`;
+}
+
+function buildManualTopicCoreContent(templateLabel, topic) {
+  const keywordTerms = [...state.form.keywords];
+  const contentParts = [
+    `文本主题：${topic}`,
+    `主题模板：${templateLabel}`,
+    `请生成自然、真实、口语化的多轮对话文本`
+  ];
+
+  if (keywordTerms.length) {
+    contentParts.push(`核心对话内容：对话中必须明确体现这些关键词——${keywordTerms.join("，")}`);
+  }
+  if (normalizeText(el.customPrompt.value)) {
+    contentParts.push(`补充要求：${normalizeText(el.customPrompt.value)}`);
+  }
+
+  return contentParts.join("；");
 }
 
 function buildGenerateTextPayload() {
   const template = templateOptionByValue(el.templateSelect.value);
-  const duration = Number(el.targetDuration.value || 60);
-  const keywordText = state.form.keywords.join("，");
-  const contentParts = [];
+  const topic = resolvedLlmTopic();
+  const wordCount = Number(el.wordCountLimit.value || DEFAULT_WORD_COUNT);
+  const keywordTerms = [...state.form.keywords];
+  const preset = currentPresetTopic();
 
-  if (keywordText) {
-    contentParts.push(`关键词：${keywordText}`);
-  }
-  if (el.templateSelect.value === "custom" && normalizeText(el.customPrompt.value)) {
-    contentParts.push(`自定义要求：${normalizeText(el.customPrompt.value)}`);
-  }
-  if (!contentParts.length) {
-    contentParts.push(`请围绕主题“${el.llmTopic.value.trim()}”生成自然口语化对话`);
+  if (currentTopicInputMode() === "preset" && preset) {
+    const coreParts = [];
+    if (preset.core_content) {
+      coreParts.push(preset.core_content);
+    }
+    if (keywordTerms.length) {
+      coreParts.push(`核心对话内容：请在最终文本中明确体现这些关键词——${keywordTerms.join("，")}`);
+    }
+    if (normalizeText(el.customPrompt.value)) {
+      coreParts.push(`补充要求：${normalizeText(el.customPrompt.value)}`);
+    }
+
+    return {
+      title: preset.topic_text || topic,
+      profile: preset.profile || buildProfileFromTemplate(template.label, preset.topic_text || topic),
+      scenario: preset.scenario || buildManualTopicScenario(template.label, preset.topic_text || topic),
+      core_content: coreParts.join("；"),
+      people_count: speakerCountValue(),
+      word_count: wordCount,
+      language: el.llmLanguage.value,
+      audio_language: el.llmLanguage.value,
+      template_label: template.label,
+      tags: state.form.tags,
+      folder: el.folderSelect.value,
+      source_mode: "llm",
+      keyword_terms: keywordTerms,
+      preset_id: preset.id,
+      preset_source_title: preset.source_title || ""
+    };
   }
 
   return {
-    title: el.llmTopic.value.trim(),
-    scenario: `${template.label}：${el.llmTopic.value.trim()}`,
-    core_content: contentParts.join("；"),
+    title: topic,
+    profile: buildProfileFromTemplate(template.label, topic),
+    scenario: buildManualTopicScenario(template.label, topic),
+    core_content: buildManualTopicCoreContent(template.label, topic),
     people_count: speakerCountValue(),
-    word_count: mapTargetDurationToWordCount(duration),
+    word_count: wordCount,
     language: el.llmLanguage.value,
     audio_language: el.llmLanguage.value,
     template_label: template.label,
     tags: state.form.tags,
     folder: el.folderSelect.value,
     source_mode: "llm",
-    profile: buildProfileFromTemplate(template.label)
+    keyword_terms: keywordTerms
   };
 }
 
@@ -809,6 +1021,58 @@ async function loadServerInfo() {
   }
 }
 
+async function loadPresetTopics() {
+  try {
+    const payload = await fetchJson("/api/preset_topics");
+    state.presetTopics = Array.isArray(payload.presets) ? payload.presets : [];
+    state.templateOptions = [...BASE_TEMPLATE_OPTIONS];
+    state.presetTopics.forEach((preset) => {
+      if (preset.template_label) {
+        ensureTemplateOption(preset.template_label);
+      }
+    });
+
+    if (state.form.selectedPresetId && !presetTopicById(state.form.selectedPresetId)) {
+      state.form.selectedPresetId = "";
+    }
+
+    if (state.form.selectedPresetId) {
+      applyPresetSelection(currentPresetTopic(), { render: false });
+    }
+  } catch (error) {
+    state.presetTopics = [];
+    state.templateOptions = [...BASE_TEMPLATE_OPTIONS];
+    console.warn("loadPresetTopics failed", error);
+    setModalMessage(`预置文本主题加载失败：${error.message}`, "error");
+  }
+}
+
+function applyPresetSelection(preset, options = {}) {
+  const { render = true } = options;
+  if (!preset) {
+    state.form.selectedPresetId = "";
+    if (render) renderAll();
+    return;
+  }
+
+  state.form.selectedPresetId = preset.id;
+  if (preset.template_label) {
+    state.form.template = ensureTemplateOption(preset.template_label);
+  }
+  if (preset.language) {
+    state.form.llmLanguage = preset.language;
+  }
+  if (preset.default_word_count) {
+    state.form.wordCountLimit = String(preset.default_word_count);
+  }
+  if (preset.recommended_people_count) {
+    state.form.speakerCount = Math.min(10, Math.max(1, Number(preset.recommended_people_count) || state.form.speakerCount || 2));
+  }
+  if (render) {
+    renderAll();
+  }
+}
+
 async function copyShareLink() {
   const link = el.sharePrimaryLink.href && el.sharePrimaryLink.href !== "#" ? el.sharePrimaryLink.href : "";
   if (!link) return;
@@ -846,11 +1110,20 @@ async function handleGenerateText() {
       body: JSON.stringify(buildGenerateTextPayload())
     });
 
-    state.form.dialogueId = payload.dialogue_id;
+    state.form.dialogueId = payload.dialogue_id || "";
+    state.form.generatedTextFileName = payload.file_name || "";
     state.form.previewText = payload.dialogue_text || "";
     el.previewText.value = payload.dialogue_text || "";
-    setModalMessage("文本生成完成，可继续编辑并提交音频生成。", "success");
-    showToast("success", "文本生成完成，可在下方预览和编辑");
+
+    const enforcedKeywords = Array.isArray(payload.debug?.keywords_enforced) ? payload.debug.keywords_enforced : [];
+    if (enforcedKeywords.length) {
+      const message = `文本生成完成，已补入关键词：${enforcedKeywords.join("、")}`;
+      setModalMessage(message, "success");
+      showToast("success", message);
+    } else {
+      setModalMessage("文本生成完成，可继续编辑并提交音频生成。", "success");
+      showToast("success", "文本生成完成，可在下方预览和编辑");
+    }
   } catch (requestError) {
     setModalMessage(`文本生成失败：${requestError.message}`, "error");
     showToast("error", `文本生成失败：${requestError.message}`);
@@ -880,7 +1153,7 @@ async function submitAudioGeneration() {
     let dialogueId = state.form.dialogueId;
     let workingText = currentWorkingText();
     let textDownloadUrl = "";
-    let textFileName = "";
+    let textFileName = state.form.generatedTextFileName || "";
 
     if (currentMode() === "manual") {
       const createPayload = await fetchJson("/api/create_dialogue_from_text", {
@@ -891,8 +1164,31 @@ async function submitAudioGeneration() {
       dialogueId = createPayload.dialogue_id;
       state.form.dialogueId = dialogueId;
       textDownloadUrl = createPayload.text_download_url || "";
-      textFileName = createPayload.file_name || "";
+      textFileName = createPayload.file_name || textFileName;
       workingText = createPayload.dialogue_text || workingText;
+    } else if (!dialogueId) {
+      const template = templateOptionByValue(el.templateSelect.value);
+      const recoveryPayload = await fetchJson("/api/create_dialogue_from_text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: currentTitle(),
+          dialogue_text: workingText,
+          language: currentLanguageBackend(),
+          audio_language: currentLanguageBackend(),
+          people_count: speakerCountValue(),
+          scenario: buildManualTopicScenario(template.label, currentTitle()),
+          template_label: template.label,
+          tags: state.form.tags,
+          folder: el.folderSelect.value,
+          source_mode: "llm"
+        })
+      });
+      dialogueId = recoveryPayload.dialogue_id;
+      state.form.dialogueId = dialogueId;
+      textDownloadUrl = recoveryPayload.text_download_url || "";
+      textFileName = recoveryPayload.file_name || textFileName;
+      workingText = recoveryPayload.dialogue_text || workingText;
     } else {
       textDownloadUrl = `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=text`;
     }
@@ -908,15 +1204,14 @@ async function submitAudioGeneration() {
       createdAt: audioPayload.updated_at || nowIsoString(),
       dialogueId,
       fileName: audioPayload.file_name || basenameFromPath(audioPayload.audio_file_path),
-      textFileName: textFileName || basenameFromPath(audioPayload.text_path),
+      textFileName: textFileName || basenameFromPath(state.form.generatedTextFileName),
       textDownloadUrl: textDownloadUrl || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=text`,
       audioDownloadUrl: audioPayload.audio_download_url || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=audio`
     });
 
-    state.form.isSubmittingAudio = false;
     state.modalOpen = false;
-    resetForm();
     showToast("success", "任务已提交，请在生成任务列表查看进度");
+    resetForm();
   } catch (requestError) {
     updateTask(taskId, {
       status: "生成失败",
@@ -957,6 +1252,7 @@ function bindEvents() {
   el.openOnlineAudioBtn.addEventListener("click", openModal);
   el.closeModalBtn.addEventListener("click", closeModal);
   el.cancelModalBtn.addEventListener("click", closeModal);
+
   el.modeCardLlm.addEventListener("click", (event) => {
     event.preventDefault();
     if (state.form.isGeneratingText || state.form.isSubmittingAudio) return;
@@ -969,6 +1265,20 @@ function bindEvents() {
   });
   el.modeLlm.addEventListener("change", readAndRender);
   el.modeManual.addEventListener("change", readAndRender);
+
+  el.topicModeCardManual.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (state.form.isGeneratingText || state.form.isSubmittingAudio) return;
+    setTopicInputMode("manual");
+  });
+  el.topicModeCardPreset.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (state.form.isGeneratingText || state.form.isSubmittingAudio) return;
+    setTopicInputMode("preset");
+  });
+  el.topicModeManual.addEventListener("change", readAndRender);
+  el.topicModePreset.addEventListener("change", readAndRender);
+
   el.templateSelect.addEventListener("change", readAndRender);
   el.llmLanguage.addEventListener("change", readAndRender);
   el.manualLanguage.addEventListener("change", readAndRender);
@@ -976,10 +1286,27 @@ function bindEvents() {
   el.speakerCount.addEventListener("input", readAndRender);
   el.outputFormat.addEventListener("change", readAndRender);
   el.includeScripts.addEventListener("change", readAndRender);
-  el.llmTopic.addEventListener("input", persistState);
-  el.customPrompt.addEventListener("input", persistState);
-  el.targetDuration.addEventListener("input", persistState);
-  el.manualTopic.addEventListener("input", persistState);
+
+  el.llmTopic.addEventListener("input", () => {
+    state.form.llmTopic = el.llmTopic.value;
+    persistState();
+  });
+  el.customPrompt.addEventListener("input", () => {
+    state.form.customPrompt = el.customPrompt.value;
+    persistState();
+  });
+  el.wordCountLimit.addEventListener("input", () => {
+    state.form.wordCountLimit = el.wordCountLimit.value;
+    persistState();
+  });
+  el.presetTopicSelect.addEventListener("change", () => {
+    applyPresetSelection(presetTopicById(el.presetTopicSelect.value));
+  });
+
+  el.manualTopic.addEventListener("input", () => {
+    state.form.manualTopic = el.manualTopic.value;
+    persistState();
+  });
   el.manualText.addEventListener("input", () => {
     state.form.manualText = el.manualText.value;
     persistState();
@@ -987,11 +1314,18 @@ function bindEvents() {
   el.previewText.addEventListener("input", () => {
     state.form.previewText = el.previewText.value;
     renderModeUi();
+    renderKeywordHighlightPreview();
     renderSubmitState();
     persistState();
   });
-  el.preciseDuration.addEventListener("input", persistState);
-  el.folderSelect.addEventListener("change", persistState);
+  el.preciseDuration.addEventListener("input", () => {
+    state.form.preciseDuration = el.preciseDuration.value;
+    persistState();
+  });
+  el.folderSelect.addEventListener("change", () => {
+    state.form.folder = el.folderSelect.value;
+    persistState();
+  });
 
   el.keywordInput.addEventListener("keydown", (event) => handleTagInputKeydown(event, addKeyword));
   el.keywordInput.addEventListener("blur", (event) => handleTagInputBlur(event, addKeyword));
@@ -1004,14 +1338,12 @@ function bindEvents() {
   el.taskTableBody.addEventListener("click", handleTaskTableClick);
 }
 
-function init() {
-  renderTemplates();
-  renderLanguages();
+async function init() {
   restoreState();
-  syncFormToDom();
+  await loadPresetTopics();
   bindEvents();
-  loadServerInfo();
   renderAll();
+  await loadServerInfo();
   if (state.modalOpen) {
     openModal();
   }
