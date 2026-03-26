@@ -64,6 +64,10 @@ VOICE_CATALOG = {
     "German": ["de-DE-KatjaNeural", "de-DE-ConradNeural"],
     "Spanish": ["es-ES-ElviraNeural", "es-ES-AlvaroNeural"],
     "Portuguese": ["pt-BR-FranciscaNeural", "pt-BR-AntonioNeural"],
+    "Italian": ["it-IT-ElsaNeural", "it-IT-DiegoNeural"],
+    "Russian": ["ru-RU-DariyaNeural", "ru-RU-DmitryNeural"],
+    "Arabic": ["ar-SA-ZariyahNeural", "ar-SA-HamedNeural"],
+    "Indonesian": ["id-ID-GadisNeural", "id-ID-ArdiNeural"],
     "Cantonese": ["zh-HK-HiuGaaiNeural", "zh-HK-WanLungNeural", "zh-HK-HiuMaanNeural"],
 }
 
@@ -79,21 +83,44 @@ def active_static_dir() -> Path:
 def _canonical_language(value: str) -> str:
     mapping = {
         "中文": "Chinese",
+        "中文（普通话）": "Chinese",
         "Chinese": "Chinese",
+        "zh": "Chinese",
         "英文": "English",
+        "英语": "English",
         "English": "English",
+        "en": "English",
         "日语": "Japanese",
         "Japanese": "Japanese",
+        "ja": "Japanese",
         "韩语": "Korean",
         "Korean": "Korean",
+        "ko": "Korean",
         "法语": "French",
         "French": "French",
+        "fr": "French",
         "德语": "German",
         "German": "German",
+        "de": "German",
         "西班牙语": "Spanish",
         "Spanish": "Spanish",
+        "es": "Spanish",
         "葡萄牙语": "Portuguese",
         "Portuguese": "Portuguese",
+        "pt": "Portuguese",
+        "意大利语": "Italian",
+        "Italian": "Italian",
+        "it": "Italian",
+        "俄语": "Russian",
+        "Russian": "Russian",
+        "ru": "Russian",
+        "阿拉伯语": "Arabic",
+        "Arabic": "Arabic",
+        "ar": "Arabic",
+        "印度尼西亚语": "Indonesian",
+        "印尼语": "Indonesian",
+        "Indonesian": "Indonesian",
+        "id": "Indonesian",
         "粤语": "Cantonese",
         "Cantonese": "Cantonese",
     }
@@ -105,10 +132,24 @@ def _speaker_numeric_id(speaker_label: str) -> int:
     return int(match.group(1)) if match else 1
 
 
-def _voice_for_speaker(language: str, speaker_label: str) -> str:
+def _voice_for_speaker(language: str, speaker_label: str, selected_voice_map: dict[str, str] | None = None) -> str:
+    speaker_id = str(_speaker_numeric_id(speaker_label))
+    if selected_voice_map and selected_voice_map.get(speaker_id):
+        return str(selected_voice_map[speaker_id])
     voices = VOICE_CATALOG.get(_canonical_language(language), VOICE_CATALOG["Chinese"])
-    speaker_id = _speaker_numeric_id(speaker_label)
-    return voices[(speaker_id - 1) % len(voices)]
+    return voices[(int(speaker_id) - 1) % len(voices)]
+
+
+def _safe_file_component(value: str, fallback: str = "audio") -> str:
+    text = str(value or "").strip()
+    text = re.sub(r"[\\/:*?\"<>|]+", "_", text)
+    text = re.sub(r"\s+", "_", text)
+    text = re.sub(r"_+", "_", text).strip("._")
+    return text or fallback
+
+
+def _basename_from_title(title: str, timestamp: str, fallback: str = "audio") -> str:
+    return f"{_safe_file_component(title, fallback)}_{timestamp}"
 
 
 def _ffmpeg_path() -> str | None:
@@ -208,6 +249,9 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     word_count = max(300, _safe_int(payload.get("word_count"), 1000))
     language = _canonical_language(str(payload.get("audio_language") or payload.get("language") or "Chinese"))
     title = str(payload.get("title") or f"{profile['job_function']}_{profile['seniority']}").strip()
+    template_label = str(payload.get("template_label") or "").strip()
+    tags = payload.get("tags") or []
+    folder = str(payload.get("folder") or "默认目录").strip() or "默认目录"
 
     lines, rewrite_info = bundle_server._generate_dialogue_lines(
         profile,
@@ -222,7 +266,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     dialogue_id = _new_dialogue_id()
-    basename = bundle_server.generate_basename(profile, language, timestamp)
+    basename = _basename_from_title(title, timestamp, bundle_server.generate_basename(profile, language, timestamp))
     save_dir = ROOT / "demo" / timestamp
     save_dir.mkdir(parents=True, exist_ok=True)
     text_path = save_dir / f"{basename}.txt"
@@ -240,6 +284,10 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         "people_count": people_count,
         "word_count": word_count,
         "audio_language": language,
+        "template_label": template_label,
+        "tags": tags,
+        "folder": folder,
+        "source_mode": str(payload.get("source_mode") or "llm").strip() or "llm",
         "save_dir": str(save_dir),
         "text_path": str(text_path),
         "text_updated_at": updated_at,
@@ -381,6 +429,77 @@ def _save_dialogue_edit(bundle_server: Any, dialogue_id: str, dialogue_text: str
     }
 
 
+def _create_manual_dialogue_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[str, Any]:
+    title = str(payload.get("title") or "在线生成音频").strip() or "在线生成音频"
+    language = _canonical_language(str(payload.get("language") or payload.get("audio_language") or "Chinese"))
+    people_count = max(1, min(10, _safe_int(payload.get("people_count"), 2)))
+    dialogue_text = _normalize_dialogue_text_for_storage(str(payload.get("dialogue_text") or ""))
+    scenario = str(payload.get("scenario") or "").strip()
+    template_label = str(payload.get("template_label") or "").strip()
+    folder = str(payload.get("folder") or "默认目录").strip() or "默认目录"
+    tags = payload.get("tags") or []
+    source_mode = str(payload.get("source_mode") or "manual").strip() or "manual"
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    dialogue_id = _new_dialogue_id()
+    basename = _basename_from_title(title, timestamp, "manual_dialogue")
+    save_dir = ROOT / "demo" / timestamp
+    save_dir.mkdir(parents=True, exist_ok=True)
+    text_path = save_dir / f"{basename}.txt"
+    text_path.write_text(dialogue_text, encoding="utf-8")
+    updated_at = datetime.now().isoformat(timespec="seconds")
+
+    try:
+        line_tuples = _dialogue_lines_from_text(dialogue_text)
+        normalized_lines = _normalize_lines(bundle_server, line_tuples)
+    except Exception:
+        normalized_lines = []
+
+    manifest = {
+        "dialogue_id": dialogue_id,
+        "timestamp": timestamp,
+        "basename": basename,
+        "title": title,
+        "scenario": scenario,
+        "core_content": "",
+        "profile": {
+            "job_function": "在线生成音频",
+            "work_content": template_label or "直接输入",
+            "seniority": "标准",
+            "use_case": template_label or "直接输入文本生成音频",
+        },
+        "people_count": people_count,
+        "word_count": 0,
+        "audio_language": language,
+        "template_label": template_label,
+        "tags": tags,
+        "folder": folder,
+        "source_mode": source_mode,
+        "save_dir": str(save_dir),
+        "text_path": str(text_path),
+        "text_updated_at": updated_at,
+        "audio_path": "",
+        "voice_map": {},
+        "edited_text": True,
+    }
+    _write_json(save_dir / "manifest.json", manifest)
+
+    return {
+        "ok": True,
+        "success": True,
+        "dialogue_id": dialogue_id,
+        "timestamp": timestamp,
+        "basename": basename,
+        "text_path": str(text_path),
+        "file_name": text_path.name,
+        "updated_at": updated_at,
+        "dialogue_text": dialogue_text,
+        "text": dialogue_text,
+        "lines": normalized_lines,
+        "text_download_url": _download_url(dialogue_id, "text"),
+    }
+
+
 def _latest_audio_path(save_dir: Path, basename: str) -> Path | None:
     candidates = []
     for suffix in (".mp3", ".wav"):
@@ -416,6 +535,9 @@ async def _synthesize_audio_from_lines(
     save_dir: Path,
     basename: str,
     bundle_server: Any,
+    selected_voice_map: dict[str, str] | None = None,
+    output_format: str = "mp3",
+    include_scripts: bool = False,
 ) -> dict[str, Any]:
     from pydub import AudioSegment
 
@@ -424,6 +546,9 @@ async def _synthesize_audio_from_lines(
         AudioSegment.converter = ffmpeg
 
     tmp_dir = Path(tempfile.mkdtemp(prefix="_edited_tts_tmp_", dir=save_dir))
+    normalized_output_format = str(output_format or "mp3").strip().lower()
+    if normalized_output_format not in {"mp3", "wav", "m4a"}:
+        normalized_output_format = "mp3"
 
     combined = AudioSegment.silent(duration=120)
     segments: list[dict[str, Any]] = []
@@ -437,7 +562,7 @@ async def _synthesize_audio_from_lines(
             cleaned = text.strip()
             if not cleaned:
                 continue
-            voice = _voice_for_speaker(language, speaker)
+            voice = _voice_for_speaker(language, speaker, selected_voice_map)
             speaker_id = str(_speaker_numeric_id(speaker))
             voice_map[speaker_id] = voice
             segment_file = tmp_dir / f"line_{idx:03d}.mp3"
@@ -464,31 +589,50 @@ async def _synthesize_audio_from_lines(
 
         wav_path = save_dir / f"{basename}.wav"
         mp3_path = save_dir / f"{basename}.mp3"
+        m4a_path = save_dir / f"{basename}.m4a"
         combined.export(wav_path, format="wav")
         combined.export(mp3_path, format="mp3")
+        if normalized_output_format == "m4a":
+            combined.export(m4a_path, format="mp4")
 
-        segments_path = save_dir / "segments.json"
-        _write_json(segments_path, {"segments": segments, "language": _canonical_language(language)})
+        segments_path = ""
+        srt_path = ""
+        if include_scripts:
+            segments_target = save_dir / f"{basename}_transcript.json"
+            _write_json(segments_target, {"segments": segments, "language": _canonical_language(language)})
+            segments_path = str(segments_target)
 
-        vtt_path = save_dir / "transcript.vtt"
-        vtt_lines = ["WEBVTT", ""]
-        for idx, item in enumerate(segments, start=1):
-            vtt_lines.append(str(idx))
-            vtt_lines.append(f"{_format_vtt_ts(item['start_sec'])} --> {_format_vtt_ts(item['end_sec'])}")
-            vtt_lines.append(f"{item['speaker']}: {item['text']}")
-            vtt_lines.append("")
-        vtt_path.write_text("\n".join(vtt_lines), encoding="utf-8")
+            srt_target = save_dir / f"{basename}_transcript.srt"
+            srt_lines: list[str] = []
+            for idx, item in enumerate(segments, start=1):
+                srt_lines.append(str(idx))
+                srt_lines.append(
+                    f"{_format_vtt_ts(item['start_sec']).replace('.', ',')} --> "
+                    f"{_format_vtt_ts(item['end_sec']).replace('.', ',')}"
+                )
+                srt_lines.append(f"S{_speaker_numeric_id(item['speaker'])}: {item['text']}")
+                srt_lines.append("")
+            srt_target.write_text("\n".join(srt_lines), encoding="utf-8")
+            srt_path = str(srt_target)
 
         debug_path = save_dir / "tts_input_debug.txt"
         debug_path.write_text("\n".join(debug_lines), encoding="utf-8")
 
+        selected_audio_path = str(mp3_path)
+        if normalized_output_format == "wav":
+            selected_audio_path = str(wav_path)
+        elif normalized_output_format == "m4a":
+            selected_audio_path = str(m4a_path)
+
         return {
-            "audio_file_path": str(mp3_path),
+            "audio_file_path": selected_audio_path,
             "mp3_path": str(mp3_path),
             "wav_path": str(wav_path),
+            "m4a_path": str(m4a_path) if normalized_output_format == "m4a" else "",
+            "output_format": normalized_output_format,
             "voice_map": voice_map,
-            "segments_json_path": str(segments_path),
-            "transcript_vtt_path": str(vtt_path),
+            "segments_json_path": segments_path,
+            "transcript_srt_path": srt_path,
             "tts_debug_file": str(debug_path),
             "warning": warning_message,
         }
@@ -496,16 +640,19 @@ async def _synthesize_audio_from_lines(
         warning_message = f"edge_tts_fallback:{type(exc).__name__}:{exc}"
         wav_path = save_dir / f"{basename}.wav"
         mp3_path = save_dir / f"{basename}.mp3"
+        m4a_path = save_dir / f"{basename}.m4a"
         audio = bundle_server._generate_wave_for_lines(lines)
         bundle_server._write_wav(audio, wav_path)
         AudioSegment.from_wav(wav_path).export(mp3_path, format="mp3")
+        if normalized_output_format == "m4a":
+            AudioSegment.from_wav(wav_path).export(m4a_path, format="mp4")
 
         segments: list[dict[str, Any]] = []
         cursor_sec = 0.0
         fallback_voice_map: dict[str, str] = {}
         for idx, (speaker, text) in enumerate(lines, start=1):
             duration = max(1.2, min(6.0, len(text) / 8.0))
-            voice = _voice_for_speaker(language, speaker)
+            voice = _voice_for_speaker(language, speaker, selected_voice_map)
             speaker_id = str(_speaker_numeric_id(speaker))
             fallback_voice_map[speaker_id] = voice
             segments.append(
@@ -520,36 +667,52 @@ async def _synthesize_audio_from_lines(
             )
             cursor_sec += duration
 
-        segments_path = save_dir / "segments.json"
-        _write_json(segments_path, {"segments": segments, "language": _canonical_language(language)})
+        segments_path = ""
+        srt_path = ""
+        if include_scripts:
+            segments_target = save_dir / f"{basename}_transcript.json"
+            _write_json(segments_target, {"segments": segments, "language": _canonical_language(language)})
+            segments_path = str(segments_target)
 
-        vtt_path = save_dir / "transcript.vtt"
-        vtt_lines = ["WEBVTT", ""]
-        for idx, item in enumerate(segments, start=1):
-            vtt_lines.append(str(idx))
-            vtt_lines.append(f"{_format_vtt_ts(item['start_sec'])} --> {_format_vtt_ts(item['end_sec'])}")
-            vtt_lines.append(f"{item['speaker']}: {item['text']}")
-            vtt_lines.append("")
-        vtt_path.write_text("\n".join(vtt_lines), encoding="utf-8")
+            srt_target = save_dir / f"{basename}_transcript.srt"
+            srt_lines: list[str] = []
+            for idx, item in enumerate(segments, start=1):
+                srt_lines.append(str(idx))
+                srt_lines.append(
+                    f"{_format_vtt_ts(item['start_sec']).replace('.', ',')} --> "
+                    f"{_format_vtt_ts(item['end_sec']).replace('.', ',')}"
+                )
+                srt_lines.append(f"S{_speaker_numeric_id(item['speaker'])}: {item['text']}")
+                srt_lines.append("")
+            srt_target.write_text("\n".join(srt_lines), encoding="utf-8")
+            srt_path = str(srt_target)
 
         debug_path = save_dir / "tts_input_debug.txt"
         debug_path.write_text(
             "\n".join(
                 [
-                    f"{speaker}\tsynthetic_fallback:{_voice_for_speaker(language, speaker)}\t{text}"
+                    f"{speaker}\tsynthetic_fallback:{_voice_for_speaker(language, speaker, selected_voice_map)}\t{text}"
                     for speaker, text in lines
                 ]
             ),
             encoding="utf-8",
         )
 
+        selected_audio_path = str(mp3_path)
+        if normalized_output_format == "wav":
+            selected_audio_path = str(wav_path)
+        elif normalized_output_format == "m4a":
+            selected_audio_path = str(m4a_path)
+
         return {
-            "audio_file_path": str(mp3_path),
+            "audio_file_path": selected_audio_path,
             "mp3_path": str(mp3_path),
             "wav_path": str(wav_path),
+            "m4a_path": str(m4a_path) if normalized_output_format == "m4a" else "",
+            "output_format": normalized_output_format,
             "voice_map": fallback_voice_map,
-            "segments_json_path": str(segments_path),
-            "transcript_vtt_path": str(vtt_path),
+            "segments_json_path": segments_path,
+            "transcript_srt_path": srt_path,
             "tts_debug_file": str(debug_path),
             "warning": warning_message,
         }
@@ -621,6 +784,19 @@ class UpdateDialogueHandler(JsonHandler):
         )
 
 
+class CreateDialogueFromTextHandler(JsonHandler):
+    def post(self) -> None:
+        payload = self.read_json()
+        if not str(payload.get("title", "")).strip():
+            raise HTTPError(400, reason="title is required")
+        if not str(payload.get("dialogue_text", "")).strip():
+            raise HTTPError(400, reason="dialogue_text is required")
+
+        bundle_server = load_bundle_server()
+        response = _create_manual_dialogue_payload(bundle_server, payload)
+        self.write_json(response)
+
+
 class GenerateAudioCustomHandler(JsonHandler):
     async def post(self) -> None:
         payload = self.read_json()
@@ -649,16 +825,29 @@ class GenerateAudioCustomHandler(JsonHandler):
 
         basename = manifest.get("basename", dialogue_id)
         language = str(payload.get("language") or manifest.get("audio_language") or "中文")
-        audio_result = await _synthesize_audio_from_lines(line_tuples, language, save_dir, basename, bundle_server)
+        selected_voice_map = payload.get("voice_map") or {}
+        output_format = str(payload.get("format") or manifest.get("audio_output_format") or "mp3")
+        include_scripts = bool(payload.get("include_scripts"))
+        audio_result = await _synthesize_audio_from_lines(
+            line_tuples,
+            language,
+            save_dir,
+            basename,
+            bundle_server,
+            selected_voice_map=selected_voice_map if isinstance(selected_voice_map, dict) else None,
+            output_format=output_format,
+            include_scripts=include_scripts,
+        )
         generated_at = datetime.now().isoformat(timespec="seconds")
 
         audio_file = audio_result["audio_file_path"]
         manifest["audio_path"] = audio_file
         manifest["voice_map"] = audio_result["voice_map"]
         manifest["audio_language"] = language
+        manifest["audio_output_format"] = audio_result["output_format"]
         manifest["audio_warning"] = audio_result["warning"]
         manifest["segments_json_path"] = audio_result["segments_json_path"]
-        manifest["transcript_vtt_path"] = audio_result["transcript_vtt_path"]
+        manifest["transcript_srt_path"] = audio_result["transcript_srt_path"]
         manifest["audio_updated_at"] = generated_at
         _write_json(Path(manifest.get("save_dir") or save_dir) / "manifest.json", manifest)
 
@@ -673,11 +862,13 @@ class GenerateAudioCustomHandler(JsonHandler):
                 "updated_at": generated_at,
                 "mp3_path": audio_result["mp3_path"],
                 "wav_path": audio_result["wav_path"],
+                "m4a_path": audio_result["m4a_path"],
+                "output_format": audio_result["output_format"],
                 "voice_map": audio_result["voice_map"],
                 "warning": audio_result["warning"],
                 "tts_debug_file": audio_result["tts_debug_file"],
                 "segments_json_path": audio_result["segments_json_path"],
-                "transcript_vtt_path": audio_result["transcript_vtt_path"],
+                "transcript_srt_path": audio_result["transcript_srt_path"],
                 "audio_download_url": _download_url(dialogue_id, "audio"),
             }
         )
@@ -867,6 +1058,7 @@ def make_app():
         r".*$",
         [
             (r"/api/server_info", ServerInfoHandler),
+            (r"/api/create_dialogue_from_text", CreateDialogueFromTextHandler),
             (r"/api/update_dialogue", UpdateDialogueHandler),
             (r"/api/generate_audio_custom", GenerateAudioCustomHandler),
             (r"/api/download", DownloadHandler),
