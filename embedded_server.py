@@ -30,6 +30,7 @@ SRC_DIR = ROOT / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+from demo_app.multilingual_naturalness import enforce_keywords_in_lines as merge_keywords_into_lines
 from demo_app.multilingual_naturalness import polish_generated_lines
 
 RUNTIME_CACHE = ROOT / "runtime" / "cache" / "embedded_bundle"
@@ -396,22 +397,7 @@ def _keyword_in_text(text: str, keyword: str) -> bool:
 
 
 def _enforce_keywords_in_lines(lines: list[tuple[str, str]], keywords: list[str], language: str) -> tuple[list[tuple[str, str]], list[str]]:
-    normalized_keywords = [item.strip() for item in keywords if item and item.strip()]
-    if not normalized_keywords:
-        return lines, []
-
-    rendered_text = "\n".join(f"{speaker}: {content}" for speaker, content in lines)
-    missing_keywords = [keyword for keyword in normalized_keywords if not _keyword_in_text(rendered_text, keyword)]
-    if not missing_keywords:
-        return lines, []
-
-    speaker_label = lines[0][0] if lines else "Speaker 1"
-    canonical_language = _canonical_language(language)
-    if canonical_language == "English":
-        appended_text = f"We also need to explicitly cover these keywords: {', '.join(missing_keywords)}."
-    else:
-        appended_text = f"我们这次讨论还需要明确提到这些关键词：{'、'.join(missing_keywords)}。"
-    return [*lines, (speaker_label, appended_text)], missing_keywords
+    return merge_keywords_into_lines(lines, keywords, language)
 
 
 def _new_dialogue_id() -> str:
@@ -440,7 +426,14 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         word_count,
         language,
     )
-    lines, injected_keywords = _enforce_keywords_in_lines(lines, keyword_terms, language)
+    lines, injected_keywords = merge_keywords_into_lines(
+        lines,
+        keyword_terms,
+        language,
+        scenario=scenario,
+        core_content=core_content,
+        profile=profile,
+    )
     dialogue_text = _render_dialogue_text(bundle_server, lines)
     normalized_lines = _normalize_lines(bundle_server, lines)
 
@@ -1208,7 +1201,13 @@ def load_bundle_server():
                 context_pack,
             )
             try:
-                polished_lines, naturalness = polish_generated_lines(lines, language)
+                polished_lines, naturalness = polish_generated_lines(
+                    lines,
+                    language,
+                    scenario=scenario,
+                    core_content=core,
+                    profile=profile,
+                )
                 if naturalness.get("rewrite_count"):
                     lines = polished_lines
                     rewrite_info = dict(rewrite_info or {})

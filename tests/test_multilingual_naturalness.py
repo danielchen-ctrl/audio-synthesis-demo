@@ -9,7 +9,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from demo_app.multilingual_naturalness import polish_generated_lines
+from demo_app.multilingual_naturalness import enforce_keywords_in_lines, polish_generated_lines
 from demo_app.rule_loader import clear_rule_cache, load_text_naturalness_rules
 
 
@@ -23,46 +23,66 @@ class MultilingualNaturalnessTests(unittest.TestCase):
         self.assertIn("Spanish", payload.get("languages", {}))
         self.assertIn("Cantonese", payload.get("languages", {}))
 
-    def test_polish_generated_lines_localizes_japanese_templates(self) -> None:
-        lines = [
-            ("Speaker 1", "您好，我叫Professional，是专业人士。今天我们来详细讨论。"),
-            ("Speaker 2", "这个问题很重要，让我核实一下具体情况再回复您。"),
-            ("Speaker 1", "The most important thing is: <<Core:membership growth>>"),
-            ("Speaker 3", "这个问题是从什么时候开始的？"),
-        ]
-        polished, meta = polish_generated_lines(lines, "Japanese")
-        self.assertEqual(polished[0][1], "こんにちは。今日は進め方を一緒に整理したいです。")
-        self.assertEqual(polished[1][1], "重要な論点なので、前提条件を確認してから判断します。")
-        self.assertTrue(polished[2][1].startswith("いちばん重要なのは、<<Core:"))
-        self.assertEqual(polished[3][1], "この問題はいつ頃から表面化しましたか。")
-        self.assertGreaterEqual(meta["rewrite_count"], 4)
+    def test_polish_generated_lines_keeps_non_chinese_rule_path_available(self) -> None:
+        lines = [("Speaker 1", "The most important thing is: <<Core:membership growth>>")]
+        polished, meta = polish_generated_lines(lines, "English")
+        self.assertEqual(polished, lines)
+        self.assertEqual(meta["rewrite_count"], 0)
 
-    def test_polish_generated_lines_localizes_spanish_followups(self) -> None:
+    def test_polish_generated_lines_rewrites_chinese_placeholders_and_noise(self) -> None:
         lines = [
-            ("Speaker 2", "我理解了，能否给我一些时间整理一下思路？"),
-            ("Speaker 3", "从技术实现看，我会认真思考这个问题，准备好之后再向您汇报。需要考虑接口性能和降级策略。"),
-            ("Speaker 1", "最重要的是： <<Core:membership growth>>"),
+            ("Speaker 1", "您好，我是Professional，是专业人士。我们开始吧。"),
+            ("Speaker 2", "您好，我是Counterpart。乐意参加讨论。"),
+            ("Speaker 1", "The most important thing is: <<Core:chronic disease management + follow-up system upgrade>>"),
+            ("Speaker 2", "Risk Alert: 质量目标 requires attention, 完成率 currently at 82%, needs monitoring."),
         ]
-        polished, meta = polish_generated_lines(lines, "Spanish")
-        self.assertEqual(polished[0][1], "Entiendo. ¿Puedo tomar un poco de tiempo para ordenar bien la idea?")
-        self.assertEqual(
-            polished[1][1],
-            "Desde la implementación técnica, también hay que revisar el rendimiento de las interfaces y la estrategia de degradación.",
+        polished, meta = polish_generated_lines(
+            lines,
+            "Chinese",
+            scenario="病人和医生讨论慢病复诊安排",
+            core_content="慢病管理和复诊安排",
+            profile={"work_content": "慢病复诊", "use_case": "问诊"},
         )
-        self.assertTrue(polished[2][1].startswith("Lo más importante es: <<Core:"))
+        rendered = "\n".join(text for _, text in polished)
         self.assertGreaterEqual(meta["rewrite_count"], 3)
+        self.assertNotIn("Professional", rendered)
+        self.assertNotIn("Counterpart", rendered)
+        self.assertNotIn("<<Core:", rendered)
+        self.assertNotIn("Risk Alert", rendered)
+        self.assertRegex(polished[0][1], r"^你好，我是[\u4e00-\u9fff]{2,4}")
+        self.assertRegex(polished[1][1], r"^你好，我是[\u4e00-\u9fff]{2,4}")
+        self.assertTrue(any("慢病管理和复诊安排" in text or "病人和医生讨论慢病复诊安排" in text for _, text in polished))
 
-    def test_polish_generated_lines_localizes_cantonese_templates(self) -> None:
+    def test_polish_generated_lines_rewrites_boilerplate_sentences(self) -> None:
         lines = [
-            ("Speaker 1", "大家好，我是Professional，是专业人士。准备好了吗？"),
-            ("Speaker 3", "我理解了，能否给我一些时间整理一下思路？"),
-            ("Speaker 1", "The most important thing is: <<Core:會員增長>>"),
+            ("Speaker 1", "基于刚才的讨论，我建议我们有几个选择："),
+            ("Speaker 1", "方案1: 方案一是快速推进，两周内完成，但可能需要您这边配合加班。"),
+            ("Speaker 1", "方案2: 方案二是稳步推进，一个月完成，时间更充裕，质量更有保障。"),
         ]
-        polished, meta = polish_generated_lines(lines, "Cantonese")
-        self.assertEqual(polished[0][1], "大家好，我哋先講清楚前提同做法。")
-        self.assertEqual(polished[1][1], "明白，可唔可以畀我少少時間整理一下思路？")
-        self.assertTrue(polished[2][1].startswith("最重要嘅係：<<Core:"))
-        self.assertGreaterEqual(meta["rewrite_count"], 3)
+        polished, _ = polish_generated_lines(lines, "Chinese", scenario="季度项目讨论", core_content="", profile={})
+        self.assertEqual(polished[0][1], "现在大致有两种思路，我们可以一起权衡哪种更合适。")
+        self.assertEqual(polished[1][1], "一种做法是先从最关键的部分开始，边推进边看效果。")
+        self.assertEqual(polished[2][1], "另一种做法是先把方案准备充分，再整体往下推。")
+
+    def test_enforce_keywords_in_lines_weaves_missing_keywords_naturally_for_chinese(self) -> None:
+        lines = [
+            ("Speaker 1", "你好，我们先把现在的情况梳理一下。"),
+            ("Speaker 2", "好，我最想知道接下来应该怎么推进。"),
+        ]
+        updated, missing = enforce_keywords_in_lines(
+            lines,
+            ["慢病管理", "复诊率"],
+            "Chinese",
+            scenario="医院慢病随访讨论",
+            core_content="慢病管理策略",
+            profile={"work_content": "慢病随访"},
+        )
+        self.assertEqual(missing, ["慢病管理", "复诊率"])
+        self.assertGreater(len(updated), len(lines))
+        rendered = "\n".join(text for _, text in updated)
+        self.assertIn("慢病管理", rendered)
+        self.assertIn("复诊率", rendered)
+        self.assertNotIn("明确提到这些关键词", rendered)
 
 
 if __name__ == "__main__":
