@@ -31,7 +31,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from demo_app.multilingual_naturalness import enforce_keywords_in_lines as merge_keywords_into_lines
-from demo_app.multilingual_naturalness import polish_generated_lines
+from demo_app.multilingual_naturalness import polish_generated_lines, repair_dialogue_quality
 
 RUNTIME_CACHE = ROOT / "runtime" / "cache" / "embedded_bundle"
 MODULE_CACHE = RUNTIME_CACHE / "modules"
@@ -426,6 +426,18 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         word_count,
         language,
     )
+    repaired_lines, repair_meta = repair_dialogue_quality(
+        lines,
+        language,
+        scenario=scenario,
+        core_content=core_content,
+        profile=profile,
+        target_word_count=word_count,
+        people_count=people_count,
+        keywords=keyword_terms,
+    )
+    if repair_meta.get("repaired"):
+        lines = repaired_lines
     lines, injected_keywords = merge_keywords_into_lines(
         lines,
         keyword_terms,
@@ -462,6 +474,9 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         "keyword_terms": keyword_terms,
         "folder": folder,
         "source_mode": str(payload.get("source_mode") or "llm").strip() or "llm",
+        "topic_input_mode": str(payload.get("topic_input_mode") or "manual").strip() or "manual",
+        "preset_id": str(payload.get("preset_id") or "").strip(),
+        "preset_source_title": str(payload.get("preset_source_title") or "").strip(),
         "save_dir": str(save_dir),
         "text_path": str(text_path),
         "text_updated_at": updated_at,
@@ -491,6 +506,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
             }
         },
         "keywords_enforced": injected_keywords,
+        "repair_meta": repair_meta,
         "raw_rewrite_info": rewrite_info or {},
     }
 
@@ -614,6 +630,7 @@ def _create_manual_dialogue_payload(bundle_server: Any, payload: dict[str, Any])
     template_label = str(payload.get("template_label") or "").strip()
     folder = str(payload.get("folder") or "默认目录").strip() or "默认目录"
     tags = payload.get("tags") or []
+    keyword_terms = _safe_str_list(payload.get("keyword_terms"))
     source_mode = str(payload.get("source_mode") or "manual").strip() or "manual"
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -649,6 +666,7 @@ def _create_manual_dialogue_payload(bundle_server: Any, payload: dict[str, Any])
         "audio_language": language,
         "template_label": template_label,
         "tags": tags,
+        "keyword_terms": keyword_terms,
         "folder": folder,
         "source_mode": source_mode,
         "save_dir": str(save_dir),
@@ -678,16 +696,53 @@ def _create_manual_dialogue_payload(bundle_server: Any, payload: dict[str, Any])
 
 def _latest_audio_path(save_dir: Path, basename: str) -> Path | None:
     candidates = []
-    for suffix in (".mp3", ".wav"):
+    for suffix in (".mp3", ".wav", ".m4a"):
         path = save_dir / f"{basename}{suffix}"
         if path.exists():
             candidates.append(path)
     if candidates:
         return sorted(candidates, key=lambda item: item.stat().st_mtime, reverse=True)[0]
-    any_audio = sorted(save_dir.glob("*.mp3")) + sorted(save_dir.glob("*.wav"))
+    any_audio = sorted(save_dir.glob("*.mp3")) + sorted(save_dir.glob("*.wav")) + sorted(save_dir.glob("*.m4a"))
     if any_audio:
         return sorted(any_audio, key=lambda item: item.stat().st_mtime, reverse=True)[0]
     return None
+
+
+def _audio_output_paths(save_dir: Path, basename: str) -> dict[str, Path]:
+    return {
+        "mp3": save_dir / f"{basename}.mp3",
+        "wav": save_dir / f"{basename}.wav",
+        "m4a": save_dir / f"{basename}.m4a",
+    }
+
+
+def _cleanup_extra_audio_formats(audio_paths: dict[str, Path], keep_format: str) -> None:
+    for output_format, path in audio_paths.items():
+        if output_format == keep_format:
+            continue
+        try:
+            if path.exists():
+                path.unlink()
+        except OSError:
+            continue
+
+
+def _resolve_audio_target(manifest: dict[str, Any], dialogue_id: str) -> Path | None:
+    save_dir = Path(manifest.get("save_dir") or ROOT / "demo")
+    basename = str(manifest.get("basename") or dialogue_id)
+    audio_path = str(manifest.get("audio_path") or "").strip()
+    if audio_path:
+        candidate = Path(audio_path)
+        if candidate.exists():
+            return candidate
+
+    output_format = str(manifest.get("audio_output_format") or "").strip().lower()
+    if output_format in {"mp3", "wav", "m4a"}:
+        expected = _audio_output_paths(save_dir, basename)[output_format]
+        if expected.exists():
+            return expected
+
+    return _latest_audio_path(save_dir, basename)
 
 
 def _download_url(dialogue_id: str, kind: str) -> str:
@@ -763,13 +818,11 @@ async def _synthesize_audio_from_lines(
             combined += audio + AudioSegment.silent(duration=220)
             cursor_sec = end_sec + 0.22
 
-        wav_path = save_dir / f"{basename}.wav"
-        mp3_path = save_dir / f"{basename}.mp3"
-        m4a_path = save_dir / f"{basename}.m4a"
-        combined.export(wav_path, format="wav")
-        combined.export(mp3_path, format="mp3")
-        if normalized_output_format == "m4a":
-            combined.export(m4a_path, format="mp4")
+        audio_paths = _audio_output_paths(save_dir, basename)
+        selected_audio_path = audio_paths[normalized_output_format]
+        export_format = {"mp3": "mp3", "wav": "wav", "m4a": "mp4"}[normalized_output_format]
+        combined.export(selected_audio_path, format=export_format)
+        _cleanup_extra_audio_formats(audio_paths, normalized_output_format)
 
         segments_path = ""
         srt_path = ""
@@ -794,17 +847,11 @@ async def _synthesize_audio_from_lines(
         debug_path = save_dir / "tts_input_debug.txt"
         debug_path.write_text("\n".join(debug_lines), encoding="utf-8")
 
-        selected_audio_path = str(mp3_path)
-        if normalized_output_format == "wav":
-            selected_audio_path = str(wav_path)
-        elif normalized_output_format == "m4a":
-            selected_audio_path = str(m4a_path)
-
         return {
-            "audio_file_path": selected_audio_path,
-            "mp3_path": str(mp3_path),
-            "wav_path": str(wav_path),
-            "m4a_path": str(m4a_path) if normalized_output_format == "m4a" else "",
+            "audio_file_path": str(selected_audio_path),
+            "mp3_path": str(audio_paths["mp3"]) if normalized_output_format == "mp3" else "",
+            "wav_path": str(audio_paths["wav"]) if normalized_output_format == "wav" else "",
+            "m4a_path": str(audio_paths["m4a"]) if normalized_output_format == "m4a" else "",
             "output_format": normalized_output_format,
             "voice_map": voice_map,
             "segments_json_path": segments_path,
@@ -814,14 +861,17 @@ async def _synthesize_audio_from_lines(
         }
     except Exception as exc:
         warning_message = f"edge_tts_fallback:{type(exc).__name__}:{exc}"
-        wav_path = save_dir / f"{basename}.wav"
-        mp3_path = save_dir / f"{basename}.mp3"
-        m4a_path = save_dir / f"{basename}.m4a"
+        audio_paths = _audio_output_paths(save_dir, basename)
+        selected_audio_path = audio_paths[normalized_output_format]
+        temp_wav_path = tmp_dir / f"{basename}.wav"
         audio = bundle_server._generate_wave_for_lines(lines)
-        bundle_server._write_wav(audio, wav_path)
-        AudioSegment.from_wav(wav_path).export(mp3_path, format="mp3")
-        if normalized_output_format == "m4a":
-            AudioSegment.from_wav(wav_path).export(m4a_path, format="mp4")
+        bundle_server._write_wav(audio, temp_wav_path)
+        if normalized_output_format == "wav":
+            shutil.copyfile(temp_wav_path, selected_audio_path)
+        else:
+            export_format = "mp3" if normalized_output_format == "mp3" else "mp4"
+            AudioSegment.from_wav(temp_wav_path).export(selected_audio_path, format=export_format)
+        _cleanup_extra_audio_formats(audio_paths, normalized_output_format)
 
         segments: list[dict[str, Any]] = []
         cursor_sec = 0.0
@@ -874,17 +924,11 @@ async def _synthesize_audio_from_lines(
             encoding="utf-8",
         )
 
-        selected_audio_path = str(mp3_path)
-        if normalized_output_format == "wav":
-            selected_audio_path = str(wav_path)
-        elif normalized_output_format == "m4a":
-            selected_audio_path = str(m4a_path)
-
         return {
-            "audio_file_path": selected_audio_path,
-            "mp3_path": str(mp3_path),
-            "wav_path": str(wav_path),
-            "m4a_path": str(m4a_path) if normalized_output_format == "m4a" else "",
+            "audio_file_path": str(selected_audio_path),
+            "mp3_path": str(audio_paths["mp3"]) if normalized_output_format == "mp3" else "",
+            "wav_path": str(audio_paths["wav"]) if normalized_output_format == "wav" else "",
+            "m4a_path": str(audio_paths["m4a"]) if normalized_output_format == "m4a" else "",
             "output_format": normalized_output_format,
             "voice_map": fallback_voice_map,
             "segments_json_path": segments_path,
@@ -1035,6 +1079,8 @@ class GenerateAudioCustomHandler(JsonHandler):
         manifest["audio_warning"] = audio_result["warning"]
         manifest["segments_json_path"] = audio_result["segments_json_path"]
         manifest["transcript_srt_path"] = audio_result["transcript_srt_path"]
+        manifest["include_scripts"] = include_scripts
+        manifest["precise_duration"] = str(payload.get("precise_duration") or "").strip()
         manifest["audio_updated_at"] = generated_at
         _write_json(Path(manifest.get("save_dir") or save_dir) / "manifest.json", manifest)
 
@@ -1076,14 +1122,7 @@ class DownloadHandler(RequestHandler):
         if kind == "text":
             target = Path(manifest["text_path"])
         else:
-            target = None
-            audio_path = manifest.get("audio_path")
-            if audio_path:
-                audio_candidate = Path(audio_path)
-                if audio_candidate.exists():
-                    target = audio_candidate
-            if target is None:
-                target = _latest_audio_path(save_dir, manifest.get("basename", dialogue_id))
+            target = _resolve_audio_target(manifest, dialogue_id)
 
         if target is None or not target.exists():
             raise HTTPError(404, reason=f"{kind} file not found")
@@ -1096,7 +1135,36 @@ class DownloadHandler(RequestHandler):
             "Content-Disposition",
             f"attachment; filename=\"{safe_name}\"; filename*=UTF-8''{quoted_name}",
         )
-        self.write(target.read_bytes())
+        try:
+            payload = target.read_bytes()
+        except OSError as exc:
+            raise HTTPError(500, reason=f"Unable to read {kind} file: {exc}") from exc
+        self.set_header("Content-Length", str(len(payload)))
+        self.finish(payload)
+
+
+class DialogueDetailHandler(JsonHandler):
+    def get(self) -> None:
+        dialogue_id = self.get_query_argument("dialogue_id", "").strip()
+        if not dialogue_id:
+            raise HTTPError(400, reason="dialogue_id is required")
+
+        _, manifest = _find_manifest(dialogue_id)
+        text_path = Path(str(manifest.get("text_path") or ""))
+        dialogue_text = text_path.read_text(encoding="utf-8") if text_path.exists() else ""
+        audio_path = _resolve_audio_target(manifest, dialogue_id)
+
+        self.write_json(
+            {
+                "ok": True,
+                "success": True,
+                "dialogue_id": dialogue_id,
+                "dialogue_text": dialogue_text,
+                "text_file_name": text_path.name if text_path.exists() else "",
+                "audio_file_name": audio_path.name if audio_path and audio_path.exists() else "",
+                "manifest": manifest,
+            }
+        )
 
 
 def _reset_cache() -> None:
@@ -1255,6 +1323,7 @@ def make_app():
             (r"/api/create_dialogue_from_text", CreateDialogueFromTextHandler),
             (r"/api/update_dialogue", UpdateDialogueHandler),
             (r"/api/generate_audio_custom", GenerateAudioCustomHandler),
+            (r"/api/dialogue_detail", DialogueDetailHandler),
             (r"/api/download", DownloadHandler),
         ],
     )

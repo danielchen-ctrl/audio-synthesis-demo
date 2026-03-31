@@ -124,7 +124,8 @@ const state = {
   presetTopics: [],
   templateOptions: [...BASE_TEMPLATE_OPTIONS],
   form: createDefaultFormState(),
-  tasks: []
+  tasks: [],
+  modalSize: null
 };
 
 const el = {
@@ -137,6 +138,8 @@ const el = {
   taskEmpty: document.getElementById("taskEmpty"),
   toastContainer: document.getElementById("toastContainer"),
   modalOverlay: document.getElementById("modalOverlay"),
+  modalPanel: document.getElementById("modalPanel"),
+  modalResizeHandle: document.getElementById("modalResizeHandle"),
   closeModalBtn: document.getElementById("closeModalBtn"),
   cancelModalBtn: document.getElementById("cancelModalBtn"),
   modeCardLlm: document.getElementById("modeCardLlm"),
@@ -304,6 +307,36 @@ function currentWorkingText() {
   return currentMode() === "llm" ? normalizeText(el.previewText.value) : normalizeText(el.manualText.value);
 }
 
+function cloneVoiceAssignments(assignments = {}) {
+  return Object.fromEntries(Object.entries(assignments).map(([key, value]) => [String(key), String(value || "")]));
+}
+
+function snapshotCurrentForm() {
+  readFormFromDom();
+  return {
+    ...state.form,
+    keywords: [...state.form.keywords],
+    tags: [...state.form.tags],
+    voiceAssignments: cloneVoiceAssignments(state.form.voiceAssignments)
+  };
+}
+
+function applyModalSize() {
+  if (!el.modalPanel) return;
+  if (!state.modalSize || !state.modalSize.width || !state.modalSize.height) {
+    el.modalPanel.style.width = "";
+    el.modalPanel.style.height = "";
+    return;
+  }
+
+  const maxWidth = Math.max(760, window.innerWidth - 24);
+  const maxHeight = Math.max(560, window.innerHeight - 24);
+  const width = Math.min(maxWidth, Math.max(760, Number(state.modalSize.width) || 960));
+  const height = Math.min(maxHeight, Math.max(560, Number(state.modalSize.height) || 760));
+  el.modalPanel.style.width = `${width}px`;
+  el.modalPanel.style.height = `${height}px`;
+}
+
 function speakerCountValue() {
   const parsed = Number(el.speakerCount.value || state.form.speakerCount || 2);
   return Math.min(10, Math.max(1, parsed || 2));
@@ -352,6 +385,7 @@ function showToast(type, message) {
 function openModal() {
   state.modalOpen = true;
   el.modalOverlay.classList.add("open");
+  applyModalSize();
   persistState();
 }
 
@@ -416,6 +450,7 @@ function persistState() {
   const payload = {
     modalOpen: state.modalOpen,
     tasks: state.tasks,
+    modalSize: state.modalSize,
     form: {
       ...state.form,
       keywords: [...state.form.keywords],
@@ -433,6 +468,7 @@ function restoreState() {
     const cached = JSON.parse(raw);
     state.modalOpen = cached.modalOpen !== false;
     state.tasks = Array.isArray(cached.tasks) ? cached.tasks : [];
+    state.modalSize = cached.modalSize || null;
     state.form = {
       ...createDefaultFormState(),
       ...(cached.form || {}),
@@ -652,6 +688,9 @@ function renderSubmitState() {
 
 function renderModalVisibility() {
   el.modalOverlay.classList.toggle("open", state.modalOpen);
+  if (state.modalOpen) {
+    applyModalSize();
+  }
 }
 
 function statusBadgeClass(status) {
@@ -676,6 +715,9 @@ function renderTasks() {
       <td><span class="status-badge ${statusBadgeClass(task.status)}">${escapeHtml(task.status)}</span></td>
       <td>
         <div class="row-actions">
+          <button class="btn btn-secondary btn-sm" type="button" data-action="view-task" data-id="${task.id}" ${
+            task.dialogueId ? "" : "disabled"
+          }>查看任务</button>
           <button class="btn btn-secondary btn-sm" type="button" data-action="download-text" data-id="${task.id}" ${
             task.textDownloadUrl ? "" : "disabled"
           }>下载文本</button>
@@ -920,6 +962,7 @@ function buildGenerateTextPayload() {
       folder: el.folderSelect.value,
       source_mode: "llm",
       keyword_terms: keywordTerms,
+      topic_input_mode: "preset",
       preset_id: preset.id,
       preset_source_title: preset.source_title || ""
     };
@@ -938,7 +981,8 @@ function buildGenerateTextPayload() {
     tags: state.form.tags,
     folder: el.folderSelect.value,
     source_mode: "llm",
-    keyword_terms: keywordTerms
+    keyword_terms: keywordTerms,
+    topic_input_mode: "manual"
   };
 }
 
@@ -951,6 +995,7 @@ function buildManualCreatePayload() {
     people_count: speakerCountValue(),
     scenario: el.manualTopic.value.trim(),
     template_label: "直接输入",
+    keyword_terms: [...state.form.keywords],
     tags: state.form.tags,
     folder: el.folderSelect.value,
     source_mode: "manual"
@@ -980,6 +1025,155 @@ async function fetchJson(url, options = {}) {
     throw new Error(payload.error || payload.reason || `请求失败: ${response.status}`);
   }
   return payload;
+}
+
+function buildTaskSnapshot(dialogueId, dialogueText, textFileName) {
+  const formSnapshot = snapshotCurrentForm();
+  return {
+    dialogueId,
+    textFileName,
+    dialogueText,
+    form: {
+      ...formSnapshot,
+      dialogueId,
+      generatedTextFileName: textFileName || formSnapshot.generatedTextFileName || "",
+      previewText: currentMode() === "llm" ? dialogueText : formSnapshot.previewText,
+      manualText: currentMode() === "manual" ? dialogueText : formSnapshot.manualText
+    }
+  };
+}
+
+function taskSnapshotToForm(snapshot) {
+  if (!snapshot || !snapshot.form) return null;
+  const form = snapshot.form;
+  return {
+    ...createDefaultFormState(),
+    ...form,
+    keywords: Array.isArray(form.keywords) ? [...form.keywords] : [],
+    tags: Array.isArray(form.tags) ? [...form.tags] : [],
+    voiceAssignments: cloneVoiceAssignments(form.voiceAssignments || {}),
+    isGeneratingText: false,
+    isSubmittingAudio: false,
+    modalMessage: "已载入历史任务，可继续查看、编辑并重新生成音频。",
+    modalMessageType: "info"
+  };
+}
+
+function detailPayloadToForm(payload) {
+  const manifest = payload?.manifest || {};
+  const sourceMode = manifest.source_mode === "manual" ? "manual" : "llm";
+  const templateValue = manifest.template_label ? ensureTemplateOption(manifest.template_label) : BASE_TEMPLATE_OPTIONS[0].value;
+  const outputFormat = String(manifest.audio_output_format || "mp3").toUpperCase();
+  const normalizedKeywords = Array.isArray(manifest.keyword_terms) ? manifest.keyword_terms : [];
+  const normalizedTags = Array.isArray(manifest.tags) ? manifest.tags : [];
+  const topicInputMode = manifest.topic_input_mode === "preset" && manifest.preset_id ? "preset" : "manual";
+
+  return {
+    ...createDefaultFormState(),
+    mode: sourceMode,
+    topicInputMode,
+    llmTopic: sourceMode === "llm" ? String(manifest.title || "") : "",
+    selectedPresetId: topicInputMode === "preset" ? String(manifest.preset_id || "") : "",
+    template: templateValue,
+    llmLanguage: String(manifest.audio_language || LANGUAGE_OPTIONS[0].backend),
+    wordCountLimit: String(manifest.word_count || DEFAULT_WORD_COUNT),
+    keywords: [...normalizedKeywords],
+    manualTopic: sourceMode === "manual" ? String(manifest.title || "") : "",
+    manualLanguage: String(manifest.audio_language || LANGUAGE_OPTIONS[0].backend),
+    manualText: sourceMode === "manual" ? String(payload.dialogue_text || "") : "",
+    speakerCount: Math.min(10, Math.max(1, Number(manifest.people_count) || 2)),
+    previewText: sourceMode === "llm" ? String(payload.dialogue_text || "") : "",
+    dialogueId: String(payload.dialogue_id || ""),
+    generatedTextFileName: String(payload.text_file_name || ""),
+    voiceAssignments: cloneVoiceAssignments(manifest.voice_map || {}),
+    outputFormat: ["MP3", "WAV", "M4A"].includes(outputFormat) ? outputFormat : "MP3",
+    preciseDuration: String(manifest.precise_duration || ""),
+    folder: String(manifest.folder || "默认目录"),
+    tags: [...normalizedTags],
+    includeScripts: Boolean(manifest.include_scripts),
+    isGeneratingText: false,
+    isSubmittingAudio: false,
+    modalMessage: "已从任务列表恢复该任务，可继续查看或调整参数。",
+    modalMessageType: "info"
+  };
+}
+
+async function fetchTaskDetail(dialogueId) {
+  return fetchJson(`/api/dialogue_detail?dialogue_id=${encodeURIComponent(dialogueId)}`);
+}
+
+async function openTaskInModal(task) {
+  let nextForm = taskSnapshotToForm(task.snapshot);
+  if (!nextForm && task.dialogueId) {
+    const detail = await fetchTaskDetail(task.dialogueId);
+    nextForm = detailPayloadToForm(detail);
+  }
+  if (!nextForm) {
+    throw new Error("该任务缺少可恢复的参数信息");
+  }
+
+  state.form = nextForm;
+  state.modalOpen = true;
+  renderAll();
+  openModal();
+}
+
+function triggerBrowserDownload(blob, fileName) {
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = fileName || "download";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+}
+
+async function downloadTaskAsset(task, kind) {
+  const url = kind === "audio" ? task.audioDownloadUrl : task.textDownloadUrl;
+  if (!url) {
+    throw new Error(kind === "audio" ? "当前任务暂无可下载音频" : "当前任务暂无可下载文本");
+  }
+  const response = await fetch(url);
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(detail || `下载失败: ${response.status}`);
+  }
+  const blob = await response.blob();
+  const fileName = kind === "audio" ? task.fileName : task.textFileName;
+  triggerBrowserDownload(blob, fileName);
+}
+
+function initModalResize() {
+  if (!el.modalPanel || !el.modalResizeHandle) return;
+
+  el.modalResizeHandle.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const rect = el.modalPanel.getBoundingClientRect();
+    const startWidth = rect.width;
+    const startHeight = rect.height;
+
+    const move = (moveEvent) => {
+      const maxWidth = Math.max(760, window.innerWidth - 24);
+      const maxHeight = Math.max(560, window.innerHeight - 24);
+      state.modalSize = {
+        width: Math.min(maxWidth, Math.max(760, startWidth + moveEvent.clientX - startX)),
+        height: Math.min(maxHeight, Math.max(560, startHeight + moveEvent.clientY - startY))
+      };
+      applyModalSize();
+    };
+
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      persistState();
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+  });
 }
 
 function createTaskPlaceholder() {
@@ -1062,11 +1256,14 @@ function applyPresetSelection(preset, options = {}) {
   if (preset.language) {
     state.form.llmLanguage = preset.language;
   }
-  if (preset.default_word_count) {
-    state.form.wordCountLimit = String(preset.default_word_count);
+  if (preset.word_count || preset.default_word_count) {
+    state.form.wordCountLimit = String(preset.word_count || preset.default_word_count);
   }
-  if (preset.recommended_people_count) {
-    state.form.speakerCount = Math.min(10, Math.max(1, Number(preset.recommended_people_count) || state.form.speakerCount || 2));
+  if (preset.people_count || preset.recommended_people_count) {
+    state.form.speakerCount = Math.min(
+      10,
+      Math.max(1, Number(preset.people_count || preset.recommended_people_count) || state.form.speakerCount || 2)
+    );
   }
   if (render) {
     renderAll();
@@ -1206,7 +1403,8 @@ async function submitAudioGeneration() {
       fileName: audioPayload.file_name || basenameFromPath(audioPayload.audio_file_path),
       textFileName: textFileName || basenameFromPath(state.form.generatedTextFileName),
       textDownloadUrl: textDownloadUrl || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=text`,
-      audioDownloadUrl: audioPayload.audio_download_url || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=audio`
+      audioDownloadUrl: audioPayload.audio_download_url || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=audio`,
+      snapshot: buildTaskSnapshot(dialogueId, workingText, textFileName || basenameFromPath(state.form.generatedTextFileName))
     });
 
     state.modalOpen = false;
@@ -1225,26 +1423,37 @@ async function submitAudioGeneration() {
   }
 }
 
-function handleTaskTableClick(event) {
+async function handleTaskTableClick(event) {
   const button = event.target.closest("button[data-action]");
   if (!button) return;
   const task = state.tasks.find((item) => item.id === button.dataset.id);
   if (!task) return;
 
-  if (button.dataset.action === "download-text" && task.textDownloadUrl) {
-    window.location.href = task.textDownloadUrl;
-    return;
-  }
-  if (button.dataset.action === "download-audio" && task.audioDownloadUrl) {
-    window.location.href = task.audioDownloadUrl;
-    return;
-  }
-  if (button.dataset.action === "show-error" && task.errorMessage) {
-    showToast("error", task.errorMessage);
+  try {
+    if (button.dataset.action === "view-task" && task.dialogueId) {
+      await openTaskInModal(task);
+      return;
+    }
+    if (button.dataset.action === "download-text" && task.textDownloadUrl) {
+      await downloadTaskAsset(task, "text");
+      return;
+    }
+    if (button.dataset.action === "download-audio" && task.audioDownloadUrl) {
+      await downloadTaskAsset(task, "audio");
+      return;
+    }
+    if (button.dataset.action === "show-error" && task.errorMessage) {
+      showToast("error", task.errorMessage);
+    }
+  } catch (error) {
+    const actionLabel = button.dataset.action === "view-task" ? "任务回看" : "下载";
+    showToast("error", `${actionLabel}失败：${error.message}`);
   }
 }
 
 function bindEvents() {
+  initModalResize();
+  window.addEventListener("resize", applyModalSize);
   el.copyShareBtn.addEventListener("click", copyShareLink);
   el.uploadBtn.addEventListener("click", () => {
     showToast("info", "演示版当前只开放“在线生成音频”流程。");
