@@ -282,6 +282,9 @@ window.setMode = setMode;
 function setTopicInputMode(mode) {
   state.form.topicInputMode = mode === "preset" ? "preset" : "manual";
   renderAll();
+  if (state.form.topicInputMode === "preset") {
+    void refreshPresetTopicsIfNeeded(true);
+  }
 }
 
 function currentLanguageBackend() {
@@ -387,6 +390,9 @@ function openModal() {
   el.modalOverlay.classList.add("open");
   applyModalSize();
   persistState();
+  if (state.form.mode === "llm") {
+    void refreshPresetTopicsIfNeeded(state.presetTopics.length === 0);
+  }
 }
 
 function closeModal() {
@@ -1241,6 +1247,14 @@ async function loadPresetTopics() {
   }
 }
 
+async function refreshPresetTopicsIfNeeded(force = false) {
+  if (!force && state.presetTopics.length) {
+    return;
+  }
+  await loadPresetTopics();
+  renderAll();
+}
+
 function applyPresetSelection(preset, options = {}) {
   const { render = true } = options;
   if (!preset) {
@@ -1487,6 +1501,11 @@ function bindEvents() {
   });
   el.topicModeManual.addEventListener("change", readAndRender);
   el.topicModePreset.addEventListener("change", readAndRender);
+  el.presetTopicSelect.addEventListener("pointerdown", () => {
+    if (!state.presetTopics.length) {
+      void refreshPresetTopicsIfNeeded(true);
+    }
+  });
 
   el.templateSelect.addEventListener("change", readAndRender);
   el.llmLanguage.addEventListener("change", readAndRender);
