@@ -14,7 +14,7 @@
 
 当前仓库的核心模块如下：
 
-- `embedded_server.py`
+- `src/demo_app/embedded_server_main.py`
   - 当前实际服务主实现
   - 提供 Web 接口、文本生成、音频合成和下载能力
 - `static/`

@@ -16,21 +16,19 @@
   - 服务启动脚本
 - `scripts/start_server.py`
   - Python 启动包装
-- `run.py`
 - `server.py`
-- `app.py`
 
 其中当前真实服务主实现是：
 
-- `embedded_server.py`
+- `src/demo_app/embedded_server_main.py`
 
-`run.py`、`server.py`、`app.py` 主要承担兼容入口角色。
+`server.py` 负责把根目录启动入口转发到 `src/demo_app/embedded_server_main.py`。
 
 ### 2. 服务层
 
 当前仓库的主要服务逻辑集中在：
 
-- `embedded_server.py`
+- `src/demo_app/embedded_server_main.py`
 
 它负责：
 
@@ -150,7 +148,7 @@ start_demo.bat
 
 ## 当前技术债
 
-1. 当前真实服务主实现仍集中在 `embedded_server.py`
+1. 当前真实服务主实现集中在 `src/demo_app/embedded_server_main.py`
    - 可维护，但后续如果服务继续变复杂，建议进一步拆分模块
 2. `src/demo_app/` 与当前实际运行链路并未完全统一
    - 后续是否收敛：待补充

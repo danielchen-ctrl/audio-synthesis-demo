@@ -108,6 +108,6 @@ Codex 进入仓库后建议顺序：
 
 说明：
 
-- 该门禁基于当前仓库的真实可运行结构（`embedded_server.py` + `scripts/start_server.py`）
+- 该门禁基于当前仓库的真实可运行结构（`server.py` + `src/demo_app/embedded_server_main.py` + `scripts/start_server.py`）
 - 如果当前 checkout 缺少本地 build bundle，embedded smoke 会被标记为 `skipped`
 - 其余仓库级检查（关键文件、YAML、Python 编译、repo daily check）仍会继续执行

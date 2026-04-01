@@ -8,18 +8,17 @@ version: 1.0
 # Files that must never be moved
 # --------------------------------
 protected_files:
-  - app.py
   - server.py
-  - run.py
-  - embedded_server.py
   - runtime_patches.py
   - resource_path_utils.py
   - template_retriever.py
   - pack_adapter.py
+  - embedded_server_main.py
   - project_guard.py
-  - project_guard_rules.yaml
   - cleanup_tool.py
+  - project_guard_rules.yaml
   - .cleanupignore
+  - AGENTS.md
   - README.md
   - requirements.txt
   - start_demo.bat
@@ -48,30 +47,17 @@ protected_patterns:
 # Everything else should be moved
 # --------------------------------
 root_allowlist:
+  - AGENTS.md
   - README.md
-  - requirements.txt
-  - run.py
-  - app.py
   - server.py
-  - cleanup_tool.py
-  - cleanup_report_template.md
-  - project_guard.py
-  - project_guard_rules.yaml
   - .cleanupignore
   - .gitignore
-  - pyproject.toml
-  - sitecustomize.py
-  - embedded_server.py
   - start_demo.bat
-  - cleanup_report.md
-  - migration_notes.md
-  - project_guard_report.md
 
 root_allow_dirs:
   - .git
   - src
   - config
-  - .claude
   - .github
   - demo
   - scripts
@@ -79,15 +65,12 @@ root_allow_dirs:
   - tools
   - docs
   - runtime
-  - archive
   - reports
   - output
   - tests
   - training
   - build
-  - dist
   - bin
-  - .autogate
 
 # --------------------------------
 # Temporary script patterns
