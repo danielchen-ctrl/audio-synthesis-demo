@@ -25,12 +25,13 @@ from PyInstaller.loader.pyimod01_archive import PYZ_ITEM_MODULE, PYZ_ITEM_PKG
 from tornado.web import HTTPError, RequestHandler
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 SRC_DIR = ROOT / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from demo_app.multilingual_naturalness import polish_generated_lines
+from demo_app.multilingual_naturalness import enforce_keywords_in_lines as merge_keywords_into_lines
+from demo_app.multilingual_naturalness import polish_generated_lines, repair_dialogue_quality
 
 RUNTIME_CACHE = ROOT / "runtime" / "cache" / "embedded_bundle"
 MODULE_CACHE = RUNTIME_CACHE / "modules"
@@ -64,8 +65,16 @@ VOICE_CATALOG = {
     "German": ["de-DE-KatjaNeural", "de-DE-ConradNeural"],
     "Spanish": ["es-ES-ElviraNeural", "es-ES-AlvaroNeural"],
     "Portuguese": ["pt-BR-FranciscaNeural", "pt-BR-AntonioNeural"],
+    "Italian": ["it-IT-ElsaNeural", "it-IT-DiegoNeural"],
+    "Russian": ["ru-RU-DariyaNeural", "ru-RU-DmitryNeural"],
+    "Arabic": ["ar-SA-ZariyahNeural", "ar-SA-HamedNeural"],
+    "Indonesian": ["id-ID-GadisNeural", "id-ID-ArdiNeural"],
     "Cantonese": ["zh-HK-HiuGaaiNeural", "zh-HK-WanLungNeural", "zh-HK-HiuMaanNeural"],
 }
+
+MAX_AUDIO_TEXT_CHARS = 12000
+PRESET_TOPIC_FILE_NAME = "预置对话情景参数.txt"
+PRESET_BLOCK_RE = re.compile(r"(?ms)^\s*(\d+)[）\)]\s*(.+?)(?=^\s*\d+[）\)]\s*|\Z)")
 
 
 def active_static_dir() -> Path:
@@ -77,21 +86,44 @@ def active_static_dir() -> Path:
 def _canonical_language(value: str) -> str:
     mapping = {
         "中文": "Chinese",
+        "中文（普通话）": "Chinese",
         "Chinese": "Chinese",
+        "zh": "Chinese",
         "英文": "English",
+        "英语": "English",
         "English": "English",
+        "en": "English",
         "日语": "Japanese",
         "Japanese": "Japanese",
+        "ja": "Japanese",
         "韩语": "Korean",
         "Korean": "Korean",
+        "ko": "Korean",
         "法语": "French",
         "French": "French",
+        "fr": "French",
         "德语": "German",
         "German": "German",
+        "de": "German",
         "西班牙语": "Spanish",
         "Spanish": "Spanish",
+        "es": "Spanish",
         "葡萄牙语": "Portuguese",
         "Portuguese": "Portuguese",
+        "pt": "Portuguese",
+        "意大利语": "Italian",
+        "Italian": "Italian",
+        "it": "Italian",
+        "俄语": "Russian",
+        "Russian": "Russian",
+        "ru": "Russian",
+        "阿拉伯语": "Arabic",
+        "Arabic": "Arabic",
+        "ar": "Arabic",
+        "印度尼西亚语": "Indonesian",
+        "印尼语": "Indonesian",
+        "Indonesian": "Indonesian",
+        "id": "Indonesian",
         "粤语": "Cantonese",
         "Cantonese": "Cantonese",
     }
@@ -103,10 +135,24 @@ def _speaker_numeric_id(speaker_label: str) -> int:
     return int(match.group(1)) if match else 1
 
 
-def _voice_for_speaker(language: str, speaker_label: str) -> str:
+def _voice_for_speaker(language: str, speaker_label: str, selected_voice_map: dict[str, str] | None = None) -> str:
+    speaker_id = str(_speaker_numeric_id(speaker_label))
+    if selected_voice_map and selected_voice_map.get(speaker_id):
+        return str(selected_voice_map[speaker_id])
     voices = VOICE_CATALOG.get(_canonical_language(language), VOICE_CATALOG["Chinese"])
-    speaker_id = _speaker_numeric_id(speaker_label)
-    return voices[(speaker_id - 1) % len(voices)]
+    return voices[(int(speaker_id) - 1) % len(voices)]
+
+
+def _safe_file_component(value: str, fallback: str = "audio") -> str:
+    text = str(value or "").strip()
+    text = re.sub(r"[\\/:*?\"<>|]+", "_", text)
+    text = re.sub(r"\s+", "_", text)
+    text = re.sub(r"_+", "_", text).strip("._")
+    return text or fallback
+
+
+def _basename_from_title(title: str, timestamp: str, fallback: str = "audio") -> str:
+    return f"{_safe_file_component(title, fallback)}_{timestamp}"
 
 
 def _ffmpeg_path() -> str | None:
@@ -193,6 +239,190 @@ def _safe_int(value: Any, default: int) -> int:
         return default
 
 
+def _safe_str_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    result: list[str] = []
+    for item in value:
+        normalized = str(item or "").strip()
+        if normalized and normalized not in result:
+            result.append(normalized)
+    return result
+
+
+def _compact_multiline_text(value: str) -> str:
+    cleaned: list[str] = []
+    for raw_line in str(value or "").splitlines():
+        line = raw_line.strip()
+        if not line or line == ">":
+            continue
+        line = re.sub(r"^<Core[:：]?", "", line).strip()
+        line = line.rstrip(">").strip()
+        line = re.sub(r"^[\-\*•\d\.、\)\(]+", "", line).strip()
+        if line:
+            cleaned.append(line)
+    return " ".join(cleaned).strip()
+
+
+def _extract_section(block: str, start_tokens: list[str], stop_tokens: list[str]) -> str:
+    start_index = -1
+    matched_token = ""
+    for token in start_tokens:
+        idx = block.find(token)
+        if idx != -1 and (start_index == -1 or idx < start_index):
+            start_index = idx
+            matched_token = token
+    if start_index == -1:
+        return ""
+
+    section = block[start_index + len(matched_token):]
+    if section.startswith(("：", ":")):
+        section = section[1:]
+
+    stop_index = len(section)
+    for token in stop_tokens:
+        idx = section.find(token)
+        if idx != -1:
+            stop_index = min(stop_index, idx)
+
+    return _compact_multiline_text(section[:stop_index])
+
+
+def _extract_word_count(block: str) -> int:
+    range_match = re.search(r"target_words\s*=\s*(\d+)\s*[~～\-]\s*(\d+)", block, flags=re.IGNORECASE)
+    if range_match:
+        low = int(range_match.group(1))
+        high = int(range_match.group(2))
+        return max(100, int(round((low + high) / 2)))
+    single_match = re.search(r"target_words\s*=\s*(\d+)", block, flags=re.IGNORECASE)
+    if single_match:
+        return max(100, int(single_match.group(1)))
+    return 1000
+
+
+def _guess_template_label(title: str, scenario: str) -> str:
+    match = re.search(r"[（(]([^()（）]{1,20})[)）]", title)
+    if match:
+        return match.group(1).strip()
+
+    combined = f"{title} {scenario}"
+    if "问诊" in combined or ("医生" in combined and "病" in combined):
+        return "问诊"
+    if "战略周会" in combined or "周会" in combined:
+        return "战略周会"
+    if "访谈" in combined:
+        return "访谈"
+    if "销售" in combined or "洽谈" in combined or "客户" in combined:
+        return "客户访谈"
+    if "决策" in combined:
+        return "方案决策"
+    if "排查" in combined or "异常" in combined:
+        return "问题排查"
+    if "评审" in combined or "准入" in combined or "Go / No-Go" in combined or "Go/No-Go" in combined:
+        return "评审会"
+    return "会议讨论"
+
+
+def _preset_topic_text(title: str) -> str:
+    source = title.split("｜", 1)[1].strip() if "｜" in title else title.strip()
+    source = re.sub(r"[（(].*?[)）]", "", source).strip() or title.strip()
+    return source
+
+
+def _preset_display_title(topic_text: str) -> str:
+    compact = re.sub(r"\s+", "", topic_text)
+    return compact[:20] if len(compact) > 20 else compact
+
+
+def _preset_profile(title: str, topic_text: str, template_label: str) -> dict[str, str]:
+    industry = title.split("｜", 1)[0].strip() if "｜" in title else template_label or "在线生成音频"
+    return {
+        "job_function": industry or template_label or "在线生成音频",
+        "work_content": topic_text or template_label or "场景对话",
+        "seniority": "资深",
+        "use_case": template_label or "会议讨论",
+    }
+
+
+def _resolve_preset_topic_file() -> Path | None:
+    candidates: list[Path] = []
+    for base in [ROOT, ROOT.parent, ROOT.parent.parent]:
+        candidates.extend(
+            [
+                base / "demo" / "对话情景参数" / PRESET_TOPIC_FILE_NAME,
+                base / "demo" / PRESET_TOPIC_FILE_NAME,
+                base / "demo_app" / "demo" / "对话情景参数" / PRESET_TOPIC_FILE_NAME,
+                base / "demo_app" / "demo" / PRESET_TOPIC_FILE_NAME,
+            ]
+        )
+
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def _load_preset_topics() -> list[dict[str, Any]]:
+    preset_topic_file = _resolve_preset_topic_file()
+    if not preset_topic_file:
+        return []
+
+    raw_text = preset_topic_file.read_text(encoding="utf-8")
+    presets: list[dict[str, Any]] = []
+
+    for match in PRESET_BLOCK_RE.finditer(raw_text):
+        preset_id = match.group(1)
+        block = match.group(2).strip()
+        title = next((line.strip() for line in block.splitlines() if line.strip()), "")
+        if not title:
+            continue
+
+        scenario = _extract_section(
+            block,
+            ["场景对话设置（升级版）", "场景对话设置"],
+            ["对话生成参数", "**参数", "参数：", "参数:", "对话核心内容", "核心内容", "全新情景对话", "全新对话", "对话节选"],
+        )
+        core_content = _extract_section(
+            block,
+            ["对话核心内容（红色标注）", "对话核心内容", "核心内容"],
+            ["全新情景对话", "全新对话", "对话节选", "Action Items"],
+        )
+        topic_text = _preset_topic_text(title)
+        template_label = _guess_template_label(title, scenario)
+        people_match = re.search(r"people_count\s*=\s*(\d+)", block, flags=re.IGNORECASE)
+        language_match = re.search(r"language\s*=\s*([^\s｜|]+)", block, flags=re.IGNORECASE)
+
+        presets.append(
+            {
+                "id": preset_id,
+                "source_title": title,
+                "topic_text": topic_text,
+                "display_title": _preset_display_title(topic_text),
+                "scenario": scenario or topic_text,
+                "core_content": core_content,
+                "template_label": template_label,
+                "people_count": max(2, min(10, _safe_int(people_match.group(1) if people_match else None, 3))),
+                "word_count": min(3000, max(100, _extract_word_count(block))),
+                "language": _canonical_language(language_match.group(1) if language_match else "Chinese"),
+                "profile": _preset_profile(title, topic_text, template_label),
+            }
+        )
+
+    return presets
+
+
+def _keyword_in_text(text: str, keyword: str) -> bool:
+    return keyword.casefold() in text.casefold()
+
+
+def _enforce_keywords_in_lines(lines: list[tuple[str, str]], keywords: list[str], language: str) -> tuple[list[tuple[str, str]], list[str]]:
+    return merge_keywords_into_lines(lines, keywords, language)
+
+
 def _new_dialogue_id() -> str:
     alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
     return "".join(secrets.choice(alphabet) for _ in range(8))
@@ -203,9 +433,13 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     scenario = str(payload.get("scenario") or "").strip()
     core_content = str(payload.get("core_content") or "").strip()
     people_count = max(2, min(10, _safe_int(payload.get("people_count"), 3)))
-    word_count = max(300, _safe_int(payload.get("word_count"), 1000))
+    word_count = min(3000, max(100, _safe_int(payload.get("word_count"), 1000)))
     language = _canonical_language(str(payload.get("audio_language") or payload.get("language") or "Chinese"))
     title = str(payload.get("title") or f"{profile['job_function']}_{profile['seniority']}").strip()
+    template_label = str(payload.get("template_label") or "").strip()
+    tags = payload.get("tags") or []
+    keyword_terms = _safe_str_list(payload.get("keyword_terms"))
+    folder = str(payload.get("folder") or "默认目录").strip() or "默认目录"
 
     lines, rewrite_info = bundle_server._generate_dialogue_lines(
         profile,
@@ -215,16 +449,37 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         word_count,
         language,
     )
+    repaired_lines, repair_meta = repair_dialogue_quality(
+        lines,
+        language,
+        scenario=scenario,
+        core_content=core_content,
+        profile=profile,
+        target_word_count=word_count,
+        people_count=people_count,
+        keywords=keyword_terms,
+    )
+    if repair_meta.get("repaired"):
+        lines = repaired_lines
+    lines, injected_keywords = merge_keywords_into_lines(
+        lines,
+        keyword_terms,
+        language,
+        scenario=scenario,
+        core_content=core_content,
+        profile=profile,
+    )
     dialogue_text = _render_dialogue_text(bundle_server, lines)
     normalized_lines = _normalize_lines(bundle_server, lines)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     dialogue_id = _new_dialogue_id()
-    basename = bundle_server.generate_basename(profile, language, timestamp)
+    basename = _basename_from_title(title, timestamp, bundle_server.generate_basename(profile, language, timestamp))
     save_dir = ROOT / "demo" / timestamp
     save_dir.mkdir(parents=True, exist_ok=True)
     text_path = save_dir / f"{basename}.txt"
     text_path.write_text(dialogue_text, encoding="utf-8")
+    updated_at = datetime.now().isoformat(timespec="seconds")
 
     manifest = {
         "dialogue_id": dialogue_id,
@@ -237,8 +492,17 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         "people_count": people_count,
         "word_count": word_count,
         "audio_language": language,
+        "template_label": template_label,
+        "tags": tags,
+        "keyword_terms": keyword_terms,
+        "folder": folder,
+        "source_mode": str(payload.get("source_mode") or "llm").strip() or "llm",
+        "topic_input_mode": str(payload.get("topic_input_mode") or "manual").strip() or "manual",
+        "preset_id": str(payload.get("preset_id") or "").strip(),
+        "preset_source_title": str(payload.get("preset_source_title") or "").strip(),
         "save_dir": str(save_dir),
         "text_path": str(text_path),
+        "text_updated_at": updated_at,
         "audio_path": "",
         "voice_map": {},
         "edited_text": False,
@@ -261,17 +525,23 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
                 "word_count": word_count,
                 "audio_language": language,
                 "profile": profile,
+                "keyword_terms": keyword_terms,
             }
         },
+        "keywords_enforced": injected_keywords,
+        "repair_meta": repair_meta,
         "raw_rewrite_info": rewrite_info or {},
     }
 
     return {
         "ok": True,
+        "success": True,
         "dialogue_id": dialogue_id,
         "timestamp": timestamp,
         "basename": basename,
         "text_path": str(text_path),
+        "file_name": text_path.name,
+        "updated_at": updated_at,
         "dialogue_text": dialogue_text,
         "text": dialogue_text,
         "lines": normalized_lines,
@@ -323,6 +593,13 @@ def _dialogue_lines_from_text(dialogue_text: str) -> list[tuple[str, str]]:
     return lines
 
 
+def _normalize_dialogue_text_for_storage(dialogue_text: str) -> str:
+    normalized = str(dialogue_text or "").replace("\r\n", "\n").strip()
+    if not normalized:
+        raise ValueError("当前对话文本为空，无法保存")
+    return normalized
+
+
 def _render_dialogue_text(bundle_server: Any, lines: list[tuple[str, str]]) -> str:
     return bundle_server._render_dialogue_text(lines)
 
@@ -336,40 +613,159 @@ def _save_dialogue_edit(bundle_server: Any, dialogue_id: str, dialogue_text: str
     save_dir = Path(manifest.get("save_dir") or manifest_path.parent)
     save_dir.mkdir(parents=True, exist_ok=True)
 
-    lines = _dialogue_lines_from_text(dialogue_text)
-    rendered_text = _render_dialogue_text(bundle_server, lines)
+    rendered_text = _normalize_dialogue_text_for_storage(dialogue_text)
     text_path = Path(manifest.get("text_path") or save_dir / f"{manifest.get('basename', dialogue_id)}.txt")
     text_path.write_text(rendered_text, encoding="utf-8")
+    updated_at = datetime.now().isoformat(timespec="seconds")
 
     manifest["text_path"] = str(text_path)
     manifest["edited_text"] = True
-    manifest["edited_at"] = __import__("datetime").datetime.now().isoformat(timespec="seconds")
+    manifest["edited_at"] = updated_at
+    manifest["text_updated_at"] = updated_at
     _write_json(manifest_path, manifest)
+
+    try:
+        line_tuples = _dialogue_lines_from_text(rendered_text)
+        normalized_lines = _normalize_lines(bundle_server, line_tuples)
+    except Exception:
+        line_tuples = None
+        normalized_lines = []
 
     return {
         "dialogue_id": dialogue_id,
         "manifest_path": str(manifest_path),
         "save_dir": str(save_dir),
         "text_path": str(text_path),
+        "updated_at": updated_at,
         "dialogue_text": rendered_text,
-        "lines": _normalize_lines(bundle_server, lines),
+        "lines": normalized_lines,
         "manifest": manifest,
-        "line_tuples": lines,
+        "line_tuples": line_tuples,
+    }
+
+
+def _create_manual_dialogue_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[str, Any]:
+    title = str(payload.get("title") or "在线生成音频").strip() or "在线生成音频"
+    language = _canonical_language(str(payload.get("language") or payload.get("audio_language") or "Chinese"))
+    people_count = max(1, min(10, _safe_int(payload.get("people_count"), 2)))
+    dialogue_text = _normalize_dialogue_text_for_storage(str(payload.get("dialogue_text") or ""))
+    scenario = str(payload.get("scenario") or "").strip()
+    template_label = str(payload.get("template_label") or "").strip()
+    folder = str(payload.get("folder") or "默认目录").strip() or "默认目录"
+    tags = payload.get("tags") or []
+    keyword_terms = _safe_str_list(payload.get("keyword_terms"))
+    source_mode = str(payload.get("source_mode") or "manual").strip() or "manual"
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    dialogue_id = _new_dialogue_id()
+    basename = _basename_from_title(title, timestamp, "manual_dialogue")
+    save_dir = ROOT / "demo" / timestamp
+    save_dir.mkdir(parents=True, exist_ok=True)
+    text_path = save_dir / f"{basename}.txt"
+    text_path.write_text(dialogue_text, encoding="utf-8")
+    updated_at = datetime.now().isoformat(timespec="seconds")
+
+    try:
+        line_tuples = _dialogue_lines_from_text(dialogue_text)
+        normalized_lines = _normalize_lines(bundle_server, line_tuples)
+    except Exception:
+        normalized_lines = []
+
+    manifest = {
+        "dialogue_id": dialogue_id,
+        "timestamp": timestamp,
+        "basename": basename,
+        "title": title,
+        "scenario": scenario,
+        "core_content": "",
+        "profile": {
+            "job_function": "在线生成音频",
+            "work_content": template_label or "直接输入",
+            "seniority": "标准",
+            "use_case": template_label or "直接输入文本生成音频",
+        },
+        "people_count": people_count,
+        "word_count": 0,
+        "audio_language": language,
+        "template_label": template_label,
+        "tags": tags,
+        "keyword_terms": keyword_terms,
+        "folder": folder,
+        "source_mode": source_mode,
+        "save_dir": str(save_dir),
+        "text_path": str(text_path),
+        "text_updated_at": updated_at,
+        "audio_path": "",
+        "voice_map": {},
+        "edited_text": True,
+    }
+    _write_json(save_dir / "manifest.json", manifest)
+
+    return {
+        "ok": True,
+        "success": True,
+        "dialogue_id": dialogue_id,
+        "timestamp": timestamp,
+        "basename": basename,
+        "text_path": str(text_path),
+        "file_name": text_path.name,
+        "updated_at": updated_at,
+        "dialogue_text": dialogue_text,
+        "text": dialogue_text,
+        "lines": normalized_lines,
+        "text_download_url": _download_url(dialogue_id, "text"),
     }
 
 
 def _latest_audio_path(save_dir: Path, basename: str) -> Path | None:
     candidates = []
-    for suffix in (".mp3", ".wav"):
+    for suffix in (".mp3", ".wav", ".m4a"):
         path = save_dir / f"{basename}{suffix}"
         if path.exists():
             candidates.append(path)
     if candidates:
         return sorted(candidates, key=lambda item: item.stat().st_mtime, reverse=True)[0]
-    any_audio = sorted(save_dir.glob("*.mp3")) + sorted(save_dir.glob("*.wav"))
+    any_audio = sorted(save_dir.glob("*.mp3")) + sorted(save_dir.glob("*.wav")) + sorted(save_dir.glob("*.m4a"))
     if any_audio:
         return sorted(any_audio, key=lambda item: item.stat().st_mtime, reverse=True)[0]
     return None
+
+
+def _audio_output_paths(save_dir: Path, basename: str) -> dict[str, Path]:
+    return {
+        "mp3": save_dir / f"{basename}.mp3",
+        "wav": save_dir / f"{basename}.wav",
+        "m4a": save_dir / f"{basename}.m4a",
+    }
+
+
+def _cleanup_extra_audio_formats(audio_paths: dict[str, Path], keep_format: str) -> None:
+    for output_format, path in audio_paths.items():
+        if output_format == keep_format:
+            continue
+        try:
+            if path.exists():
+                path.unlink()
+        except OSError:
+            continue
+
+
+def _resolve_audio_target(manifest: dict[str, Any], dialogue_id: str) -> Path | None:
+    save_dir = Path(manifest.get("save_dir") or ROOT / "demo")
+    basename = str(manifest.get("basename") or dialogue_id)
+    audio_path = str(manifest.get("audio_path") or "").strip()
+    if audio_path:
+        candidate = Path(audio_path)
+        if candidate.exists():
+            return candidate
+
+    output_format = str(manifest.get("audio_output_format") or "").strip().lower()
+    if output_format in {"mp3", "wav", "m4a"}:
+        expected = _audio_output_paths(save_dir, basename)[output_format]
+        if expected.exists():
+            return expected
+
+    return _latest_audio_path(save_dir, basename)
 
 
 def _download_url(dialogue_id: str, kind: str) -> str:
@@ -393,6 +789,9 @@ async def _synthesize_audio_from_lines(
     save_dir: Path,
     basename: str,
     bundle_server: Any,
+    selected_voice_map: dict[str, str] | None = None,
+    output_format: str = "mp3",
+    include_scripts: bool = False,
 ) -> dict[str, Any]:
     from pydub import AudioSegment
 
@@ -400,10 +799,10 @@ async def _synthesize_audio_from_lines(
     if ffmpeg:
         AudioSegment.converter = ffmpeg
 
-    tmp_dir = save_dir / "_edited_tts_tmp"
-    if tmp_dir.exists():
-        shutil.rmtree(tmp_dir)
-    tmp_dir.mkdir(parents=True, exist_ok=True)
+    tmp_dir = Path(tempfile.mkdtemp(prefix="_edited_tts_tmp_", dir=save_dir))
+    normalized_output_format = str(output_format or "mp3").strip().lower()
+    if normalized_output_format not in {"mp3", "wav", "m4a"}:
+        normalized_output_format = "mp3"
 
     combined = AudioSegment.silent(duration=120)
     segments: list[dict[str, Any]] = []
@@ -417,7 +816,7 @@ async def _synthesize_audio_from_lines(
             cleaned = text.strip()
             if not cleaned:
                 continue
-            voice = _voice_for_speaker(language, speaker)
+            voice = _voice_for_speaker(language, speaker, selected_voice_map)
             speaker_id = str(_speaker_numeric_id(speaker))
             voice_map[speaker_id] = voice
             segment_file = tmp_dir / f"line_{idx:03d}.mp3"
@@ -442,50 +841,67 @@ async def _synthesize_audio_from_lines(
             combined += audio + AudioSegment.silent(duration=220)
             cursor_sec = end_sec + 0.22
 
-        wav_path = save_dir / f"{basename}.wav"
-        mp3_path = save_dir / f"{basename}.mp3"
-        combined.export(wav_path, format="wav")
-        combined.export(mp3_path, format="mp3")
+        audio_paths = _audio_output_paths(save_dir, basename)
+        selected_audio_path = audio_paths[normalized_output_format]
+        export_format = {"mp3": "mp3", "wav": "wav", "m4a": "mp4"}[normalized_output_format]
+        combined.export(selected_audio_path, format=export_format)
+        _cleanup_extra_audio_formats(audio_paths, normalized_output_format)
 
-        segments_path = save_dir / "segments.json"
-        _write_json(segments_path, {"segments": segments, "language": _canonical_language(language)})
+        segments_path = ""
+        srt_path = ""
+        if include_scripts:
+            segments_target = save_dir / f"{basename}_transcript.json"
+            _write_json(segments_target, {"segments": segments, "language": _canonical_language(language)})
+            segments_path = str(segments_target)
 
-        vtt_path = save_dir / "transcript.vtt"
-        vtt_lines = ["WEBVTT", ""]
-        for idx, item in enumerate(segments, start=1):
-            vtt_lines.append(str(idx))
-            vtt_lines.append(f"{_format_vtt_ts(item['start_sec'])} --> {_format_vtt_ts(item['end_sec'])}")
-            vtt_lines.append(f"{item['speaker']}: {item['text']}")
-            vtt_lines.append("")
-        vtt_path.write_text("\n".join(vtt_lines), encoding="utf-8")
+            srt_target = save_dir / f"{basename}_transcript.srt"
+            srt_lines: list[str] = []
+            for idx, item in enumerate(segments, start=1):
+                srt_lines.append(str(idx))
+                srt_lines.append(
+                    f"{_format_vtt_ts(item['start_sec']).replace('.', ',')} --> "
+                    f"{_format_vtt_ts(item['end_sec']).replace('.', ',')}"
+                )
+                srt_lines.append(f"S{_speaker_numeric_id(item['speaker'])}: {item['text']}")
+                srt_lines.append("")
+            srt_target.write_text("\n".join(srt_lines), encoding="utf-8")
+            srt_path = str(srt_target)
 
         debug_path = save_dir / "tts_input_debug.txt"
         debug_path.write_text("\n".join(debug_lines), encoding="utf-8")
 
         return {
-            "audio_file_path": str(mp3_path),
-            "mp3_path": str(mp3_path),
-            "wav_path": str(wav_path),
+            "audio_file_path": str(selected_audio_path),
+            "mp3_path": str(audio_paths["mp3"]) if normalized_output_format == "mp3" else "",
+            "wav_path": str(audio_paths["wav"]) if normalized_output_format == "wav" else "",
+            "m4a_path": str(audio_paths["m4a"]) if normalized_output_format == "m4a" else "",
+            "output_format": normalized_output_format,
             "voice_map": voice_map,
-            "segments_json_path": str(segments_path),
-            "transcript_vtt_path": str(vtt_path),
+            "segments_json_path": segments_path,
+            "transcript_srt_path": srt_path,
             "tts_debug_file": str(debug_path),
             "warning": warning_message,
         }
     except Exception as exc:
         warning_message = f"edge_tts_fallback:{type(exc).__name__}:{exc}"
-        wav_path = save_dir / f"{basename}.wav"
-        mp3_path = save_dir / f"{basename}.mp3"
+        audio_paths = _audio_output_paths(save_dir, basename)
+        selected_audio_path = audio_paths[normalized_output_format]
+        temp_wav_path = tmp_dir / f"{basename}.wav"
         audio = bundle_server._generate_wave_for_lines(lines)
-        bundle_server._write_wav(audio, wav_path)
-        AudioSegment.from_wav(wav_path).export(mp3_path, format="mp3")
+        bundle_server._write_wav(audio, temp_wav_path)
+        if normalized_output_format == "wav":
+            shutil.copyfile(temp_wav_path, selected_audio_path)
+        else:
+            export_format = "mp3" if normalized_output_format == "mp3" else "mp4"
+            AudioSegment.from_wav(temp_wav_path).export(selected_audio_path, format=export_format)
+        _cleanup_extra_audio_formats(audio_paths, normalized_output_format)
 
         segments: list[dict[str, Any]] = []
         cursor_sec = 0.0
         fallback_voice_map: dict[str, str] = {}
         for idx, (speaker, text) in enumerate(lines, start=1):
             duration = max(1.2, min(6.0, len(text) / 8.0))
-            voice = _voice_for_speaker(language, speaker)
+            voice = _voice_for_speaker(language, speaker, selected_voice_map)
             speaker_id = str(_speaker_numeric_id(speaker))
             fallback_voice_map[speaker_id] = voice
             segments.append(
@@ -500,23 +916,31 @@ async def _synthesize_audio_from_lines(
             )
             cursor_sec += duration
 
-        segments_path = save_dir / "segments.json"
-        _write_json(segments_path, {"segments": segments, "language": _canonical_language(language)})
+        segments_path = ""
+        srt_path = ""
+        if include_scripts:
+            segments_target = save_dir / f"{basename}_transcript.json"
+            _write_json(segments_target, {"segments": segments, "language": _canonical_language(language)})
+            segments_path = str(segments_target)
 
-        vtt_path = save_dir / "transcript.vtt"
-        vtt_lines = ["WEBVTT", ""]
-        for idx, item in enumerate(segments, start=1):
-            vtt_lines.append(str(idx))
-            vtt_lines.append(f"{_format_vtt_ts(item['start_sec'])} --> {_format_vtt_ts(item['end_sec'])}")
-            vtt_lines.append(f"{item['speaker']}: {item['text']}")
-            vtt_lines.append("")
-        vtt_path.write_text("\n".join(vtt_lines), encoding="utf-8")
+            srt_target = save_dir / f"{basename}_transcript.srt"
+            srt_lines: list[str] = []
+            for idx, item in enumerate(segments, start=1):
+                srt_lines.append(str(idx))
+                srt_lines.append(
+                    f"{_format_vtt_ts(item['start_sec']).replace('.', ',')} --> "
+                    f"{_format_vtt_ts(item['end_sec']).replace('.', ',')}"
+                )
+                srt_lines.append(f"S{_speaker_numeric_id(item['speaker'])}: {item['text']}")
+                srt_lines.append("")
+            srt_target.write_text("\n".join(srt_lines), encoding="utf-8")
+            srt_path = str(srt_target)
 
         debug_path = save_dir / "tts_input_debug.txt"
         debug_path.write_text(
             "\n".join(
                 [
-                    f"{speaker}\tsynthetic_fallback:{_voice_for_speaker(language, speaker)}\t{text}"
+                    f"{speaker}\tsynthetic_fallback:{_voice_for_speaker(language, speaker, selected_voice_map)}\t{text}"
                     for speaker, text in lines
                 ]
             ),
@@ -524,12 +948,14 @@ async def _synthesize_audio_from_lines(
         )
 
         return {
-            "audio_file_path": str(mp3_path),
-            "mp3_path": str(mp3_path),
-            "wav_path": str(wav_path),
+            "audio_file_path": str(selected_audio_path),
+            "mp3_path": str(audio_paths["mp3"]) if normalized_output_format == "mp3" else "",
+            "wav_path": str(audio_paths["wav"]) if normalized_output_format == "wav" else "",
+            "m4a_path": str(audio_paths["m4a"]) if normalized_output_format == "m4a" else "",
+            "output_format": normalized_output_format,
             "voice_map": fallback_voice_map,
-            "segments_json_path": str(segments_path),
-            "transcript_vtt_path": str(vtt_path),
+            "segments_json_path": segments_path,
+            "transcript_srt_path": srt_path,
             "tts_debug_file": str(debug_path),
             "warning": warning_message,
         }
@@ -563,12 +989,24 @@ class ServerInfoHandler(JsonHandler):
         self.write_json(
             {
                 "ok": True,
+                "success": True,
                 "listen_host": os.environ.get("DEMO_APP_HOST", "0.0.0.0"),
                 "port": port,
                 "local_urls": urls,
                 "localhost_url": f"http://127.0.0.1:{port}/",
                 "preferred_share_url": preferred_share_url,
                 "share_hint": "同一局域网内的其他电脑可通过上面的 IP 地址访问。如果访问失败，先放行 Windows 防火墙的 8899 端口。",
+            }
+        )
+
+
+class PresetTopicsHandler(JsonHandler):
+    def get(self) -> None:
+        self.write_json(
+            {
+                "ok": True,
+                "success": True,
+                "presets": _load_preset_topics(),
             }
         )
 
@@ -588,13 +1026,29 @@ class UpdateDialogueHandler(JsonHandler):
         self.write_json(
             {
                 "ok": True,
+                "success": True,
                 "dialogue_id": dialogue_id,
                 "text_path": result["text_path"],
+                "file_name": Path(result["text_path"]).name,
+                "updated_at": result["updated_at"],
                 "dialogue_text": result["dialogue_text"],
                 "lines": result["lines"],
                 "text_download_url": _download_url(dialogue_id, "text"),
             }
         )
+
+
+class CreateDialogueFromTextHandler(JsonHandler):
+    def post(self) -> None:
+        payload = self.read_json()
+        if not str(payload.get("title", "")).strip():
+            raise HTTPError(400, reason="title is required")
+        if not str(payload.get("dialogue_text", "")).strip():
+            raise HTTPError(400, reason="dialogue_text is required")
+
+        bundle_server = load_bundle_server()
+        response = _create_manual_dialogue_payload(bundle_server, payload)
+        self.write_json(response)
 
 
 class GenerateAudioCustomHandler(JsonHandler):
@@ -607,41 +1061,70 @@ class GenerateAudioCustomHandler(JsonHandler):
         bundle_server = load_bundle_server()
         dialogue_text = str(payload.get("dialogue_text", "")).strip()
         if dialogue_text:
-            result = _save_dialogue_edit(bundle_server, dialogue_id, dialogue_text)
+            normalized_text = _normalize_dialogue_text_for_storage(dialogue_text)
+            if len(normalized_text) > MAX_AUDIO_TEXT_CHARS:
+                raise HTTPError(400, reason=f"文本过长，请缩短到 {MAX_AUDIO_TEXT_CHARS} 个字符以内后再生成音频")
+            result = _save_dialogue_edit(bundle_server, dialogue_id, normalized_text)
             manifest = result["manifest"]
-            line_tuples = result["line_tuples"]
             save_dir = Path(result["save_dir"])
+            line_tuples = _dialogue_lines_from_text(normalized_text)
         else:
             manifest_path, manifest = _find_manifest(dialogue_id)
             save_dir = Path(manifest.get("save_dir") or manifest_path.parent)
             text_path = Path(manifest["text_path"])
-            line_tuples = _dialogue_lines_from_text(text_path.read_text(encoding="utf-8"))
+            normalized_text = _normalize_dialogue_text_for_storage(text_path.read_text(encoding="utf-8"))
+            if len(normalized_text) > MAX_AUDIO_TEXT_CHARS:
+                raise HTTPError(400, reason=f"文本过长，请缩短到 {MAX_AUDIO_TEXT_CHARS} 个字符以内后再生成音频")
+            line_tuples = _dialogue_lines_from_text(normalized_text)
 
         basename = manifest.get("basename", dialogue_id)
         language = str(payload.get("language") or manifest.get("audio_language") or "中文")
-        audio_result = await _synthesize_audio_from_lines(line_tuples, language, save_dir, basename, bundle_server)
+        selected_voice_map = payload.get("voice_map") or {}
+        output_format = str(payload.get("format") or manifest.get("audio_output_format") or "mp3")
+        include_scripts = bool(payload.get("include_scripts"))
+        audio_result = await _synthesize_audio_from_lines(
+            line_tuples,
+            language,
+            save_dir,
+            basename,
+            bundle_server,
+            selected_voice_map=selected_voice_map if isinstance(selected_voice_map, dict) else None,
+            output_format=output_format,
+            include_scripts=include_scripts,
+        )
+        generated_at = datetime.now().isoformat(timespec="seconds")
 
         audio_file = audio_result["audio_file_path"]
         manifest["audio_path"] = audio_file
         manifest["voice_map"] = audio_result["voice_map"]
         manifest["audio_language"] = language
+        manifest["audio_output_format"] = audio_result["output_format"]
         manifest["audio_warning"] = audio_result["warning"]
         manifest["segments_json_path"] = audio_result["segments_json_path"]
-        manifest["transcript_vtt_path"] = audio_result["transcript_vtt_path"]
+        manifest["transcript_srt_path"] = audio_result["transcript_srt_path"]
+        manifest["include_scripts"] = include_scripts
+        manifest["precise_duration"] = str(payload.get("precise_duration") or "").strip()
+        manifest["audio_updated_at"] = generated_at
         _write_json(Path(manifest.get("save_dir") or save_dir) / "manifest.json", manifest)
 
         self.write_json(
             {
                 "ok": True,
+                "success": True,
                 "dialogue_id": dialogue_id,
                 "audio_file_path": audio_file,
+                "file_name": Path(audio_file).name,
+                "generated_at": generated_at,
+                "updated_at": generated_at,
                 "mp3_path": audio_result["mp3_path"],
                 "wav_path": audio_result["wav_path"],
+                "m4a_path": audio_result["m4a_path"],
+                "output_format": audio_result["output_format"],
                 "voice_map": audio_result["voice_map"],
                 "warning": audio_result["warning"],
                 "tts_debug_file": audio_result["tts_debug_file"],
                 "segments_json_path": audio_result["segments_json_path"],
-                "transcript_vtt_path": audio_result["transcript_vtt_path"],
+                "transcript_srt_path": audio_result["transcript_srt_path"],
                 "audio_download_url": _download_url(dialogue_id, "audio"),
             }
         )
@@ -662,14 +1145,7 @@ class DownloadHandler(RequestHandler):
         if kind == "text":
             target = Path(manifest["text_path"])
         else:
-            target = None
-            audio_path = manifest.get("audio_path")
-            if audio_path:
-                audio_candidate = Path(audio_path)
-                if audio_candidate.exists():
-                    target = audio_candidate
-            if target is None:
-                target = _latest_audio_path(save_dir, manifest.get("basename", dialogue_id))
+            target = _resolve_audio_target(manifest, dialogue_id)
 
         if target is None or not target.exists():
             raise HTTPError(404, reason=f"{kind} file not found")
@@ -682,7 +1158,36 @@ class DownloadHandler(RequestHandler):
             "Content-Disposition",
             f"attachment; filename=\"{safe_name}\"; filename*=UTF-8''{quoted_name}",
         )
-        self.write(target.read_bytes())
+        try:
+            payload = target.read_bytes()
+        except OSError as exc:
+            raise HTTPError(500, reason=f"Unable to read {kind} file: {exc}") from exc
+        self.set_header("Content-Length", str(len(payload)))
+        self.finish(payload)
+
+
+class DialogueDetailHandler(JsonHandler):
+    def get(self) -> None:
+        dialogue_id = self.get_query_argument("dialogue_id", "").strip()
+        if not dialogue_id:
+            raise HTTPError(400, reason="dialogue_id is required")
+
+        _, manifest = _find_manifest(dialogue_id)
+        text_path = Path(str(manifest.get("text_path") or ""))
+        dialogue_text = text_path.read_text(encoding="utf-8") if text_path.exists() else ""
+        audio_path = _resolve_audio_target(manifest, dialogue_id)
+
+        self.write_json(
+            {
+                "ok": True,
+                "success": True,
+                "dialogue_id": dialogue_id,
+                "dialogue_text": dialogue_text,
+                "text_file_name": text_path.name if text_path.exists() else "",
+                "audio_file_name": audio_path.name if audio_path and audio_path.exists() else "",
+                "manifest": manifest,
+            }
+        )
 
 
 def _reset_cache() -> None:
@@ -787,7 +1292,13 @@ def load_bundle_server():
                 context_pack,
             )
             try:
-                polished_lines, naturalness = polish_generated_lines(lines, language)
+                polished_lines, naturalness = polish_generated_lines(
+                    lines,
+                    language,
+                    scenario=scenario,
+                    core_content=core,
+                    profile=profile,
+                )
                 if naturalness.get("rewrite_count"):
                     lines = polished_lines
                     rewrite_info = dict(rewrite_info or {})
@@ -831,8 +1342,11 @@ def make_app():
         r".*$",
         [
             (r"/api/server_info", ServerInfoHandler),
+            (r"/api/preset_topics", PresetTopicsHandler),
+            (r"/api/create_dialogue_from_text", CreateDialogueFromTextHandler),
             (r"/api/update_dialogue", UpdateDialogueHandler),
             (r"/api/generate_audio_custom", GenerateAudioCustomHandler),
+            (r"/api/dialogue_detail", DialogueDetailHandler),
             (r"/api/download", DownloadHandler),
         ],
     )

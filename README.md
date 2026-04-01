@@ -14,7 +14,9 @@
 
 当前仓库以“可演示版本 + 脚本化治理 + GitHub 协作流程”为主，核心目录如下：
 
-- `embedded_server.py`
+- `server.py`
+  - 根目录唯一服务入口
+- `src/demo_app/embedded_server_main.py`
   - 当前实际服务主实现
 - `static/`
   - Web 前端页面

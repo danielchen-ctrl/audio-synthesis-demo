@@ -111,11 +111,11 @@ PR 必须至少说明：
 
 当前仓库的可运行主链以以下文件为主：
 
-- `embedded_server.py`：当前实际服务主实现
-- `server.py` / `run.py` / `app.py`：兼容入口
+- `src/demo_app/embedded_server_main.py`：当前实际服务主实现
+- `server.py`：根目录唯一服务入口
 - `static/`：Web 前端资源
 - `scripts/`：启动、检查、治理和自动化脚本
 - `config/`：项目配置
 - `tests/`：自动化测试
 
-`src/demo_app/` 当前主要承载资源和领域数据，业务源码结构仍可继续演进，文档中会持续以“当前真实状态”为准。
+`src/demo_app/` 当前承载服务实现、多语言文本处理和领域数据，文档中会持续以“当前真实状态”为准。

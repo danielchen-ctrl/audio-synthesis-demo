@@ -203,6 +203,6 @@ netstat -ano | findstr :8899
 
 ## 当前已知限制
 
-1. 当前服务主实现仍是 `embedded_server.py`
+1. 当前服务主实现是 `src/demo_app/embedded_server_main.py`
 2. Demo 依赖本地 build bundle，不是完全独立的纯源码服务
 3. 局域网分享依赖当前电脑持续开着服务窗口
