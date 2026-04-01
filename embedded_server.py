@@ -73,7 +73,7 @@ VOICE_CATALOG = {
 }
 
 MAX_AUDIO_TEXT_CHARS = 12000
-PRESET_TOPIC_FILE = ROOT / "demo" / "预置对话情景参数.txt"
+PRESET_TOPIC_FILE_NAME = "预置对话情景参数.txt"
 PRESET_BLOCK_RE = re.compile(r"(?ms)^\s*(\d+)[）\)]\s*(.+?)(?=^\s*\d+[）\)]\s*|\Z)")
 
 
@@ -344,11 +344,34 @@ def _preset_profile(title: str, topic_text: str, template_label: str) -> dict[st
     }
 
 
+def _resolve_preset_topic_file() -> Path | None:
+    candidates: list[Path] = []
+    for base in [ROOT, ROOT.parent, ROOT.parent.parent]:
+        candidates.extend(
+            [
+                base / "demo" / "对话情景参数" / PRESET_TOPIC_FILE_NAME,
+                base / "demo" / PRESET_TOPIC_FILE_NAME,
+                base / "demo_app" / "demo" / "对话情景参数" / PRESET_TOPIC_FILE_NAME,
+                base / "demo_app" / "demo" / PRESET_TOPIC_FILE_NAME,
+            ]
+        )
+
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def _load_preset_topics() -> list[dict[str, Any]]:
-    if not PRESET_TOPIC_FILE.exists():
+    preset_topic_file = _resolve_preset_topic_file()
+    if not preset_topic_file:
         return []
 
-    raw_text = PRESET_TOPIC_FILE.read_text(encoding="utf-8")
+    raw_text = preset_topic_file.read_text(encoding="utf-8")
     presets: list[dict[str, Any]] = []
 
     for match in PRESET_BLOCK_RE.finditer(raw_text):

@@ -119,8 +119,13 @@ def _context_topic_fragment(scenario: str, core_content: str, profile: dict[str,
 def _core_focus_fragment(core_content: str, scenario: str) -> str:
     for candidate in (core_content, scenario):
         text = str(candidate or "").strip()
-        if text and _contains_cjk(text):
-            return _clip_text(text, 24)
+        text = re.sub(r"^(核心对话内容|核心内容|补充要求)\s*[:：]?\s*", "", text)
+        if not text or not _contains_cjk(text):
+            continue
+        for piece in re.split(r"[\n,，。；;、/｜|]+", text):
+            cleaned = _clip_text(piece, 24)
+            if cleaned:
+                return cleaned
     return ""
 
 
@@ -422,6 +427,10 @@ def _content_length(lines: list[tuple[str, str]]) -> int:
     return sum(len(re.sub(r"\s+", "", str(text or ""))) for _, text in lines)
 
 
+def _rendered_length(lines: list[tuple[str, str]]) -> int:
+    return len("\n".join(f"{speaker}: {text}" for speaker, text in lines))
+
+
 def _speaker_turn_counts(lines: list[tuple[str, str]]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for speaker, _ in lines:
@@ -432,7 +441,8 @@ def _speaker_turn_counts(lines: list[tuple[str, str]]) -> dict[str, int]:
 def _split_focus_candidates(*values: str) -> list[str]:
     results: list[str] = []
     for value in values:
-        for piece in re.split(r"[\n,，。；;、/｜|]+", str(value or "")):
+        normalized = re.sub(r"^(核心对话内容|核心内容|补充要求)\s*[:：]?\s*", "", str(value or "").strip())
+        for piece in re.split(r"[\n,，。；;、/｜|]+", normalized):
             cleaned = _clip_text(piece, 22)
             if cleaned and cleaned not in results and len(cleaned) >= 3:
                 results.append(cleaned)
@@ -509,6 +519,12 @@ def _primary_summary_line(topic: str, focus: str, round_index: int) -> str:
     return variants[round_index % len(variants)]
 
 
+def _secondary_intro_line(role_hint: str, point: str, medical: bool) -> str:
+    if medical:
+        return f"你好，我这边主要想围绕{role_hint}再问清楚一点，尤其是{point}这块。"
+    return f"你好，我先从{role_hint}这个角度补充一下，尤其想把{point}这块说具体。"
+
+
 def _secondary_round_line(
     speaker_name: str,
     role_hint: str,
@@ -583,22 +599,28 @@ def _build_structured_chinese_dialogue(
         order.append(f"Speaker {len(order) + 1}")
 
     topic = _context_topic_fragment(scenario, core_content, profile)
-    focus = _core_focus_fragment(core_content, scenario) or topic
     medical = _is_medical_context(scenario, core_content, profile)
     speaker_names = _build_chinese_speaker_names([(speaker, "") for speaker in order], scenario, core_content, profile)
-    points = _structured_focus_points(topic, focus, keywords, core_content, scenario)
+    focus_seed = _core_focus_fragment(core_content, scenario) or topic
+    points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario)
+    focus = "、".join(points[:2]) if len(points) > 1 else (points[0] if points else topic)
 
     rebuilt: list[tuple[str, str]] = []
     primary = order[0]
     secondary = order[1:] or [primary]
 
-    for speaker in order:
-        rebuilt.append((speaker, _build_intro_line(speaker, primary, speaker_names, topic, medical)))
+    for idx, speaker in enumerate(order):
+        if idx == 0:
+            rebuilt.append((speaker, _build_intro_line(speaker, primary, speaker_names, topic, medical)))
+            continue
+        role_hint = _SECONDARY_ROLE_HINTS[(idx - 1) % len(_SECONDARY_ROLE_HINTS)]
+        point = _speaker_specific_point(points, idx - 1, 0)
+        rebuilt.append((speaker, _secondary_intro_line(role_hint, point, medical)))
     rebuilt.append((primary, _build_core_line(primary, primary, focus)))
 
     round_index = 0
-    target_floor = max(280, int(target_word_count * 0.92))
-    while _content_length(rebuilt) < target_floor:
+    target_floor = max(260, int(target_word_count * 0.93))
+    while _rendered_length(rebuilt) < target_floor:
         for idx, speaker in enumerate(secondary):
             role_hint = _SECONDARY_ROLE_HINTS[idx % len(_SECONDARY_ROLE_HINTS)]
             point = _speaker_specific_point(points, idx, round_index)
@@ -612,11 +634,11 @@ def _build_structured_chinese_dialogue(
         if round_index >= 6:
             break
 
-    if rebuilt and _content_length(rebuilt) > int(target_word_count * 1.12):
+    if rebuilt and _rendered_length(rebuilt) > int(target_word_count * 1.04):
         trimmed: list[tuple[str, str]] = []
         for speaker, text in rebuilt:
             trimmed.append((speaker, text))
-            if _content_length(trimmed) >= int(target_word_count * 1.02):
+            if _rendered_length(trimmed) >= int(target_word_count * 0.98):
                 break
         rebuilt = trimmed
 
