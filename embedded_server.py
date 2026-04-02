@@ -770,6 +770,48 @@ def _resolve_audio_target(manifest: dict[str, Any], dialogue_id: str) -> Path | 
     return _latest_audio_path(save_dir, basename)
 
 
+def _task_storage_dir(manifest_path: Path, manifest: dict[str, Any]) -> Path:
+    candidate = Path(str(manifest.get("save_dir") or manifest_path.parent))
+    try:
+        resolved = candidate.resolve()
+    except OSError:
+        resolved = candidate.absolute()
+
+    demo_root = (ROOT / "demo").resolve()
+    try:
+        resolved.relative_to(demo_root)
+    except ValueError as exc:
+        raise HTTPError(400, reason="task save_dir is outside demo directory") from exc
+
+    if resolved == demo_root:
+        raise HTTPError(400, reason="refuse to delete demo root")
+
+    return resolved
+
+
+def _delete_task_artifacts(dialogue_id: str) -> dict[str, Any]:
+    try:
+        manifest_path, manifest = _find_manifest(dialogue_id)
+    except FileNotFoundError:
+        return {"dialogue_id": dialogue_id, "deleted": False, "not_found": True}
+
+    target_dir = _task_storage_dir(manifest_path, manifest)
+    deleted = False
+    if target_dir.exists():
+        shutil.rmtree(target_dir)
+        deleted = True
+    elif manifest_path.exists():
+        manifest_path.unlink()
+        deleted = True
+
+    return {
+        "dialogue_id": dialogue_id,
+        "deleted": deleted,
+        "not_found": False,
+        "deleted_path": str(target_dir),
+    }
+
+
 def _download_url(dialogue_id: str, kind: str) -> str:
     return f"/api/download?dialogue_id={dialogue_id}&kind={kind}"
 
@@ -972,6 +1014,19 @@ class JsonHandler(RequestHandler):
     def write_json(self, payload: dict[str, Any], status: int = 200) -> None:
         self.set_status(status)
         self.finish(json.dumps(payload, ensure_ascii=False))
+
+    def write_error(self, status_code: int, **kwargs: Any) -> None:
+        reason = self._reason or f"HTTP {status_code}"
+        exc_info = kwargs.get("exc_info")
+        if exc_info:
+            exception = exc_info[1]
+            if isinstance(exception, HTTPError) and exception.reason:
+                reason = exception.reason
+            elif isinstance(exception, Exception) and str(exception):
+                reason = str(exception)
+        if self._finished:
+            return
+        self.write_json({"ok": False, "success": False, "error": reason, "status": status_code}, status=status_code)
 
     def read_json(self) -> dict[str, Any]:
         try:
@@ -1198,6 +1253,15 @@ class DialogueDetailHandler(JsonHandler):
         )
 
 
+class DeleteTaskHandler(JsonHandler):
+    def post(self) -> None:
+        payload = self.read_json()
+        dialogue_id = str(payload.get("dialogue_id") or "").strip()
+        if not dialogue_id:
+            raise HTTPError(400, reason="dialogue_id is required")
+        self.write_json({"ok": True, "success": True, **_delete_task_artifacts(dialogue_id)})
+
+
 def _reset_cache() -> None:
     if RUNTIME_CACHE.exists():
         shutil.rmtree(RUNTIME_CACHE)
@@ -1357,6 +1421,7 @@ def make_app():
             (r"/api/generate_audio_custom", GenerateAudioCustomHandler),
             (r"/api/dialogue_detail", DialogueDetailHandler),
             (r"/api/download", DownloadHandler),
+            (r"/api/delete_task", DeleteTaskHandler),
         ],
     )
     return app
