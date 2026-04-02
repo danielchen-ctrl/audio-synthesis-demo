@@ -75,6 +75,36 @@ VOICE_CATALOG = {
 MAX_AUDIO_TEXT_CHARS = 12000
 PRESET_TOPIC_FILE_NAME = "预置对话情景参数.txt"
 PRESET_BLOCK_RE = re.compile(r"(?ms)^\s*(\d+)[）\)]\s*(.+?)(?=^\s*\d+[）\)]\s*|\Z)")
+PRESET_DISPLAY_TITLE_OVERRIDES = {
+    "1": "医疗健康｜慢病随访",
+    "2": "人力资源与招聘｜招聘补岗",
+    "3": "娱乐/媒体｜艺人商业化",
+    "4": "建筑与工程行业｜项目交付",
+    "5": "汽车行业｜车型投放",
+    "6": "咨询/专业服务｜客户拓展",
+    "7": "法律服务｜法顾专项",
+    "8": "金融/投资｜资产配置",
+    "9": "零售行业｜会员复购",
+    "10": "保险行业｜保险质检",
+    "11": "房地产｜项目去化",
+    "12": "人工智能/科技｜付费转化",
+    "13": "制造业｜产线提效",
+    "14": "娱乐/媒体｜战略周会",
+    "15": "法律服务｜广告合规",
+    "16": "保险行业｜销售洞察",
+    "17": "测试开发｜支付接入",
+    "18": "测试开发｜下单回调",
+    "19": "测试开发｜退款安全",
+    "20": "测试开发｜对账差错",
+    "21": "测试开发｜稳定性准入",
+    "22": "测试开发｜朋友圈项目",
+    "23": "测试开发｜内容发布",
+    "24": "测试开发｜多端分发",
+    "25": "测试开发｜互动一致性",
+    "26": "测试开发｜隐私可见性",
+    "27": "测试开发｜内容审核",
+    "28": "测试开发｜容量与准入",
+}
 
 
 def active_static_dir() -> Path:
@@ -401,7 +431,7 @@ def _load_preset_topics() -> list[dict[str, Any]]:
                 "id": preset_id,
                 "source_title": title,
                 "topic_text": topic_text,
-                "display_title": _preset_display_title(topic_text),
+                "display_title": PRESET_DISPLAY_TITLE_OVERRIDES.get(preset_id) or _preset_display_title(topic_text),
                 "scenario": scenario or topic_text,
                 "core_content": core_content,
                 "template_label": template_label,
