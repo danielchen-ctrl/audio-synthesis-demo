@@ -1,6 +1,7 @@
 const STORAGE_KEY = "online_audio_generation_demo_v2";
 const AUDIO_TEXT_MAX_CHARS = 12000;
 const DEFAULT_WORD_COUNT = "1000";
+const STALE_TASK_MS = 24 * 60 * 60 * 1000;
 const SPEAKER_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4", "#84CC16", "#F97316", "#EC4899", "#6B7280"];
 
 const LANGUAGE_OPTIONS = [
@@ -134,6 +135,7 @@ const el = {
   shareHint: document.getElementById("shareHint"),
   uploadBtn: document.getElementById("uploadBtn"),
   openOnlineAudioBtn: document.getElementById("openOnlineAudioBtn"),
+  cleanupOldTasksBtn: document.getElementById("cleanupOldTasksBtn"),
   taskTableBody: document.getElementById("taskTableBody"),
   taskEmpty: document.getElementById("taskEmpty"),
   toastContainer: document.getElementById("toastContainer"),
@@ -310,6 +312,16 @@ function currentWorkingText() {
   return currentMode() === "llm" ? normalizeText(el.previewText.value) : normalizeText(el.manualText.value);
 }
 
+function parseTaskTime(task) {
+  const timestamp = Date.parse(String(task?.createdAt || ""));
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function isTaskStale(task) {
+  const timestamp = parseTaskTime(task);
+  return timestamp > 0 && Date.now() - timestamp >= STALE_TASK_MS;
+}
+
 function cloneVoiceAssignments(assignments = {}) {
   return Object.fromEntries(Object.entries(assignments).map(([key, value]) => [String(key), String(value || "")]));
 }
@@ -473,7 +485,7 @@ function restoreState() {
     if (!raw) return;
     const cached = JSON.parse(raw);
     state.modalOpen = cached.modalOpen !== false;
-    state.tasks = Array.isArray(cached.tasks) ? cached.tasks : [];
+    state.tasks = Array.isArray(cached.tasks) ? cached.tasks.map(normalizeTask) : [];
     state.modalSize = cached.modalSize || null;
     state.form = {
       ...createDefaultFormState(),
@@ -707,7 +719,7 @@ function statusBadgeClass(status) {
 }
 
 function taskCanOpen(task) {
-  return Boolean(task?.snapshot?.form || task?.dialogueId);
+  return Boolean(task?.snapshot?.form || task?.dialogueId || task?.title);
 }
 
 function renderTasks() {
@@ -737,6 +749,7 @@ function renderTasks() {
           <button class="btn btn-secondary btn-sm" type="button" data-action="show-error" data-id="${task.id}" ${
             task.status === "生成失败" ? "" : "disabled"
           }>查看原因</button>
+          <button class="btn btn-secondary btn-sm" type="button" data-action="delete-task" data-id="${task.id}">删除</button>
         </div>
       </td>
     </tr>
@@ -1027,9 +1040,24 @@ function buildAudioPayload(dialogueId, dialogueText) {
 async function fetchJson(url, options = {}) {
   const response = await fetch(url, options);
   const contentType = response.headers.get("content-type") || "";
-  const payload = contentType.includes("application/json")
-    ? await response.json()
-    : { success: false, error: await response.text() };
+  const rawText = await response.text();
+  let payload;
+
+  if (contentType.includes("application/json")) {
+    try {
+      payload = rawText ? JSON.parse(rawText) : {};
+    } catch (error) {
+      const compact = rawText.replace(/\s+/g, " ").trim();
+      payload = {
+        success: false,
+        error: compact.startsWith("<")
+          ? `接口返回了非 JSON 错误页（${response.status}）`
+          : compact || `请求失败: ${response.status}`
+      };
+    }
+  } else {
+    payload = { success: false, error: rawText };
+  }
 
   if (!response.ok || payload.ok === false || payload.success === false) {
     throw new Error(payload.error || payload.reason || `请求失败: ${response.status}`);
@@ -1067,6 +1095,50 @@ function taskSnapshotToForm(snapshot) {
     modalMessage: "已载入历史任务，可继续查看、编辑并重新生成音频。",
     modalMessageType: "info"
   };
+}
+
+function legacyTaskToForm(task) {
+  const title = String(task?.title || "").trim();
+  if (!title) return null;
+  return {
+    ...createDefaultFormState(),
+    mode: "llm",
+    llmTopic: title,
+    manualTopic: title,
+    dialogueId: String(task?.dialogueId || ""),
+    generatedTextFileName: String(task?.textFileName || ""),
+    outputFormat: String(task?.outputFormat || "MP3"),
+    modalMessage: task?.errorMessage
+      ? `已恢复历史失败任务的基础信息。原失败原因：${task.errorMessage}`
+      : "已恢复历史任务的基础信息。",
+    modalMessageType: task?.errorMessage ? "error" : "info"
+  };
+}
+
+function normalizeTask(task) {
+  const normalized = {
+    id: task?.id || `${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
+    title: String(task?.title || "未命名任务"),
+    createdAt: String(task?.createdAt || nowIsoString()),
+    sourceLabel: task?.sourceLabel === "上传" ? "上传" : "生成",
+    status: String(task?.status || "文本生成中"),
+    fileName: String(task?.fileName || ""),
+    textFileName: String(task?.textFileName || ""),
+    textDownloadUrl: String(task?.textDownloadUrl || ""),
+    audioDownloadUrl: String(task?.audioDownloadUrl || ""),
+    errorMessage: String(task?.errorMessage || ""),
+    dialogueId: String(task?.dialogueId || ""),
+    snapshot: task?.snapshot && task.snapshot.form ? task.snapshot : null
+  };
+  if (!normalized.snapshot && normalized.title) {
+    normalized.snapshot = {
+      dialogueId: normalized.dialogueId,
+      textFileName: normalized.textFileName,
+      dialogueText: "",
+      form: legacyTaskToForm(normalized)
+    };
+  }
+  return normalized;
 }
 
 function detailPayloadToForm(payload) {
@@ -1127,8 +1199,16 @@ async function openTaskInModal(task) {
       if (isNetworkFetchError(error)) {
         throw new Error("当前 demo 服务未连接，且该任务没有本地快照。请先启动服务后再查看任务。");
       }
-      throw error;
+      nextForm = legacyTaskToForm(task);
+      if (!nextForm) {
+        throw error;
+      }
+      nextForm.modalMessage = `该任务无法完整回放，已恢复基础参数。原错误：${error.message}`;
+      nextForm.modalMessageType = "error";
     }
+  }
+  if (!nextForm) {
+    nextForm = legacyTaskToForm(task);
   }
   if (!nextForm) {
     throw new Error("该任务缺少可恢复的参数信息");
@@ -1199,6 +1279,8 @@ function initModalResize() {
 }
 
 function createTaskPlaceholder() {
+  const workingText = currentWorkingText();
+  const textFileName = state.form.generatedTextFileName || "";
   const task = {
     id: `${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
     title: currentTitle() || "未命名任务",
@@ -1210,7 +1292,8 @@ function createTaskPlaceholder() {
     textDownloadUrl: "",
     audioDownloadUrl: "",
     errorMessage: "",
-    dialogueId: ""
+    dialogueId: "",
+    snapshot: buildTaskSnapshot("", workingText, textFileName)
   };
   state.tasks = [task, ...state.tasks];
   renderTasks();
@@ -1218,8 +1301,75 @@ function createTaskPlaceholder() {
   return task.id;
 }
 
+function removeTasksLocally(taskIds) {
+  const idSet = new Set(taskIds);
+  state.tasks = state.tasks.filter((task) => !idSet.has(task.id));
+  renderTasks();
+  persistState();
+}
+
+async function deleteTaskRemotely(dialogueId) {
+  if (!dialogueId) {
+    return { deleted: false, not_found: true };
+  }
+  return fetchJson("/api/delete_task", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dialogue_id: dialogueId })
+  });
+}
+
+async function handleDeleteTask(task) {
+  const confirmed = window.confirm(`确认删除任务“${task.title || "未命名任务"}”？`);
+  if (!confirmed) return;
+
+  let remoteError = "";
+  if (task.dialogueId) {
+    try {
+      await deleteTaskRemotely(task.dialogueId);
+    } catch (error) {
+      remoteError = error.message;
+    }
+  }
+
+  removeTasksLocally([task.id]);
+  if (remoteError) {
+    showToast("error", `任务已从列表移除，但服务端文件清理失败：${remoteError}`);
+    return;
+  }
+  showToast("success", "任务已删除");
+}
+
+async function cleanupOldTasks() {
+  const staleTasks = state.tasks.filter((task) => isTaskStale(task));
+  if (!staleTasks.length) {
+    showToast("info", "当前没有需要清理的过时任务");
+    return;
+  }
+
+  const confirmed = window.confirm(`确认清理 ${staleTasks.length} 条过时任务？这会同时清理可找到的本地生成文件。`);
+  if (!confirmed) return;
+
+  let remoteFailures = 0;
+  for (const task of staleTasks) {
+    if (!task.dialogueId) continue;
+    try {
+      await deleteTaskRemotely(task.dialogueId);
+    } catch (error) {
+      remoteFailures += 1;
+    }
+  }
+
+  removeTasksLocally(staleTasks.map((task) => task.id));
+  if (remoteFailures) {
+    showToast("error", `已清理 ${staleTasks.length} 条过时任务，其中 ${remoteFailures} 条服务端文件未成功删除`);
+    return;
+  }
+  showToast("success", `已清理 ${staleTasks.length} 条过时任务`);
+}
+
 function updateTask(taskId, patch) {
-  state.tasks = state.tasks.map((task) => (task.id === taskId ? { ...task, ...patch } : task));
+  state.tasks = state.tasks.map((task) => (task.id === taskId ? normalizeTask({ ...task, ...patch }) : task));
   renderTasks();
   persistState();
 }
@@ -1372,17 +1522,16 @@ async function submitAudioGeneration() {
   }
 
   const taskId = createTaskPlaceholder();
+  let dialogueId = state.form.dialogueId;
+  let workingText = currentWorkingText();
+  let textDownloadUrl = "";
+  let textFileName = state.form.generatedTextFileName || "";
   state.form.isSubmittingAudio = true;
   setModalMessage("任务已提交，正在生成音频...", "info");
   renderSubmitState();
   persistState();
 
   try {
-    let dialogueId = state.form.dialogueId;
-    let workingText = currentWorkingText();
-    let textDownloadUrl = "";
-    let textFileName = state.form.generatedTextFileName || "";
-
     if (currentMode() === "manual") {
       const createPayload = await fetchJson("/api/create_dialogue_from_text", {
         method: "POST",
@@ -1444,7 +1593,11 @@ async function submitAudioGeneration() {
   } catch (requestError) {
     updateTask(taskId, {
       status: "生成失败",
-      errorMessage: requestError.message
+      errorMessage: requestError.message,
+      dialogueId,
+      textFileName,
+      textDownloadUrl,
+      snapshot: buildTaskSnapshot(dialogueId, workingText, textFileName)
     });
     setModalMessage(`音频生成失败：${requestError.message}`, "error");
     showToast("error", `音频生成失败：${requestError.message}`);
@@ -1461,7 +1614,7 @@ async function handleTaskTableClick(event) {
   if (!task) return;
 
   try {
-    if (button.dataset.action === "view-task" && task.dialogueId) {
+    if (button.dataset.action === "view-task" && taskCanOpen(task)) {
       await openTaskInModal(task);
       return;
     }
@@ -1475,9 +1628,19 @@ async function handleTaskTableClick(event) {
     }
     if (button.dataset.action === "show-error" && task.errorMessage) {
       showToast("error", task.errorMessage);
+      return;
+    }
+    if (button.dataset.action === "delete-task") {
+      await handleDeleteTask(task);
     }
   } catch (error) {
-    const actionLabel = button.dataset.action === "view-task" ? "任务回看" : "下载";
+    const actionLabelMap = {
+      "view-task": "任务回看",
+      "download-text": "文本下载",
+      "download-audio": "音频下载",
+      "delete-task": "任务删除"
+    };
+    const actionLabel = actionLabelMap[button.dataset.action] || "操作";
     showToast("error", `${actionLabel}失败：${error.message}`);
   }
 }
@@ -1486,6 +1649,9 @@ function bindEvents() {
   initModalResize();
   window.addEventListener("resize", applyModalSize);
   el.copyShareBtn.addEventListener("click", copyShareLink);
+  el.cleanupOldTasksBtn.addEventListener("click", () => {
+    void cleanupOldTasks();
+  });
   el.uploadBtn.addEventListener("click", () => {
     showToast("info", "演示版当前只开放“在线生成音频”流程。");
   });
