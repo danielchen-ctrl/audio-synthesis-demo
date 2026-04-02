@@ -36,19 +36,24 @@ const PRESET_TEMPLATE_LABELS = [
   "娱乐/媒体｜战略周会",
   "法律服务｜广告合规",
   "保险行业｜销售洞察",
-  "测试开发｜支付接入",
-  "测试开发｜下单回调",
-  "测试开发｜退款安全",
-  "测试开发｜对账差错",
-  "测试开发｜稳定性准入",
-  "测试开发｜朋友圈项目",
-  "测试开发｜内容发布",
-  "测试开发｜多端分发",
-  "测试开发｜互动一致性",
-  "测试开发｜隐私可见性",
-  "测试开发｜内容审核",
-  "测试开发｜容量与准入"
+  "测试开发｜支付项目",
+  "测试开发｜朋友圈项目"
 ];
+
+const TEST_DEV_TEMPLATE_GROUPS = {
+  "测试开发｜支付接入": "测试开发｜支付项目",
+  "测试开发｜下单回调": "测试开发｜支付项目",
+  "测试开发｜退款安全": "测试开发｜支付项目",
+  "测试开发｜对账差错": "测试开发｜支付项目",
+  "测试开发｜稳定性准入": "测试开发｜支付项目",
+  "测试开发｜朋友圈项目": "测试开发｜朋友圈项目",
+  "测试开发｜内容发布": "测试开发｜朋友圈项目",
+  "测试开发｜多端分发": "测试开发｜朋友圈项目",
+  "测试开发｜互动一致性": "测试开发｜朋友圈项目",
+  "测试开发｜隐私可见性": "测试开发｜朋友圈项目",
+  "测试开发｜内容审核": "测试开发｜朋友圈项目",
+  "测试开发｜容量与准入": "测试开发｜朋友圈项目"
+};
 
 const BASE_TEMPLATE_OPTIONS = PRESET_TEMPLATE_LABELS.map((label) => ({
   value: dynamicTemplateValue(label),
@@ -260,11 +265,17 @@ function templateOptionByLabel(label) {
   return state.templateOptions.find((item) => item.label === label) || null;
 }
 
+function normalizeTemplateDropdownLabel(label) {
+  const normalized = String(label || "").trim();
+  if (!normalized) return "";
+  return TEST_DEV_TEMPLATE_GROUPS[normalized] || normalized;
+}
+
 function templateDisplayLabelFromPreset(preset) {
   const displayTitle = String(preset?.display_title || "").trim();
-  if (displayTitle) return displayTitle;
+  if (displayTitle) return normalizeTemplateDropdownLabel(displayTitle);
   const templateLabel = String(preset?.template_label || "").trim();
-  if (templateLabel) return templateLabel;
+  if (templateLabel) return normalizeTemplateDropdownLabel(templateLabel);
   return "";
 }
 
@@ -277,7 +288,7 @@ function dynamicTemplateValue(label) {
 }
 
 function ensureTemplateOption(label) {
-  const normalized = String(label || "").trim();
+  const normalized = normalizeTemplateDropdownLabel(label);
   if (!normalized) {
     return state.templateOptions[0]?.value || BASE_TEMPLATE_OPTIONS[0].value;
   }
@@ -1191,7 +1202,9 @@ function normalizeTask(task) {
 function detailPayloadToForm(payload) {
   const manifest = payload?.manifest || {};
   const sourceMode = manifest.source_mode === "manual" ? "manual" : "llm";
-  const templateValue = manifest.template_label ? ensureTemplateOption(manifest.template_label) : BASE_TEMPLATE_OPTIONS[0].value;
+  const templateValue = manifest.template_label
+    ? ensureTemplateOption(normalizeTemplateDropdownLabel(manifest.template_label))
+    : BASE_TEMPLATE_OPTIONS[0].value;
   const outputFormat = String(manifest.audio_output_format || "mp3").toUpperCase();
   const normalizedKeywords = Array.isArray(manifest.keyword_terms) ? manifest.keyword_terms : [];
   const normalizedTags = Array.isArray(manifest.tags) ? manifest.tags : [];
@@ -1439,7 +1452,7 @@ async function loadPresetTopics() {
   try {
     const payload = await fetchJson("/api/preset_topics");
     state.presetTopics = Array.isArray(payload.presets) ? payload.presets : [];
-    const currentTemplateLabel = templateOptionByValue(state.form.template)?.label || "";
+    const currentTemplateLabel = normalizeTemplateDropdownLabel(templateOptionByValue(state.form.template)?.label || "");
     state.templateOptions = buildTemplateOptionsFromPresets(state.presetTopics);
     state.form.template = currentTemplateLabel ? ensureTemplateOption(currentTemplateLabel) : state.templateOptions[0]?.value || "";
 
