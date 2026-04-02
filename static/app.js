@@ -706,6 +706,10 @@ function statusBadgeClass(status) {
   return "status-wait";
 }
 
+function taskCanOpen(task) {
+  return Boolean(task?.snapshot?.form || task?.dialogueId);
+}
+
 function renderTasks() {
   const tasks = [...state.tasks].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
   el.taskTableBody.innerHTML = tasks
@@ -722,7 +726,7 @@ function renderTasks() {
       <td>
         <div class="row-actions">
           <button class="btn btn-secondary btn-sm" type="button" data-action="view-task" data-id="${task.id}" ${
-            task.dialogueId ? "" : "disabled"
+            taskCanOpen(task) ? "" : "disabled"
           }>查看任务</button>
           <button class="btn btn-secondary btn-sm" type="button" data-action="download-text" data-id="${task.id}" ${
             task.textDownloadUrl ? "" : "disabled"
@@ -1108,11 +1112,23 @@ async function fetchTaskDetail(dialogueId) {
   return fetchJson(`/api/dialogue_detail?dialogue_id=${encodeURIComponent(dialogueId)}`);
 }
 
+function isNetworkFetchError(error) {
+  const message = String(error?.message || "");
+  return error instanceof TypeError || /Failed to fetch|NetworkError|Load failed|网络/i.test(message);
+}
+
 async function openTaskInModal(task) {
   let nextForm = taskSnapshotToForm(task.snapshot);
   if (!nextForm && task.dialogueId) {
-    const detail = await fetchTaskDetail(task.dialogueId);
-    nextForm = detailPayloadToForm(detail);
+    try {
+      const detail = await fetchTaskDetail(task.dialogueId);
+      nextForm = detailPayloadToForm(detail);
+    } catch (error) {
+      if (isNetworkFetchError(error)) {
+        throw new Error("当前 demo 服务未连接，且该任务没有本地快照。请先启动服务后再查看任务。");
+      }
+      throw error;
+    }
   }
   if (!nextForm) {
     throw new Error("该任务缺少可恢复的参数信息");
@@ -1214,6 +1230,7 @@ async function loadServerInfo() {
     state.serverInfo = payload;
     renderShareBox(payload);
   } catch (error) {
+    state.serverInfo = null;
     el.sharePrimaryLink.textContent = "获取失败";
     el.sharePrimaryLink.href = "#";
     el.copyShareBtn.disabled = true;

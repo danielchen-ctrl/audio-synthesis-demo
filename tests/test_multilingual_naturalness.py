@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import re
 import unittest
 from pathlib import Path
 
@@ -111,6 +112,40 @@ class MultilingualNaturalnessTests(unittest.TestCase):
         self.assertIn("接口超时", rendered)
         self.assertTrue(any("降级策略" in text for text in speaker_two_lines + speaker_three_lines))
         self.assertGreater(len(rendered.replace("\n", "")), 700)
+
+    def test_repair_dialogue_quality_respects_target_speakers_and_content_length(self) -> None:
+        lines = [
+            ("Speaker 1", "你好，我们先把稳定性与上线准入这件事聊明白。"),
+            ("Speaker 2", "这个我需要回去确认一下，明天给您答复可以吗？"),
+            ("Speaker 3", "我会认真思考这个问题，准备好之后再向您汇报。"),
+            ("Speaker 4", "我明白了，这个确实需要注意。"),
+        ]
+        repaired, meta = repair_dialogue_quality(
+            lines,
+            "Chinese",
+            title="稳定性与上线准入",
+            scenario="围绕稳定性与上线准入进行真实自然的多轮评审会对话",
+            core_content="核心对话内容：对话中必须明确体现这些关键词——接口超时，降级策略，回滚预案",
+            profile={"work_content": "稳定性与上线准入", "use_case": "评审会"},
+            target_word_count=1000,
+            people_count=3,
+            keywords=["接口超时", "降级策略", "回滚预案"],
+        )
+        speakers = sorted({speaker for speaker, _ in repaired})
+        content_length = sum(len(re.sub(r"\s+", "", text)) for _, text in repaired)
+        rendered = "\n".join(text for _, text in repaired)
+        self.assertTrue(meta["repaired"])
+        self.assertEqual(speakers, ["Speaker 1", "Speaker 2", "Speaker 3"])
+        self.assertGreaterEqual(content_length, 960)
+        self.assertNotIn("这件事", repaired[0][1])
+        self.assertNotIn("进行真实自然的多轮", rendered)
+        self.assertIn("接口超时", rendered)
+        self.assertIn("降级策略", rendered)
+        self.assertIn("回滚预案", rendered)
+        speaker_two_lines = [text for speaker, text in repaired if speaker == "Speaker 2"]
+        speaker_three_lines = [text for speaker, text in repaired if speaker == "Speaker 3"]
+        self.assertTrue(set(speaker_two_lines) - set(speaker_three_lines))
+        self.assertTrue(set(speaker_three_lines) - set(speaker_two_lines))
 
 
 if __name__ == "__main__":

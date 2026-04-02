@@ -101,31 +101,56 @@ def _clip_text(text: str, limit: int = 18) -> str:
     return cleaned[:limit] if len(cleaned) > limit else cleaned
 
 
-def _context_topic_fragment(scenario: str, core_content: str, profile: dict[str, Any] | None) -> str:
+def _normalize_topic_candidate(text: str, limit: int = 20) -> str:
+    updated = str(text or "").strip()
+    if not updated:
+        return ""
+    updated = re.sub(r"^(文本主题|主题|场景|主题概括)\s*[:：]?\s*", "", updated)
+    updated = re.sub(r"^(围绕|关于)", "", updated)
+    updated = re.sub(r"(进行真实自然的多轮.*|展开真实自然的多轮.*|多轮.*对话|场景对话|评审会对话)$", "", updated)
+    updated = re.sub(r"\s+", "", updated)
+    updated = updated.strip("“”\"'《》[]【】")
+    if not updated:
+        return ""
+    return updated[:limit] if len(updated) > limit else updated
+
+
+def _split_meaningful_pieces(text: str) -> list[str]:
+    updated = str(text or "").strip()
+    if not updated:
+        return []
+    updated = re.sub(r"^(核心对话内容|核心内容|补充要求)\s*[:：]?\s*", "", updated)
+    updated = re.sub(r"对话中必须明确体现这些关键词[——:：-]*", "", updated)
+    updated = re.sub(r"(请生成自然、真实、口语化的多轮对话文本|请生成真实自然的多轮对话文本)", "", updated)
+    pieces: list[str] = []
+    for piece in re.split(r"[\n,，。；;、/｜|]+", updated):
+        cleaned = _normalize_topic_candidate(piece, limit=24)
+        if cleaned and cleaned not in pieces:
+            pieces.append(cleaned)
+    return pieces
+
+
+def _context_topic_fragment(title: str, scenario: str, core_content: str, profile: dict[str, Any] | None) -> str:
     candidates = [
-        str(scenario or "").strip(),
+        str(title or "").strip(),
         str((profile or {}).get("work_content") or "").strip(),
+        str(scenario or "").strip(),
         str((profile or {}).get("use_case") or "").strip(),
         str(core_content or "").strip(),
     ]
     for candidate in candidates:
         if candidate and _contains_cjk(candidate):
-            fragment = _clip_text(candidate, 20)
-            if fragment:
+            fragment = _normalize_topic_candidate(candidate, 20)
+            if fragment and fragment not in {"在线生成音频", "这件事"}:
                 return fragment
     return "这件事"
 
 
-def _core_focus_fragment(core_content: str, scenario: str) -> str:
-    for candidate in (core_content, scenario):
-        text = str(candidate or "").strip()
-        text = re.sub(r"^(核心对话内容|核心内容|补充要求)\s*[:：]?\s*", "", text)
-        if not text or not _contains_cjk(text):
-            continue
-        for piece in re.split(r"[\n,，。；;、/｜|]+", text):
-            cleaned = _clip_text(piece, 24)
-            if cleaned:
-                return cleaned
+def _core_focus_fragment(title: str, core_content: str, scenario: str, profile: dict[str, Any] | None) -> str:
+    for candidate in (core_content, title, str((profile or {}).get("work_content") or ""), scenario):
+        pieces = _split_meaningful_pieces(candidate)
+        if pieces:
+            return pieces[0]
     return ""
 
 
@@ -260,12 +285,14 @@ def _polish_chinese_generated_lines(
     scenario: str,
     core_content: str,
     profile: dict[str, Any] | None,
+    *,
+    title: str = "",
 ) -> tuple[list[tuple[str, str]], dict[str, Any]]:
     if not lines:
         return [], {"language": "Chinese", "rewrite_count": 0, "rewrites": []}
 
-    topic = _context_topic_fragment(scenario, core_content, profile)
-    focus = _core_focus_fragment(core_content, scenario) or topic
+    topic = _context_topic_fragment(title, scenario, core_content, profile)
+    focus = _core_focus_fragment(title, core_content, scenario, profile) or topic
     medical = _is_medical_context(scenario, core_content, profile)
     speaker_names = _build_chinese_speaker_names(lines, scenario, core_content, profile)
     primary_speaker = _speaker_order(lines)[0]
@@ -302,6 +329,7 @@ def enforce_keywords_in_lines(
     keywords: list[str],
     language: str,
     *,
+    title: str = "",
     scenario: str = "",
     core_content: str = "",
     profile: dict[str, Any] | None = None,
@@ -317,7 +345,7 @@ def enforce_keywords_in_lines(
 
     order = _speaker_order(lines) or ["Speaker 1"]
     primary_speaker = order[0]
-    topic = _context_topic_fragment(scenario, core_content, profile)
+    topic = _context_topic_fragment(title, scenario, core_content, profile)
     canonical = canonical_language(language)
 
     if canonical == "Chinese":
@@ -342,13 +370,14 @@ def polish_generated_lines(
     lines: list[tuple[str, str]],
     language: str,
     *,
+    title: str = "",
     scenario: str = "",
     core_content: str = "",
     profile: dict[str, Any] | None = None,
 ) -> tuple[list[tuple[str, str]], dict[str, Any]]:
     canonical = canonical_language(language)
     if canonical == "Chinese":
-        return _polish_chinese_generated_lines(lines, scenario, core_content, profile)
+        return _polish_chinese_generated_lines(lines, scenario, core_content, profile, title=title)
     if canonical in {"", "English"}:
         return list(lines), {"language": canonical, "rewrite_count": 0, "rewrites": []}
 
@@ -422,6 +451,27 @@ _SECONDARY_ROLE_HINTS = [
     "培训和宣导",
 ]
 
+_BUSINESS_FOCUS_DEFAULTS = [
+    "当前现状",
+    "主要阻塞",
+    "责任分工",
+    "验收标准",
+    "资源排期",
+    "上线窗口",
+    "回滚预案",
+    "数据验证",
+]
+
+_MEDICAL_FOCUS_DEFAULTS = [
+    "当前症状",
+    "检查结果",
+    "治疗安排",
+    "复查节点",
+    "风险提示",
+    "用药配合",
+    "家属协助",
+]
+
 
 def _content_length(lines: list[tuple[str, str]]) -> int:
     return sum(len(re.sub(r"\s+", "", str(text or ""))) for _, text in lines)
@@ -441,10 +491,9 @@ def _speaker_turn_counts(lines: list[tuple[str, str]]) -> dict[str, int]:
 def _split_focus_candidates(*values: str) -> list[str]:
     results: list[str] = []
     for value in values:
-        normalized = re.sub(r"^(核心对话内容|核心内容|补充要求)\s*[:：]?\s*", "", str(value or "").strip())
-        for piece in re.split(r"[\n,，。；;、/｜|]+", normalized):
-            cleaned = _clip_text(piece, 22)
-            if cleaned and cleaned not in results and len(cleaned) >= 3:
+        for piece in _split_meaningful_pieces(value):
+            cleaned = _normalize_topic_candidate(piece, 22)
+            if cleaned and cleaned not in results and len(cleaned) >= 2:
                 results.append(cleaned)
     return results
 
@@ -465,7 +514,7 @@ def _needs_dialogue_repair(
         return True
 
     order = _speaker_order(lines)
-    if len(order) < people_count:
+    if len(order) != people_count:
         return True
 
     counts = _speaker_turn_counts(lines)
@@ -485,18 +534,29 @@ def _needs_dialogue_repair(
     if generic_secondary >= max(2, len(order) - 1):
         return True
 
-    if _content_length(lines) < int(target_word_count * 0.82):
+    if _content_length(lines) < int(target_word_count * 0.92):
         return True
 
     return False
 
 
-def _structured_focus_points(topic: str, focus: str, keywords: list[str], core_content: str, scenario: str) -> list[str]:
+def _structured_focus_points(
+    topic: str,
+    focus: str,
+    keywords: list[str],
+    core_content: str,
+    scenario: str,
+    medical: bool,
+) -> list[str]:
     preferred = [item.strip() for item in keywords if item and item.strip()]
     candidates = [*preferred, *_split_focus_candidates(focus, core_content, scenario, topic)]
     results: list[str] = []
     for candidate in candidates:
         if candidate and candidate not in results:
+            results.append(candidate)
+    defaults = _MEDICAL_FOCUS_DEFAULTS if medical else _BUSINESS_FOCUS_DEFAULTS
+    for candidate in defaults:
+        if candidate not in results:
             results.append(candidate)
     if not results:
         results = [topic or "当前情况"]
@@ -506,7 +566,7 @@ def _structured_focus_points(topic: str, focus: str, keywords: list[str], core_c
 def _speaker_specific_point(points: list[str], speaker_index: int, round_index: int) -> str:
     if not points:
         return "当前情况"
-    return points[(speaker_index + round_index) % len(points)]
+    return points[(speaker_index * 2 + round_index) % len(points)]
 
 
 def _primary_summary_line(topic: str, focus: str, round_index: int) -> str:
@@ -526,10 +586,10 @@ def _secondary_intro_line(role_hint: str, point: str, medical: bool) -> str:
 
 
 def _secondary_round_line(
-    speaker_name: str,
     role_hint: str,
     point: str,
     round_index: int,
+    speaker_variant: int,
     medical: bool,
 ) -> str:
     if medical:
@@ -546,7 +606,25 @@ def _secondary_round_line(
             f"如果围绕{point}继续推进，我希望先把谁来负责、什么时候验证、出什么结果讲明白。",
             f"另外{point}这块一旦处理得太粗，后面无论是执行还是复盘都会比较被动。",
         ]
-    return variants[round_index % len(variants)]
+    return variants[(round_index + speaker_variant) % len(variants)]
+
+
+def _secondary_followup_line(role_hint: str, point: str, round_index: int, speaker_variant: int, medical: bool) -> str:
+    if medical:
+        variants = [
+            f"如果继续围绕{point}推进，我更想知道后面观察指标、复查节点和可能的风险提示应该怎么安排。",
+            f"从{role_hint}的角度，我还想追问一下{point}会不会影响后面的恢复节奏和用药判断。",
+            f"那关于{point}，我们是不是要先把检查、复查和家属配合的重点同步好，避免中间理解偏差。",
+            f"我担心的是，如果{point}这块讲得不够细，回去以后我自己执行起来还是容易心里没底。",
+        ]
+    else:
+        variants = [
+            f"如果继续围绕{point}推进，我更想知道谁来拍板、什么时候验收、出了问题怎么兜底。",
+            f"从{role_hint}的角度，我还想追问一下{point}会不会影响上线窗口、资源排期和回滚准备。",
+            f"那关于{point}，我们是不是要先把负责人、验证标准和失败后的应对动作一次讲清楚，避免后面扯皮。",
+            f"我担心的是，如果{point}这块讲得不够细，团队回去以后各自理解不同，执行就会很散。",
+        ]
+    return variants[(round_index + speaker_variant) % len(variants)]
 
 
 def _primary_response_line(point: str, round_index: int, medical: bool) -> str:
@@ -563,11 +641,27 @@ def _primary_response_line(point: str, round_index: int, medical: bool) -> str:
             f"这个点我认可，围绕{point}不能只停在判断上，还得把执行条件和校验口径讲透。",
             f"那我们就按{point}来拆，先确认事实，再决定方案优先级和推进节奏。",
             f"{point}这部分我会讲细一点，关键不是喊口号，而是把真正会影响结果的地方说透。",
+    ]
+    return variants[round_index % len(variants)]
+
+
+def _primary_plan_line(point: str, topic: str, round_index: int, medical: bool) -> str:
+    if medical:
+        variants = [
+            f"所以围绕{point}，我的建议是先把当前情况说明白，再把复查安排、观察重点和异常处理方式定下来。",
+            f"接下来我们就按{topic}这条主线往下走，先确认关键风险，再决定哪些地方需要提前干预。",
+            f"你们刚才提到的点我都记住了，后面会围绕{point}把结论、节奏和注意事项说得更落地一些。",
+        ]
+    else:
+        variants = [
+            f"所以围绕{point}，我的建议是先把事实、责任人和验收标准定住，再安排后续推进节奏。",
+            f"接下来我们就按{topic}这条主线往下走，先收敛关键风险，再决定资源和上线窗口怎么排。",
+            f"你们刚才提到的点我都记住了，后面会围绕{point}把动作、边界和兜底方案讲得更落地一些。",
         ]
     return variants[round_index % len(variants)]
 
 
-def _secondary_commit_line(point: str, round_index: int, medical: bool) -> str:
+def _secondary_commit_line(role_hint: str, point: str, round_index: int, speaker_variant: int, medical: bool) -> str:
     if medical:
         variants = [
             f"明白了，那我会先把和{point}有关的实际感受、检查情况和这段时间的变化整理出来。",
@@ -577,14 +671,15 @@ def _secondary_commit_line(point: str, round_index: int, medical: bool) -> str:
     else:
         variants = [
             f"明白了，那我这边会先把和{point}有关的现状、数据和阻塞项整理出来，再跟大家对一次。",
-            f"好，那围绕{point}我这边先把责任人、时间点和验证方式补齐，避免后面再来回改。",
-            f"这样我就更清楚了，后面关于{point}我会先把准备工作做扎实，再推进下一步。",
+            f"好，那围绕{point}我会从{role_hint}这个角度先把责任人、时间点和验证方式补齐，避免后面再来回改。",
+            f"这样我就更清楚了，后面关于{point}我会先把和{role_hint}有关的准备工作做扎实，再推进下一步。",
         ]
-    return variants[round_index % len(variants)]
+    return variants[(round_index + speaker_variant) % len(variants)]
 
 
 def _build_structured_chinese_dialogue(
     lines: list[tuple[str, str]],
+    title: str,
     scenario: str,
     core_content: str,
     profile: dict[str, Any] | None,
@@ -592,17 +687,12 @@ def _build_structured_chinese_dialogue(
     people_count: int,
     keywords: list[str],
 ) -> list[tuple[str, str]]:
-    order = _speaker_order(lines)
-    if not order:
-        order = [f"Speaker {index}" for index in range(1, max(2, people_count) + 1)]
-    while len(order) < people_count:
-        order.append(f"Speaker {len(order) + 1}")
-
-    topic = _context_topic_fragment(scenario, core_content, profile)
+    order = [f"Speaker {index}" for index in range(1, max(2, people_count) + 1)]
+    topic = _context_topic_fragment(title, scenario, core_content, profile)
     medical = _is_medical_context(scenario, core_content, profile)
     speaker_names = _build_chinese_speaker_names([(speaker, "") for speaker in order], scenario, core_content, profile)
-    focus_seed = _core_focus_fragment(core_content, scenario) or topic
-    points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario)
+    focus_seed = _core_focus_fragment(title, core_content, scenario, profile) or topic
+    points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario, medical)
     focus = "、".join(points[:2]) if len(points) > 1 else (points[0] if points else topic)
 
     rebuilt: list[tuple[str, str]] = []
@@ -619,26 +709,32 @@ def _build_structured_chinese_dialogue(
     rebuilt.append((primary, _build_core_line(primary, primary, focus)))
 
     round_index = 0
-    target_floor = max(260, int(target_word_count * 0.93))
-    while _rendered_length(rebuilt) < target_floor:
+    target_floor = max(260, int(target_word_count * 0.96))
+    while _content_length(rebuilt) < target_floor:
         for idx, speaker in enumerate(secondary):
             role_hint = _SECONDARY_ROLE_HINTS[idx % len(_SECONDARY_ROLE_HINTS)]
             point = _speaker_specific_point(points, idx, round_index)
-            rebuilt.append((speaker, _secondary_round_line(speaker_names.get(speaker, speaker), role_hint, point, round_index, medical)))
+            rebuilt.append((speaker, _secondary_round_line(role_hint, point, round_index, idx, medical)))
         rebuilt.append((primary, _primary_summary_line(topic, focus, round_index)))
         for idx, speaker in enumerate(secondary):
             point = _speaker_specific_point(points, idx + len(secondary), round_index)
-            rebuilt.append((speaker, _secondary_commit_line(point, round_index, medical)))
+            role_hint = _SECONDARY_ROLE_HINTS[(idx + round_index + 1) % len(_SECONDARY_ROLE_HINTS)]
+            rebuilt.append((speaker, _secondary_followup_line(role_hint, point, round_index, idx, medical)))
         rebuilt.append((primary, _primary_response_line(_speaker_specific_point(points, round_index, round_index), round_index, medical)))
+        for idx, speaker in enumerate(secondary):
+            point = _speaker_specific_point(points, idx + len(secondary) * 2, round_index)
+            role_hint = _SECONDARY_ROLE_HINTS[(idx + 2) % len(_SECONDARY_ROLE_HINTS)]
+            rebuilt.append((speaker, _secondary_commit_line(role_hint, point, round_index, idx, medical)))
+        rebuilt.append((primary, _primary_plan_line(_speaker_specific_point(points, round_index + 1, round_index), topic, round_index, medical)))
         round_index += 1
         if round_index >= 6:
             break
 
-    if rebuilt and _rendered_length(rebuilt) > int(target_word_count * 1.04):
+    if rebuilt and _content_length(rebuilt) > int(target_word_count * 1.08):
         trimmed: list[tuple[str, str]] = []
         for speaker, text in rebuilt:
             trimmed.append((speaker, text))
-            if _rendered_length(trimmed) >= int(target_word_count * 0.98):
+            if _content_length(trimmed) >= int(target_word_count * 0.98):
                 break
         rebuilt = trimmed
 
@@ -658,6 +754,7 @@ def repair_dialogue_quality(
     lines: list[tuple[str, str]],
     language: str,
     *,
+    title: str = "",
     scenario: str = "",
     core_content: str = "",
     profile: dict[str, Any] | None = None,
@@ -676,6 +773,7 @@ def repair_dialogue_quality(
 
     repaired = _build_structured_chinese_dialogue(
         lines,
+        title,
         scenario,
         core_content,
         profile,

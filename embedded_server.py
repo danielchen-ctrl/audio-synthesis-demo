@@ -452,6 +452,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     repaired_lines, repair_meta = repair_dialogue_quality(
         lines,
         language,
+        title=title,
         scenario=scenario,
         core_content=core_content,
         profile=profile,
@@ -465,6 +466,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         lines,
         keyword_terms,
         language,
+        title=title,
         scenario=scenario,
         core_content=core_content,
         profile=profile,
@@ -1139,7 +1141,10 @@ class DownloadHandler(RequestHandler):
         if kind not in {"text", "audio"}:
             raise HTTPError(400, reason="kind must be text or audio")
 
-        _, manifest = _find_manifest(dialogue_id)
+        try:
+            _, manifest = _find_manifest(dialogue_id)
+        except FileNotFoundError as exc:
+            raise HTTPError(404, reason=str(exc)) from exc
         save_dir = Path(manifest.get("save_dir") or ROOT / "demo")
 
         if kind == "text":
@@ -1172,7 +1177,10 @@ class DialogueDetailHandler(JsonHandler):
         if not dialogue_id:
             raise HTTPError(400, reason="dialogue_id is required")
 
-        _, manifest = _find_manifest(dialogue_id)
+        try:
+            _, manifest = _find_manifest(dialogue_id)
+        except FileNotFoundError as exc:
+            raise HTTPError(404, reason=str(exc)) from exc
         text_path = Path(str(manifest.get("text_path") or ""))
         dialogue_text = text_path.read_text(encoding="utf-8") if text_path.exists() else ""
         audio_path = _resolve_audio_target(manifest, dialogue_id)
@@ -1295,6 +1303,7 @@ def load_bundle_server():
                 polished_lines, naturalness = polish_generated_lines(
                     lines,
                     language,
+                    title=str(profile.get("work_content") or scenario or ""),
                     scenario=scenario,
                     core_content=core,
                     profile=profile,
