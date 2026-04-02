@@ -19,174 +19,53 @@ const LANGUAGE_OPTIONS = [
   { label: "印度尼西亚语", backend: "Indonesian", code: "id" }
 ];
 
-const PRESET_TEMPLATE_LABELS = [
-  "医疗健康｜慢病随访",
-  "人力资源与招聘｜招聘补岗",
-  "娱乐/媒体｜艺人商业化",
-  "建筑与工程行业｜项目交付",
-  "汽车行业｜车型投放",
-  "咨询/专业服务｜客户拓展",
-  "法律服务｜法顾专项",
-  "金融/投资｜资产配置",
-  "零售行业｜会员复购",
-  "保险行业｜保险质检",
-  "房地产｜项目去化",
-  "人工智能/科技｜付费转化",
-  "制造业｜产线提效",
-  "娱乐/媒体｜战略周会",
-  "法律服务｜广告合规",
-  "保险行业｜销售洞察",
-  "测试开发｜支付项目",
-  "测试开发｜朋友圈项目"
-];
-
-const TEMPLATE_CONTEXT_MAP = {
-  "医疗健康｜慢病随访": {
-    primaryRole: "随访医生",
-    supportingRoles: ["患者本人", "家属", "随访护士"],
-    discussionAxes: ["症状变化", "用药执行", "复查节点", "风险提示", "患者配合"],
-    deliverable: "形成清晰的随访安排、复查节点和注意事项",
-    goalStem: "围绕慢病随访过程中的当前情况、风险判断和后续安排展开真实交流"
+const FALLBACK_ONLINE_AUDIO_CONFIG = {
+  defaults: {
+    wordCount: DEFAULT_WORD_COUNT,
+    wordCountMin: 100,
+    wordCountMax: 3000,
+    folder: "默认目录"
   },
-  "人力资源与招聘｜招聘补岗": {
-    primaryRole: "招聘负责人",
-    supportingRoles: ["业务部门经理", "HRBP", "用人主管"],
-    discussionAxes: ["岗位缺口", "优先级", "候选人画像", "渠道策略", "到岗时间"],
-    deliverable: "明确补岗优先级、招聘策略和推进节奏",
-    goalStem: "围绕招聘补岗过程中的岗位画像、时间压力和渠道策略展开讨论"
+  folderOptions: ["默认目录", "项目 A / 会议语料", "项目 A / 访谈语料", "项目 B"],
+  templateAliasGroups: {
+    "测试开发｜支付接入": "测试开发｜支付项目",
+    "测试开发｜下单回调": "测试开发｜支付项目",
+    "测试开发｜退款安全": "测试开发｜支付项目",
+    "测试开发｜对账差错": "测试开发｜支付项目",
+    "测试开发｜稳定性准入": "测试开发｜支付项目",
+    "测试开发｜朋友圈项目": "测试开发｜朋友圈项目",
+    "测试开发｜内容发布": "测试开发｜朋友圈项目",
+    "测试开发｜多端分发": "测试开发｜朋友圈项目",
+    "测试开发｜互动一致性": "测试开发｜朋友圈项目",
+    "测试开发｜隐私可见性": "测试开发｜朋友圈项目",
+    "测试开发｜内容审核": "测试开发｜朋友圈项目",
+    "测试开发｜容量与准入": "测试开发｜朋友圈项目"
   },
-  "娱乐/媒体｜艺人商业化": {
-    primaryRole: "商务负责人",
-    supportingRoles: ["经纪人", "品牌负责人", "内容运营"],
-    discussionAxes: ["商业定位", "品牌匹配", "报价策略", "执行风险", "转化目标"],
-    deliverable: "形成艺人商业化推进策略和合作判断",
-    goalStem: "围绕艺人商业化中的品牌合作、资源投入和转化效果展开讨论"
-  },
-  "建筑与工程行业｜项目交付": {
-    primaryRole: "项目经理",
-    supportingRoles: ["工程负责人", "甲方代表", "采购或成本负责人"],
-    discussionAxes: ["交付进度", "现场问题", "成本控制", "风险处理", "验收节点"],
-    deliverable: "形成项目交付问题清单和推进方案",
-    goalStem: "围绕项目交付中的进度、成本、现场风险和验收安排展开讨论"
-  },
-  "汽车行业｜车型投放": {
-    primaryRole: "车型项目负责人",
-    supportingRoles: ["市场负责人", "销售负责人", "区域运营代表"],
-    discussionAxes: ["投放节奏", "渠道准备", "卖点表达", "库存规划", "区域反馈"],
-    deliverable: "形成车型投放节奏和重点动作安排",
-    goalStem: "围绕车型投放中的市场准备、渠道协同和节奏控制展开讨论"
-  },
-  "咨询/专业服务｜客户拓展": {
-    primaryRole: "客户拓展负责人",
-    supportingRoles: ["顾问经理", "行业顾问", "交付负责人"],
-    discussionAxes: ["客户诉求", "方案切入", "关系推进", "报价策略", "交付匹配"],
-    deliverable: "形成客户拓展策略和下一步推进动作",
-    goalStem: "围绕客户拓展中的切入点、关系推进和方案竞争力展开讨论"
-  },
-  "法律服务｜法顾专项": {
-    primaryRole: "法务顾问",
-    supportingRoles: ["客户负责人", "专项律师", "合规经理"],
-    discussionAxes: ["风险识别", "证据材料", "处理方案", "边界判断", "执行安排"],
-    deliverable: "形成法顾专项的处理路径和分工建议",
-    goalStem: "围绕法顾专项中的法律风险、证据准备和执行方案展开讨论"
-  },
-  "金融/投资｜资产配置": {
-    primaryRole: "投顾负责人",
-    supportingRoles: ["客户经理", "研究员", "风险控制负责人"],
-    discussionAxes: ["配置目标", "风险偏好", "资金安排", "收益预期", "调整策略"],
-    deliverable: "形成清晰的资产配置建议和风险提示",
-    goalStem: "围绕资产配置中的收益目标、风险偏好和组合调整展开讨论"
-  },
-  "零售行业｜会员复购": {
-    primaryRole: "会员运营负责人",
-    supportingRoles: ["门店负责人", "活动运营", "数据分析师"],
-    discussionAxes: ["会员分层", "活动策略", "复购触达", "门店配合", "效果验证"],
-    deliverable: "形成会员复购提升方案和执行节奏",
-    goalStem: "围绕会员复购中的触达策略、门店配合和活动效果展开讨论"
-  },
-  "保险行业｜保险质检": {
-    primaryRole: "质检负责人",
-    supportingRoles: ["销售主管", "培训负责人", "合规专员"],
-    discussionAxes: ["录音质检", "销售话术", "风险点", "培训改进", "复盘闭环"],
-    deliverable: "形成保险质检问题结论和改进动作",
-    goalStem: "围绕保险质检中的话术风险、培训改进和问题闭环展开讨论"
-  },
-  "房地产｜项目去化": {
-    primaryRole: "项目营销负责人",
-    supportingRoles: ["渠道经理", "案场负责人", "投放运营"],
-    discussionAxes: ["去化压力", "客源结构", "渠道效率", "价格策略", "案场转化"],
-    deliverable: "形成项目去化提效方案和短期动作安排",
-    goalStem: "围绕项目去化中的渠道效率、案场转化和价格策略展开讨论"
-  },
-  "人工智能/科技｜付费转化": {
-    primaryRole: "增长负责人",
-    supportingRoles: ["产品经理", "数据分析师", "运营负责人"],
-    discussionAxes: ["转化漏斗", "付费门槛", "试用策略", "价值感知", "数据回收"],
-    deliverable: "形成付费转化优化方案和实验计划",
-    goalStem: "围绕付费转化中的产品策略、转化漏斗和数据验证展开讨论"
-  },
-  "制造业｜产线提效": {
-    primaryRole: "产线负责人",
-    supportingRoles: ["工艺工程师", "设备负责人", "质量经理"],
-    discussionAxes: ["瓶颈工序", "设备效率", "良率波动", "排产协同", "异常处理"],
-    deliverable: "形成产线提效方案和关键改善动作",
-    goalStem: "围绕产线提效中的瓶颈工序、设备效率和质量稳定性展开讨论"
-  },
-  "娱乐/媒体｜战略周会": {
-    primaryRole: "业务负责人",
-    supportingRoles: ["内容负责人", "增长负责人", "商务负责人"],
-    discussionAxes: ["业务目标", "资源投入", "进展复盘", "重点风险", "下周动作"],
-    deliverable: "形成战略周会的重点决策和分工安排",
-    goalStem: "围绕战略周会中的业务目标、资源分配和重点风险展开讨论"
-  },
-  "法律服务｜广告合规": {
-    primaryRole: "法务负责人",
-    supportingRoles: ["市场负责人", "品牌经理", "合规专员"],
-    discussionAxes: ["广告表述", "风险边界", "素材审核", "整改建议", "上线条件"],
-    deliverable: "形成广告合规判断和修改建议",
-    goalStem: "围绕广告合规中的风险边界、素材表述和整改方案展开讨论"
-  },
-  "保险行业｜销售洞察": {
-    primaryRole: "销售管理负责人",
-    supportingRoles: ["区域经理", "培训负责人", "数据分析师"],
-    discussionAxes: ["销售表现", "客户反馈", "转化瓶颈", "团队差异", "改善动作"],
-    deliverable: "形成销售洞察结论和管理改进动作",
-    goalStem: "围绕销售洞察中的客户反馈、团队差异和改善动作展开讨论"
-  },
-  "测试开发｜支付项目": {
-    primaryRole: "测试负责人",
-    supportingRoles: ["服务端开发", "客户端开发", "产品经理", "质量负责人"],
-    discussionAxes: ["支付接入", "下单回调", "退款安全", "对账差错", "稳定性准入"],
-    deliverable: "形成支付项目的测试范围、风险清单和上线准入结论",
-    goalStem: "围绕支付项目中的链路完整性、异常兜底和上线风险展开讨论"
-  },
-  "测试开发｜朋友圈项目": {
-    primaryRole: "测试负责人",
-    supportingRoles: ["客户端开发", "服务端开发", "产品经理", "运营负责人"],
-    discussionAxes: ["内容发布", "多端分发", "互动一致性", "隐私可见性", "内容审核", "容量与准入"],
-    deliverable: "形成朋友圈项目的重点测试范围、风险判断和准入结论",
-    goalStem: "围绕朋友圈项目中的内容链路、可见性规则和容量风险展开讨论"
-  }
+  templateCatalog: [
+    { label: "医疗健康｜慢病随访", domain: "医疗健康", sceneType: "慢病随访", primaryRole: "随访医生", supportingRoles: ["患者本人", "家属", "随访护士"], discussionAxes: ["症状变化", "用药执行", "复查节点", "风险提示", "患者配合"], deliverable: "形成清晰的随访安排、复查节点和注意事项", goalStem: "围绕慢病随访过程中的当前情况、风险判断和后续安排展开真实交流" },
+    { label: "人力资源与招聘｜招聘补岗", domain: "人力资源与招聘", sceneType: "招聘补岗", primaryRole: "招聘负责人", supportingRoles: ["业务部门经理", "HRBP", "用人主管"], discussionAxes: ["岗位缺口", "优先级", "候选人画像", "渠道策略", "到岗时间"], deliverable: "明确补岗优先级、招聘策略和推进节奏", goalStem: "围绕招聘补岗过程中的岗位画像、时间压力和渠道策略展开讨论" },
+    { label: "娱乐/媒体｜艺人商业化", domain: "娱乐/媒体", sceneType: "艺人商业化", primaryRole: "商务负责人", supportingRoles: ["经纪人", "品牌负责人", "内容运营"], discussionAxes: ["商业定位", "品牌匹配", "报价策略", "执行风险", "转化目标"], deliverable: "形成艺人商业化推进策略和合作判断", goalStem: "围绕艺人商业化中的品牌合作、资源投入和转化效果展开讨论" },
+    { label: "建筑与工程行业｜项目交付", domain: "建筑与工程行业", sceneType: "项目交付", primaryRole: "项目经理", supportingRoles: ["工程负责人", "甲方代表", "采购或成本负责人"], discussionAxes: ["交付进度", "现场问题", "成本控制", "风险处理", "验收节点"], deliverable: "形成项目交付问题清单和推进方案", goalStem: "围绕项目交付中的进度、成本、现场风险和验收安排展开讨论" },
+    { label: "汽车行业｜车型投放", domain: "汽车行业", sceneType: "车型投放", primaryRole: "车型项目负责人", supportingRoles: ["市场负责人", "销售负责人", "区域运营代表"], discussionAxes: ["投放节奏", "渠道准备", "卖点表达", "库存规划", "区域反馈"], deliverable: "形成车型投放节奏和重点动作安排", goalStem: "围绕车型投放中的市场准备、渠道协同和节奏控制展开讨论" },
+    { label: "咨询/专业服务｜客户拓展", domain: "咨询/专业服务", sceneType: "客户拓展", primaryRole: "客户拓展负责人", supportingRoles: ["顾问经理", "行业顾问", "交付负责人"], discussionAxes: ["客户诉求", "方案切入", "关系推进", "报价策略", "交付匹配"], deliverable: "形成客户拓展策略和下一步推进动作", goalStem: "围绕客户拓展中的切入点、关系推进和方案竞争力展开讨论" },
+    { label: "法律服务｜法顾专项", domain: "法律服务", sceneType: "法顾专项", primaryRole: "法务顾问", supportingRoles: ["客户负责人", "专项律师", "合规经理"], discussionAxes: ["风险识别", "证据材料", "处理方案", "边界判断", "执行安排"], deliverable: "形成法顾专项的处理路径和分工建议", goalStem: "围绕法顾专项中的法律风险、证据准备和执行方案展开讨论" },
+    { label: "金融/投资｜资产配置", domain: "金融/投资", sceneType: "资产配置", primaryRole: "投顾负责人", supportingRoles: ["客户经理", "研究员", "风险控制负责人"], discussionAxes: ["配置目标", "风险偏好", "资金安排", "收益预期", "调整策略"], deliverable: "形成清晰的资产配置建议和风险提示", goalStem: "围绕资产配置中的收益目标、风险偏好和组合调整展开讨论" },
+    { label: "零售行业｜会员复购", domain: "零售行业", sceneType: "会员复购", primaryRole: "会员运营负责人", supportingRoles: ["门店负责人", "活动运营", "数据分析师"], discussionAxes: ["会员分层", "活动策略", "复购触达", "门店配合", "效果验证"], deliverable: "形成会员复购提升方案和执行节奏", goalStem: "围绕会员复购中的触达策略、门店配合和活动效果展开讨论" },
+    { label: "保险行业｜保险质检", domain: "保险行业", sceneType: "保险质检", primaryRole: "质检负责人", supportingRoles: ["销售主管", "培训负责人", "合规专员"], discussionAxes: ["录音质检", "销售话术", "风险点", "培训改进", "复盘闭环"], deliverable: "形成保险质检问题结论和改进动作", goalStem: "围绕保险质检中的话术风险、培训改进和问题闭环展开讨论" },
+    { label: "房地产｜项目去化", domain: "房地产", sceneType: "项目去化", primaryRole: "项目营销负责人", supportingRoles: ["渠道经理", "案场负责人", "投放运营"], discussionAxes: ["去化压力", "客源结构", "渠道效率", "价格策略", "案场转化"], deliverable: "形成项目去化提效方案和短期动作安排", goalStem: "围绕项目去化中的渠道效率、案场转化和价格策略展开讨论" },
+    { label: "人工智能/科技｜付费转化", domain: "人工智能/科技", sceneType: "付费转化", primaryRole: "增长负责人", supportingRoles: ["产品经理", "数据分析师", "运营负责人"], discussionAxes: ["转化漏斗", "付费门槛", "试用策略", "价值感知", "数据回收"], deliverable: "形成付费转化优化方案和实验计划", goalStem: "围绕付费转化中的产品策略、转化漏斗和数据验证展开讨论" },
+    { label: "制造业｜产线提效", domain: "制造业", sceneType: "产线提效", primaryRole: "产线负责人", supportingRoles: ["工艺工程师", "设备负责人", "质量经理"], discussionAxes: ["瓶颈工序", "设备效率", "良率波动", "排产协同", "异常处理"], deliverable: "形成产线提效方案和关键改善动作", goalStem: "围绕产线提效中的瓶颈工序、设备效率和质量稳定性展开讨论" },
+    { label: "娱乐/媒体｜战略周会", domain: "娱乐/媒体", sceneType: "战略周会", primaryRole: "业务负责人", supportingRoles: ["内容负责人", "增长负责人", "商务负责人"], discussionAxes: ["业务目标", "资源投入", "进展复盘", "重点风险", "下周动作"], deliverable: "形成战略周会的重点决策和分工安排", goalStem: "围绕战略周会中的业务目标、资源分配和重点风险展开讨论" },
+    { label: "法律服务｜广告合规", domain: "法律服务", sceneType: "广告合规", primaryRole: "法务负责人", supportingRoles: ["市场负责人", "品牌经理", "合规专员"], discussionAxes: ["广告表述", "风险边界", "素材审核", "整改建议", "上线条件"], deliverable: "形成广告合规判断和修改建议", goalStem: "围绕广告合规中的风险边界、素材表述和整改方案展开讨论" },
+    { label: "保险行业｜销售洞察", domain: "保险行业", sceneType: "销售洞察", primaryRole: "销售管理负责人", supportingRoles: ["区域经理", "培训负责人", "数据分析师"], discussionAxes: ["销售表现", "客户反馈", "转化瓶颈", "团队差异", "改善动作"], deliverable: "形成销售洞察结论和管理改进动作", goalStem: "围绕销售洞察中的客户反馈、团队差异和改善动作展开讨论" },
+    { label: "测试开发｜支付项目", domain: "测试开发", sceneType: "支付项目", primaryRole: "测试负责人", supportingRoles: ["服务端开发", "客户端开发", "产品经理", "质量负责人"], discussionAxes: ["支付接入", "下单回调", "退款安全", "对账差错", "稳定性准入"], deliverable: "形成支付项目的测试范围、风险清单和上线准入结论", goalStem: "围绕支付项目中的链路完整性、异常兜底和上线风险展开讨论" },
+    { label: "测试开发｜朋友圈项目", domain: "测试开发", sceneType: "朋友圈项目", primaryRole: "测试负责人", supportingRoles: ["客户端开发", "服务端开发", "产品经理", "运营负责人"], discussionAxes: ["内容发布", "多端分发", "互动一致性", "隐私可见性", "内容审核", "容量与准入"], deliverable: "形成朋友圈项目的重点测试范围、风险判断和准入结论", goalStem: "围绕朋友圈项目中的内容链路、可见性规则和容量风险展开讨论" }
+  ]
 };
 
-const TEST_DEV_TEMPLATE_GROUPS = {
-  "测试开发｜支付接入": "测试开发｜支付项目",
-  "测试开发｜下单回调": "测试开发｜支付项目",
-  "测试开发｜退款安全": "测试开发｜支付项目",
-  "测试开发｜对账差错": "测试开发｜支付项目",
-  "测试开发｜稳定性准入": "测试开发｜支付项目",
-  "测试开发｜朋友圈项目": "测试开发｜朋友圈项目",
-  "测试开发｜内容发布": "测试开发｜朋友圈项目",
-  "测试开发｜多端分发": "测试开发｜朋友圈项目",
-  "测试开发｜互动一致性": "测试开发｜朋友圈项目",
-  "测试开发｜隐私可见性": "测试开发｜朋友圈项目",
-  "测试开发｜内容审核": "测试开发｜朋友圈项目",
-  "测试开发｜容量与准入": "测试开发｜朋友圈项目"
-};
-
-const BASE_TEMPLATE_OPTIONS = PRESET_TEMPLATE_LABELS.map((label) => ({
-  value: dynamicTemplateValue(label),
-  label
+const BASE_TEMPLATE_OPTIONS = FALLBACK_ONLINE_AUDIO_CONFIG.templateCatalog.map((item) => ({
+  value: dynamicTemplateValue(item.label),
+  label: item.label
 }));
 
 const VOICE_LIBRARY = {
@@ -265,7 +144,7 @@ function createDefaultFormState() {
     voiceAssignments: { "1": "", "2": "" },
     outputFormat: "MP3",
     preciseDuration: "",
-    folder: "默认目录",
+    folder: FALLBACK_ONLINE_AUDIO_CONFIG.defaults.folder,
     tags: [],
     includeScripts: false,
     isGeneratingText: false,
@@ -275,28 +154,52 @@ function createDefaultFormState() {
   };
 }
 
+function createDefaultTaskFilters() {
+  return {
+    query: "",
+    status: "all",
+    source: "all",
+    staleOnly: false
+  };
+}
+
 const state = {
   serverInfo: null,
   modalOpen: true,
+  onlineAudioConfig: JSON.parse(JSON.stringify(FALLBACK_ONLINE_AUDIO_CONFIG)),
   presetTopics: [],
   templateOptions: [...BASE_TEMPLATE_OPTIONS],
   form: createDefaultFormState(),
   tasks: [],
-  modalSize: null
+  taskFilters: createDefaultTaskFilters(),
+  advancedSearchOpen: false,
+  modalSize: null,
+  modalOffset: { x: 0, y: 0 }
 };
 
 const el = {
   sharePrimaryLink: document.getElementById("sharePrimaryLink"),
   copyShareBtn: document.getElementById("copyShareBtn"),
   shareHint: document.getElementById("shareHint"),
+  taskSearchInput: document.getElementById("taskSearchInput"),
+  taskSearchBtn: document.getElementById("taskSearchBtn"),
+  advancedSearchBtn: document.getElementById("advancedSearchBtn"),
   uploadBtn: document.getElementById("uploadBtn"),
   openOnlineAudioBtn: document.getElementById("openOnlineAudioBtn"),
   cleanupOldTasksBtn: document.getElementById("cleanupOldTasksBtn"),
+  taskFilterBar: document.getElementById("taskFilterBar"),
+  taskStatusFilter: document.getElementById("taskStatusFilter"),
+  taskSourceFilter: document.getElementById("taskSourceFilter"),
+  staleOnlyFilter: document.getElementById("staleOnlyFilter"),
+  clearTaskFiltersBtn: document.getElementById("clearTaskFiltersBtn"),
+  taskSummary: document.getElementById("taskSummary"),
   taskTableBody: document.getElementById("taskTableBody"),
   taskEmpty: document.getElementById("taskEmpty"),
   toastContainer: document.getElementById("toastContainer"),
   modalOverlay: document.getElementById("modalOverlay"),
   modalPanel: document.getElementById("modalPanel"),
+  modalHeader: document.getElementById("modalHeader"),
+  resetModalLayoutBtn: document.getElementById("resetModalLayoutBtn"),
   modalResizeHandle: document.getElementById("modalResizeHandle"),
   closeModalBtn: document.getElementById("closeModalBtn"),
   cancelModalBtn: document.getElementById("cancelModalBtn"),
@@ -346,6 +249,50 @@ const el = {
   modalMessage: document.getElementById("modalMessage"),
   submitAudioBtn: document.getElementById("submitAudioBtn")
 };
+
+function cloneOnlineAudioConfig(config = FALLBACK_ONLINE_AUDIO_CONFIG) {
+  return {
+    defaults: { ...(config.defaults || FALLBACK_ONLINE_AUDIO_CONFIG.defaults) },
+    folderOptions: [...(config.folderOptions || FALLBACK_ONLINE_AUDIO_CONFIG.folderOptions)],
+    templateAliasGroups: { ...(config.templateAliasGroups || FALLBACK_ONLINE_AUDIO_CONFIG.templateAliasGroups) },
+    templateCatalog: (config.templateCatalog || FALLBACK_ONLINE_AUDIO_CONFIG.templateCatalog).map((item) => ({
+      ...item,
+      supportingRoles: [...(item.supportingRoles || [])],
+      discussionAxes: [...(item.discussionAxes || [])]
+    }))
+  };
+}
+
+function currentOnlineAudioConfig() {
+  return state.onlineAudioConfig || FALLBACK_ONLINE_AUDIO_CONFIG;
+}
+
+function currentTemplateCatalog() {
+  return currentOnlineAudioConfig().templateCatalog || [];
+}
+
+function templateLabelOrder() {
+  return currentTemplateCatalog().map((item) => String(item.label || "").trim()).filter(Boolean);
+}
+
+function defaultFolderOption() {
+  return currentOnlineAudioConfig().defaults?.folder || FALLBACK_ONLINE_AUDIO_CONFIG.defaults.folder;
+}
+
+function defaultWordCountLimit() {
+  return String(currentOnlineAudioConfig().defaults?.wordCount || DEFAULT_WORD_COUNT);
+}
+
+function wordCountRange() {
+  return {
+    min: Number(currentOnlineAudioConfig().defaults?.wordCountMin || 100),
+    max: Number(currentOnlineAudioConfig().defaults?.wordCountMax || 3000)
+  };
+}
+
+function currentTemplateContextMap() {
+  return Object.fromEntries(currentTemplateCatalog().map((item) => [String(item.label || "").trim(), item]));
+}
 
 function normalizeText(value) {
   return String(value || "").replace(/\r\n/g, "\n").trim();
@@ -397,7 +344,7 @@ function templateOptionByLabel(label) {
 function normalizeTemplateDropdownLabel(label) {
   const normalized = String(label || "").trim();
   if (!normalized) return "";
-  return TEST_DEV_TEMPLATE_GROUPS[normalized] || normalized;
+  return currentOnlineAudioConfig().templateAliasGroups?.[normalized] || normalized;
 }
 
 function templateDisplayLabelFromPreset(preset) {
@@ -452,7 +399,7 @@ function splitTemplateLabelParts(label) {
 
 function templateContextForLabel(templateLabel, topic, keywordTerms = []) {
   const normalizedLabel = normalizeTemplateDropdownLabel(templateLabel);
-  const base = TEMPLATE_CONTEXT_MAP[normalizedLabel] || {};
+  const base = currentTemplateContextMap()[normalizedLabel] || {};
   const { domain, sceneType } = splitTemplateLabelParts(normalizedLabel);
   const topicText = String(topic || "").trim() || sceneType || "业务议题";
   const discussionAxes = uniqueStrings([
@@ -508,8 +455,9 @@ function buildTemplateOptionsFromPresets(presets) {
     }
   });
 
-  const orderedLabels = PRESET_TEMPLATE_LABELS.filter((label) => labelsFromPresets.has(label));
-  const extraLabels = [...labelsFromPresets].filter((label) => !PRESET_TEMPLATE_LABELS.includes(label)).sort();
+  const orderedTemplateLabels = templateLabelOrder();
+  const orderedLabels = orderedTemplateLabels.filter((label) => labelsFromPresets.has(label));
+  const extraLabels = [...labelsFromPresets].filter((label) => !orderedTemplateLabels.includes(label)).sort();
   const finalLabels = [...orderedLabels, ...extraLabels];
 
   return finalLabels.length
@@ -598,20 +546,39 @@ function snapshotCurrentForm() {
   };
 }
 
-function applyModalSize() {
-  if (!el.modalPanel) return;
-  if (!state.modalSize || !state.modalSize.width || !state.modalSize.height) {
-    el.modalPanel.style.width = "";
-    el.modalPanel.style.height = "";
-    return;
-  }
-
+function resolvedModalDimensions() {
   const maxWidth = Math.max(760, window.innerWidth - 24);
   const maxHeight = Math.max(560, window.innerHeight - 24);
-  const width = Math.min(maxWidth, Math.max(760, Number(state.modalSize.width) || 960));
-  const height = Math.min(maxHeight, Math.max(560, Number(state.modalSize.height) || 760));
+  return {
+    width: Math.min(maxWidth, Math.max(760, Number(state.modalSize?.width) || 960)),
+    height: Math.min(maxHeight, Math.max(560, Number(state.modalSize?.height) || 760))
+  };
+}
+
+function clampModalOffset(offset = state.modalOffset || { x: 0, y: 0 }) {
+  const { width, height } = resolvedModalDimensions();
+  const maxX = Math.max(0, Math.floor((window.innerWidth - width) / 2) - 12);
+  const maxY = Math.max(0, Math.floor((window.innerHeight - height) / 2) - 12);
+  return {
+    x: Math.max(-maxX, Math.min(maxX, Number(offset.x) || 0)),
+    y: Math.max(-maxY, Math.min(maxY, Number(offset.y) || 0))
+  };
+}
+
+function applyModalSize() {
+  if (!el.modalPanel) return;
+  const { width, height } = resolvedModalDimensions();
+  state.modalOffset = clampModalOffset();
   el.modalPanel.style.width = `${width}px`;
   el.modalPanel.style.height = `${height}px`;
+  el.modalPanel.style.transform = `translate(${state.modalOffset.x}px, ${state.modalOffset.y}px)`;
+}
+
+function resetModalLayout() {
+  state.modalSize = null;
+  state.modalOffset = { x: 0, y: 0 };
+  applyModalSize();
+  persistState();
 }
 
 function speakerCountValue() {
@@ -713,7 +680,9 @@ function syncFormToDom() {
   el.templateSelect.value = templateOptionByValue(state.form.template).value;
   el.customPrompt.value = state.form.customPrompt || "";
   el.llmLanguage.value = state.form.llmLanguage || LANGUAGE_OPTIONS[0].backend;
-  el.wordCountLimit.value = state.form.wordCountLimit || DEFAULT_WORD_COUNT;
+  el.wordCountLimit.min = String(wordCountRange().min);
+  el.wordCountLimit.max = String(wordCountRange().max);
+  el.wordCountLimit.value = state.form.wordCountLimit || defaultWordCountLimit();
   el.manualTopic.value = state.form.manualTopic || "";
   el.manualLanguage.value = state.form.manualLanguage || LANGUAGE_OPTIONS[0].backend;
   el.manualText.value = state.form.manualText || "";
@@ -721,7 +690,7 @@ function syncFormToDom() {
   el.previewText.value = state.form.previewText || "";
   el.outputFormat.value = state.form.outputFormat || "MP3";
   el.preciseDuration.value = state.form.preciseDuration || "";
-  el.folderSelect.value = state.form.folder || "默认目录";
+  el.folderSelect.value = state.form.folder || defaultFolderOption();
   el.includeScripts.checked = Boolean(state.form.includeScripts);
 }
 
@@ -730,7 +699,10 @@ function persistState() {
   const payload = {
     modalOpen: state.modalOpen,
     tasks: state.tasks,
+    taskFilters: state.taskFilters,
+    advancedSearchOpen: state.advancedSearchOpen,
     modalSize: state.modalSize,
+    modalOffset: state.modalOffset,
     form: {
       ...state.form,
       keywords: [...state.form.keywords],
@@ -748,7 +720,10 @@ function restoreState() {
     const cached = JSON.parse(raw);
     state.modalOpen = cached.modalOpen !== false;
     state.tasks = Array.isArray(cached.tasks) ? cached.tasks.map(normalizeTask) : [];
+    state.taskFilters = { ...createDefaultTaskFilters(), ...(cached.taskFilters || {}) };
+    state.advancedSearchOpen = Boolean(cached.advancedSearchOpen);
     state.modalSize = cached.modalSize || null;
+    state.modalOffset = cached.modalOffset || { x: 0, y: 0 };
     state.form = {
       ...createDefaultFormState(),
       ...(cached.form || {}),
@@ -845,6 +820,17 @@ function renderTemplates() {
   el.templateSelect.innerHTML = state.templateOptions
     .map((option) => `<option value="${option.value}">${option.label}</option>`)
     .join("");
+}
+
+function renderFolderOptions() {
+  const folderOptions = [...(currentOnlineAudioConfig().folderOptions || [defaultFolderOption()])];
+  if (state.form.folder && !folderOptions.includes(state.form.folder)) {
+    folderOptions.push(state.form.folder);
+  }
+  const options = folderOptions.map(
+    (option) => `<option value="${escapeHtml(option)}">${escapeHtml(option)}</option>`
+  );
+  el.folderSelect.innerHTML = options.join("");
 }
 
 function renderLanguages() {
@@ -984,8 +970,43 @@ function taskCanOpen(task) {
   return Boolean(task?.snapshot?.form || task?.dialogueId || task?.title);
 }
 
+function filteredTasks() {
+  const query = normalizeText(state.taskFilters.query || "").toLocaleLowerCase();
+  return [...state.tasks]
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
+    .filter((task) => {
+      if (state.taskFilters.status !== "all" && task.status !== state.taskFilters.status) return false;
+      if (state.taskFilters.source !== "all" && (task.sourceLabel === "上传" ? "上传" : "生成") !== state.taskFilters.source) return false;
+      if (state.taskFilters.staleOnly && !isTaskStale(task)) return false;
+      if (!query) return true;
+      const haystack = [
+        task.title,
+        task.fileName,
+        task.textFileName,
+        task.status,
+        task.sourceLabel,
+        formatTimestamp(task.createdAt)
+      ]
+        .join(" ")
+        .toLocaleLowerCase();
+      return haystack.includes(query);
+    });
+}
+
+function renderTaskSearchUi() {
+  el.taskSearchInput.value = state.taskFilters.query || "";
+  el.taskStatusFilter.value = state.taskFilters.status || "all";
+  el.taskSourceFilter.value = state.taskFilters.source || "all";
+  el.staleOnlyFilter.checked = Boolean(state.taskFilters.staleOnly);
+  el.taskFilterBar.classList.toggle("hidden", !state.advancedSearchOpen);
+  el.advancedSearchBtn.textContent = state.advancedSearchOpen ? "收起筛选" : "高级筛选";
+  const total = state.tasks.length;
+  const shown = filteredTasks().length;
+  el.taskSummary.textContent = total ? `当前显示 ${shown} / ${total} 条任务` : "当前暂无任务";
+}
+
 function renderTasks() {
-  const tasks = [...state.tasks].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const tasks = filteredTasks();
   el.taskTableBody.innerHTML = tasks
     .map(
       (task) => `
@@ -1019,6 +1040,13 @@ function renderTasks() {
     )
     .join("");
   el.taskEmpty.classList.toggle("hidden", tasks.length > 0);
+  if (!tasks.length && state.tasks.length > 0) {
+    el.taskEmpty.querySelector(".empty-title").textContent = "当前筛选条件下暂无任务";
+    el.taskEmpty.querySelector(".empty-desc").textContent = "可以清空搜索或筛选条件后，再查看已有任务。";
+  } else {
+    el.taskEmpty.querySelector(".empty-title").textContent = "暂无生成任务";
+    el.taskEmpty.querySelector(".empty-desc").textContent = "点击右上角“在线生成音频”，按原型流程提交一条生成任务。";
+  }
 }
 
 function renderShareBox(payload) {
@@ -1032,6 +1060,7 @@ function renderShareBox(payload) {
 function renderAll() {
   renderTemplates();
   renderLanguages();
+  renderFolderOptions();
   renderPresetTopics();
   syncFormToDom();
   renderTagEditor(el.keywordWrap, el.keywordInput, state.form.keywords, removeKeyword);
@@ -1040,6 +1069,7 @@ function renderAll() {
   renderVoiceRows();
   renderKeywordHighlightPreview();
   renderSubmitState();
+  renderTaskSearchUi();
   renderTasks();
   renderModalVisibility();
   setModalMessage(state.form.modalMessage, state.form.modalMessageType);
@@ -1118,6 +1148,7 @@ function validateLlmBeforeGenerateText() {
   const topic = resolvedLlmTopic();
   const templateValue = el.templateSelect.value;
   const wordCount = Number(el.wordCountLimit.value || 0);
+  const { min: minWordCount, max: maxWordCount } = wordCountRange();
 
   if (topicMode === "preset" && !el.presetTopicSelect.value) {
     return "请选择预置文本主题";
@@ -1137,8 +1168,8 @@ function validateLlmBeforeGenerateText() {
   if (speakerCountValue() < 2) {
     return "LLM 生成对话时，说话人数至少需要 2 人";
   }
-  if (!Number.isInteger(wordCount) || wordCount < 100 || wordCount > 3000) {
-    return "字数限制需在 100 到 3000 之间";
+  if (!Number.isInteger(wordCount) || wordCount < minWordCount || wordCount > maxWordCount) {
+    return `字数限制需在 ${minWordCount} 到 ${maxWordCount} 之间`;
   }
   return "";
 }
@@ -1553,6 +1584,40 @@ function initModalResize() {
   });
 }
 
+function initModalDrag() {
+  if (!el.modalPanel || !el.modalHeader) return;
+
+  el.modalHeader.addEventListener("dblclick", (event) => {
+    if (event.target.closest("button")) return;
+    resetModalLayout();
+  });
+
+  el.modalHeader.addEventListener("pointerdown", (event) => {
+    if (event.target.closest("button")) return;
+    event.preventDefault();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startOffset = { ...(state.modalOffset || { x: 0, y: 0 }) };
+
+    const move = (moveEvent) => {
+      state.modalOffset = clampModalOffset({
+        x: startOffset.x + moveEvent.clientX - startX,
+        y: startOffset.y + moveEvent.clientY - startY
+      });
+      applyModalSize();
+    };
+
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      persistState();
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+  });
+}
+
 function createTaskPlaceholder() {
   const workingText = currentWorkingText();
   const textFileName = state.form.generatedTextFileName || "";
@@ -1684,6 +1749,26 @@ async function loadPresetTopics() {
     state.form.template = state.templateOptions[0]?.value || "";
     console.warn("loadPresetTopics failed", error);
     setModalMessage(`预置文本主题加载失败：${error.message}`, "error");
+  }
+}
+
+async function loadOnlineAudioConfig() {
+  try {
+    const payload = await fetchJson("/api/online_audio_config");
+    const config = cloneOnlineAudioConfig(payload.config || FALLBACK_ONLINE_AUDIO_CONFIG);
+    state.onlineAudioConfig = config;
+    const currentTemplateLabel = normalizeTemplateDropdownLabel(templateOptionByValue(state.form.template)?.label || "");
+    state.templateOptions = (config.templateCatalog || []).map((item) => ({
+      value: dynamicTemplateValue(item.label),
+      label: item.label
+    }));
+    state.form.template = currentTemplateLabel ? ensureTemplateOption(currentTemplateLabel) : state.templateOptions[0]?.value || "";
+    state.form.wordCountLimit = state.form.wordCountLimit || defaultWordCountLimit();
+    state.form.folder = state.form.folder || defaultFolderOption();
+  } catch (error) {
+    state.onlineAudioConfig = cloneOnlineAudioConfig(FALLBACK_ONLINE_AUDIO_CONFIG);
+    console.warn("loadOnlineAudioConfig failed", error);
+    setModalMessage(`在线音频配置加载失败，已使用默认配置：${error.message}`, "error");
   }
 }
 
@@ -1921,8 +2006,61 @@ async function handleTaskTableClick(event) {
 
 function bindEvents() {
   initModalResize();
+  initModalDrag();
   window.addEventListener("resize", applyModalSize);
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.modalOpen) {
+      closeModal();
+    }
+  });
+  el.modalOverlay.addEventListener("click", (event) => {
+    if (event.target === el.modalOverlay) {
+      closeModal();
+    }
+  });
+  el.resetModalLayoutBtn.addEventListener("click", resetModalLayout);
   el.copyShareBtn.addEventListener("click", copyShareLink);
+  el.taskSearchInput.addEventListener("input", () => {
+    state.taskFilters.query = el.taskSearchInput.value;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.taskSearchBtn.addEventListener("click", () => {
+    state.taskFilters.query = el.taskSearchInput.value;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.advancedSearchBtn.addEventListener("click", () => {
+    state.advancedSearchOpen = !state.advancedSearchOpen;
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.taskStatusFilter.addEventListener("change", () => {
+    state.taskFilters.status = el.taskStatusFilter.value;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.taskSourceFilter.addEventListener("change", () => {
+    state.taskFilters.source = el.taskSourceFilter.value;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.staleOnlyFilter.addEventListener("change", () => {
+    state.taskFilters.staleOnly = el.staleOnlyFilter.checked;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.clearTaskFiltersBtn.addEventListener("click", () => {
+    state.taskFilters = createDefaultTaskFilters();
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
   el.cleanupOldTasksBtn.addEventListener("click", () => {
     void cleanupOldTasks();
   });
@@ -2025,6 +2163,7 @@ function bindEvents() {
 
 async function init() {
   restoreState();
+  await loadOnlineAudioConfig();
   await loadPresetTopics();
   bindEvents();
   renderAll();

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>音频语料生成平台 Demo</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260402f" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260402g" />
   </head>
   <body>
     <div class="app-shell">
@@ -35,13 +35,43 @@
       <main class="workspace">
         <section class="workspace-toolbar">
           <div class="search-wrap">
-            <input class="input-field" type="text" placeholder="搜索文件名关键词…" disabled />
-            <button class="btn btn-primary btn-sm" type="button" disabled>搜索</button>
-            <button class="btn btn-secondary btn-sm" type="button" disabled>高级搜索</button>
+            <input id="taskSearchInput" class="input-field" type="text" placeholder="搜索任务标题、文件名或状态…" />
+            <button id="taskSearchBtn" class="btn btn-primary btn-sm" type="button">搜索</button>
+            <button id="advancedSearchBtn" class="btn btn-secondary btn-sm" type="button">高级筛选</button>
           </div>
           <div class="toolbar-actions">
             <button id="uploadBtn" class="btn btn-secondary" type="button">上传文件</button>
             <button id="openOnlineAudioBtn" class="btn btn-primary" type="button">+ 在线生成音频</button>
+          </div>
+        </section>
+
+        <section id="taskFilterBar" class="task-filter-bar hidden">
+          <div class="filter-grid">
+            <div class="filter-field">
+              <label for="taskStatusFilter">状态</label>
+              <select id="taskStatusFilter" class="select-field">
+                <option value="all">全部状态</option>
+                <option value="生成成功">生成成功</option>
+                <option value="生成失败">生成失败</option>
+                <option value="语音合成中">语音合成中</option>
+                <option value="文本生成中">文本生成中</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="taskSourceFilter">来源</label>
+              <select id="taskSourceFilter" class="select-field">
+                <option value="all">全部来源</option>
+                <option value="生成">生成</option>
+                <option value="上传">上传</option>
+              </select>
+            </div>
+            <label class="checkbox-row filter-checkbox" for="staleOnlyFilter">
+              <input id="staleOnlyFilter" type="checkbox" />
+              <span>只看过时任务（24 小时前）</span>
+            </label>
+            <div class="filter-actions">
+              <button id="clearTaskFiltersBtn" class="btn btn-secondary btn-sm" type="button">清空筛选</button>
+            </div>
           </div>
         </section>
 
@@ -52,6 +82,7 @@
               <div class="table-subtitle">提交在线生成任务后，会在这里查看状态和下载结果。</div>
             </div>
             <div class="table-head-actions">
+              <span id="taskSummary" class="task-summary">当前暂无任务</span>
               <button id="cleanupOldTasksBtn" class="btn btn-secondary btn-sm" type="button">清理过时任务</button>
             </div>
           </div>
@@ -81,9 +112,12 @@
 
     <div id="modalOverlay" class="modal-overlay open">
       <div id="modalPanel" class="modal-panel">
-        <div class="modal-header">
+        <div id="modalHeader" class="modal-header">
           <div class="modal-title">在线生成音频</div>
-          <button id="closeModalBtn" class="modal-close" type="button" aria-label="关闭">×</button>
+          <div class="modal-header-actions">
+            <button id="resetModalLayoutBtn" class="modal-header-btn" type="button">重置布局</button>
+            <button id="closeModalBtn" class="modal-close" type="button" aria-label="关闭">×</button>
+          </div>
         </div>
 
         <div class="modal-body">
@@ -293,6 +327,6 @@
       </div>
     </div>
 
-    <script src="/static/app.js?v=20260402f"></script>
+    <script src="/static/app.js?v=20260402g"></script>
   </body>
 </html>
