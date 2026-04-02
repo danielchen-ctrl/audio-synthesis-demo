@@ -40,6 +40,135 @@ const PRESET_TEMPLATE_LABELS = [
   "测试开发｜朋友圈项目"
 ];
 
+const TEMPLATE_CONTEXT_MAP = {
+  "医疗健康｜慢病随访": {
+    primaryRole: "随访医生",
+    supportingRoles: ["患者本人", "家属", "随访护士"],
+    discussionAxes: ["症状变化", "用药执行", "复查节点", "风险提示", "患者配合"],
+    deliverable: "形成清晰的随访安排、复查节点和注意事项",
+    goalStem: "围绕慢病随访过程中的当前情况、风险判断和后续安排展开真实交流"
+  },
+  "人力资源与招聘｜招聘补岗": {
+    primaryRole: "招聘负责人",
+    supportingRoles: ["业务部门经理", "HRBP", "用人主管"],
+    discussionAxes: ["岗位缺口", "优先级", "候选人画像", "渠道策略", "到岗时间"],
+    deliverable: "明确补岗优先级、招聘策略和推进节奏",
+    goalStem: "围绕招聘补岗过程中的岗位画像、时间压力和渠道策略展开讨论"
+  },
+  "娱乐/媒体｜艺人商业化": {
+    primaryRole: "商务负责人",
+    supportingRoles: ["经纪人", "品牌负责人", "内容运营"],
+    discussionAxes: ["商业定位", "品牌匹配", "报价策略", "执行风险", "转化目标"],
+    deliverable: "形成艺人商业化推进策略和合作判断",
+    goalStem: "围绕艺人商业化中的品牌合作、资源投入和转化效果展开讨论"
+  },
+  "建筑与工程行业｜项目交付": {
+    primaryRole: "项目经理",
+    supportingRoles: ["工程负责人", "甲方代表", "采购或成本负责人"],
+    discussionAxes: ["交付进度", "现场问题", "成本控制", "风险处理", "验收节点"],
+    deliverable: "形成项目交付问题清单和推进方案",
+    goalStem: "围绕项目交付中的进度、成本、现场风险和验收安排展开讨论"
+  },
+  "汽车行业｜车型投放": {
+    primaryRole: "车型项目负责人",
+    supportingRoles: ["市场负责人", "销售负责人", "区域运营代表"],
+    discussionAxes: ["投放节奏", "渠道准备", "卖点表达", "库存规划", "区域反馈"],
+    deliverable: "形成车型投放节奏和重点动作安排",
+    goalStem: "围绕车型投放中的市场准备、渠道协同和节奏控制展开讨论"
+  },
+  "咨询/专业服务｜客户拓展": {
+    primaryRole: "客户拓展负责人",
+    supportingRoles: ["顾问经理", "行业顾问", "交付负责人"],
+    discussionAxes: ["客户诉求", "方案切入", "关系推进", "报价策略", "交付匹配"],
+    deliverable: "形成客户拓展策略和下一步推进动作",
+    goalStem: "围绕客户拓展中的切入点、关系推进和方案竞争力展开讨论"
+  },
+  "法律服务｜法顾专项": {
+    primaryRole: "法务顾问",
+    supportingRoles: ["客户负责人", "专项律师", "合规经理"],
+    discussionAxes: ["风险识别", "证据材料", "处理方案", "边界判断", "执行安排"],
+    deliverable: "形成法顾专项的处理路径和分工建议",
+    goalStem: "围绕法顾专项中的法律风险、证据准备和执行方案展开讨论"
+  },
+  "金融/投资｜资产配置": {
+    primaryRole: "投顾负责人",
+    supportingRoles: ["客户经理", "研究员", "风险控制负责人"],
+    discussionAxes: ["配置目标", "风险偏好", "资金安排", "收益预期", "调整策略"],
+    deliverable: "形成清晰的资产配置建议和风险提示",
+    goalStem: "围绕资产配置中的收益目标、风险偏好和组合调整展开讨论"
+  },
+  "零售行业｜会员复购": {
+    primaryRole: "会员运营负责人",
+    supportingRoles: ["门店负责人", "活动运营", "数据分析师"],
+    discussionAxes: ["会员分层", "活动策略", "复购触达", "门店配合", "效果验证"],
+    deliverable: "形成会员复购提升方案和执行节奏",
+    goalStem: "围绕会员复购中的触达策略、门店配合和活动效果展开讨论"
+  },
+  "保险行业｜保险质检": {
+    primaryRole: "质检负责人",
+    supportingRoles: ["销售主管", "培训负责人", "合规专员"],
+    discussionAxes: ["录音质检", "销售话术", "风险点", "培训改进", "复盘闭环"],
+    deliverable: "形成保险质检问题结论和改进动作",
+    goalStem: "围绕保险质检中的话术风险、培训改进和问题闭环展开讨论"
+  },
+  "房地产｜项目去化": {
+    primaryRole: "项目营销负责人",
+    supportingRoles: ["渠道经理", "案场负责人", "投放运营"],
+    discussionAxes: ["去化压力", "客源结构", "渠道效率", "价格策略", "案场转化"],
+    deliverable: "形成项目去化提效方案和短期动作安排",
+    goalStem: "围绕项目去化中的渠道效率、案场转化和价格策略展开讨论"
+  },
+  "人工智能/科技｜付费转化": {
+    primaryRole: "增长负责人",
+    supportingRoles: ["产品经理", "数据分析师", "运营负责人"],
+    discussionAxes: ["转化漏斗", "付费门槛", "试用策略", "价值感知", "数据回收"],
+    deliverable: "形成付费转化优化方案和实验计划",
+    goalStem: "围绕付费转化中的产品策略、转化漏斗和数据验证展开讨论"
+  },
+  "制造业｜产线提效": {
+    primaryRole: "产线负责人",
+    supportingRoles: ["工艺工程师", "设备负责人", "质量经理"],
+    discussionAxes: ["瓶颈工序", "设备效率", "良率波动", "排产协同", "异常处理"],
+    deliverable: "形成产线提效方案和关键改善动作",
+    goalStem: "围绕产线提效中的瓶颈工序、设备效率和质量稳定性展开讨论"
+  },
+  "娱乐/媒体｜战略周会": {
+    primaryRole: "业务负责人",
+    supportingRoles: ["内容负责人", "增长负责人", "商务负责人"],
+    discussionAxes: ["业务目标", "资源投入", "进展复盘", "重点风险", "下周动作"],
+    deliverable: "形成战略周会的重点决策和分工安排",
+    goalStem: "围绕战略周会中的业务目标、资源分配和重点风险展开讨论"
+  },
+  "法律服务｜广告合规": {
+    primaryRole: "法务负责人",
+    supportingRoles: ["市场负责人", "品牌经理", "合规专员"],
+    discussionAxes: ["广告表述", "风险边界", "素材审核", "整改建议", "上线条件"],
+    deliverable: "形成广告合规判断和修改建议",
+    goalStem: "围绕广告合规中的风险边界、素材表述和整改方案展开讨论"
+  },
+  "保险行业｜销售洞察": {
+    primaryRole: "销售管理负责人",
+    supportingRoles: ["区域经理", "培训负责人", "数据分析师"],
+    discussionAxes: ["销售表现", "客户反馈", "转化瓶颈", "团队差异", "改善动作"],
+    deliverable: "形成销售洞察结论和管理改进动作",
+    goalStem: "围绕销售洞察中的客户反馈、团队差异和改善动作展开讨论"
+  },
+  "测试开发｜支付项目": {
+    primaryRole: "测试负责人",
+    supportingRoles: ["服务端开发", "客户端开发", "产品经理", "质量负责人"],
+    discussionAxes: ["支付接入", "下单回调", "退款安全", "对账差错", "稳定性准入"],
+    deliverable: "形成支付项目的测试范围、风险清单和上线准入结论",
+    goalStem: "围绕支付项目中的链路完整性、异常兜底和上线风险展开讨论"
+  },
+  "测试开发｜朋友圈项目": {
+    primaryRole: "测试负责人",
+    supportingRoles: ["客户端开发", "服务端开发", "产品经理", "运营负责人"],
+    discussionAxes: ["内容发布", "多端分发", "互动一致性", "隐私可见性", "内容审核", "容量与准入"],
+    deliverable: "形成朋友圈项目的重点测试范围、风险判断和准入结论",
+    goalStem: "围绕朋友圈项目中的内容链路、可见性规则和容量风险展开讨论"
+  }
+};
+
 const TEST_DEV_TEMPLATE_GROUPS = {
   "测试开发｜支付接入": "测试开发｜支付项目",
   "测试开发｜下单回调": "测试开发｜支付项目",
@@ -297,6 +426,76 @@ function ensureTemplateOption(label) {
   const next = { value: dynamicTemplateValue(normalized), label: normalized };
   state.templateOptions = [...state.templateOptions, next];
   return next.value;
+}
+
+function uniqueStrings(items) {
+  const result = [];
+  (items || []).forEach((item) => {
+    const normalized = String(item || "").trim();
+    if (normalized && !result.includes(normalized)) {
+      result.push(normalized);
+    }
+  });
+  return result;
+}
+
+function splitTemplateLabelParts(label) {
+  const parts = String(label || "")
+    .split("｜")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) {
+    return { domain: parts[0], sceneType: parts.slice(1).join("｜") };
+  }
+  return { domain: "", sceneType: String(label || "").trim() || "业务场景" };
+}
+
+function templateContextForLabel(templateLabel, topic, keywordTerms = []) {
+  const normalizedLabel = normalizeTemplateDropdownLabel(templateLabel);
+  const base = TEMPLATE_CONTEXT_MAP[normalizedLabel] || {};
+  const { domain, sceneType } = splitTemplateLabelParts(normalizedLabel);
+  const topicText = String(topic || "").trim() || sceneType || "业务议题";
+  const discussionAxes = uniqueStrings([
+    ...(base.discussionAxes || []),
+    ...keywordTerms
+  ]);
+  return {
+    label: normalizedLabel,
+    domain: base.domain || domain || "通用业务",
+    sceneType: base.sceneType || sceneType || "场景讨论",
+    primaryRole: base.primaryRole || `${domain || "业务"}负责人`,
+    supportingRoles: uniqueStrings(base.supportingRoles || ["执行负责人", "协作方代表", "数据或质量代表"]),
+    discussionAxes: discussionAxes.length ? discussionAxes : ["当前现状", "主要风险", "推进节奏", "验收标准"],
+    deliverable: base.deliverable || `形成围绕${topicText}的下一步方案、责任分工和验证口径`,
+    goalStem: base.goalStem || `围绕${topicText}中的现状、风险、方案选择和推进节奏展开讨论`
+  };
+}
+
+function buildRoleBriefs(templateContext, speakerCount) {
+  const roles = uniqueStrings([templateContext.primaryRole, ...(templateContext.supportingRoles || [])]);
+  while (roles.length < speakerCount) {
+    roles.push(`相关协作方${roles.length}`);
+  }
+  return roles.slice(0, speakerCount);
+}
+
+function buildGenerationContext(templateLabel, topic, keywordTerms = []) {
+  const templateContext = templateContextForLabel(templateLabel, topic, keywordTerms);
+  const roleBriefs = buildRoleBriefs(templateContext, speakerCountValue());
+  return {
+    domain: templateContext.domain,
+    scene_type: templateContext.sceneType,
+    scene_goal: `${templateContext.goalStem}，主题聚焦“${String(topic || "").trim() || templateContext.sceneType}”`,
+    deliverable: templateContext.deliverable,
+    discussion_axes: templateContext.discussionAxes,
+    role_briefs: roleBriefs,
+    quality_constraints: [
+      "必须口语化、真实、避免套话",
+      "每个说话人都要有明确立场和信息量",
+      "避免中英混杂和空洞重复",
+      "对话要围绕事实、风险、动作和结论推进"
+    ]
+  };
 }
 
 function buildTemplateOptionsFromPresets(presets) {
@@ -972,32 +1171,36 @@ function validateBeforeSubmit() {
   return validateSpeakerConsistency(el.manualText.value);
 }
 
-function buildProfileFromTemplate(templateLabel, topic) {
-  const normalizedTemplate = String(templateLabel || "通用对话").trim() || "通用对话";
+function buildProfileFromTemplate(templateLabel, topic, generationContext = null) {
+  const context = generationContext || buildGenerationContext(templateLabel, topic, []);
   const normalizedTopic = String(topic || "在线生成音频").trim() || "在线生成音频";
   return {
-    job_function: normalizedTemplate,
+    job_function: context.primaryRole || context.label || "通用对话",
     work_content: normalizedTopic,
-    seniority: "标准",
-    use_case: normalizedTemplate
+    seniority: "资深",
+    use_case: `${context.domain || "通用业务"}｜${context.scene_type || context.label || "场景讨论"}`
   };
 }
 
-function buildManualTopicScenario(templateLabel, topic) {
-  const normalizedTemplate = String(templateLabel || "通用对话").trim() || "通用对话";
-  const normalizedTopic = String(topic || "").trim();
-  if (!normalizedTopic) {
-    return `${normalizedTemplate}场景对话`;
-  }
-  return `${normalizedTemplate}：围绕“${normalizedTopic}”展开真实自然的多轮场景对话`;
+function buildManualTopicScenario(templateLabel, topic, generationContext = null) {
+  const context = generationContext || buildGenerationContext(templateLabel, topic, []);
+  const normalizedTopic = String(topic || "").trim() || context.scene_type || "业务议题";
+  const roles = (context.role_briefs || []).join("、");
+  const axes = (context.discussion_axes || []).slice(0, 5).join("、");
+  return `场景：${context.scene_goal}。参与角色：${roles}。重点讨论：${axes}。最终目标：${context.deliverable}。主题：${normalizedTopic}。`;
 }
 
-function buildManualTopicCoreContent(templateLabel, topic) {
+function buildManualTopicCoreContent(templateLabel, topic, generationContext = null) {
+  const context = generationContext || buildGenerationContext(templateLabel, topic, state.form.keywords);
   const keywordTerms = [...state.form.keywords];
   const contentParts = [
     `文本主题：${topic}`,
     `主题模板：${templateLabel}`,
-    `请生成自然、真实、口语化的多轮对话文本`
+    `行业场景：${context.domain}，场景类型：${context.scene_type}`,
+    `角色分工：${(context.role_briefs || []).join("、")}`,
+    `讨论重点：${(context.discussion_axes || []).join("、")}`,
+    `目标输出：${context.deliverable}`,
+    `写作要求：${(context.quality_constraints || []).join("；")}`
   ];
 
   if (keywordTerms.length) {
@@ -1016,12 +1219,17 @@ function buildGenerateTextPayload() {
   const wordCount = Number(el.wordCountLimit.value || DEFAULT_WORD_COUNT);
   const keywordTerms = [...state.form.keywords];
   const preset = currentPresetTopic();
+  const generationContext = buildGenerationContext(template.label, topic, keywordTerms);
 
   if (currentTopicInputMode() === "preset" && preset) {
     const coreParts = [];
     if (preset.core_content) {
       coreParts.push(preset.core_content);
     }
+    coreParts.push(`角色分工：${generationContext.role_briefs.join("、")}`);
+    coreParts.push(`讨论重点：${generationContext.discussion_axes.join("、")}`);
+    coreParts.push(`目标输出：${generationContext.deliverable}`);
+    coreParts.push(`写作要求：${generationContext.quality_constraints.join("；")}`);
     if (keywordTerms.length) {
       coreParts.push(`核心对话内容：请在最终文本中明确体现这些关键词——${keywordTerms.join("，")}`);
     }
@@ -1031,8 +1239,8 @@ function buildGenerateTextPayload() {
 
     return {
       title: preset.topic_text || topic,
-      profile: preset.profile || buildProfileFromTemplate(template.label, preset.topic_text || topic),
-      scenario: preset.scenario || buildManualTopicScenario(template.label, preset.topic_text || topic),
+      profile: preset.profile || buildProfileFromTemplate(template.label, preset.topic_text || topic, generationContext),
+      scenario: `${preset.scenario || buildManualTopicScenario(template.label, preset.topic_text || topic, generationContext)} 参与角色：${generationContext.role_briefs.join("、")}。`,
       core_content: coreParts.join("；"),
       people_count: speakerCountValue(),
       word_count: wordCount,
@@ -1045,15 +1253,16 @@ function buildGenerateTextPayload() {
       keyword_terms: keywordTerms,
       topic_input_mode: "preset",
       preset_id: preset.id,
-      preset_source_title: preset.source_title || ""
+      preset_source_title: preset.source_title || "",
+      generation_context: generationContext
     };
   }
 
   return {
     title: topic,
-    profile: buildProfileFromTemplate(template.label, topic),
-    scenario: buildManualTopicScenario(template.label, topic),
-    core_content: buildManualTopicCoreContent(template.label, topic),
+    profile: buildProfileFromTemplate(template.label, topic, generationContext),
+    scenario: buildManualTopicScenario(template.label, topic, generationContext),
+    core_content: buildManualTopicCoreContent(template.label, topic, generationContext),
     people_count: speakerCountValue(),
     word_count: wordCount,
     language: el.llmLanguage.value,
@@ -1063,7 +1272,8 @@ function buildGenerateTextPayload() {
     folder: el.folderSelect.value,
     source_mode: "llm",
     keyword_terms: keywordTerms,
-    topic_input_mode: "manual"
+    topic_input_mode: "manual",
+    generation_context: generationContext
   };
 }
 

@@ -262,6 +262,30 @@ def _safe_profile(payload: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def _safe_generation_context(payload: dict[str, Any]) -> dict[str, Any]:
+    context = payload.get("generation_context") or {}
+    if not isinstance(context, dict):
+        return {}
+    return {
+        "domain": str(context.get("domain") or "").strip(),
+        "scene_type": str(context.get("scene_type") or "").strip(),
+        "scene_goal": str(context.get("scene_goal") or "").strip(),
+        "deliverable": str(context.get("deliverable") or "").strip(),
+        "role_briefs": _safe_str_list(context.get("role_briefs")),
+        "discussion_axes": _safe_str_list(context.get("discussion_axes")),
+        "quality_constraints": _safe_str_list(context.get("quality_constraints")),
+    }
+
+
+def _merge_text_parts(*parts: str) -> str:
+    merged: list[str] = []
+    for part in parts:
+        normalized = str(part or "").strip()
+        if normalized and normalized not in merged:
+            merged.append(normalized)
+    return "；".join(merged)
+
+
 def _safe_int(value: Any, default: int) -> int:
     try:
         return int(value)
@@ -460,6 +484,7 @@ def _new_dialogue_id() -> str:
 
 def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[str, Any]:
     profile = _safe_profile(payload)
+    generation_context = _safe_generation_context(payload)
     scenario = str(payload.get("scenario") or "").strip()
     core_content = str(payload.get("core_content") or "").strip()
     people_count = max(2, min(10, _safe_int(payload.get("people_count"), 3)))
@@ -470,6 +495,21 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     tags = payload.get("tags") or []
     keyword_terms = _safe_str_list(payload.get("keyword_terms"))
     folder = str(payload.get("folder") or "默认目录").strip() or "默认目录"
+
+    if generation_context.get("domain") and profile["use_case"] == "general_use_case":
+        scene_type = generation_context.get("scene_type") or template_label or "场景讨论"
+        profile["use_case"] = f"{generation_context['domain']}｜{scene_type}"
+    if generation_context.get("role_briefs") and profile["job_function"] == "unknown_job_function":
+        profile["job_function"] = generation_context["role_briefs"][0]
+    if generation_context.get("scene_goal"):
+        scenario = _merge_text_parts(scenario, generation_context["scene_goal"], f"参与角色：{'、'.join(generation_context.get('role_briefs', []))}")
+    if generation_context.get("discussion_axes") or generation_context.get("deliverable") or generation_context.get("quality_constraints"):
+        core_content = _merge_text_parts(
+            core_content,
+            f"重点讨论：{'、'.join(generation_context.get('discussion_axes', []))}" if generation_context.get("discussion_axes") else "",
+            f"目标输出：{generation_context.get('deliverable', '')}" if generation_context.get("deliverable") else "",
+            f"写作要求：{'；'.join(generation_context.get('quality_constraints', []))}" if generation_context.get("quality_constraints") else "",
+        )
 
     lines, rewrite_info = bundle_server._generate_dialogue_lines(
         profile,
@@ -489,6 +529,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         target_word_count=word_count,
         people_count=people_count,
         keywords=keyword_terms,
+        generation_context=generation_context,
     )
     if repair_meta.get("repaired"):
         lines = repaired_lines
@@ -500,6 +541,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         scenario=scenario,
         core_content=core_content,
         profile=profile,
+        generation_context=generation_context,
     )
     dialogue_text = _render_dialogue_text(bundle_server, lines)
     normalized_lines = _normalize_lines(bundle_server, lines)
@@ -532,6 +574,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         "topic_input_mode": str(payload.get("topic_input_mode") or "manual").strip() or "manual",
         "preset_id": str(payload.get("preset_id") or "").strip(),
         "preset_source_title": str(payload.get("preset_source_title") or "").strip(),
+        "generation_context": generation_context,
         "save_dir": str(save_dir),
         "text_path": str(text_path),
         "text_updated_at": updated_at,
