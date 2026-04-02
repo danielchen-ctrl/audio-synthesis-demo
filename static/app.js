@@ -499,20 +499,25 @@ function buildGenerationContext(templateLabel, topic, keywordTerms = []) {
 }
 
 function buildTemplateOptionsFromPresets(presets) {
-  const seen = new Set();
-  const options = [];
+  const labelsFromPresets = new Set();
 
   (Array.isArray(presets) ? presets : []).forEach((preset) => {
     const label = templateDisplayLabelFromPreset(preset);
-    if (!label || seen.has(label)) return;
-    seen.add(label);
-    options.push({
-      value: dynamicTemplateValue(label),
-      label
-    });
+    if (label) {
+      labelsFromPresets.add(label);
+    }
   });
 
-  return options.length ? options : [...BASE_TEMPLATE_OPTIONS];
+  const orderedLabels = PRESET_TEMPLATE_LABELS.filter((label) => labelsFromPresets.has(label));
+  const extraLabels = [...labelsFromPresets].filter((label) => !PRESET_TEMPLATE_LABELS.includes(label)).sort();
+  const finalLabels = [...orderedLabels, ...extraLabels];
+
+  return finalLabels.length
+    ? finalLabels.map((label) => ({
+        value: dynamicTemplateValue(label),
+        label
+      }))
+    : [...BASE_TEMPLATE_OPTIONS];
 }
 
 function presetTopicById(id) {
