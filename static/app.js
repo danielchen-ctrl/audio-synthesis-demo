@@ -19,19 +19,41 @@ const LANGUAGE_OPTIONS = [
   { label: "印度尼西亚语", backend: "Indonesian", code: "id" }
 ];
 
-const BASE_TEMPLATE_OPTIONS = [
-  { value: "meeting", label: "会议讨论" },
-  { value: "interview", label: "访谈" },
-  { value: "medical", label: "问诊" },
-  { value: "review", label: "评审会" },
-  { value: "customer", label: "客户访谈" },
-  { value: "internal", label: "内部会议" },
-  { value: "decision", label: "方案决策" },
-  { value: "troubleshooting", label: "问题排查" },
-  { value: "strategy", label: "战略周会" },
-  { value: "other", label: "其他" },
-  { value: "custom", label: "自定义" }
+const PRESET_TEMPLATE_LABELS = [
+  "医疗健康｜慢病随访",
+  "人力资源与招聘｜招聘补岗",
+  "娱乐/媒体｜艺人商业化",
+  "建筑与工程行业｜项目交付",
+  "汽车行业｜车型投放",
+  "咨询/专业服务｜客户拓展",
+  "法律服务｜法顾专项",
+  "金融/投资｜资产配置",
+  "零售行业｜会员复购",
+  "保险行业｜保险质检",
+  "房地产｜项目去化",
+  "人工智能/科技｜付费转化",
+  "制造业｜产线提效",
+  "娱乐/媒体｜战略周会",
+  "法律服务｜广告合规",
+  "保险行业｜销售洞察",
+  "测试开发｜支付接入",
+  "测试开发｜下单回调",
+  "测试开发｜退款安全",
+  "测试开发｜对账差错",
+  "测试开发｜稳定性准入",
+  "测试开发｜朋友圈项目",
+  "测试开发｜内容发布",
+  "测试开发｜多端分发",
+  "测试开发｜互动一致性",
+  "测试开发｜隐私可见性",
+  "测试开发｜内容审核",
+  "测试开发｜容量与准入"
 ];
+
+const BASE_TEMPLATE_OPTIONS = PRESET_TEMPLATE_LABELS.map((label) => ({
+  value: dynamicTemplateValue(label),
+  label
+}));
 
 const VOICE_LIBRARY = {
   Chinese: [
@@ -94,7 +116,7 @@ function createDefaultFormState() {
     topicInputMode: "manual",
     llmTopic: "",
     selectedPresetId: "",
-    template: BASE_TEMPLATE_OPTIONS[0].value,
+    template: BASE_TEMPLATE_OPTIONS[0]?.value || "",
     customPrompt: "",
     llmLanguage: LANGUAGE_OPTIONS[0].backend,
     wordCountLimit: DEFAULT_WORD_COUNT,
@@ -238,6 +260,14 @@ function templateOptionByLabel(label) {
   return state.templateOptions.find((item) => item.label === label) || null;
 }
 
+function templateDisplayLabelFromPreset(preset) {
+  const displayTitle = String(preset?.display_title || "").trim();
+  if (displayTitle) return displayTitle;
+  const templateLabel = String(preset?.template_label || "").trim();
+  if (templateLabel) return templateLabel;
+  return "";
+}
+
 function dynamicTemplateValue(label) {
   const code = Array.from(String(label || "其他"))
     .map((char) => char.codePointAt(0).toString(16))
@@ -256,6 +286,23 @@ function ensureTemplateOption(label) {
   const next = { value: dynamicTemplateValue(normalized), label: normalized };
   state.templateOptions = [...state.templateOptions, next];
   return next.value;
+}
+
+function buildTemplateOptionsFromPresets(presets) {
+  const seen = new Set();
+  const options = [];
+
+  (Array.isArray(presets) ? presets : []).forEach((preset) => {
+    const label = templateDisplayLabelFromPreset(preset);
+    if (!label || seen.has(label)) return;
+    seen.add(label);
+    options.push({
+      value: dynamicTemplateValue(label),
+      label
+    });
+  });
+
+  return options.length ? options : [...BASE_TEMPLATE_OPTIONS];
 }
 
 function presetTopicById(id) {
@@ -1392,12 +1439,9 @@ async function loadPresetTopics() {
   try {
     const payload = await fetchJson("/api/preset_topics");
     state.presetTopics = Array.isArray(payload.presets) ? payload.presets : [];
-    state.templateOptions = [...BASE_TEMPLATE_OPTIONS];
-    state.presetTopics.forEach((preset) => {
-      if (preset.template_label) {
-        ensureTemplateOption(preset.template_label);
-      }
-    });
+    const currentTemplateLabel = templateOptionByValue(state.form.template)?.label || "";
+    state.templateOptions = buildTemplateOptionsFromPresets(state.presetTopics);
+    state.form.template = currentTemplateLabel ? ensureTemplateOption(currentTemplateLabel) : state.templateOptions[0]?.value || "";
 
     if (state.form.selectedPresetId && !presetTopicById(state.form.selectedPresetId)) {
       state.form.selectedPresetId = "";
@@ -1409,6 +1453,7 @@ async function loadPresetTopics() {
   } catch (error) {
     state.presetTopics = [];
     state.templateOptions = [...BASE_TEMPLATE_OPTIONS];
+    state.form.template = state.templateOptions[0]?.value || "";
     console.warn("loadPresetTopics failed", error);
     setModalMessage(`预置文本主题加载失败：${error.message}`, "error");
   }
@@ -1431,8 +1476,9 @@ function applyPresetSelection(preset, options = {}) {
   }
 
   state.form.selectedPresetId = preset.id;
-  if (preset.template_label) {
-    state.form.template = ensureTemplateOption(preset.template_label);
+  const templateLabel = templateDisplayLabelFromPreset(preset);
+  if (templateLabel) {
+    state.form.template = ensureTemplateOption(templateLabel);
   }
   if (preset.language) {
     state.form.llmLanguage = preset.language;
