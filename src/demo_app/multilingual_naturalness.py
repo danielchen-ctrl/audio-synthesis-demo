@@ -451,6 +451,27 @@ _SECONDARY_ROLE_HINTS = [
     "培训和宣导",
 ]
 
+_BUSINESS_FOCUS_DEFAULTS = [
+    "当前现状",
+    "主要阻塞",
+    "责任分工",
+    "验收标准",
+    "资源排期",
+    "上线窗口",
+    "回滚预案",
+    "数据验证",
+]
+
+_MEDICAL_FOCUS_DEFAULTS = [
+    "当前症状",
+    "检查结果",
+    "治疗安排",
+    "复查节点",
+    "风险提示",
+    "用药配合",
+    "家属协助",
+]
+
 
 def _content_length(lines: list[tuple[str, str]]) -> int:
     return sum(len(re.sub(r"\s+", "", str(text or ""))) for _, text in lines)
@@ -519,12 +540,23 @@ def _needs_dialogue_repair(
     return False
 
 
-def _structured_focus_points(topic: str, focus: str, keywords: list[str], core_content: str, scenario: str) -> list[str]:
+def _structured_focus_points(
+    topic: str,
+    focus: str,
+    keywords: list[str],
+    core_content: str,
+    scenario: str,
+    medical: bool,
+) -> list[str]:
     preferred = [item.strip() for item in keywords if item and item.strip()]
     candidates = [*preferred, *_split_focus_candidates(focus, core_content, scenario, topic)]
     results: list[str] = []
     for candidate in candidates:
         if candidate and candidate not in results:
+            results.append(candidate)
+    defaults = _MEDICAL_FOCUS_DEFAULTS if medical else _BUSINESS_FOCUS_DEFAULTS
+    for candidate in defaults:
+        if candidate not in results:
             results.append(candidate)
     if not results:
         results = [topic or "当前情况"]
@@ -534,7 +566,7 @@ def _structured_focus_points(topic: str, focus: str, keywords: list[str], core_c
 def _speaker_specific_point(points: list[str], speaker_index: int, round_index: int) -> str:
     if not points:
         return "当前情况"
-    return points[(speaker_index + round_index) % len(points)]
+    return points[(speaker_index * 2 + round_index) % len(points)]
 
 
 def _primary_summary_line(topic: str, focus: str, round_index: int) -> str:
@@ -557,6 +589,7 @@ def _secondary_round_line(
     role_hint: str,
     point: str,
     round_index: int,
+    speaker_variant: int,
     medical: bool,
 ) -> str:
     if medical:
@@ -573,10 +606,10 @@ def _secondary_round_line(
             f"如果围绕{point}继续推进，我希望先把谁来负责、什么时候验证、出什么结果讲明白。",
             f"另外{point}这块一旦处理得太粗，后面无论是执行还是复盘都会比较被动。",
         ]
-    return variants[round_index % len(variants)]
+    return variants[(round_index + speaker_variant) % len(variants)]
 
 
-def _secondary_followup_line(role_hint: str, point: str, round_index: int, medical: bool) -> str:
+def _secondary_followup_line(role_hint: str, point: str, round_index: int, speaker_variant: int, medical: bool) -> str:
     if medical:
         variants = [
             f"如果继续围绕{point}推进，我更想知道后面观察指标、复查节点和可能的风险提示应该怎么安排。",
@@ -591,7 +624,7 @@ def _secondary_followup_line(role_hint: str, point: str, round_index: int, medic
             f"那关于{point}，我们是不是要先把负责人、验证标准和失败后的应对动作一次讲清楚，避免后面扯皮。",
             f"我担心的是，如果{point}这块讲得不够细，团队回去以后各自理解不同，执行就会很散。",
         ]
-    return variants[round_index % len(variants)]
+    return variants[(round_index + speaker_variant) % len(variants)]
 
 
 def _primary_response_line(point: str, round_index: int, medical: bool) -> str:
@@ -628,7 +661,7 @@ def _primary_plan_line(point: str, topic: str, round_index: int, medical: bool) 
     return variants[round_index % len(variants)]
 
 
-def _secondary_commit_line(point: str, round_index: int, medical: bool) -> str:
+def _secondary_commit_line(role_hint: str, point: str, round_index: int, speaker_variant: int, medical: bool) -> str:
     if medical:
         variants = [
             f"明白了，那我会先把和{point}有关的实际感受、检查情况和这段时间的变化整理出来。",
@@ -638,10 +671,10 @@ def _secondary_commit_line(point: str, round_index: int, medical: bool) -> str:
     else:
         variants = [
             f"明白了，那我这边会先把和{point}有关的现状、数据和阻塞项整理出来，再跟大家对一次。",
-            f"好，那围绕{point}我这边先把责任人、时间点和验证方式补齐，避免后面再来回改。",
-            f"这样我就更清楚了，后面关于{point}我会先把准备工作做扎实，再推进下一步。",
+            f"好，那围绕{point}我会从{role_hint}这个角度先把责任人、时间点和验证方式补齐，避免后面再来回改。",
+            f"这样我就更清楚了，后面关于{point}我会先把和{role_hint}有关的准备工作做扎实，再推进下一步。",
         ]
-    return variants[round_index % len(variants)]
+    return variants[(round_index + speaker_variant) % len(variants)]
 
 
 def _build_structured_chinese_dialogue(
@@ -659,7 +692,7 @@ def _build_structured_chinese_dialogue(
     medical = _is_medical_context(scenario, core_content, profile)
     speaker_names = _build_chinese_speaker_names([(speaker, "") for speaker in order], scenario, core_content, profile)
     focus_seed = _core_focus_fragment(title, core_content, scenario, profile) or topic
-    points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario)
+    points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario, medical)
     focus = "、".join(points[:2]) if len(points) > 1 else (points[0] if points else topic)
 
     rebuilt: list[tuple[str, str]] = []
@@ -681,16 +714,17 @@ def _build_structured_chinese_dialogue(
         for idx, speaker in enumerate(secondary):
             role_hint = _SECONDARY_ROLE_HINTS[idx % len(_SECONDARY_ROLE_HINTS)]
             point = _speaker_specific_point(points, idx, round_index)
-            rebuilt.append((speaker, _secondary_round_line(role_hint, point, round_index, medical)))
+            rebuilt.append((speaker, _secondary_round_line(role_hint, point, round_index, idx, medical)))
         rebuilt.append((primary, _primary_summary_line(topic, focus, round_index)))
         for idx, speaker in enumerate(secondary):
             point = _speaker_specific_point(points, idx + len(secondary), round_index)
             role_hint = _SECONDARY_ROLE_HINTS[(idx + round_index + 1) % len(_SECONDARY_ROLE_HINTS)]
-            rebuilt.append((speaker, _secondary_followup_line(role_hint, point, round_index, medical)))
+            rebuilt.append((speaker, _secondary_followup_line(role_hint, point, round_index, idx, medical)))
         rebuilt.append((primary, _primary_response_line(_speaker_specific_point(points, round_index, round_index), round_index, medical)))
         for idx, speaker in enumerate(secondary):
             point = _speaker_specific_point(points, idx + len(secondary) * 2, round_index)
-            rebuilt.append((speaker, _secondary_commit_line(point, round_index, medical)))
+            role_hint = _SECONDARY_ROLE_HINTS[(idx + 2) % len(_SECONDARY_ROLE_HINTS)]
+            rebuilt.append((speaker, _secondary_commit_line(role_hint, point, round_index, idx, medical)))
         rebuilt.append((primary, _primary_plan_line(_speaker_specific_point(points, round_index + 1, round_index), topic, round_index, medical)))
         round_index += 1
         if round_index >= 6:

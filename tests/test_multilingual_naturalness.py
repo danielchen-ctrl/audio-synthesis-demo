@@ -142,6 +142,10 @@ class MultilingualNaturalnessTests(unittest.TestCase):
         self.assertIn("接口超时", rendered)
         self.assertIn("降级策略", rendered)
         self.assertIn("回滚预案", rendered)
+        speaker_two_lines = [text for speaker, text in repaired if speaker == "Speaker 2"]
+        speaker_three_lines = [text for speaker, text in repaired if speaker == "Speaker 3"]
+        self.assertTrue(set(speaker_two_lines) - set(speaker_three_lines))
+        self.assertTrue(set(speaker_three_lines) - set(speaker_two_lines))
 
 
 if __name__ == "__main__":
