@@ -74,8 +74,9 @@ VOICE_CATALOG = {
 
 MAX_AUDIO_TEXT_CHARS = 12000
 PRESET_TOPIC_FILE_NAME = "预置对话情景参数.txt"
+ONLINE_AUDIO_CONFIG_FILE_NAME = "online_audio_ui.json"
 PRESET_BLOCK_RE = re.compile(r"(?ms)^\s*(\d+)[）\)]\s*(.+?)(?=^\s*\d+[）\)]\s*|\Z)")
-PRESET_DISPLAY_TITLE_OVERRIDES = {
+DEFAULT_PRESET_DISPLAY_TITLE_OVERRIDES = {
     "1": "医疗健康｜慢病随访",
     "2": "人力资源与招聘｜招聘补岗",
     "3": "娱乐/媒体｜艺人商业化",
@@ -398,6 +399,77 @@ def _preset_profile(title: str, topic_text: str, template_label: str) -> dict[st
     }
 
 
+def _default_online_audio_config() -> dict[str, Any]:
+    template_catalog = []
+    for label in list(DEFAULT_PRESET_DISPLAY_TITLE_OVERRIDES.values())[:18]:
+        domain, scene = (label.split("｜", 1) + ["场景讨论"])[:2]
+        template_catalog.append(
+            {
+                "label": label,
+                "domain": domain.strip() or "通用业务",
+                "sceneType": scene.strip() or "场景讨论",
+                "primaryRole": "业务负责人",
+                "supportingRoles": [],
+                "discussionAxes": [],
+                "deliverable": "",
+                "goalStem": "",
+            }
+        )
+    return {
+        "defaults": {
+            "wordCount": "1000",
+            "wordCountMin": 100,
+            "wordCountMax": 3000,
+            "folder": "默认目录",
+        },
+        "folderOptions": ["默认目录", "项目 A / 会议语料", "项目 A / 访谈语料", "项目 B"],
+        "presetDisplayTitles": dict(DEFAULT_PRESET_DISPLAY_TITLE_OVERRIDES),
+        "templateAliasGroups": {},
+        "templateCatalog": template_catalog,
+    }
+
+
+def _resolve_online_audio_config_file() -> Path | None:
+    candidates: list[Path] = []
+    for base in [ROOT, ROOT.parent, ROOT.parent.parent]:
+        candidates.extend(
+            [
+                base / "config" / ONLINE_AUDIO_CONFIG_FILE_NAME,
+                base / "demo_app" / "config" / ONLINE_AUDIO_CONFIG_FILE_NAME,
+            ]
+        )
+
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def _load_online_audio_config() -> dict[str, Any]:
+    config_file = _resolve_online_audio_config_file()
+    if not config_file:
+        return _default_online_audio_config()
+
+    try:
+        loaded = json.loads(config_file.read_text(encoding="utf-8"))
+    except Exception:
+        return _default_online_audio_config()
+
+    fallback = _default_online_audio_config()
+    merged = {
+        "defaults": {**fallback["defaults"], **(loaded.get("defaults") or {})},
+        "folderOptions": list(loaded.get("folderOptions") or fallback["folderOptions"]),
+        "presetDisplayTitles": {**fallback["presetDisplayTitles"], **(loaded.get("presetDisplayTitles") or {})},
+        "templateAliasGroups": {**fallback["templateAliasGroups"], **(loaded.get("templateAliasGroups") or {})},
+        "templateCatalog": list(loaded.get("templateCatalog") or fallback["templateCatalog"]),
+    }
+    return merged
+
+
 def _resolve_preset_topic_file() -> Path | None:
     candidates: list[Path] = []
     for base in [ROOT, ROOT.parent, ROOT.parent.parent]:
@@ -425,6 +497,8 @@ def _load_preset_topics() -> list[dict[str, Any]]:
     if not preset_topic_file:
         return []
 
+    online_audio_config = _load_online_audio_config()
+    preset_display_titles = online_audio_config.get("presetDisplayTitles") or {}
     raw_text = preset_topic_file.read_text(encoding="utf-8")
     presets: list[dict[str, Any]] = []
 
@@ -455,7 +529,7 @@ def _load_preset_topics() -> list[dict[str, Any]]:
                 "id": preset_id,
                 "source_title": title,
                 "topic_text": topic_text,
-                "display_title": PRESET_DISPLAY_TITLE_OVERRIDES.get(preset_id) or _preset_display_title(topic_text),
+                "display_title": str(preset_display_titles.get(preset_id) or _preset_display_title(topic_text)),
                 "scenario": scenario or topic_text,
                 "core_content": core_content,
                 "template_label": template_label,
@@ -1130,6 +1204,17 @@ class ServerInfoHandler(JsonHandler):
         )
 
 
+class OnlineAudioConfigHandler(JsonHandler):
+    def get(self) -> None:
+        self.write_json(
+            {
+                "ok": True,
+                "success": True,
+                "config": _load_online_audio_config(),
+            }
+        )
+
+
 class PresetTopicsHandler(JsonHandler):
     def get(self) -> None:
         self.write_json(
@@ -1488,6 +1573,7 @@ def make_app():
         r".*$",
         [
             (r"/api/server_info", ServerInfoHandler),
+            (r"/api/online_audio_config", OnlineAudioConfigHandler),
             (r"/api/preset_topics", PresetTopicsHandler),
             (r"/api/create_dialogue_from_text", CreateDialogueFromTextHandler),
             (r"/api/update_dialogue", UpdateDialogueHandler),
