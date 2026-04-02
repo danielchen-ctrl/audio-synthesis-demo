@@ -86,6 +86,10 @@ def _ascii_ratio(text: str) -> float:
     return ascii_count / len(compact)
 
 
+def _keyword_in_text(text: str, keyword: str) -> bool:
+    return str(keyword or "").casefold() in str(text or "").casefold()
+
+
 def _speaker_order(lines: list[tuple[str, str]]) -> list[str]:
     order: list[str] = []
     for speaker, _ in lines:
@@ -107,7 +111,7 @@ def _normalize_topic_candidate(text: str, limit: int = 20) -> str:
         return ""
     updated = re.sub(r"^(文本主题|主题|场景|主题概括)\s*[:：]?\s*", "", updated)
     updated = re.sub(r"^(围绕|关于)", "", updated)
-    updated = re.sub(r"(进行真实自然的多轮.*|展开真实自然的多轮.*|多轮.*对话|场景对话|评审会对话)$", "", updated)
+    updated = re.sub(r"(进行真实自然的多轮.*|展开真实自然的多轮.*|多轮.*对话|场景对话|评审会对话|进行讨论|展开讨论)$", "", updated)
     updated = re.sub(r"\s+", "", updated)
     updated = updated.strip("“”\"'《》[]【】")
     if not updated:
@@ -119,11 +123,12 @@ def _split_meaningful_pieces(text: str) -> list[str]:
     updated = str(text or "").strip()
     if not updated:
         return []
-    updated = re.sub(r"^(核心对话内容|核心内容|补充要求)\s*[:：]?\s*", "", updated)
+    updated = re.sub(r"^(核心对话内容|核心内容|补充要求|文本主题|主题模板|行业场景|场景类型|角色分工|讨论重点|目标输出|写作要求|参与角色|最终目标|主题)\s*[:：]?\s*", "", updated)
     updated = re.sub(r"对话中必须明确体现这些关键词[——:：-]*", "", updated)
     updated = re.sub(r"(请生成自然、真实、口语化的多轮对话文本|请生成真实自然的多轮对话文本)", "", updated)
     pieces: list[str] = []
     for piece in re.split(r"[\n,，。；;、/｜|]+", updated):
+        piece = re.sub(r"^(核心对话内容|核心内容|补充要求|文本主题|主题模板|行业场景|场景类型|角色分工|讨论重点|目标输出|写作要求|参与角色|最终目标|主题)\s*[:：]?\s*", "", piece.strip())
         cleaned = _normalize_topic_candidate(piece, limit=24)
         if cleaned and cleaned not in pieces:
             pieces.append(cleaned)
@@ -209,17 +214,25 @@ def _build_intro_line(
     speaker_names: dict[str, str],
     topic: str,
     medical: bool,
+    role_hint: str = "",
+    scene_goal: str = "",
 ) -> str:
     name = speaker_names.get(speaker, "李明")
     if speaker == primary_speaker:
+        if role_hint:
+            role_prefix = f"，我这边是{role_hint}" if re.search(r"(负责人|经理|医生|主管|代表)$", role_hint) else f"，我主要负责{role_hint}"
+        else:
+            role_prefix = ""
         if medical:
-            return f"你好，我是{name}，先跟你一起把{topic}梳理清楚。"
+            return f"你好，我是{name}{role_prefix}，先跟你一起把{topic}梳理清楚。"
         if topic == "这件事":
-            return f"你好，我是{name}，我们先把这件事聊明白。"
-        return f"你好，我是{name}，我们先把{topic}聊明白。"
+            return f"你好，我是{name}{role_prefix}，我们先把这件事聊明白。"
+        return f"你好，我是{name}{role_prefix}，我们先把{topic}聊明白。"
+    role_prefix = f"，我主要站在{role_hint}这个角度" if role_hint else ""
     if medical:
-        return f"你好，我是{name}，我主要想了解一下{topic}现在该怎么处理。"
-    return f"你好，我是{name}，我先把这边最关心的情况说具体一点。"
+        return f"你好，我是{name}{role_prefix}，我主要想了解一下{topic}现在该怎么处理。"
+    goal_suffix = f"，尤其想把{scene_goal}里我最担心的部分说具体" if scene_goal and len(scene_goal) < 40 else ""
+    return f"你好，我是{name}{role_prefix}，我先把这边最关心的情况说具体一点{goal_suffix}。"
 
 
 def _build_core_line(speaker: str, primary_speaker: str, focus: str) -> str:
@@ -333,6 +346,7 @@ def enforce_keywords_in_lines(
     scenario: str = "",
     core_content: str = "",
     profile: dict[str, Any] | None = None,
+    generation_context: dict[str, Any] | None = None,
 ) -> tuple[list[tuple[str, str]], list[str]]:
     normalized_keywords = [item.strip() for item in keywords if item and item.strip()]
     if not normalized_keywords:
@@ -349,17 +363,32 @@ def enforce_keywords_in_lines(
     canonical = canonical_language(language)
 
     if canonical == "Chinese":
+        updated = list(lines)
         additions: list[tuple[str, str]] = []
-        for index in range(0, len(missing_keywords), 2):
-            chunk = missing_keywords[index:index + 2]
-            speaker = order[(index // 2 + 1) % len(order)] if len(order) > 1 else primary_speaker
-            joined = "、".join(chunk)
+        role_briefs = _context_role_briefs(generation_context, profile, len(order), _is_medical_context(scenario, core_content, profile))
+        for index, keyword in enumerate(missing_keywords):
+            speaker = order[(index + 1) % len(order)] if len(order) > 1 else primary_speaker
+            injected = False
+            for pos in range(len(updated) - 1, -1, -1):
+                line_speaker, line_text = updated[pos]
+                if line_speaker != speaker or _keyword_in_text(line_text, keyword):
+                    continue
+                clause = (
+                    f"尤其是{keyword}这块需要单独盯住"
+                    if speaker == primary_speaker
+                    else f"我这里最担心的就是{keyword}会不会影响后面的判断"
+                )
+                updated[pos] = (line_speaker, _normalize_line_text(f"{line_text.rstrip('。！？!?；;，,')}，{clause}。"))
+                injected = True
+                break
+            if injected:
+                continue
+            joined_role = role_briefs[order.index(speaker)] if speaker in order and order.index(speaker) < len(role_briefs) else "相关角色"
             if speaker == primary_speaker:
-                content = f"另外，围绕{topic}这件事，{joined}这块也得重点说清楚。"
+                additions.append((speaker, f"另外，围绕{topic}这件事，{keyword}这块也得重点说清楚。"))
             else:
-                content = f"对，我现在最关心的就是{joined}，想听听你更具体的判断。"
-            additions.append((speaker, content))
-        return [*lines, *additions], missing_keywords
+                additions.append((speaker, f"从{joined_role}这边看，我现在最关心的就是{keyword}，想听听更具体的判断。"))
+        return [*updated, *additions], missing_keywords
 
     speaker_label = primary_speaker
     appended_text = f"We should explicitly cover these keywords in the dialogue: {', '.join(missing_keywords)}."
@@ -472,9 +501,78 @@ _MEDICAL_FOCUS_DEFAULTS = [
     "家属协助",
 ]
 
+_DOMAIN_ROLE_HINTS = {
+    "医疗健康": ["随访医生", "患者本人", "家属", "随访护士"],
+    "人力资源与招聘": ["招聘负责人", "业务部门经理", "HRBP", "用人主管"],
+    "娱乐/媒体": ["业务负责人", "经纪人", "商务负责人", "内容运营"],
+    "建筑与工程行业": ["项目经理", "工程负责人", "甲方代表", "成本负责人"],
+    "汽车行业": ["车型项目负责人", "市场负责人", "销售负责人", "区域运营"],
+    "咨询/专业服务": ["客户拓展负责人", "顾问经理", "行业顾问", "交付负责人"],
+    "法律服务": ["法务负责人", "客户负责人", "专项律师", "合规经理"],
+    "金融/投资": ["投顾负责人", "客户经理", "研究员", "风险控制负责人"],
+    "零售行业": ["会员运营负责人", "门店负责人", "活动运营", "数据分析师"],
+    "保险行业": ["销售管理负责人", "培训负责人", "质检负责人", "数据分析师"],
+    "房地产": ["项目营销负责人", "渠道经理", "案场负责人", "投放运营"],
+    "人工智能/科技": ["增长负责人", "产品经理", "数据分析师", "运营负责人"],
+    "制造业": ["产线负责人", "工艺工程师", "设备负责人", "质量经理"],
+    "测试开发": ["测试负责人", "服务端开发", "客户端开发", "产品经理", "质量负责人"],
+}
+
 
 def _content_length(lines: list[tuple[str, str]]) -> int:
     return sum(len(re.sub(r"\s+", "", str(text or ""))) for _, text in lines)
+
+
+def _normalize_generation_context(generation_context: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(generation_context, dict):
+        return {}
+    role_briefs = [
+        str(item or "").strip()
+        for item in generation_context.get("role_briefs", [])
+        if str(item or "").strip()
+    ]
+    discussion_axes = [
+        str(item or "").strip()
+        for item in generation_context.get("discussion_axes", [])
+        if str(item or "").strip()
+    ]
+    quality_constraints = [
+        str(item or "").strip()
+        for item in generation_context.get("quality_constraints", [])
+        if str(item or "").strip()
+    ]
+    return {
+        "domain": str(generation_context.get("domain") or "").strip(),
+        "scene_type": str(generation_context.get("scene_type") or "").strip(),
+        "scene_goal": str(generation_context.get("scene_goal") or "").strip(),
+        "deliverable": str(generation_context.get("deliverable") or "").strip(),
+        "role_briefs": role_briefs,
+        "discussion_axes": discussion_axes,
+        "quality_constraints": quality_constraints,
+    }
+
+
+def _context_role_briefs(
+    generation_context: dict[str, Any] | None,
+    profile: dict[str, Any] | None,
+    people_count: int,
+    medical: bool,
+) -> list[str]:
+    context = _normalize_generation_context(generation_context)
+    roles = [item for item in context.get("role_briefs", []) if item]
+    if not roles:
+        domain = str(context.get("domain") or "").strip()
+        if not domain:
+            use_case = str((profile or {}).get("use_case") or "")
+            if "｜" in use_case:
+                domain = use_case.split("｜", 1)[0].strip()
+        roles = list(_DOMAIN_ROLE_HINTS.get(domain, []))
+    if not roles:
+        roles = ["接诊医生", "患者本人", "家属"] if medical else ["负责人", *_SECONDARY_ROLE_HINTS]
+
+    while len(roles) < people_count:
+        roles.append(f"相关协作方{len(roles)}")
+    return roles[:people_count]
 
 
 def _rendered_length(lines: list[tuple[str, str]]) -> int:
@@ -547,12 +645,21 @@ def _structured_focus_points(
     core_content: str,
     scenario: str,
     medical: bool,
+    generation_context: dict[str, Any] | None = None,
 ) -> list[str]:
     preferred = [item.strip() for item in keywords if item and item.strip()]
-    candidates = [*preferred, *_split_focus_candidates(focus, core_content, scenario, topic)]
+    context = _normalize_generation_context(generation_context)
+    context_axes = context.get("discussion_axes", [])
+    candidates = [*preferred, *context_axes, *_split_focus_candidates(focus, core_content, topic)]
+    if not context_axes:
+        candidates.extend(_split_focus_candidates(scenario))
+    ignored = {str(context.get("domain") or "").strip(), "测试开发", "通用业务"}
+    deliverable = context.get("deliverable")
+    if deliverable:
+        candidates.extend(_split_focus_candidates(str(deliverable)))
     results: list[str] = []
     for candidate in candidates:
-        if candidate and candidate not in results:
+        if candidate and candidate not in ignored and candidate not in results:
             results.append(candidate)
     defaults = _MEDICAL_FOCUS_DEFAULTS if medical else _BUSINESS_FOCUS_DEFAULTS
     for candidate in defaults:
@@ -579,10 +686,10 @@ def _primary_summary_line(topic: str, focus: str, round_index: int) -> str:
     return variants[round_index % len(variants)]
 
 
-def _secondary_intro_line(role_hint: str, point: str, medical: bool) -> str:
+def _secondary_intro_line(name: str, role_hint: str, point: str, medical: bool) -> str:
     if medical:
-        return f"你好，我这边主要想围绕{role_hint}再问清楚一点，尤其是{point}这块。"
-    return f"你好，我先从{role_hint}这个角度补充一下，尤其想把{point}这块说具体。"
+        return f"你好，我是{name}，我这边主要想围绕{role_hint}再问清楚一点，尤其是{point}这块。"
+    return f"你好，我是{name}，我先从{role_hint}这个角度补充一下，尤其想把{point}这块说具体。"
 
 
 def _secondary_round_line(
@@ -686,13 +793,16 @@ def _build_structured_chinese_dialogue(
     target_word_count: int,
     people_count: int,
     keywords: list[str],
+    generation_context: dict[str, Any] | None = None,
 ) -> list[tuple[str, str]]:
     order = [f"Speaker {index}" for index in range(1, max(2, people_count) + 1)]
     topic = _context_topic_fragment(title, scenario, core_content, profile)
     medical = _is_medical_context(scenario, core_content, profile)
     speaker_names = _build_chinese_speaker_names([(speaker, "") for speaker in order], scenario, core_content, profile)
     focus_seed = _core_focus_fragment(title, core_content, scenario, profile) or topic
-    points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario, medical)
+    context = _normalize_generation_context(generation_context)
+    role_briefs = _context_role_briefs(context, profile, len(order), medical)
+    points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario, medical, context)
     focus = "、".join(points[:2]) if len(points) > 1 else (points[0] if points else topic)
 
     rebuilt: list[tuple[str, str]] = []
@@ -700,41 +810,42 @@ def _build_structured_chinese_dialogue(
     secondary = order[1:] or [primary]
 
     for idx, speaker in enumerate(order):
+        role_hint = role_briefs[idx] if idx < len(role_briefs) else _SECONDARY_ROLE_HINTS[idx % len(_SECONDARY_ROLE_HINTS)]
         if idx == 0:
-            rebuilt.append((speaker, _build_intro_line(speaker, primary, speaker_names, topic, medical)))
+            rebuilt.append((speaker, _build_intro_line(speaker, primary, speaker_names, topic, medical, role_hint, context.get("scene_goal", ""))))
             continue
-        role_hint = _SECONDARY_ROLE_HINTS[(idx - 1) % len(_SECONDARY_ROLE_HINTS)]
         point = _speaker_specific_point(points, idx - 1, 0)
-        rebuilt.append((speaker, _secondary_intro_line(role_hint, point, medical)))
+        rebuilt.append((speaker, _secondary_intro_line(speaker_names.get(speaker, "李明"), role_hint, point, medical)))
     rebuilt.append((primary, _build_core_line(primary, primary, focus)))
 
     round_index = 0
-    target_floor = max(260, int(target_word_count * 0.96))
+    target_floor = max(260, int(target_word_count * 0.99))
+    max_rounds = max(8, min(14, int(target_word_count / 110)))
     while _content_length(rebuilt) < target_floor:
         for idx, speaker in enumerate(secondary):
-            role_hint = _SECONDARY_ROLE_HINTS[idx % len(_SECONDARY_ROLE_HINTS)]
+            role_hint = role_briefs[idx + 1] if idx + 1 < len(role_briefs) else _SECONDARY_ROLE_HINTS[idx % len(_SECONDARY_ROLE_HINTS)]
             point = _speaker_specific_point(points, idx, round_index)
             rebuilt.append((speaker, _secondary_round_line(role_hint, point, round_index, idx, medical)))
         rebuilt.append((primary, _primary_summary_line(topic, focus, round_index)))
         for idx, speaker in enumerate(secondary):
             point = _speaker_specific_point(points, idx + len(secondary), round_index)
-            role_hint = _SECONDARY_ROLE_HINTS[(idx + round_index + 1) % len(_SECONDARY_ROLE_HINTS)]
+            role_hint = role_briefs[idx + 1] if idx + 1 < len(role_briefs) else _SECONDARY_ROLE_HINTS[(idx + round_index + 1) % len(_SECONDARY_ROLE_HINTS)]
             rebuilt.append((speaker, _secondary_followup_line(role_hint, point, round_index, idx, medical)))
         rebuilt.append((primary, _primary_response_line(_speaker_specific_point(points, round_index, round_index), round_index, medical)))
         for idx, speaker in enumerate(secondary):
             point = _speaker_specific_point(points, idx + len(secondary) * 2, round_index)
-            role_hint = _SECONDARY_ROLE_HINTS[(idx + 2) % len(_SECONDARY_ROLE_HINTS)]
+            role_hint = role_briefs[idx + 1] if idx + 1 < len(role_briefs) else _SECONDARY_ROLE_HINTS[(idx + 2) % len(_SECONDARY_ROLE_HINTS)]
             rebuilt.append((speaker, _secondary_commit_line(role_hint, point, round_index, idx, medical)))
         rebuilt.append((primary, _primary_plan_line(_speaker_specific_point(points, round_index + 1, round_index), topic, round_index, medical)))
         round_index += 1
-        if round_index >= 6:
+        if round_index >= max_rounds:
             break
 
-    if rebuilt and _content_length(rebuilt) > int(target_word_count * 1.08):
+    if rebuilt and _content_length(rebuilt) > int(target_word_count * 1.03):
         trimmed: list[tuple[str, str]] = []
         for speaker, text in rebuilt:
             trimmed.append((speaker, text))
-            if _content_length(trimmed) >= int(target_word_count * 0.98):
+            if _content_length(trimmed) >= int(target_word_count * 0.995):
                 break
         rebuilt = trimmed
 
@@ -761,6 +872,7 @@ def repair_dialogue_quality(
     target_word_count: int = 1000,
     people_count: int | None = None,
     keywords: list[str] | None = None,
+    generation_context: dict[str, Any] | None = None,
 ) -> tuple[list[tuple[str, str]], dict[str, Any]]:
     canonical = canonical_language(language)
     expected_people = max(1, int(people_count or len(_speaker_order(lines)) or 1))
@@ -768,7 +880,9 @@ def repair_dialogue_quality(
     if canonical != "Chinese":
         return list(lines), {"language": canonical, "repaired": False, "reason": "non_chinese"}
 
-    if not _needs_dialogue_repair(lines, expected_people, target):
+    context = _normalize_generation_context(generation_context)
+    force_rebuild = bool(context.get("discussion_axes") or context.get("role_briefs") or target >= 700)
+    if not force_rebuild and not _needs_dialogue_repair(lines, expected_people, target):
         return list(lines), {"language": canonical, "repaired": False, "reason": "quality_ok"}
 
     repaired = _build_structured_chinese_dialogue(
@@ -780,11 +894,12 @@ def repair_dialogue_quality(
         target,
         expected_people,
         [item for item in (keywords or []) if str(item or "").strip()],
+        context,
     )
     return repaired, {
         "language": canonical,
         "repaired": True,
-        "reason": "structured_rebuild",
+        "reason": "structured_rebuild" if force_rebuild else "quality_repair",
         "original_line_count": len(lines),
         "repaired_line_count": len(repaired),
         "target_word_count": target,

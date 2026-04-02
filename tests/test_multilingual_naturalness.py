@@ -79,11 +79,11 @@ class MultilingualNaturalnessTests(unittest.TestCase):
             profile={"work_content": "慢病随访"},
         )
         self.assertEqual(missing, ["慢病管理", "复诊率"])
-        self.assertGreater(len(updated), len(lines))
         rendered = "\n".join(text for _, text in updated)
         self.assertIn("慢病管理", rendered)
         self.assertIn("复诊率", rendered)
         self.assertNotIn("明确提到这些关键词", rendered)
+        self.assertTrue(any("慢病管理" in text or "复诊率" in text for _, text in updated))
 
     def test_repair_dialogue_quality_rebuilds_flat_secondary_lines(self) -> None:
         lines = [
@@ -146,6 +146,42 @@ class MultilingualNaturalnessTests(unittest.TestCase):
         speaker_three_lines = [text for speaker, text in repaired if speaker == "Speaker 3"]
         self.assertTrue(set(speaker_two_lines) - set(speaker_three_lines))
         self.assertTrue(set(speaker_three_lines) - set(speaker_two_lines))
+
+    def test_repair_dialogue_quality_uses_generation_context_roles_and_stricter_length(self) -> None:
+        lines = [
+            ("Speaker 1", "你好，我们先看一下当前情况。"),
+            ("Speaker 2", "我觉得还有一些地方需要确认。"),
+            ("Speaker 3", "好的，那我再补充一点。"),
+        ]
+        repaired, meta = repair_dialogue_quality(
+            lines,
+            "Chinese",
+            title="支付项目上线评审",
+            scenario="围绕支付项目中的关键风险进行讨论",
+            core_content="重点关注支付接入、下单回调、退款安全、对账差错、稳定性准入",
+            profile={"work_content": "支付项目", "use_case": "测试开发｜支付项目"},
+            target_word_count=1000,
+            people_count=3,
+            keywords=["支付接入", "退款安全", "稳定性准入"],
+            generation_context={
+                "domain": "测试开发",
+                "scene_type": "支付项目",
+                "scene_goal": "围绕支付链路接入、异常兜底和上线风险展开讨论",
+                "deliverable": "形成测试范围、风险清单和上线准入结论",
+                "role_briefs": ["测试负责人", "服务端开发", "产品经理"],
+                "discussion_axes": ["支付接入", "下单回调", "退款安全", "对账差错", "稳定性准入"],
+            },
+        )
+        content_length = sum(len(re.sub(r"\s+", "", text)) for _, text in repaired)
+        rendered = "\n".join(text for _, text in repaired)
+        self.assertTrue(meta["repaired"])
+        self.assertGreaterEqual(content_length, 980)
+        self.assertLessEqual(content_length, 1035)
+        self.assertIn("支付接入", rendered)
+        self.assertIn("退款安全", rendered)
+        self.assertIn("稳定性准入", rendered)
+        self.assertTrue(any("服务端开发" in text for _, text in repaired))
+        self.assertTrue(any("产品经理" in text for _, text in repaired))
 
 
 if __name__ == "__main__":
