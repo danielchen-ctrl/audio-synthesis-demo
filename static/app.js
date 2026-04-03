@@ -426,9 +426,63 @@ function buildRoleBriefs(templateContext, speakerCount) {
   return roles.slice(0, speakerCount);
 }
 
+function buildRoleObjectives(templateContext, roleBriefs, topic, keywordTerms = []) {
+  const axes = uniqueStrings([...(templateContext.discussionAxes || []), ...keywordTerms]);
+  const normalizedTopic = String(topic || "").trim() || templateContext.sceneType || "当前议题";
+  const deliverable = templateContext.deliverable || `形成围绕${normalizedTopic}的明确结论和行动项`;
+  return roleBriefs.map((role, index) => {
+    const leadAxis = axes[index % Math.max(axes.length, 1)] || normalizedTopic;
+    const supportAxis = axes[(index + 2) % Math.max(axes.length, 1)] || deliverable;
+    if (index === 0) {
+      return `${role}：负责把${leadAxis}、${supportAxis}和最终输出口径讲透，推动大家收敛结论`;
+    }
+    const patterns = [
+      `从${role}角度补充${leadAxis}的现状、问题和约束，不只表态，要给出具体信息`,
+      `从${role}角度判断${leadAxis}与${supportAxis}的风险边界，并明确最担心的卡点`,
+      `从${role}角度推动${leadAxis}的执行动作、时间点和协作配合，避免只说空话`,
+      `从${role}角度说明${leadAxis}的验证方式、验收标准和失败兜底，不重复别人说过的话`
+    ];
+    return `${role}：${patterns[(index - 1) % patterns.length]}`;
+  });
+}
+
+function buildStagePrompts(templateContext, topic, keywordTerms = []) {
+  const axes = uniqueStrings([...(templateContext.discussionAxes || []), ...keywordTerms]);
+  const normalizedTopic = String(topic || "").trim() || templateContext.sceneType || "当前议题";
+  const firstAxis = axes[0] || normalizedTopic;
+  const secondAxis = axes[1] || templateContext.sceneType || normalizedTopic;
+  const thirdAxis = axes[2] || templateContext.deliverable || "后续动作";
+  return uniqueStrings([
+    `先对齐${normalizedTopic}的现状、目标和关键背景`,
+    `围绕${firstAxis}、${secondAxis}拆开主要风险、约束和分歧`,
+    `比较可执行方案，明确${thirdAxis}涉及的优先级、取舍与资源投入`,
+    `收敛责任分工、时间点、验收标准和下一步动作`
+  ]);
+}
+
+function buildRiskChecks(templateContext, keywordTerms = []) {
+  const axes = uniqueStrings([...(templateContext.discussionAxes || []), ...keywordTerms]);
+  return uniqueStrings([
+    ...(axes.slice(0, 4).map((axis) => `${axis}是否存在风险边界不清或执行落空`)),
+    `最终输出是否能落到${templateContext.deliverable || "明确结论和行动项"}`
+  ]);
+}
+
+function buildSuccessSignals(templateContext, keywordTerms = []) {
+  const axes = uniqueStrings([...(templateContext.discussionAxes || []), ...keywordTerms]);
+  return uniqueStrings([
+    templateContext.deliverable || "形成明确结论和分工",
+    ...(axes.slice(0, 3).map((axis) => `${axis}有明确负责人、验证方式和时间点`))
+  ]);
+}
+
 function buildGenerationContext(templateLabel, topic, keywordTerms = []) {
   const templateContext = templateContextForLabel(templateLabel, topic, keywordTerms);
   const roleBriefs = buildRoleBriefs(templateContext, speakerCountValue());
+  const roleObjectives = buildRoleObjectives(templateContext, roleBriefs, topic, keywordTerms);
+  const stagePrompts = buildStagePrompts(templateContext, topic, keywordTerms);
+  const riskChecks = buildRiskChecks(templateContext, keywordTerms);
+  const successSignals = buildSuccessSignals(templateContext, keywordTerms);
   return {
     domain: templateContext.domain,
     scene_type: templateContext.sceneType,
@@ -436,11 +490,16 @@ function buildGenerationContext(templateLabel, topic, keywordTerms = []) {
     deliverable: templateContext.deliverable,
     discussion_axes: templateContext.discussionAxes,
     role_briefs: roleBriefs,
+    role_objectives: roleObjectives,
+    stage_prompts: stagePrompts,
+    risk_checks: riskChecks,
+    success_signals: successSignals,
     quality_constraints: [
       "必须口语化、真实、避免套话",
       "每个说话人都要有明确立场和信息量",
       "避免中英混杂和空洞重复",
-      "对话要围绕事实、风险、动作和结论推进"
+      "对话要围绕事实、风险、动作和结论推进",
+      "不同说话人不能只做附和或重复总结"
     ]
   };
 }
@@ -1223,7 +1282,8 @@ function buildManualTopicScenario(templateLabel, topic, generationContext = null
   const normalizedTopic = String(topic || "").trim() || context.scene_type || "业务议题";
   const roles = (context.role_briefs || []).join("、");
   const axes = (context.discussion_axes || []).slice(0, 5).join("、");
-  return `场景：${context.scene_goal}。参与角色：${roles}。重点讨论：${axes}。最终目标：${context.deliverable}。主题：${normalizedTopic}。`;
+  const stages = (context.stage_prompts || []).join("；");
+  return `场景：${context.scene_goal}。参与角色：${roles}。重点讨论：${axes}。推进阶段：${stages}。最终目标：${context.deliverable}。主题：${normalizedTopic}。`;
 }
 
 function buildManualTopicCoreContent(templateLabel, topic, generationContext = null) {
@@ -1234,7 +1294,11 @@ function buildManualTopicCoreContent(templateLabel, topic, generationContext = n
     `主题模板：${templateLabel}`,
     `行业场景：${context.domain}，场景类型：${context.scene_type}`,
     `角色分工：${(context.role_briefs || []).join("、")}`,
+    `角色目标：${(context.role_objectives || []).join("；")}`,
     `讨论重点：${(context.discussion_axes || []).join("、")}`,
+    `推进阶段：${(context.stage_prompts || []).join("；")}`,
+    `风险检查点：${(context.risk_checks || []).join("；")}`,
+    `成功标准：${(context.success_signals || []).join("；")}`,
     `目标输出：${context.deliverable}`,
     `写作要求：${(context.quality_constraints || []).join("；")}`
   ];
@@ -1263,7 +1327,11 @@ function buildGenerateTextPayload() {
       coreParts.push(preset.core_content);
     }
     coreParts.push(`角色分工：${generationContext.role_briefs.join("、")}`);
+    coreParts.push(`角色目标：${generationContext.role_objectives.join("；")}`);
     coreParts.push(`讨论重点：${generationContext.discussion_axes.join("、")}`);
+    coreParts.push(`推进阶段：${generationContext.stage_prompts.join("；")}`);
+    coreParts.push(`风险检查点：${generationContext.risk_checks.join("；")}`);
+    coreParts.push(`成功标准：${generationContext.success_signals.join("；")}`);
     coreParts.push(`目标输出：${generationContext.deliverable}`);
     coreParts.push(`写作要求：${generationContext.quality_constraints.join("；")}`);
     if (keywordTerms.length) {
