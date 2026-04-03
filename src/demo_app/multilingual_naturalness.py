@@ -530,6 +530,79 @@ _DOMAIN_ROLE_HINTS = {
     "测试开发": ["测试负责人", "服务端开发", "客户端开发", "产品经理", "质量负责人"],
 }
 
+_DOMAIN_REALISM_GUIDE = {
+    "医疗健康": {
+        "facts": ["这段时间的症状变化", "检查指标和复查结果", "用药执行情况", "家属配合度"],
+        "risks": ["复查节点拖延", "症状变化判断偏差", "用药依从性不足", "风险提示没有同步到位"],
+        "outputs": ["复查安排", "观察重点", "异常处理提醒", "家庭配合动作"],
+    },
+    "人力资源与招聘": {
+        "facts": ["岗位缺口和业务优先级", "候选人画像匹配度", "渠道转化效率", "到岗时间压力"],
+        "risks": ["画像不清导致投放失焦", "业务需求反复变化", "关键岗位补位过慢", "offer转化不稳定"],
+        "outputs": ["招聘推进节奏", "渠道分配方案", "候选人筛选标准", "业务对齐口径"],
+    },
+    "娱乐/媒体": {
+        "facts": ["内容资源和排期情况", "品牌合作匹配度", "流量投放节奏", "商务回报预期"],
+        "risks": ["资源投入回收不成正比", "传播节奏失控", "品牌调性不匹配", "执行落地反复返工"],
+        "outputs": ["商务推进策略", "内容合作口径", "投放节奏安排", "复盘指标"],
+    },
+    "建筑与工程行业": {
+        "facts": ["现场进度和交付节点", "甲方反馈", "成本与采购情况", "施工配合条件"],
+        "risks": ["交付节奏失控", "现场问题反复出现", "成本偏差扩大", "验收节点卡住"],
+        "outputs": ["交付问题清单", "现场整改动作", "验收准备安排", "责任分工"],
+    },
+    "汽车行业": {
+        "facts": ["车型投放节奏", "渠道准备度", "库存与区域反馈", "卖点表达和市场认知"],
+        "risks": ["渠道准备不到位", "区域反馈滞后", "库存压力失衡", "卖点传达不一致"],
+        "outputs": ["投放节奏表", "区域协同安排", "渠道沟通口径", "销售跟进动作"],
+    },
+    "咨询/专业服务": {
+        "facts": ["客户真实诉求", "方案切入点", "关系推进状态", "交付能力匹配"],
+        "risks": ["方案太泛导致竞争力不足", "客户关系推进停滞", "交付承诺过度", "报价缺乏支撑"],
+        "outputs": ["客户拓展策略", "提案主线", "推进节奏", "角色分工"],
+    },
+    "法律服务": {
+        "facts": ["证据材料准备度", "风险边界判断", "合规要求", "客户关注点"],
+        "risks": ["表述越界", "证据链不完整", "整改建议难执行", "上线前合规把关不足"],
+        "outputs": ["法律判断结论", "整改建议", "审核口径", "落地安排"],
+    },
+    "金融/投资": {
+        "facts": ["风险偏好和收益目标", "资金安排", "资产组合现状", "调整窗口"],
+        "risks": ["收益预期过高", "风险暴露集中", "配置节奏失衡", "客户理解偏差"],
+        "outputs": ["配置建议", "风险提示", "组合调整动作", "沟通口径"],
+    },
+    "零售行业": {
+        "facts": ["会员分层现状", "活动触达效果", "门店配合度", "复购转化数据"],
+        "risks": ["活动策略不分层", "门店执行不到位", "优惠投入回收偏弱", "效果验证口径不统一"],
+        "outputs": ["复购方案", "活动策略", "门店配合动作", "效果验证标准"],
+    },
+    "保险行业": {
+        "facts": ["销售表现", "录音质检结果", "客户反馈", "培训执行情况"],
+        "risks": ["话术触碰红线", "培训改进未闭环", "团队差异扩大", "问题重复发生"],
+        "outputs": ["质检结论", "培训改进动作", "管理要求", "复盘标准"],
+    },
+    "房地产": {
+        "facts": ["客源结构", "案场转化情况", "渠道效率", "价格反馈"],
+        "risks": ["渠道投入回报失衡", "案场转化下滑", "客群匹配偏差", "价格策略迟滞"],
+        "outputs": ["去化提效方案", "渠道动作", "案场配合安排", "短期目标"],
+    },
+    "人工智能/科技": {
+        "facts": ["漏斗转化数据", "试用和付费表现", "用户价值感知", "实验结果"],
+        "risks": ["转化门槛设置不当", "价值感知不足", "数据回收不完整", "实验节奏失控"],
+        "outputs": ["转化方案", "实验计划", "产品优化方向", "验证指标"],
+    },
+    "制造业": {
+        "facts": ["瓶颈工序情况", "设备效率", "良率波动", "排产协同状态"],
+        "risks": ["瓶颈工序拖慢节奏", "设备异常反复出现", "良率波动放大", "异常处置滞后"],
+        "outputs": ["提效动作", "排产调整建议", "设备改善安排", "质量跟踪口径"],
+    },
+    "测试开发": {
+        "facts": ["链路覆盖情况", "灰度与压测结果", "监控告警准备度", "回滚与兜底方案"],
+        "risks": ["异常链路漏测", "回调和幂等处理不完整", "灰度窗口与回滚预案不清", "准入标准和告警阈值模糊"],
+        "outputs": ["测试范围清单", "准入结论", "风险清单", "上线前动作"],
+    },
+}
+
 
 def _content_length(lines: list[tuple[str, str]]) -> int:
     return sum(len(re.sub(r"\s+", "", str(text or ""))) for _, text in lines)
@@ -717,6 +790,30 @@ def _dialogue_quality_metrics(
         "length_fit": round(length_fit, 3),
         "score": score,
     }
+
+
+def _domain_realism_pack(generation_context: dict[str, Any] | None, profile: dict[str, Any] | None, medical: bool) -> dict[str, list[str]]:
+    context = _normalize_generation_context(generation_context)
+    domain = str(context.get("domain") or "").strip()
+    use_case = str((profile or {}).get("use_case") or "")
+    if not domain and "｜" in use_case:
+        domain = use_case.split("｜", 1)[0].strip()
+    if medical and not domain:
+        domain = "医疗健康"
+    pack = _DOMAIN_REALISM_GUIDE.get(domain)
+    if pack:
+        return pack
+    return {
+        "facts": ["当前现状", "关键约束", "协作条件", "执行节奏"],
+        "risks": ["边界不清", "执行落空", "责任模糊", "结果无法验证"],
+        "outputs": ["结论", "行动项", "验收标准", "责任分工"],
+    }
+
+
+def _realism_pick(items: list[str], index: int, fallback: str) -> str:
+    if not items:
+        return fallback
+    return items[index % len(items)]
 
 
 def _rendered_length(lines: list[tuple[str, str]]) -> int:
@@ -924,6 +1021,32 @@ def _primary_plan_line(point: str, topic: str, round_index: int, medical: bool) 
     return variants[round_index % len(variants)]
 
 
+def _primary_realism_line(
+    point: str,
+    topic: str,
+    realism_pack: dict[str, list[str]],
+    round_index: int,
+    medical: bool,
+) -> str:
+    fact_hint = _realism_pick(realism_pack.get("facts", []), round_index, point)
+    fact_hint_secondary = _realism_pick(realism_pack.get("facts", []), round_index + 1, fact_hint)
+    risk_hint = _realism_pick(realism_pack.get("risks", []), round_index, point)
+    output_hint = _realism_pick(realism_pack.get("outputs", []), round_index, topic)
+    if medical:
+        variants = [
+            f"再往前走一步，{point}不能只停在感觉层面，像{fact_hint}和{risk_hint}这些都要对应到后面的{output_hint}上。",
+            f"如果现在就准备后续安排，我更希望先把{fact_hint}核实清楚，不然{risk_hint}这类问题后面还是会反复出现。",
+            f"围绕{topic}，我们最后一定要落到{output_hint}，否则前面关于{point}的讨论就很难真正帮到后续处理。",
+        ]
+    else:
+        variants = [
+            f"再往前走一步，{point}不能只停在判断层面，像{fact_hint}、{fact_hint_secondary}和{risk_hint}这些都要对应到后面的{output_hint}上。",
+            f"如果现在就准备推进，我更希望先把{fact_hint}和{fact_hint_secondary}核实清楚，不然{risk_hint}这类问题后面还是会反复返工。",
+            f"围绕{topic}，我们最后一定要落到{output_hint}，否则前面关于{point}的讨论很容易停在口头上。",
+        ]
+    return variants[round_index % len(variants)]
+
+
 def _secondary_commit_line(role_hint: str, point: str, round_index: int, speaker_variant: int, medical: bool) -> str:
     if medical:
         variants = [
@@ -974,6 +1097,7 @@ def _secondary_stage_line(
     point: str,
     risk_check: str,
     success_signal: str,
+    realism_pack: dict[str, list[str]],
     round_index: int,
     speaker_variant: int,
     medical: bool,
@@ -981,19 +1105,22 @@ def _secondary_stage_line(
     objective_hint = _objective_summary(objective, point)
     risk_hint = _objective_summary(risk_check, point)
     success_hint = _objective_summary(success_signal, point)
+    fact_hint = _realism_pick(realism_pack.get("facts", []), round_index + speaker_variant, point)
+    fact_hint_secondary = _realism_pick(realism_pack.get("facts", []), round_index + speaker_variant + 1, fact_hint)
+    output_hint = _realism_pick(realism_pack.get("outputs", []), round_index + speaker_variant + 1, success_hint)
     if medical:
         variants = [
-            f"从{role_hint}这边看，我现在最想先确认的是{point}，因为这会直接影响后面怎么判断和安排，尤其{risk_hint}不能含糊。",
-            f"我补充一个实际情况，围绕{point}我最担心的是中间信息不完整，最后既影响医生判断，也影响我们后面怎么配合{success_hint}。",
-            f"如果按{objective_hint}这个思路往下走，那{point}这块最好先讲到可执行，比如什么时候观察、什么时候复查、出现什么情况要及时反馈。",
-            f"我再把顾虑说具体一点，{point}如果现在只是大概说一下，后面执行起来还是会没底，所以{risk_hint}这件事最好先说明白。",
+            f"从{role_hint}这边看，我现在最想先确认的是{point}，因为这会直接影响后面怎么判断和安排，尤其{risk_hint}和{fact_hint}不能含糊。",
+            f"我补充一个实际情况，围绕{point}我最担心的是中间信息不完整，最后既影响医生判断，也影响我们后面怎么配合{success_hint}和{output_hint}。",
+            f"如果按{objective_hint}这个思路往下走，那{point}这块最好先讲到可执行，比如什么时候观察、什么时候复查、出现什么情况要及时反馈，同时把{fact_hint}同步清楚。",
+            f"我再把顾虑说具体一点，{point}如果现在只是大概说一下，后面执行起来还是会没底，所以{risk_hint}和{output_hint}这件事最好先说明白。",
         ]
     else:
         variants = [
-            f"从{role_hint}这边看，我现在最想先确认的是{point}，因为这会直接影响后面怎么排期、怎么推进，尤其{risk_hint}不能模糊。",
-            f"我补充一个现实情况，围绕{point}我最担心的是中间边界不清，最后既影响协作，也影响我们怎么把{success_hint}真正做出来。",
-            f"如果按{objective_hint}这个思路往下走，那{point}这块最好先讲到可执行，比如谁负责、什么时候验证、出了问题怎么兜底。",
-            f"我再把顾虑说具体一点，{point}如果现在只是停在判断上，后面执行一定会来回返工，所以{risk_hint}这件事最好先讲透。",
+            f"从{role_hint}这边看，我现在最想先确认的是{point}，因为这会直接影响后面怎么排期、怎么推进，尤其{risk_hint}以及{fact_hint}、{fact_hint_secondary}这些都不能模糊。",
+            f"我补充一个现实情况，围绕{point}我最担心的是中间边界不清，最后既影响协作，也影响我们怎么把{success_hint}和{output_hint}真正做出来。",
+            f"如果按{objective_hint}这个思路往下走，那{point}这块最好先讲到可执行，比如谁负责、什么时候验证、出了问题怎么兜底，同时把{fact_hint}和{fact_hint_secondary}讲清楚。",
+            f"我再把顾虑说具体一点，{point}如果现在只是停在判断上，后面执行一定会来回返工，所以{risk_hint}和{output_hint}这件事最好先讲透。",
         ]
     return variants[(round_index + speaker_variant) % len(variants)]
 
@@ -1029,21 +1156,29 @@ def _trim_dialogue_to_target(
     lines: list[tuple[str, str]],
     speakers: list[str],
     target_word_count: int,
+    minimum_floor: int | None = None,
 ) -> list[tuple[str, str]]:
     target_ceiling = max(260, int(target_word_count * 1.015))
+    minimum_floor = max(220, int(minimum_floor or 0))
     trimmed = list(lines)
     minimum_turns = {speaker: 3 for speaker in speakers}
     counts = _speaker_turn_counts(trimmed)
     while _content_length(trimmed) > target_ceiling and len(trimmed) > len(speakers) * 3:
         speaker, _ = trimmed[-1]
-        if counts.get(speaker, 0) > minimum_turns.get(speaker, 2):
+        projected_length = _content_length(trimmed[:-1])
+        if counts.get(speaker, 0) > minimum_turns.get(speaker, 2) and (
+            not minimum_floor or projected_length >= minimum_floor
+        ):
             counts[speaker] -= 1
             trimmed.pop()
             continue
         removable_index = None
         for index in range(len(trimmed) - 1, -1, -1):
             candidate_speaker, _ = trimmed[index]
-            if counts.get(candidate_speaker, 0) > minimum_turns.get(candidate_speaker, 2):
+            candidate_trimmed = trimmed[:index] + trimmed[index + 1 :]
+            if counts.get(candidate_speaker, 0) > minimum_turns.get(candidate_speaker, 2) and (
+                not minimum_floor or _content_length(candidate_trimmed) >= minimum_floor
+            ):
                 removable_index = index
                 break
         if removable_index is None:
@@ -1076,6 +1211,7 @@ def _build_structured_chinese_dialogue(
     stage_prompts = _context_stage_prompts(context, topic, points)
     risk_checks = _context_risk_checks(context, points, topic)
     success_signals = _context_success_signals(context, points, topic)
+    realism_pack = _domain_realism_pack(context, profile, medical)
     focus = "、".join(points[:2]) if len(points) > 1 else (points[0] if points else topic)
     deliverable = context.get("deliverable") or f"围绕{topic}形成明确结论和下一步动作"
     scene_goal = context.get("scene_goal") or topic
@@ -1109,7 +1245,7 @@ def _build_structured_chinese_dialogue(
             rebuilt.append(
                 (
                     speaker,
-                    _secondary_stage_line(role_hint, objective, point, risk_check, success_signal, round_index, idx, medical),
+                    _secondary_stage_line(role_hint, objective, point, risk_check, success_signal, realism_pack, round_index, idx, medical),
                 )
             )
         rebuilt.append((primary, _primary_response_line(stage_point, round_index, medical)))
@@ -1119,6 +1255,7 @@ def _build_structured_chinese_dialogue(
             rebuilt.append((speaker, _secondary_commit_line(role_hint, point, round_index, idx, medical)))
         success_signal = success_signals[round_index % len(success_signals)] if success_signals else deliverable
         rebuilt.append((primary, _primary_stage_close_line(stage_prompt, stage_point, deliverable, success_signal, round_index, medical)))
+        rebuilt.append((primary, _primary_realism_line(stage_point, topic, realism_pack, round_index, medical)))
         rebuilt.append((primary, _primary_plan_line(_speaker_specific_point(points, round_index + 1, round_index), topic, round_index, medical)))
         round_index += 1
         if round_index >= max_rounds:
@@ -1133,8 +1270,8 @@ def _build_structured_chinese_dialogue(
             continue
         seen.add(key)
         deduped.append((speaker, normalized))
-    deduped = _trim_dialogue_to_target(deduped, order, target_word_count)
     minimum_floor = max(260, int(target_word_count * 0.98))
+    deduped = _trim_dialogue_to_target(deduped, order, target_word_count, minimum_floor=minimum_floor)
     if _content_length(deduped) < minimum_floor:
         extension_round = round_index + 1
         stage_prompt = stage_prompts[extension_round % len(stage_prompts)]
@@ -1144,14 +1281,14 @@ def _build_structured_chinese_dialogue(
             objective = role_objectives[idx + 1] if idx + 1 < len(role_objectives) else f"{role_hint}：围绕{point}补充事实和动作要求。"
             risk_check = risk_checks[(idx + extension_round) % len(risk_checks)] if risk_checks else point
             success_signal = success_signals[(idx + extension_round) % len(success_signals)] if success_signals else deliverable
-            candidate = _secondary_stage_line(role_hint, objective, point, risk_check, success_signal, extension_round, idx + 1, medical)
+            candidate = _secondary_stage_line(role_hint, objective, point, risk_check, success_signal, realism_pack, extension_round, idx + 1, medical)
             if (speaker, candidate) not in seen:
                 deduped.append((speaker, candidate))
                 seen.add((speaker, candidate))
         closing = _primary_stage_close_line(stage_prompt, _speaker_specific_point(points, extension_round, extension_round), deliverable, success_signals[extension_round % len(success_signals)] if success_signals else deliverable, extension_round, medical)
         if (primary, closing) not in seen:
             deduped.append((primary, closing))
-    return _trim_dialogue_to_target(deduped, order, target_word_count)
+    return _trim_dialogue_to_target(deduped, order, target_word_count, minimum_floor=minimum_floor)
 
 
 def repair_dialogue_quality(

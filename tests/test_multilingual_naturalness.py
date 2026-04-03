@@ -183,6 +183,83 @@ class MultilingualNaturalnessTests(unittest.TestCase):
         self.assertTrue(any("服务端开发" in text for _, text in repaired))
         self.assertTrue(any("产品经理" in text for _, text in repaired))
 
+    def test_repair_dialogue_quality_fixed_template_regression_samples(self) -> None:
+        seed_lines = [
+            ("Speaker 1", "你好，我们先看一下当前情况。"),
+            ("Speaker 2", "我觉得还有一些地方需要确认。"),
+            ("Speaker 3", "好的，那我再补充一点。"),
+        ]
+        samples = [
+            {
+                "title": "支付项目上线评审",
+                "scenario": "围绕支付项目中的关键风险进行讨论",
+                "core_content": "重点关注支付接入、下单回调、退款安全、对账差错、稳定性准入",
+                "profile": {"work_content": "支付项目", "use_case": "测试开发｜支付项目"},
+                "target_word_count": 1000,
+                "people_count": 3,
+                "keywords": ["支付接入", "退款安全", "稳定性准入"],
+                "generation_context": {
+                    "domain": "测试开发",
+                    "scene_type": "支付项目",
+                    "scene_goal": "围绕支付链路接入、异常兜底和上线风险展开讨论",
+                    "deliverable": "形成测试范围、风险清单和上线准入结论",
+                    "role_briefs": ["测试负责人", "服务端开发", "产品经理"],
+                    "discussion_axes": ["支付接入", "下单回调", "退款安全", "对账差错", "稳定性准入"],
+                },
+                "must_include": ["灰度", "回滚", "支付接入"],
+            },
+            {
+                "title": "慢病随访复盘",
+                "scenario": "围绕慢病随访中的复查安排和病情变化进行讨论",
+                "core_content": "重点关注症状变化、用药执行、复查节点、风险提示",
+                "profile": {"work_content": "慢病随访", "use_case": "医疗健康｜慢病随访"},
+                "target_word_count": 900,
+                "people_count": 3,
+                "keywords": ["症状变化", "复查节点", "风险提示"],
+                "generation_context": {
+                    "domain": "医疗健康",
+                    "scene_type": "慢病随访",
+                    "scene_goal": "围绕患者当前症状、复查安排和治疗配合展开交流",
+                    "deliverable": "形成明确的复查安排、风险提示和家庭配合动作",
+                    "role_briefs": ["随访医生", "患者本人", "家属"],
+                    "discussion_axes": ["症状变化", "用药执行", "复查节点", "风险提示"],
+                },
+                "must_include": ["复查", "用药", "风险提示"],
+            },
+            {
+                "title": "会员复购提升会",
+                "scenario": "围绕会员复购提升中的活动策略和门店配合展开讨论",
+                "core_content": "重点关注会员分层、活动策略、门店配合、效果验证",
+                "profile": {"work_content": "会员复购", "use_case": "零售行业｜会员复购"},
+                "target_word_count": 950,
+                "people_count": 4,
+                "keywords": ["会员分层", "活动策略", "效果验证"],
+                "generation_context": {
+                    "domain": "零售行业",
+                    "scene_type": "会员复购",
+                    "scene_goal": "围绕触达策略、门店配合和活动效果展开讨论",
+                    "deliverable": "形成会员复购提升方案和执行节奏",
+                    "role_briefs": ["会员运营负责人", "门店负责人", "活动运营", "数据分析师"],
+                    "discussion_axes": ["会员分层", "活动策略", "门店配合", "效果验证"],
+                },
+                "must_include": ["会员分层", "门店", "复购"],
+            },
+        ]
+
+        for sample in samples:
+            must_include = sample["must_include"]
+            payload = {key: value for key, value in sample.items() if key != "must_include"}
+            repaired, meta = repair_dialogue_quality(seed_lines, "Chinese", **payload)
+            rendered = "\n".join(text for _, text in repaired)
+            content_length = sum(len(re.sub(r"\s+", "", text)) for _, text in repaired)
+            speakers = sorted({speaker for speaker, _ in repaired})
+            self.assertEqual(len(speakers), sample["people_count"])
+            self.assertGreaterEqual(content_length, int(sample["target_word_count"] * 0.98))
+            self.assertLessEqual(content_length, int(sample["target_word_count"] * 1.03))
+            self.assertGreaterEqual(meta["quality_metrics"]["score"], 0.9)
+            for term in must_include:
+                self.assertIn(term, rendered)
+
 
 if __name__ == "__main__":
     unittest.main()
