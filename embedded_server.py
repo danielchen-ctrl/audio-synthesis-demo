@@ -31,7 +31,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from demo_app.multilingual_naturalness import enforce_keywords_in_lines as merge_keywords_into_lines
-from demo_app.multilingual_naturalness import polish_generated_lines, repair_dialogue_quality
+from demo_app.multilingual_naturalness import polish_generated_lines, repair_dialogue_quality, stabilize_dialogue_constraints
 
 RUNTIME_CACHE = ROOT / "runtime" / "cache" / "embedded_bundle"
 MODULE_CACHE = RUNTIME_CACHE / "modules"
@@ -633,6 +633,18 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         profile=profile,
         generation_context=generation_context,
     )
+    lines, stabilize_meta = stabilize_dialogue_constraints(
+        lines,
+        language,
+        title=title,
+        scenario=scenario,
+        core_content=core_content,
+        profile=profile,
+        target_word_count=word_count,
+        people_count=people_count,
+        keywords=keyword_terms,
+        generation_context=generation_context,
+    )
     dialogue_text = _render_dialogue_text(bundle_server, lines)
     normalized_lines = _normalize_lines(bundle_server, lines)
 
@@ -695,6 +707,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         },
         "keywords_enforced": injected_keywords,
         "repair_meta": repair_meta,
+        "stabilize_meta": stabilize_meta,
         "raw_rewrite_info": rewrite_info or {},
     }
 

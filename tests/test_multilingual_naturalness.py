@@ -10,7 +10,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from demo_app.multilingual_naturalness import enforce_keywords_in_lines, polish_generated_lines, repair_dialogue_quality
+from demo_app.multilingual_naturalness import enforce_keywords_in_lines, polish_generated_lines, repair_dialogue_quality, stabilize_dialogue_constraints
 from demo_app.rule_loader import clear_rule_cache, load_text_naturalness_rules
 
 
@@ -259,6 +259,49 @@ class MultilingualNaturalnessTests(unittest.TestCase):
             self.assertGreaterEqual(meta["quality_metrics"]["score"], 0.9)
             for term in must_include:
                 self.assertIn(term, rendered)
+
+    def test_stabilize_dialogue_constraints_enforces_speakers_length_and_cleans_dirty_phrases(self) -> None:
+        lines = [
+            ("Speaker 1", "你好，我是王芳，我这边是测试负责人，我们先把支付需求评审会聊明白。"),
+            ("Speaker 2", "你好，我是刘洋，我先从服务端开发这个角度补充一下，尤其想把支付接入这块说具体。"),
+            ("Speaker 3", "你好，我是陈静，我先从客户端开发这个角度补充一下，尤其想把重点讨论：退款安全这块说具体。"),
+            ("Speaker 1", "这一轮我们先按“先对齐现状”往下推，先把重点讨论：支付接入和角色目标：支付项目中的链路完整性这两件事讲透。"),
+            ("Speaker 2", "好，那围绕重点讨论：支付接入我会从服务端开发这个角度先把责任人、时间点和验证方式补齐，避免后面再来回改。"),
+        ]
+        stabilized, meta = stabilize_dialogue_constraints(
+            lines,
+            "Chinese",
+            title="支付需求评审会",
+            scenario="围绕支付需求评审会中的现状、风险、方案选择和推进节奏展开讨论",
+            core_content="文本主题：支付需求评审会；主题模板：测试开发｜支付项目；讨论重点：支付接入、下单回调、退款安全；角色目标：测试负责人：负责把支付接入讲透；服务端开发：围绕支付接入补充事实、风险和动作要求；客户端开发：围绕退款安全补充事实、风险和动作要求；成功标准：支付接入有明确负责人、验证方式和时间点。",
+            profile={"work_content": "支付需求评审会", "use_case": "测试开发｜支付项目"},
+            target_word_count=1000,
+            people_count=4,
+            keywords=["支付接入", "退款安全", "下单回调"],
+            generation_context={
+                "domain": "测试开发",
+                "scene_type": "支付项目",
+                "scene_goal": "围绕支付链路接入、异常兜底和上线风险展开讨论",
+                "deliverable": "形成测试范围、风险清单和上线准入结论",
+                "role_briefs": ["测试负责人", "服务端开发", "客户端开发", "产品经理"],
+                "discussion_axes": ["支付接入", "下单回调", "退款安全", "对账差错", "稳定性准入"],
+                "stage_prompts": ["先对齐现状", "拆解风险", "比较方案", "收敛动作"],
+                "risk_checks": ["支付接入是否存在风险边界不清或执行落空", "退款安全是否存在风险边界不清或执行落空"],
+                "success_signals": ["支付接入有明确负责人、验证方式和时间点", "退款安全有明确负责人、验证方式和时间点"],
+            },
+        )
+        rendered = "\n".join(text for _, text in stabilized)
+        content_length = sum(len(re.sub(r"\s+", "", text)) for _, text in stabilized)
+        speakers = sorted({speaker for speaker, _ in stabilized})
+        self.assertEqual(speakers, ["Speaker 1", "Speaker 2", "Speaker 3", "Speaker 4"])
+        self.assertGreaterEqual(content_length, 990)
+        self.assertLessEqual(content_length, 1015)
+        self.assertNotIn("重点讨论：", rendered)
+        self.assertNotIn("角色目标：", rendered)
+        self.assertNotIn("成功标准：", rendered)
+        self.assertIn("支付接入", rendered)
+        self.assertIn("退款安全", rendered)
+        self.assertGreaterEqual(meta["quality_metrics"]["speaker_coverage"], 1.0)
 
 
 if __name__ == "__main__":
