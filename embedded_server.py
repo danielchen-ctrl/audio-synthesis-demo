@@ -31,7 +31,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from demo_app.multilingual_naturalness import enforce_keywords_in_lines as merge_keywords_into_lines
-from demo_app.multilingual_naturalness import polish_generated_lines, repair_dialogue_quality
+from demo_app.multilingual_naturalness import polish_generated_lines, repair_dialogue_quality, stabilize_dialogue_constraints
 
 RUNTIME_CACHE = ROOT / "runtime" / "cache" / "embedded_bundle"
 MODULE_CACHE = RUNTIME_CACHE / "modules"
@@ -273,7 +273,11 @@ def _safe_generation_context(payload: dict[str, Any]) -> dict[str, Any]:
         "scene_goal": str(context.get("scene_goal") or "").strip(),
         "deliverable": str(context.get("deliverable") or "").strip(),
         "role_briefs": _safe_str_list(context.get("role_briefs")),
+        "role_objectives": _safe_str_list(context.get("role_objectives")),
         "discussion_axes": _safe_str_list(context.get("discussion_axes")),
+        "stage_prompts": _safe_str_list(context.get("stage_prompts")),
+        "risk_checks": _safe_str_list(context.get("risk_checks")),
+        "success_signals": _safe_str_list(context.get("success_signals")),
         "quality_constraints": _safe_str_list(context.get("quality_constraints")),
     }
 
@@ -577,10 +581,22 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         profile["job_function"] = generation_context["role_briefs"][0]
     if generation_context.get("scene_goal"):
         scenario = _merge_text_parts(scenario, generation_context["scene_goal"], f"参与角色：{'、'.join(generation_context.get('role_briefs', []))}")
-    if generation_context.get("discussion_axes") or generation_context.get("deliverable") or generation_context.get("quality_constraints"):
+    if (
+        generation_context.get("discussion_axes")
+        or generation_context.get("deliverable")
+        or generation_context.get("quality_constraints")
+        or generation_context.get("role_objectives")
+        or generation_context.get("stage_prompts")
+        or generation_context.get("risk_checks")
+        or generation_context.get("success_signals")
+    ):
         core_content = _merge_text_parts(
             core_content,
             f"重点讨论：{'、'.join(generation_context.get('discussion_axes', []))}" if generation_context.get("discussion_axes") else "",
+            f"角色目标：{'；'.join(generation_context.get('role_objectives', []))}" if generation_context.get("role_objectives") else "",
+            f"推进阶段：{'；'.join(generation_context.get('stage_prompts', []))}" if generation_context.get("stage_prompts") else "",
+            f"风险检查点：{'；'.join(generation_context.get('risk_checks', []))}" if generation_context.get("risk_checks") else "",
+            f"成功标准：{'；'.join(generation_context.get('success_signals', []))}" if generation_context.get("success_signals") else "",
             f"目标输出：{generation_context.get('deliverable', '')}" if generation_context.get("deliverable") else "",
             f"写作要求：{'；'.join(generation_context.get('quality_constraints', []))}" if generation_context.get("quality_constraints") else "",
         )
@@ -615,6 +631,18 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         scenario=scenario,
         core_content=core_content,
         profile=profile,
+        generation_context=generation_context,
+    )
+    lines, stabilize_meta = stabilize_dialogue_constraints(
+        lines,
+        language,
+        title=title,
+        scenario=scenario,
+        core_content=core_content,
+        profile=profile,
+        target_word_count=word_count,
+        people_count=people_count,
+        keywords=keyword_terms,
         generation_context=generation_context,
     )
     dialogue_text = _render_dialogue_text(bundle_server, lines)
@@ -679,6 +707,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         },
         "keywords_enforced": injected_keywords,
         "repair_meta": repair_meta,
+        "stabilize_meta": stabilize_meta,
         "raw_rewrite_info": rewrite_info or {},
     }
 

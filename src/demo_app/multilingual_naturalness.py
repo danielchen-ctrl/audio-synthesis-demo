@@ -47,6 +47,83 @@ _DOCTOR_NAME_POOL = ["李医生", "王医生", "陈医生", "周医生", "赵医
 _PATIENT_NAME_POOL = ["张阿姨", "王阿姨", "刘叔叔", "赵先生", "李女士", "陈大爷", "周女士", "孙先生"]
 _BUSINESS_NAME_POOL = ["李明", "王芳", "张伟", "刘洋", "陈静", "赵磊", "周婷", "孙杰", "吴敏", "郑凯"]
 
+_DESCRIPTOR_PREFIX_RE = re.compile(
+    r"^(核心对话内容|核心内容|补充要求|文本主题|主题模板|行业场景|场景类型|角色分工|讨论重点|重点讨论|目标输出|写作要求|参与角色|最终目标|主题|角色目标|推进阶段|风险检查点|成功标准|重点关注)\s*[:：]?\s*"
+)
+_INLINE_DESCRIPTOR_RE = re.compile(r"(核心对话内容|核心内容|文本主题|主题模板|行业场景|场景类型|角色分工|讨论重点|重点讨论|目标输出|写作要求|参与角色|最终目标|主题|角色目标|推进阶段|风险检查点|成功标准|重点关注)\s*[:：]\s*")
+_GENERIC_FOCUS_TERMS = {
+    "相关协作方",
+    "相关协作方2",
+    "相关协作方3",
+    "当前情况",
+    "当前现状",
+    "关键背景",
+    "下一步动作",
+    "明确结论",
+    "执行动作",
+    "目标输出",
+    "写作要求",
+}
+
+_ROLE_SPECIFIC_PACKS: list[tuple[tuple[str, ...], dict[str, list[str]]]] = [
+    (
+        ("服务端", "后端"),
+        {
+            "facts": ["接口返回码与幂等处理", "回调状态机与补单链路", "服务日志与异常兜底"],
+            "risks": ["回调状态回写不一致", "异步通知漏测", "异常单补偿缺口"],
+            "outputs": ["服务端测试范围", "接口校验点", "回滚与补偿方案"],
+        },
+    ),
+    (
+        ("客户端", "前端", "App"),
+        {
+            "facts": ["端侧唤起与结果页提示", "弱网重试与重复点击", "埋点回传与状态刷新"],
+            "risks": ["端侧提示与服务端状态不一致", "弱网场景体验失真", "埋点遗漏影响复盘"],
+            "outputs": ["端侧验证清单", "交互验收口径", "端到端回归范围"],
+        },
+    ),
+    (
+        ("产品", "业务负责人"),
+        {
+            "facts": ["业务规则边界", "异常流程与用户提示", "上线验收口径"],
+            "risks": ["规则口径反复变更", "验收标准不统一", "异常路径没有业务兜底"],
+            "outputs": ["需求冻结清单", "规则确认稿", "上线验收标准"],
+        },
+    ),
+    (
+        ("数据", "分析"),
+        {
+            "facts": ["指标口径与样本范围", "监控看板与异常阈值", "复盘所需数据留痕"],
+            "risks": ["指标口径不统一", "监控阈值失真", "复盘数据缺口"],
+            "outputs": ["数据口径说明", "监控指标清单", "效果复盘模板"],
+        },
+    ),
+    (
+        ("运营", "会员运营", "活动运营"),
+        {
+            "facts": ["活动触达节奏", "用户分层与触达路径", "资源位与内容准备度"],
+            "risks": ["触达节奏与资源位错配", "活动口径前后台不一致", "复盘数据断层"],
+            "outputs": ["执行排期表", "运营口径说明", "触达与复购复盘表"],
+        },
+    ),
+    (
+        ("门店",),
+        {
+            "facts": ["门店执行动作", "一线反馈与异常案例", "门店人员培训准备度"],
+            "risks": ["门店执行标准不统一", "异常反馈回流不及时", "培训不到位影响落地"],
+            "outputs": ["门店动作清单", "反馈收集表", "执行培训安排"],
+        },
+    ),
+    (
+        ("患者", "家属"),
+        {
+            "facts": ["症状变化记录", "用药执行情况", "复查时间安排"],
+            "risks": ["症状变化被忽略", "用药执行不到位", "复查节奏被拖延"],
+            "outputs": ["复查提醒单", "家庭观察重点", "异常反馈方式"],
+        },
+    ),
+]
+
 _CN_TEMPLATE_REWRITES: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"^从实际情况来看，这个方案需要分几个步骤.*"), "如果要继续推进，最好先把现状摸清，再决定方案和节奏。"),
     (re.compile(r"^根据以往的经验，类似的情况处理周期.*"), "如果按常规节奏推进，一般要先确认现状，再安排后续处理，不用急着一步到位。"),
@@ -70,6 +147,7 @@ def canonical_language(value: str | None) -> str:
 
 def _normalize_line_text(text: str) -> str:
     updated = re.sub(r"\s+", " ", str(text or "").strip())
+    updated = _INLINE_DESCRIPTOR_RE.sub("", updated)
     updated = re.sub(r"\s+([,.!?;:])", r"\1", updated)
     return updated
 
@@ -105,16 +183,31 @@ def _clip_text(text: str, limit: int = 18) -> str:
     return cleaned[:limit] if len(cleaned) > limit else cleaned
 
 
-def _normalize_topic_candidate(text: str, limit: int = 20) -> str:
+def _strip_descriptor_prefix(text: str) -> str:
     updated = str(text or "").strip()
+    while updated:
+        next_value = _DESCRIPTOR_PREFIX_RE.sub("", updated).strip()
+        if next_value == updated:
+            break
+        updated = next_value
+    return updated
+
+
+def _normalize_topic_candidate(text: str, limit: int = 20) -> str:
+    updated = _strip_descriptor_prefix(text)
     if not updated:
         return ""
-    updated = re.sub(r"^(文本主题|主题|场景|主题概括)\s*[:：]?\s*", "", updated)
     updated = re.sub(r"^(围绕|关于)", "", updated)
+    updated = re.sub(r"^(先对齐|比较|收敛|拆开|明确|形成|负责把|推动|补充|说明|判断)", "", updated)
+    updated = re.sub(r"(进行真实自然的多轮.*|展开真实自然的多轮.*|多轮.*对话|场景对话|评审会对话|进行讨论|展开讨论)$", "", updated)
+    updated = re.sub(r"(中的现状目标和关键背景|对应的取舍与优先级|的下一步方案责任分工和验证口径|有明确负责人验证方式和时间点)$", "", updated)
     updated = re.sub(r"(进行真实自然的多轮.*|展开真实自然的多轮.*|多轮.*对话|场景对话|评审会对话|进行讨论|展开讨论)$", "", updated)
     updated = re.sub(r"\s+", "", updated)
     updated = updated.strip("“”\"'《》[]【】")
+    updated = updated.strip("，。；;：:、")
     if not updated:
+        return ""
+    if updated in _GENERIC_FOCUS_TERMS:
         return ""
     return updated[:limit] if len(updated) > limit else updated
 
@@ -123,12 +216,12 @@ def _split_meaningful_pieces(text: str) -> list[str]:
     updated = str(text or "").strip()
     if not updated:
         return []
-    updated = re.sub(r"^(核心对话内容|核心内容|补充要求|文本主题|主题模板|行业场景|场景类型|角色分工|讨论重点|目标输出|写作要求|参与角色|最终目标|主题)\s*[:：]?\s*", "", updated)
+    updated = _strip_descriptor_prefix(updated)
     updated = re.sub(r"对话中必须明确体现这些关键词[——:：-]*", "", updated)
     updated = re.sub(r"(请生成自然、真实、口语化的多轮对话文本|请生成真实自然的多轮对话文本)", "", updated)
     pieces: list[str] = []
     for piece in re.split(r"[\n,，。；;、/｜|]+", updated):
-        piece = re.sub(r"^(核心对话内容|核心内容|补充要求|文本主题|主题模板|行业场景|场景类型|角色分工|讨论重点|目标输出|写作要求|参与角色|最终目标|主题)\s*[:：]?\s*", "", piece.strip())
+        piece = _strip_descriptor_prefix(piece.strip())
         cleaned = _normalize_topic_candidate(piece, limit=24)
         if cleaned and cleaned not in pieces:
             pieces.append(cleaned)
@@ -366,6 +459,7 @@ def enforce_keywords_in_lines(
         updated = list(lines)
         additions: list[tuple[str, str]] = []
         role_briefs = _context_role_briefs(generation_context, profile, len(order), _is_medical_context(scenario, core_content, profile))
+        role_objectives = _context_role_objectives(generation_context, role_briefs, _split_focus_candidates(core_content, scenario, title), topic)
         for index, keyword in enumerate(missing_keywords):
             speaker = order[(index + 1) % len(order)] if len(order) > 1 else primary_speaker
             injected = False
@@ -373,21 +467,32 @@ def enforce_keywords_in_lines(
                 line_speaker, line_text = updated[pos]
                 if line_speaker != speaker or _keyword_in_text(line_text, keyword):
                     continue
+                speaker_index = order.index(speaker) if speaker in order else 0
+                role_hint = role_briefs[speaker_index] if speaker_index < len(role_briefs) else "相关角色"
+                objective_hint = _objective_summary(role_objectives[speaker_index], keyword) if speaker_index < len(role_objectives) else keyword
+                clause_variants = [
+                    f"尤其是{keyword}这块得落到明确负责人和验证口径",
+                    f"这里最容易被忽略的其实是{keyword}，后面不补清楚就会影响{objective_hint}",
+                    f"另外{keyword}不能只停在提一下，最好直接说到怎么做、谁来跟进",
+                    f"{keyword}这块如果不讲透，站在{role_hint}角度后面会一直担心执行跑偏",
+                ]
                 clause = (
-                    f"尤其是{keyword}这块需要单独盯住"
+                    clause_variants[index % len(clause_variants)]
                     if speaker == primary_speaker
-                    else f"我这里最担心的就是{keyword}会不会影响后面的判断"
+                    else clause_variants[(index + speaker_index + 1) % len(clause_variants)]
                 )
                 updated[pos] = (line_speaker, _normalize_line_text(f"{line_text.rstrip('。！？!?；;，,')}，{clause}。"))
                 injected = True
                 break
             if injected:
                 continue
-            joined_role = role_briefs[order.index(speaker)] if speaker in order and order.index(speaker) < len(role_briefs) else "相关角色"
+            speaker_index = order.index(speaker) if speaker in order else 0
+            joined_role = role_briefs[speaker_index] if speaker_index < len(role_briefs) else "相关角色"
+            objective_hint = _objective_summary(role_objectives[speaker_index], keyword) if speaker_index < len(role_objectives) else keyword
             if speaker == primary_speaker:
-                additions.append((speaker, f"另外，围绕{topic}这件事，{keyword}这块也得重点说清楚。"))
+                additions.append((speaker, f"另外，围绕{topic}这件事，{keyword}这块也得重点说清楚，不然后面很难把{objective_hint}收住。"))
             else:
-                additions.append((speaker, f"从{joined_role}这边看，我现在最关心的就是{keyword}，想听听更具体的判断。"))
+                additions.append((speaker, f"从{joined_role}这边看，我现在最关心的就是{keyword}，因为这会直接影响{objective_hint}，想听听更具体的判断。"))
         return [*updated, *additions], missing_keywords
 
     speaker_label = primary_speaker
@@ -481,7 +586,7 @@ _SECONDARY_ROLE_HINTS = [
 ]
 
 _BUSINESS_FOCUS_DEFAULTS = [
-    "当前现状",
+    "关键链路",
     "主要阻塞",
     "责任分工",
     "验收标准",
@@ -518,6 +623,79 @@ _DOMAIN_ROLE_HINTS = {
     "测试开发": ["测试负责人", "服务端开发", "客户端开发", "产品经理", "质量负责人"],
 }
 
+_DOMAIN_REALISM_GUIDE = {
+    "医疗健康": {
+        "facts": ["这段时间的症状变化", "检查指标和复查结果", "用药执行情况", "家属配合度"],
+        "risks": ["复查节点拖延", "症状变化判断偏差", "用药依从性不足", "风险提示没有同步到位"],
+        "outputs": ["复查安排", "观察重点", "异常处理提醒", "家庭配合动作"],
+    },
+    "人力资源与招聘": {
+        "facts": ["岗位缺口和业务优先级", "候选人画像匹配度", "渠道转化效率", "到岗时间压力"],
+        "risks": ["画像不清导致投放失焦", "业务需求反复变化", "关键岗位补位过慢", "offer转化不稳定"],
+        "outputs": ["招聘推进节奏", "渠道分配方案", "候选人筛选标准", "业务对齐口径"],
+    },
+    "娱乐/媒体": {
+        "facts": ["内容资源和排期情况", "品牌合作匹配度", "流量投放节奏", "商务回报预期"],
+        "risks": ["资源投入回收不成正比", "传播节奏失控", "品牌调性不匹配", "执行落地反复返工"],
+        "outputs": ["商务推进策略", "内容合作口径", "投放节奏安排", "复盘指标"],
+    },
+    "建筑与工程行业": {
+        "facts": ["现场进度和交付节点", "甲方反馈", "成本与采购情况", "施工配合条件"],
+        "risks": ["交付节奏失控", "现场问题反复出现", "成本偏差扩大", "验收节点卡住"],
+        "outputs": ["交付问题清单", "现场整改动作", "验收准备安排", "责任分工"],
+    },
+    "汽车行业": {
+        "facts": ["车型投放节奏", "渠道准备度", "库存与区域反馈", "卖点表达和市场认知"],
+        "risks": ["渠道准备不到位", "区域反馈滞后", "库存压力失衡", "卖点传达不一致"],
+        "outputs": ["投放节奏表", "区域协同安排", "渠道沟通口径", "销售跟进动作"],
+    },
+    "咨询/专业服务": {
+        "facts": ["客户真实诉求", "方案切入点", "关系推进状态", "交付能力匹配"],
+        "risks": ["方案太泛导致竞争力不足", "客户关系推进停滞", "交付承诺过度", "报价缺乏支撑"],
+        "outputs": ["客户拓展策略", "提案主线", "推进节奏", "角色分工"],
+    },
+    "法律服务": {
+        "facts": ["证据材料准备度", "风险边界判断", "合规要求", "客户关注点"],
+        "risks": ["表述越界", "证据链不完整", "整改建议难执行", "上线前合规把关不足"],
+        "outputs": ["法律判断结论", "整改建议", "审核口径", "落地安排"],
+    },
+    "金融/投资": {
+        "facts": ["风险偏好和收益目标", "资金安排", "资产组合现状", "调整窗口"],
+        "risks": ["收益预期过高", "风险暴露集中", "配置节奏失衡", "客户理解偏差"],
+        "outputs": ["配置建议", "风险提示", "组合调整动作", "沟通口径"],
+    },
+    "零售行业": {
+        "facts": ["会员分层现状", "活动触达效果", "门店配合度", "复购转化数据"],
+        "risks": ["活动策略不分层", "门店执行不到位", "优惠投入回收偏弱", "效果验证口径不统一"],
+        "outputs": ["复购方案", "活动策略", "门店配合动作", "效果验证标准"],
+    },
+    "保险行业": {
+        "facts": ["销售表现", "录音质检结果", "客户反馈", "培训执行情况"],
+        "risks": ["话术触碰红线", "培训改进未闭环", "团队差异扩大", "问题重复发生"],
+        "outputs": ["质检结论", "培训改进动作", "管理要求", "复盘标准"],
+    },
+    "房地产": {
+        "facts": ["客源结构", "案场转化情况", "渠道效率", "价格反馈"],
+        "risks": ["渠道投入回报失衡", "案场转化下滑", "客群匹配偏差", "价格策略迟滞"],
+        "outputs": ["去化提效方案", "渠道动作", "案场配合安排", "短期目标"],
+    },
+    "人工智能/科技": {
+        "facts": ["漏斗转化数据", "试用和付费表现", "用户价值感知", "实验结果"],
+        "risks": ["转化门槛设置不当", "价值感知不足", "数据回收不完整", "实验节奏失控"],
+        "outputs": ["转化方案", "实验计划", "产品优化方向", "验证指标"],
+    },
+    "制造业": {
+        "facts": ["瓶颈工序情况", "设备效率", "良率波动", "排产协同状态"],
+        "risks": ["瓶颈工序拖慢节奏", "设备异常反复出现", "良率波动放大", "异常处置滞后"],
+        "outputs": ["提效动作", "排产调整建议", "设备改善安排", "质量跟踪口径"],
+    },
+    "测试开发": {
+        "facts": ["链路覆盖情况", "灰度与压测结果", "监控告警准备度", "回滚与兜底方案"],
+        "risks": ["异常链路漏测", "回调和幂等处理不完整", "灰度窗口与回滚预案不清", "准入标准和告警阈值模糊"],
+        "outputs": ["测试范围清单", "准入结论", "风险清单", "上线前动作"],
+    },
+}
+
 
 def _content_length(lines: list[tuple[str, str]]) -> int:
     return sum(len(re.sub(r"\s+", "", str(text or ""))) for _, text in lines)
@@ -536,6 +714,26 @@ def _normalize_generation_context(generation_context: dict[str, Any] | None) -> 
         for item in generation_context.get("discussion_axes", [])
         if str(item or "").strip()
     ]
+    role_objectives = [
+        str(item or "").strip()
+        for item in generation_context.get("role_objectives", [])
+        if str(item or "").strip()
+    ]
+    stage_prompts = [
+        str(item or "").strip()
+        for item in generation_context.get("stage_prompts", [])
+        if str(item or "").strip()
+    ]
+    risk_checks = [
+        str(item or "").strip()
+        for item in generation_context.get("risk_checks", [])
+        if str(item or "").strip()
+    ]
+    success_signals = [
+        str(item or "").strip()
+        for item in generation_context.get("success_signals", [])
+        if str(item or "").strip()
+    ]
     quality_constraints = [
         str(item or "").strip()
         for item in generation_context.get("quality_constraints", [])
@@ -547,7 +745,11 @@ def _normalize_generation_context(generation_context: dict[str, Any] | None) -> 
         "scene_goal": str(generation_context.get("scene_goal") or "").strip(),
         "deliverable": str(generation_context.get("deliverable") or "").strip(),
         "role_briefs": role_briefs,
+        "role_objectives": role_objectives,
         "discussion_axes": discussion_axes,
+        "stage_prompts": stage_prompts,
+        "risk_checks": risk_checks,
+        "success_signals": success_signals,
         "quality_constraints": quality_constraints,
     }
 
@@ -573,6 +775,158 @@ def _context_role_briefs(
     while len(roles) < people_count:
         roles.append(f"相关协作方{len(roles)}")
     return roles[:people_count]
+
+
+def _context_role_objectives(
+    generation_context: dict[str, Any] | None,
+    role_briefs: list[str],
+    focus_points: list[str],
+    topic: str,
+) -> list[str]:
+    context = _normalize_generation_context(generation_context)
+    objectives = [item for item in context.get("role_objectives", []) if item]
+    if objectives:
+        while len(objectives) < len(role_briefs):
+            role_hint = role_briefs[len(objectives)]
+            focus = focus_points[len(objectives) % max(len(focus_points), 1)] if focus_points else topic
+            objectives.append(f"{role_hint}：围绕{focus}补充现状、风险和动作要求。")
+        return objectives[: len(role_briefs)]
+
+    generated: list[str] = []
+    for index, role_hint in enumerate(role_briefs):
+        focus = focus_points[index % max(len(focus_points), 1)] if focus_points else topic
+        follow = focus_points[(index + 2) % max(len(focus_points), 1)] if focus_points else topic
+        if index == 0:
+            generated.append(f"{role_hint}：负责推动围绕{focus}和{follow}的判断收敛，拿到清晰结论。")
+        else:
+            generated.append(f"{role_hint}：围绕{focus}补充事实、风险和执行条件，不重复别人观点。")
+    return generated
+
+
+def _context_stage_prompts(generation_context: dict[str, Any] | None, topic: str, focus_points: list[str]) -> list[str]:
+    context = _normalize_generation_context(generation_context)
+    prompts = [item for item in context.get("stage_prompts", []) if item]
+    if prompts:
+        return prompts
+    first = focus_points[0] if focus_points else topic
+    second = focus_points[1] if len(focus_points) > 1 else first
+    third = focus_points[2] if len(focus_points) > 2 else second
+    return [
+        f"先对齐{topic}的现状、目标和关键背景",
+        f"围绕{first}、{second}拆开主要风险和约束",
+        f"比较可执行方案，明确{third}对应的取舍与优先级",
+        "收敛责任分工、时间点和验收方式",
+    ]
+
+
+def _context_risk_checks(generation_context: dict[str, Any] | None, focus_points: list[str], topic: str) -> list[str]:
+    context = _normalize_generation_context(generation_context)
+    checks = [item for item in context.get("risk_checks", []) if item]
+    if checks:
+        return checks
+    results = [f"{point}是否边界不清或容易执行落空" for point in focus_points[:4]]
+    if not results:
+        results = [f"{topic}是否存在边界不清或执行落空的风险"]
+    return results
+
+
+def _context_success_signals(generation_context: dict[str, Any] | None, focus_points: list[str], topic: str) -> list[str]:
+    context = _normalize_generation_context(generation_context)
+    signals = [item for item in context.get("success_signals", []) if item]
+    if signals:
+        return signals
+    results = [f"{point}有明确负责人、验证方式和时间点" for point in focus_points[:3]]
+    if not results:
+        results = [f"{topic}形成明确结论、分工和验收口径"]
+    return results
+
+
+def _role_specific_pack(role_hint: str, medical: bool) -> dict[str, list[str]]:
+    if medical:
+        for markers, pack in _ROLE_SPECIFIC_PACKS:
+            if any(marker in role_hint for marker in markers):
+                return pack
+        return {
+            "facts": ["症状变化记录", "用药执行情况", "复查时间安排"],
+            "risks": ["症状变化被忽略", "复查节奏拖延", "家庭配合不到位"],
+            "outputs": ["复查安排单", "观察重点说明", "异常反馈方式"],
+        }
+    for markers, pack in _ROLE_SPECIFIC_PACKS:
+        if any(marker in role_hint for marker in markers):
+            return pack
+    return {
+        "facts": ["当前现状", "关键约束", "执行准备度"],
+        "risks": ["边界不清", "执行落空", "协作断层"],
+        "outputs": ["行动清单", "责任分工", "验收口径"],
+    }
+
+
+def _objective_summary(objective: str, fallback: str) -> str:
+    pieces = _split_meaningful_pieces(_strip_role_prefix(objective))
+    for piece in pieces:
+        if len(piece) >= 2:
+            return piece
+    return fallback
+
+
+def _strip_role_prefix(text: str) -> str:
+    updated = str(text or "").strip()
+    if "：" in updated:
+        return updated.split("：", 1)[1].strip()
+    return updated
+
+
+def _dialogue_quality_metrics(
+    lines: list[tuple[str, str]],
+    people_count: int,
+    target_word_count: int,
+    keywords: list[str],
+) -> dict[str, Any]:
+    text_length = _content_length(lines)
+    rendered = [_normalize_line_text(text) for _, text in lines if _normalize_line_text(text)]
+    unique_ratio = len(set(rendered)) / max(1, len(rendered))
+    counts = _speaker_turn_counts(lines)
+    covered_speakers = sum(1 for turns in counts.values() if turns >= 3)
+    speaker_coverage = covered_speakers / max(1, people_count)
+    keyword_hit_ratio = 1.0
+    if keywords:
+        all_text = "\n".join(text for _, text in lines)
+        hit_count = sum(1 for keyword in keywords if _keyword_in_text(all_text, keyword))
+        keyword_hit_ratio = hit_count / max(1, len(keywords))
+    length_fit = 1.0 - min(1.0, abs(text_length - target_word_count) / max(100, target_word_count))
+    score = round(unique_ratio * 0.35 + speaker_coverage * 0.25 + keyword_hit_ratio * 0.2 + length_fit * 0.2, 3)
+    return {
+        "content_length": text_length,
+        "unique_ratio": round(unique_ratio, 3),
+        "speaker_coverage": round(speaker_coverage, 3),
+        "keyword_hit_ratio": round(keyword_hit_ratio, 3),
+        "length_fit": round(length_fit, 3),
+        "score": score,
+    }
+
+
+def _domain_realism_pack(generation_context: dict[str, Any] | None, profile: dict[str, Any] | None, medical: bool) -> dict[str, list[str]]:
+    context = _normalize_generation_context(generation_context)
+    domain = str(context.get("domain") or "").strip()
+    use_case = str((profile or {}).get("use_case") or "")
+    if not domain and "｜" in use_case:
+        domain = use_case.split("｜", 1)[0].strip()
+    if medical and not domain:
+        domain = "医疗健康"
+    pack = _DOMAIN_REALISM_GUIDE.get(domain)
+    if pack:
+        return pack
+    return {
+        "facts": ["当前现状", "关键约束", "协作条件", "执行节奏"],
+        "risks": ["边界不清", "执行落空", "责任模糊", "结果无法验证"],
+        "outputs": ["结论", "行动项", "验收标准", "责任分工"],
+    }
+
+
+def _realism_pick(items: list[str], index: int, fallback: str) -> str:
+    if not items:
+        return fallback
+    return items[index % len(items)]
 
 
 def _rendered_length(lines: list[tuple[str, str]]) -> int:
@@ -617,7 +971,7 @@ def _needs_dialogue_repair(
 
     counts = _speaker_turn_counts(lines)
     for speaker in order[1:]:
-        if counts.get(speaker, 0) < 2:
+        if counts.get(speaker, 0) < 3:
             return True
 
     rendered = [_normalize_line_text(text) for _, text in lines if _normalize_line_text(text)]
@@ -625,14 +979,14 @@ def _needs_dialogue_repair(
         return True
 
     unique_ratio = len(set(rendered)) / max(1, len(rendered))
-    if unique_ratio < 0.75:
+    if unique_ratio < 0.82:
         return True
 
     generic_secondary = sum(1 for speaker, text in lines if speaker != order[0] and _secondary_line_is_generic(text))
     if generic_secondary >= max(2, len(order) - 1):
         return True
 
-    if _content_length(lines) < int(target_word_count * 0.92):
+    if _content_length(lines) < int(target_word_count * 0.96):
         return True
 
     return False
@@ -650,13 +1004,22 @@ def _structured_focus_points(
     preferred = [item.strip() for item in keywords if item and item.strip()]
     context = _normalize_generation_context(generation_context)
     context_axes = context.get("discussion_axes", [])
-    candidates = [*preferred, *context_axes, *_split_focus_candidates(focus, core_content, topic)]
-    if not context_axes:
+    candidates = [
+        *preferred,
+        *context_axes,
+        *_split_focus_candidates(focus, topic),
+    ]
+    if len(candidates) < 4:
+        candidates.extend(_split_focus_candidates(core_content))
+    if len(candidates) < 4 and not context_axes:
         candidates.extend(_split_focus_candidates(scenario))
     ignored = {str(context.get("domain") or "").strip(), "测试开发", "通用业务"}
     deliverable = context.get("deliverable")
-    if deliverable:
+    if deliverable and len(candidates) < 5:
         candidates.extend(_split_focus_candidates(str(deliverable)))
+    risk_checks = context.get("risk_checks", [])
+    if len(candidates) < 6:
+        candidates.extend(_split_focus_candidates(*risk_checks))
     results: list[str] = []
     for candidate in candidates:
         if candidate and candidate not in ignored and candidate not in results:
@@ -768,20 +1131,342 @@ def _primary_plan_line(point: str, topic: str, round_index: int, medical: bool) 
     return variants[round_index % len(variants)]
 
 
-def _secondary_commit_line(role_hint: str, point: str, round_index: int, speaker_variant: int, medical: bool) -> str:
+def _primary_realism_line(
+    point: str,
+    topic: str,
+    realism_pack: dict[str, list[str]],
+    round_index: int,
+    medical: bool,
+) -> str:
+    fact_hint = _realism_pick(realism_pack.get("facts", []), round_index, point)
+    fact_hint_secondary = _realism_pick(realism_pack.get("facts", []), round_index + 1, fact_hint)
+    risk_hint = _realism_pick(realism_pack.get("risks", []), round_index, point)
+    output_hint = _realism_pick(realism_pack.get("outputs", []), round_index, topic)
     if medical:
         variants = [
-            f"明白了，那我会先把和{point}有关的实际感受、检查情况和这段时间的变化整理出来。",
-            f"好，那围绕{point}我这边会先按你说的观察，有异常就及时反馈，不拖到下次再说。",
-            f"这样我就更清楚了，后面关于{point}我会按你说的节奏配合复查和记录。",
+            f"再往前走一步，{point}不能只停在感觉层面，像{fact_hint}和{risk_hint}这些都要对应到后面的{output_hint}上。",
+            f"如果现在就准备后续安排，我更希望先把{fact_hint}核实清楚，不然{risk_hint}这类问题后面还是会反复出现。",
+            f"围绕{topic}，我们最后一定要落到{output_hint}，否则前面关于{point}的讨论就很难真正帮到后续处理。",
         ]
     else:
         variants = [
-            f"明白了，那我这边会先把和{point}有关的现状、数据和阻塞项整理出来，再跟大家对一次。",
-            f"好，那围绕{point}我会从{role_hint}这个角度先把责任人、时间点和验证方式补齐，避免后面再来回改。",
-            f"这样我就更清楚了，后面关于{point}我会先把和{role_hint}有关的准备工作做扎实，再推进下一步。",
+            f"再往前走一步，{point}不能只停在判断层面，像{fact_hint}、{fact_hint_secondary}和{risk_hint}这些都要对应到后面的{output_hint}上。",
+            f"如果现在就准备推进，我更希望先把{fact_hint}和{fact_hint_secondary}核实清楚，不然{risk_hint}这类问题后面还是会反复返工。",
+            f"围绕{topic}，我们最后一定要落到{output_hint}，否则前面关于{point}的讨论很容易停在口头上。",
+        ]
+    return variants[round_index % len(variants)]
+
+
+def _secondary_commit_line(
+    role_hint: str,
+    point: str,
+    success_signal: str,
+    realism_pack: dict[str, list[str]],
+    round_index: int,
+    speaker_variant: int,
+    medical: bool,
+) -> str:
+    role_pack = _role_specific_pack(role_hint, medical)
+    fact_pool = [*role_pack.get("facts", []), *realism_pack.get("facts", [])]
+    output_pool = [*role_pack.get("outputs", []), *realism_pack.get("outputs", [])]
+    fact_hint = _realism_pick(fact_pool, round_index + speaker_variant, point)
+    output_hint = _realism_pick(output_pool, round_index + speaker_variant + 1, success_signal)
+    success_hint = _objective_summary(success_signal, point)
+    if medical:
+        variants = [
+            f"明白了，那我会先把和{point}有关的{fact_hint}整理出来，再按{success_hint}去配合后面的{output_hint}。",
+            f"好，那围绕{point}我这边会先把观察重点和异常反馈方式对齐，尤其把{fact_hint}补全，不拖到下次再说。",
+            f"这样我就更清楚了，后面关于{point}我会按你说的节奏把{output_hint}和{success_hint}一起配合起来。",
+        ]
+    else:
+        variants = [
+            f"明白了，那我这边会先把和{point}有关的{fact_hint}、现状数据和阻塞项整理出来，再把{output_hint}对给大家。",
+            f"好，那围绕{point}我会从{role_hint}这个角度先把责任人、时间点、验证方式和{success_hint}补齐，避免后面再来回改。",
+            f"这样我就更清楚了，后面关于{point}我会先把{fact_hint}和{output_hint}准备扎实，再推进下一步。",
         ]
     return variants[(round_index + speaker_variant) % len(variants)]
+
+
+def _primary_stage_open_line(
+    stage_prompt: str,
+    topic: str,
+    point: str,
+    deliverable: str,
+    scene_goal: str,
+    round_index: int,
+    medical: bool,
+) -> str:
+    deliverable_hint = _objective_summary(deliverable, "明确结论")
+    scene_hint = _objective_summary(scene_goal, topic)
+    if scene_hint and (scene_hint in point or point in scene_hint):
+        scene_hint = deliverable_hint
+    if medical:
+        variants = [
+            f"我们先按“{stage_prompt}”往下聊，重点还是把{point}和{scene_hint}这两件事先讲明白。",
+            f"这一轮我想先围绕{point}展开，不只是给结论，也要把为什么这么判断和后面怎么安排说清楚。",
+            f"先别着急往后跳，我们先把{stage_prompt}这一段过扎实，最后才能把{deliverable_hint}落稳。",
+            f"围绕{topic}，这一段先聚焦{point}，把现状、风险和后续安排都放到桌面上。",
+        ]
+    else:
+        variants = [
+            f"这一轮我们先按“{stage_prompt}”往下推，先把{point}和{scene_hint}这两件事讲透。",
+            f"我想先围绕{point}展开，不只是判断对错，还要把会影响推进的关键约束一起摆出来。",
+            f"先别急着往结论跳，先把{stage_prompt}这一段聊扎实，最后才能把{deliverable_hint}落到实处。",
+            f"围绕{topic}，这一段先聚焦{point}，把事实、风险和动作一次对齐。",
+        ]
+    return variants[round_index % len(variants)]
+
+
+def _secondary_stage_line(
+    role_hint: str,
+    objective: str,
+    point: str,
+    risk_check: str,
+    success_signal: str,
+    realism_pack: dict[str, list[str]],
+    stage_prompt: str,
+    round_index: int,
+    speaker_variant: int,
+    medical: bool,
+) -> str:
+    objective_hint = _objective_summary(objective, point)
+    risk_hint = _objective_summary(risk_check, point)
+    success_hint = _objective_summary(success_signal, point)
+    role_pack = _role_specific_pack(role_hint, medical)
+    fact_pool = [*role_pack.get("facts", []), *realism_pack.get("facts", [])]
+    risk_pool = [*role_pack.get("risks", []), *realism_pack.get("risks", [])]
+    output_pool = [*role_pack.get("outputs", []), *realism_pack.get("outputs", [])]
+    fact_hint = _realism_pick(fact_pool, round_index + speaker_variant, point)
+    fact_hint_secondary = _realism_pick(fact_pool, round_index + speaker_variant + 1, fact_hint)
+    risk_detail = _realism_pick(risk_pool, round_index + speaker_variant, risk_hint)
+    output_hint = _realism_pick(output_pool, round_index + speaker_variant + 1, success_hint)
+    if medical:
+        variants = [
+            f"从{role_hint}这边看，这一轮我最想先确认的是{point}，尤其{fact_hint}和{risk_detail}这两块要先说清楚，不然后面很难按{stage_prompt}继续往下走。",
+            f"我补充一个实际情况，围绕{point}如果现在只停在笼统判断上，后面关于{output_hint}和{success_hint}就很容易落空，所以最好先把{fact_hint_secondary}讲细。",
+            f"如果按{objective_hint}这个思路推进，那{point}至少要落到什么时候观察、什么时候复查、什么情况下要及时反馈，同时把{fact_hint}同步到位。",
+            f"我再把顾虑说具体一点，{point}不只是一个判断题，它会直接牵动{risk_hint}和{output_hint}，所以这轮最好把边界和动作一次讲透。",
+        ]
+    else:
+        variants = [
+            f"从{role_hint}这边看，这一轮我最想先确认的是{point}，因为这会直接影响后面的排期和推进，尤其{fact_hint}、{fact_hint_secondary}以及{risk_detail}这几块不能糊过去。",
+            f"我补充一个执行层面的判断，围绕{point}如果现在不把{fact_hint}和{output_hint}说到位，后面就算大家表面同意了，真正落到{success_hint}时也会反复返工。",
+            f"如果按{objective_hint}这个思路往下走，那{point}最好先拆到可执行，比如谁负责、什么时候验证、出了问题怎么兜底，同时把{fact_hint_secondary}讲清楚。",
+            f"站在{role_hint}角度，我希望这轮别只讲原则，最好直接把{point}对应的{fact_hint}、{risk_hint}和{output_hint}说到能执行，不然{stage_prompt}这一段就会悬着。",
+        ]
+    return variants[(round_index + speaker_variant) % len(variants)]
+
+
+def _primary_stage_close_line(
+    stage_prompt: str,
+    point: str,
+    deliverable: str,
+    success_signal: str,
+    round_index: int,
+    medical: bool,
+) -> str:
+    deliverable_hint = _objective_summary(deliverable, point)
+    success_hint = _objective_summary(success_signal, point)
+    if medical:
+        variants = [
+            f"好，这一段先收一下，围绕{point}至少已经把关键情况讲开了，后面我们就继续往{deliverable_hint}上收口。",
+            f"你们刚才补得比较完整，下一步就按{stage_prompt}继续走，把{success_hint}也一并说到能执行。",
+            f"这轮先到这里，围绕{point}我已经听到比较清楚的关切了，下面我们继续把{deliverable_hint}细化下来。",
+            f"我先做个小结，{point}这块不能再停在感受层面了，后面要直接落到{success_hint}和具体安排。",
+        ]
+    else:
+        variants = [
+            f"好，这一段先收一下，围绕{point}至少已经把关键事实和约束讲开了，后面我们继续往{deliverable_hint}上收口。",
+            f"你们刚才补得比较完整，下一步就按{stage_prompt}继续走，把{success_hint}也一并讲到能执行。",
+            f"这轮先到这里，围绕{point}我已经听到比较清楚的分歧和风险了，下面我们继续把{deliverable_hint}细化下来。",
+            f"我先做个小结，{point}这块不能再停在判断层面了，后面要直接落到{success_hint}和具体动作。",
+        ]
+    return variants[round_index % len(variants)]
+
+
+def _trim_dialogue_to_target(
+    lines: list[tuple[str, str]],
+    speakers: list[str],
+    target_word_count: int,
+    minimum_floor: int | None = None,
+) -> list[tuple[str, str]]:
+    target_ceiling = max(260, int(target_word_count * 1.01))
+    minimum_floor = max(220, int(minimum_floor or 0))
+    trimmed = list(lines)
+    minimum_turns = {speaker: 3 for speaker in speakers}
+    counts = _speaker_turn_counts(trimmed)
+    while _content_length(trimmed) > target_ceiling and len(trimmed) > len(speakers) * 3:
+        speaker, _ = trimmed[-1]
+        projected_length = _content_length(trimmed[:-1])
+        if counts.get(speaker, 0) > minimum_turns.get(speaker, 2) and (
+            not minimum_floor or projected_length >= minimum_floor
+        ):
+            counts[speaker] -= 1
+            trimmed.pop()
+            continue
+        removable_index = None
+        for index in range(len(trimmed) - 1, -1, -1):
+            candidate_speaker, _ = trimmed[index]
+            candidate_trimmed = trimmed[:index] + trimmed[index + 1 :]
+            if counts.get(candidate_speaker, 0) > minimum_turns.get(candidate_speaker, 2) and (
+                not minimum_floor or _content_length(candidate_trimmed) >= minimum_floor
+            ):
+                removable_index = index
+                break
+        if removable_index is None:
+            break
+        candidate_speaker, _ = trimmed.pop(removable_index)
+        counts[candidate_speaker] -= 1
+    while _content_length(trimmed) > target_ceiling:
+        shortened_index = None
+        shortened_text = ""
+        best_delta = 0
+        for index, (speaker, text) in enumerate(trimmed):
+            candidate = re.sub(r"[，,][^，,。！？!?]{10,40}[。！？!?]?$", "。", text)
+            candidate = _normalize_line_text(candidate)
+            if candidate == text or len(candidate) < 16:
+                continue
+            delta = len(re.sub(r"\s+", "", text)) - len(re.sub(r"\s+", "", candidate))
+            if delta <= 0:
+                continue
+            candidate_trimmed = list(trimmed)
+            candidate_trimmed[index] = (speaker, candidate)
+            if minimum_floor and _content_length(candidate_trimmed) < minimum_floor:
+                continue
+            if delta > best_delta:
+                shortened_index = index
+                shortened_text = candidate
+                best_delta = delta
+        if shortened_index is None:
+            break
+        speaker, _ = trimmed[shortened_index]
+        trimmed[shortened_index] = (speaker, shortened_text)
+    return trimmed
+
+
+def _stabilize_chinese_dialogue(
+    lines: list[tuple[str, str]],
+    title: str,
+    scenario: str,
+    core_content: str,
+    profile: dict[str, Any] | None,
+    target_word_count: int,
+    people_count: int,
+    keywords: list[str],
+    generation_context: dict[str, Any] | None = None,
+) -> list[tuple[str, str]]:
+    order = [f"Speaker {index}" for index in range(1, max(2, people_count) + 1)]
+    current_order = _speaker_order(lines)
+    speaker_map = {speaker: order[min(index, len(order) - 1)] for index, speaker in enumerate(current_order)}
+    normalized: list[tuple[str, str]] = []
+    for speaker, text in lines:
+        mapped = speaker_map.get(speaker)
+        cleaned = _normalize_line_text(text)
+        if mapped and cleaned:
+            normalized.append((mapped, cleaned))
+
+    topic = _context_topic_fragment(title, scenario, core_content, profile)
+    medical = _is_medical_context(scenario, core_content, profile)
+    context = _normalize_generation_context(generation_context)
+    role_briefs = _context_role_briefs(context, profile, len(order), medical)
+    points = _structured_focus_points(topic, _core_focus_fragment(title, core_content, scenario, profile) or topic, keywords, core_content, scenario, medical, context)
+    role_objectives = _context_role_objectives(context, role_briefs, points, topic)
+    stage_prompts = _context_stage_prompts(context, topic, points)
+    risk_checks = _context_risk_checks(context, points, topic)
+    success_signals = _context_success_signals(context, points, topic)
+    realism_pack = _domain_realism_pack(context, profile, medical)
+    speaker_names = _build_chinese_speaker_names([(speaker, "") for speaker in order], scenario, core_content, profile)
+    deliverable = context.get("deliverable") or f"围绕{topic}形成明确结论和下一步动作"
+    scene_goal = context.get("scene_goal") or topic
+
+    stabilized = list(normalized)
+    counts = _speaker_turn_counts(stabilized)
+    for speaker_index, speaker in enumerate(order):
+        role_hint = role_briefs[speaker_index] if speaker_index < len(role_briefs) else f"相关协作方{speaker_index}"
+        while counts.get(speaker, 0) < 3:
+            turn_index = counts.get(speaker, 0)
+            point = _speaker_specific_point(points, speaker_index + turn_index, turn_index)
+            objective = role_objectives[speaker_index] if speaker_index < len(role_objectives) else f"{role_hint}：围绕{point}补充事实和动作要求。"
+            risk_check = risk_checks[(speaker_index + turn_index) % len(risk_checks)] if risk_checks else point
+            success_signal = success_signals[(speaker_index + turn_index) % len(success_signals)] if success_signals else deliverable
+            stage_prompt = stage_prompts[(speaker_index + turn_index) % len(stage_prompts)]
+            if turn_index == 0:
+                if speaker_index == 0:
+                    candidate = _build_intro_line(speaker, order[0], speaker_names, topic, medical, role_hint, scene_goal)
+                else:
+                    candidate = _secondary_intro_line(speaker_names.get(speaker, "李明"), role_hint, point, medical)
+            elif turn_index == 1:
+                if speaker_index == 0:
+                    candidate = _primary_stage_open_line(stage_prompt, topic, point, deliverable, scene_goal, turn_index, medical)
+                else:
+                    candidate = _secondary_stage_line(
+                        role_hint,
+                        objective,
+                        point,
+                        risk_check,
+                        success_signal,
+                        realism_pack,
+                        stage_prompt,
+                        turn_index,
+                        speaker_index,
+                        medical,
+                    )
+            else:
+                if speaker_index == 0:
+                    candidate = _primary_stage_close_line(stage_prompt, point, deliverable, success_signal, turn_index, medical)
+                else:
+                    candidate = _secondary_commit_line(role_hint, point, success_signal, realism_pack, turn_index, speaker_index, medical)
+            stabilized.append((speaker, candidate))
+            counts[speaker] = counts.get(speaker, 0) + 1
+
+    target_floor = max(260, int(target_word_count * 0.99))
+    grow_round = 0
+    while _content_length(stabilized) < target_floor:
+        added_any = False
+        for speaker_index, speaker in enumerate(order):
+            role_hint = role_briefs[speaker_index] if speaker_index < len(role_briefs) else f"相关协作方{speaker_index}"
+            point = _speaker_specific_point(points, speaker_index + grow_round, grow_round)
+            objective = role_objectives[speaker_index] if speaker_index < len(role_objectives) else f"{role_hint}：围绕{point}补充事实和动作要求。"
+            risk_check = risk_checks[(speaker_index + grow_round) % len(risk_checks)] if risk_checks else point
+            success_signal = success_signals[(speaker_index + grow_round) % len(success_signals)] if success_signals else deliverable
+            stage_prompt = stage_prompts[(speaker_index + grow_round) % len(stage_prompts)]
+            if speaker_index == 0:
+                candidate = _primary_plan_line(point, topic, grow_round, medical)
+            elif grow_round % 2 == 0:
+                candidate = _secondary_followup_line(role_hint, point, grow_round, speaker_index, medical)
+            else:
+                candidate = _secondary_stage_line(
+                    role_hint,
+                    objective,
+                    point,
+                    risk_check,
+                    success_signal,
+                    realism_pack,
+                    stage_prompt,
+                    grow_round,
+                    speaker_index,
+                    medical,
+                )
+            entry = (speaker, _normalize_line_text(candidate))
+            if entry not in stabilized:
+                stabilized.append(entry)
+                added_any = True
+            if _content_length(stabilized) >= target_floor:
+                break
+        if not added_any:
+            break
+        grow_round += 1
+        if grow_round > 8:
+            break
+
+    deduped: list[tuple[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for speaker, text in stabilized:
+        key = (speaker, _normalize_line_text(text))
+        if key[1] and key not in seen:
+            seen.add(key)
+            deduped.append(key)
+    return _trim_dialogue_to_target(deduped, order, target_word_count, minimum_floor=target_floor)
 
 
 def _build_structured_chinese_dialogue(
@@ -803,7 +1488,14 @@ def _build_structured_chinese_dialogue(
     context = _normalize_generation_context(generation_context)
     role_briefs = _context_role_briefs(context, profile, len(order), medical)
     points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario, medical, context)
+    role_objectives = _context_role_objectives(context, role_briefs, points, topic)
+    stage_prompts = _context_stage_prompts(context, topic, points)
+    risk_checks = _context_risk_checks(context, points, topic)
+    success_signals = _context_success_signals(context, points, topic)
+    realism_pack = _domain_realism_pack(context, profile, medical)
     focus = "、".join(points[:2]) if len(points) > 1 else (points[0] if points else topic)
+    deliverable = context.get("deliverable") or f"围绕{topic}形成明确结论和下一步动作"
+    scene_goal = context.get("scene_goal") or topic
 
     rebuilt: list[tuple[str, str]] = []
     primary = order[0]
@@ -819,35 +1511,48 @@ def _build_structured_chinese_dialogue(
     rebuilt.append((primary, _build_core_line(primary, primary, focus)))
 
     round_index = 0
-    target_floor = max(260, int(target_word_count * 0.99))
-    max_rounds = max(8, min(14, int(target_word_count / 110)))
+    target_floor = max(260, int(target_word_count * 1.01))
+    max_rounds = max(10, min(18, int(target_word_count / 90)))
     while _content_length(rebuilt) < target_floor:
+        stage_prompt = stage_prompts[round_index % len(stage_prompts)]
+        stage_point = _speaker_specific_point(points, round_index, round_index)
+        rebuilt.append((primary, _primary_stage_open_line(stage_prompt, topic, stage_point, deliverable, scene_goal, round_index, medical)))
         for idx, speaker in enumerate(secondary):
             role_hint = role_briefs[idx + 1] if idx + 1 < len(role_briefs) else _SECONDARY_ROLE_HINTS[idx % len(_SECONDARY_ROLE_HINTS)]
-            point = _speaker_specific_point(points, idx, round_index)
-            rebuilt.append((speaker, _secondary_round_line(role_hint, point, round_index, idx, medical)))
-        rebuilt.append((primary, _primary_summary_line(topic, focus, round_index)))
+            point = _speaker_specific_point(points, idx + round_index, round_index)
+            risk_check = risk_checks[(idx + round_index) % len(risk_checks)] if risk_checks else point
+            success_signal = success_signals[(idx + round_index) % len(success_signals)] if success_signals else deliverable
+            objective = role_objectives[idx + 1] if idx + 1 < len(role_objectives) else f"{role_hint}：围绕{point}补充事实和动作要求。"
+            rebuilt.append(
+                (
+                    speaker,
+                    _secondary_stage_line(
+                        role_hint,
+                        objective,
+                        point,
+                        risk_check,
+                        success_signal,
+                        realism_pack,
+                        stage_prompt,
+                        round_index,
+                        idx,
+                        medical,
+                    ),
+                )
+            )
+        rebuilt.append((primary, _primary_response_line(stage_point, round_index, medical)))
         for idx, speaker in enumerate(secondary):
-            point = _speaker_specific_point(points, idx + len(secondary), round_index)
+            point = _speaker_specific_point(points, idx + len(secondary) + round_index, round_index)
             role_hint = role_briefs[idx + 1] if idx + 1 < len(role_briefs) else _SECONDARY_ROLE_HINTS[(idx + round_index + 1) % len(_SECONDARY_ROLE_HINTS)]
-            rebuilt.append((speaker, _secondary_followup_line(role_hint, point, round_index, idx, medical)))
-        rebuilt.append((primary, _primary_response_line(_speaker_specific_point(points, round_index, round_index), round_index, medical)))
-        for idx, speaker in enumerate(secondary):
-            point = _speaker_specific_point(points, idx + len(secondary) * 2, round_index)
-            role_hint = role_briefs[idx + 1] if idx + 1 < len(role_briefs) else _SECONDARY_ROLE_HINTS[(idx + 2) % len(_SECONDARY_ROLE_HINTS)]
-            rebuilt.append((speaker, _secondary_commit_line(role_hint, point, round_index, idx, medical)))
+            success_signal = success_signals[(idx + round_index + 1) % len(success_signals)] if success_signals else deliverable
+            rebuilt.append((speaker, _secondary_commit_line(role_hint, point, success_signal, realism_pack, round_index, idx, medical)))
+        success_signal = success_signals[round_index % len(success_signals)] if success_signals else deliverable
+        rebuilt.append((primary, _primary_stage_close_line(stage_prompt, stage_point, deliverable, success_signal, round_index, medical)))
+        rebuilt.append((primary, _primary_realism_line(stage_point, topic, realism_pack, round_index, medical)))
         rebuilt.append((primary, _primary_plan_line(_speaker_specific_point(points, round_index + 1, round_index), topic, round_index, medical)))
         round_index += 1
         if round_index >= max_rounds:
             break
-
-    if rebuilt and _content_length(rebuilt) > int(target_word_count * 1.03):
-        trimmed: list[tuple[str, str]] = []
-        for speaker, text in rebuilt:
-            trimmed.append((speaker, text))
-            if _content_length(trimmed) >= int(target_word_count * 0.995):
-                break
-        rebuilt = trimmed
 
     deduped: list[tuple[str, str]] = []
     seen: set[tuple[str, str]] = set()
@@ -858,7 +1563,36 @@ def _build_structured_chinese_dialogue(
             continue
         seen.add(key)
         deduped.append((speaker, normalized))
-    return deduped
+    minimum_floor = max(260, int(target_word_count * 0.98))
+    deduped = _trim_dialogue_to_target(deduped, order, target_word_count, minimum_floor=minimum_floor)
+    if _content_length(deduped) < minimum_floor:
+        extension_round = round_index + 1
+        stage_prompt = stage_prompts[extension_round % len(stage_prompts)]
+        for idx, speaker in enumerate(secondary):
+            role_hint = role_briefs[idx + 1] if idx + 1 < len(role_briefs) else _SECONDARY_ROLE_HINTS[idx % len(_SECONDARY_ROLE_HINTS)]
+            point = _speaker_specific_point(points, idx + extension_round, extension_round)
+            objective = role_objectives[idx + 1] if idx + 1 < len(role_objectives) else f"{role_hint}：围绕{point}补充事实和动作要求。"
+            risk_check = risk_checks[(idx + extension_round) % len(risk_checks)] if risk_checks else point
+            success_signal = success_signals[(idx + extension_round) % len(success_signals)] if success_signals else deliverable
+            candidate = _secondary_stage_line(
+                role_hint,
+                objective,
+                point,
+                risk_check,
+                success_signal,
+                realism_pack,
+                stage_prompt,
+                extension_round,
+                idx + 1,
+                medical,
+            )
+            if (speaker, candidate) not in seen:
+                deduped.append((speaker, candidate))
+                seen.add((speaker, candidate))
+        closing = _primary_stage_close_line(stage_prompt, _speaker_specific_point(points, extension_round, extension_round), deliverable, success_signals[extension_round % len(success_signals)] if success_signals else deliverable, extension_round, medical)
+        if (primary, closing) not in seen:
+            deduped.append((primary, closing))
+    return _trim_dialogue_to_target(deduped, order, target_word_count, minimum_floor=minimum_floor)
 
 
 def repair_dialogue_quality(
@@ -896,6 +1630,12 @@ def repair_dialogue_quality(
         [item for item in (keywords or []) if str(item or "").strip()],
         context,
     )
+    quality_metrics = _dialogue_quality_metrics(
+        repaired,
+        expected_people,
+        target,
+        [item for item in (keywords or []) if str(item or "").strip()],
+    )
     return repaired, {
         "language": canonical,
         "repaired": True,
@@ -903,4 +1643,50 @@ def repair_dialogue_quality(
         "original_line_count": len(lines),
         "repaired_line_count": len(repaired),
         "target_word_count": target,
+        "quality_metrics": quality_metrics,
+    }
+
+
+def stabilize_dialogue_constraints(
+    lines: list[tuple[str, str]],
+    language: str,
+    *,
+    title: str = "",
+    scenario: str = "",
+    core_content: str = "",
+    profile: dict[str, Any] | None = None,
+    target_word_count: int = 1000,
+    people_count: int | None = None,
+    keywords: list[str] | None = None,
+    generation_context: dict[str, Any] | None = None,
+) -> tuple[list[tuple[str, str]], dict[str, Any]]:
+    canonical = canonical_language(language)
+    expected_people = max(1, int(people_count or len(_speaker_order(lines)) or 1))
+    target = max(100, int(target_word_count or 1000))
+    if canonical != "Chinese":
+        return list(lines), {"language": canonical, "stabilized": False, "reason": "non_chinese"}
+
+    stabilized = _stabilize_chinese_dialogue(
+        list(lines),
+        title,
+        scenario,
+        core_content,
+        profile,
+        target,
+        expected_people,
+        [item for item in (keywords or []) if str(item or "").strip()],
+        generation_context,
+    )
+    metrics = _dialogue_quality_metrics(
+        stabilized,
+        expected_people,
+        target,
+        [item for item in (keywords or []) if str(item or "").strip()],
+    )
+    return stabilized, {
+        "language": canonical,
+        "stabilized": True,
+        "reason": "constraint_stabilized",
+        "target_word_count": target,
+        "quality_metrics": metrics,
     }
