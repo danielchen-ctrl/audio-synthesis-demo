@@ -22,5 +22,5 @@ if "%PY_CMD%"=="" (
 )
 
 echo [INFO] Cleaning debug artifacts and root screenshots...
-%PY_CMD% project_guard.py --execute --report runtime/temp/debug_artifact_cleanup_report.md
+%PY_CMD% scripts\maintenance\project_guard.py --execute --report runtime/temp/debug_artifact_cleanup_report.md
 

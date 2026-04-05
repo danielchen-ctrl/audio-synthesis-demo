@@ -22,32 +22,35 @@ RUNTIME_TEMP = ROOT / 'runtime' / 'temp' / 'pre_release_gate'
 REQUIRED_PATHS = [
     ROOT / 'AGENTS.md',
     ROOT / 'README.md',
-    ROOT / 'embedded_server.py',
     ROOT / 'server.py',
-    ROOT / 'run.py',
     ROOT / 'start_demo.bat',
+    ROOT / 'src' / 'demo_app' / 'embedded_server_main.py',
     ROOT / 'static' / 'index.html',
     ROOT / 'static' / 'app.js',
     ROOT / 'scripts' / 'start_server.py',
     ROOT / 'scripts' / 'run_repo_daily_check.py',
     ROOT / 'scripts' / 'run_multilingual_quality_checks.py',
+    ROOT / 'scripts' / 'maintenance' / 'project_guard.py',
+    ROOT / 'config' / 'project_guard_rules.yaml',
+    ROOT / 'config' / 'requirements.txt',
     ROOT / '.github' / 'workflows' / 'ci.yml',
     ROOT / '.github' / 'workflows' / 'project-reminder.yml',
     ROOT / '.github' / 'workflows' / 'pre-release-gate.yml',
 ]
 
 PYTHON_COMPILE_TARGETS = [
-    ROOT / 'embedded_server.py',
     ROOT / 'server.py',
-    ROOT / 'run.py',
+    ROOT / 'src' / 'demo_app' / 'embedded_server_main.py',
     ROOT / 'scripts' / 'start_server.py',
+    ROOT / 'scripts' / 'maintenance' / 'project_guard.py',
+    ROOT / 'scripts' / 'maintenance' / 'cleanup_tool.py',
     ROOT / 'scripts' / 'run_repo_daily_check.py',
     ROOT / 'scripts' / 'run_multilingual_quality_checks.py',
     ROOT / 'scripts' / 'run_multilingual_pre_release_source_only_check.py',
 ]
 
 YAML_TARGETS = [
-    ROOT / 'project_guard_rules.yaml',
+    ROOT / 'config' / 'project_guard_rules.yaml',
     ROOT / '.github' / 'workflows' / 'ci.yml',
     ROOT / '.github' / 'workflows' / 'project-reminder.yml',
     ROOT / '.github' / 'workflows' / 'pre-release-gate.yml',
