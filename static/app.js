@@ -1,6 +1,7 @@
 const STORAGE_KEY = "online_audio_generation_demo_v2";
 const AUDIO_TEXT_MAX_CHARS = 12000;
 const DEFAULT_WORD_COUNT = "1000";
+const STALE_TASK_MS = 24 * 60 * 60 * 1000;
 const SPEAKER_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4", "#84CC16", "#F97316", "#EC4899", "#6B7280"];
 
 const LANGUAGE_OPTIONS = [
@@ -18,19 +19,54 @@ const LANGUAGE_OPTIONS = [
   { label: "印度尼西亚语", backend: "Indonesian", code: "id" }
 ];
 
-const BASE_TEMPLATE_OPTIONS = [
-  { value: "meeting", label: "会议讨论" },
-  { value: "interview", label: "访谈" },
-  { value: "medical", label: "问诊" },
-  { value: "review", label: "评审会" },
-  { value: "customer", label: "客户访谈" },
-  { value: "internal", label: "内部会议" },
-  { value: "decision", label: "方案决策" },
-  { value: "troubleshooting", label: "问题排查" },
-  { value: "strategy", label: "战略周会" },
-  { value: "other", label: "其他" },
-  { value: "custom", label: "自定义" }
-];
+const FALLBACK_ONLINE_AUDIO_CONFIG = {
+  defaults: {
+    wordCount: DEFAULT_WORD_COUNT,
+    wordCountMin: 100,
+    wordCountMax: 3000,
+    folder: "默认目录"
+  },
+  folderOptions: ["默认目录", "项目 A / 会议语料", "项目 A / 访谈语料", "项目 B"],
+  templateAliasGroups: {
+    "测试开发｜支付接入": "测试开发｜支付项目",
+    "测试开发｜下单回调": "测试开发｜支付项目",
+    "测试开发｜退款安全": "测试开发｜支付项目",
+    "测试开发｜对账差错": "测试开发｜支付项目",
+    "测试开发｜稳定性准入": "测试开发｜支付项目",
+    "测试开发｜朋友圈项目": "测试开发｜朋友圈项目",
+    "测试开发｜内容发布": "测试开发｜朋友圈项目",
+    "测试开发｜多端分发": "测试开发｜朋友圈项目",
+    "测试开发｜互动一致性": "测试开发｜朋友圈项目",
+    "测试开发｜隐私可见性": "测试开发｜朋友圈项目",
+    "测试开发｜内容审核": "测试开发｜朋友圈项目",
+    "测试开发｜容量与准入": "测试开发｜朋友圈项目"
+  },
+  templateCatalog: [
+    { label: "医疗健康｜慢病随访", domain: "医疗健康", sceneType: "慢病随访", primaryRole: "随访医生", supportingRoles: ["患者本人", "家属", "随访护士"], discussionAxes: ["症状变化", "用药执行", "复查节点", "风险提示", "患者配合"], deliverable: "形成清晰的随访安排、复查节点和注意事项", goalStem: "围绕慢病随访过程中的当前情况、风险判断和后续安排展开真实交流" },
+    { label: "人力资源与招聘｜招聘补岗", domain: "人力资源与招聘", sceneType: "招聘补岗", primaryRole: "招聘负责人", supportingRoles: ["业务部门经理", "HRBP", "用人主管"], discussionAxes: ["岗位缺口", "优先级", "候选人画像", "渠道策略", "到岗时间"], deliverable: "明确补岗优先级、招聘策略和推进节奏", goalStem: "围绕招聘补岗过程中的岗位画像、时间压力和渠道策略展开讨论" },
+    { label: "娱乐/媒体｜艺人商业化", domain: "娱乐/媒体", sceneType: "艺人商业化", primaryRole: "商务负责人", supportingRoles: ["经纪人", "品牌负责人", "内容运营"], discussionAxes: ["商业定位", "品牌匹配", "报价策略", "执行风险", "转化目标"], deliverable: "形成艺人商业化推进策略和合作判断", goalStem: "围绕艺人商业化中的品牌合作、资源投入和转化效果展开讨论" },
+    { label: "建筑与工程行业｜项目交付", domain: "建筑与工程行业", sceneType: "项目交付", primaryRole: "项目经理", supportingRoles: ["工程负责人", "甲方代表", "采购或成本负责人"], discussionAxes: ["交付进度", "现场问题", "成本控制", "风险处理", "验收节点"], deliverable: "形成项目交付问题清单和推进方案", goalStem: "围绕项目交付中的进度、成本、现场风险和验收安排展开讨论" },
+    { label: "汽车行业｜车型投放", domain: "汽车行业", sceneType: "车型投放", primaryRole: "车型项目负责人", supportingRoles: ["市场负责人", "销售负责人", "区域运营代表"], discussionAxes: ["投放节奏", "渠道准备", "卖点表达", "库存规划", "区域反馈"], deliverable: "形成车型投放节奏和重点动作安排", goalStem: "围绕车型投放中的市场准备、渠道协同和节奏控制展开讨论" },
+    { label: "咨询/专业服务｜客户拓展", domain: "咨询/专业服务", sceneType: "客户拓展", primaryRole: "客户拓展负责人", supportingRoles: ["顾问经理", "行业顾问", "交付负责人"], discussionAxes: ["客户诉求", "方案切入", "关系推进", "报价策略", "交付匹配"], deliverable: "形成客户拓展策略和下一步推进动作", goalStem: "围绕客户拓展中的切入点、关系推进和方案竞争力展开讨论" },
+    { label: "法律服务｜法顾专项", domain: "法律服务", sceneType: "法顾专项", primaryRole: "法务顾问", supportingRoles: ["客户负责人", "专项律师", "合规经理"], discussionAxes: ["风险识别", "证据材料", "处理方案", "边界判断", "执行安排"], deliverable: "形成法顾专项的处理路径和分工建议", goalStem: "围绕法顾专项中的法律风险、证据准备和执行方案展开讨论" },
+    { label: "金融/投资｜资产配置", domain: "金融/投资", sceneType: "资产配置", primaryRole: "投顾负责人", supportingRoles: ["客户经理", "研究员", "风险控制负责人"], discussionAxes: ["配置目标", "风险偏好", "资金安排", "收益预期", "调整策略"], deliverable: "形成清晰的资产配置建议和风险提示", goalStem: "围绕资产配置中的收益目标、风险偏好和组合调整展开讨论" },
+    { label: "零售行业｜会员复购", domain: "零售行业", sceneType: "会员复购", primaryRole: "会员运营负责人", supportingRoles: ["门店负责人", "活动运营", "数据分析师"], discussionAxes: ["会员分层", "活动策略", "复购触达", "门店配合", "效果验证"], deliverable: "形成会员复购提升方案和执行节奏", goalStem: "围绕会员复购中的触达策略、门店配合和活动效果展开讨论" },
+    { label: "保险行业｜保险质检", domain: "保险行业", sceneType: "保险质检", primaryRole: "质检负责人", supportingRoles: ["销售主管", "培训负责人", "合规专员"], discussionAxes: ["录音质检", "销售话术", "风险点", "培训改进", "复盘闭环"], deliverable: "形成保险质检问题结论和改进动作", goalStem: "围绕保险质检中的话术风险、培训改进和问题闭环展开讨论" },
+    { label: "房地产｜项目去化", domain: "房地产", sceneType: "项目去化", primaryRole: "项目营销负责人", supportingRoles: ["渠道经理", "案场负责人", "投放运营"], discussionAxes: ["去化压力", "客源结构", "渠道效率", "价格策略", "案场转化"], deliverable: "形成项目去化提效方案和短期动作安排", goalStem: "围绕项目去化中的渠道效率、案场转化和价格策略展开讨论" },
+    { label: "人工智能/科技｜付费转化", domain: "人工智能/科技", sceneType: "付费转化", primaryRole: "增长负责人", supportingRoles: ["产品经理", "数据分析师", "运营负责人"], discussionAxes: ["转化漏斗", "付费门槛", "试用策略", "价值感知", "数据回收"], deliverable: "形成付费转化优化方案和实验计划", goalStem: "围绕付费转化中的产品策略、转化漏斗和数据验证展开讨论" },
+    { label: "制造业｜产线提效", domain: "制造业", sceneType: "产线提效", primaryRole: "产线负责人", supportingRoles: ["工艺工程师", "设备负责人", "质量经理"], discussionAxes: ["瓶颈工序", "设备效率", "良率波动", "排产协同", "异常处理"], deliverable: "形成产线提效方案和关键改善动作", goalStem: "围绕产线提效中的瓶颈工序、设备效率和质量稳定性展开讨论" },
+    { label: "娱乐/媒体｜战略周会", domain: "娱乐/媒体", sceneType: "战略周会", primaryRole: "业务负责人", supportingRoles: ["内容负责人", "增长负责人", "商务负责人"], discussionAxes: ["业务目标", "资源投入", "进展复盘", "重点风险", "下周动作"], deliverable: "形成战略周会的重点决策和分工安排", goalStem: "围绕战略周会中的业务目标、资源分配和重点风险展开讨论" },
+    { label: "法律服务｜广告合规", domain: "法律服务", sceneType: "广告合规", primaryRole: "法务负责人", supportingRoles: ["市场负责人", "品牌经理", "合规专员"], discussionAxes: ["广告表述", "风险边界", "素材审核", "整改建议", "上线条件"], deliverable: "形成广告合规判断和修改建议", goalStem: "围绕广告合规中的风险边界、素材表述和整改方案展开讨论" },
+    { label: "保险行业｜销售洞察", domain: "保险行业", sceneType: "销售洞察", primaryRole: "销售管理负责人", supportingRoles: ["区域经理", "培训负责人", "数据分析师"], discussionAxes: ["销售表现", "客户反馈", "转化瓶颈", "团队差异", "改善动作"], deliverable: "形成销售洞察结论和管理改进动作", goalStem: "围绕销售洞察中的客户反馈、团队差异和改善动作展开讨论" },
+    { label: "测试开发｜支付项目", domain: "测试开发", sceneType: "支付项目", primaryRole: "测试负责人", supportingRoles: ["服务端开发", "客户端开发", "产品经理", "质量负责人"], discussionAxes: ["支付接入", "下单回调", "退款安全", "对账差错", "稳定性准入"], deliverable: "形成支付项目的测试范围、风险清单和上线准入结论", goalStem: "围绕支付项目中的链路完整性、异常兜底和上线风险展开讨论" },
+    { label: "测试开发｜朋友圈项目", domain: "测试开发", sceneType: "朋友圈项目", primaryRole: "测试负责人", supportingRoles: ["客户端开发", "服务端开发", "产品经理", "运营负责人"], discussionAxes: ["内容发布", "多端分发", "互动一致性", "隐私可见性", "内容审核", "容量与准入"], deliverable: "形成朋友圈项目的重点测试范围、风险判断和准入结论", goalStem: "围绕朋友圈项目中的内容链路、可见性规则和容量风险展开讨论" }
+  ]
+};
+
+const BASE_TEMPLATE_OPTIONS = FALLBACK_ONLINE_AUDIO_CONFIG.templateCatalog.map((item) => ({
+  value: dynamicTemplateValue(item.label),
+  label: item.label
+}));
 
 const VOICE_LIBRARY = {
   Chinese: [
@@ -93,7 +129,7 @@ function createDefaultFormState() {
     topicInputMode: "manual",
     llmTopic: "",
     selectedPresetId: "",
-    template: BASE_TEMPLATE_OPTIONS[0].value,
+    template: BASE_TEMPLATE_OPTIONS[0]?.value || "",
     customPrompt: "",
     llmLanguage: LANGUAGE_OPTIONS[0].backend,
     wordCountLimit: DEFAULT_WORD_COUNT,
@@ -108,7 +144,7 @@ function createDefaultFormState() {
     voiceAssignments: { "1": "", "2": "" },
     outputFormat: "MP3",
     preciseDuration: "",
-    folder: "默认目录",
+    folder: FALLBACK_ONLINE_AUDIO_CONFIG.defaults.folder,
     tags: [],
     includeScripts: false,
     isGeneratingText: false,
@@ -118,25 +154,53 @@ function createDefaultFormState() {
   };
 }
 
+function createDefaultTaskFilters() {
+  return {
+    query: "",
+    status: "all",
+    source: "all",
+    staleOnly: false
+  };
+}
+
 const state = {
   serverInfo: null,
   modalOpen: true,
+  onlineAudioConfig: JSON.parse(JSON.stringify(FALLBACK_ONLINE_AUDIO_CONFIG)),
   presetTopics: [],
   templateOptions: [...BASE_TEMPLATE_OPTIONS],
   form: createDefaultFormState(),
-  tasks: []
+  tasks: [],
+  taskFilters: createDefaultTaskFilters(),
+  advancedSearchOpen: false,
+  modalSize: null,
+  modalOffset: { x: 0, y: 0 }
 };
 
 const el = {
   sharePrimaryLink: document.getElementById("sharePrimaryLink"),
   copyShareBtn: document.getElementById("copyShareBtn"),
   shareHint: document.getElementById("shareHint"),
+  taskSearchInput: document.getElementById("taskSearchInput"),
+  taskSearchBtn: document.getElementById("taskSearchBtn"),
+  advancedSearchBtn: document.getElementById("advancedSearchBtn"),
   uploadBtn: document.getElementById("uploadBtn"),
   openOnlineAudioBtn: document.getElementById("openOnlineAudioBtn"),
+  cleanupOldTasksBtn: document.getElementById("cleanupOldTasksBtn"),
+  taskFilterBar: document.getElementById("taskFilterBar"),
+  taskStatusFilter: document.getElementById("taskStatusFilter"),
+  taskSourceFilter: document.getElementById("taskSourceFilter"),
+  staleOnlyFilter: document.getElementById("staleOnlyFilter"),
+  clearTaskFiltersBtn: document.getElementById("clearTaskFiltersBtn"),
+  taskSummary: document.getElementById("taskSummary"),
   taskTableBody: document.getElementById("taskTableBody"),
   taskEmpty: document.getElementById("taskEmpty"),
   toastContainer: document.getElementById("toastContainer"),
   modalOverlay: document.getElementById("modalOverlay"),
+  modalPanel: document.getElementById("modalPanel"),
+  modalHeader: document.getElementById("modalHeader"),
+  resetModalLayoutBtn: document.getElementById("resetModalLayoutBtn"),
+  modalResizeHandle: document.getElementById("modalResizeHandle"),
   closeModalBtn: document.getElementById("closeModalBtn"),
   cancelModalBtn: document.getElementById("cancelModalBtn"),
   modeCardLlm: document.getElementById("modeCardLlm"),
@@ -186,6 +250,50 @@ const el = {
   submitAudioBtn: document.getElementById("submitAudioBtn")
 };
 
+function cloneOnlineAudioConfig(config = FALLBACK_ONLINE_AUDIO_CONFIG) {
+  return {
+    defaults: { ...(config.defaults || FALLBACK_ONLINE_AUDIO_CONFIG.defaults) },
+    folderOptions: [...(config.folderOptions || FALLBACK_ONLINE_AUDIO_CONFIG.folderOptions)],
+    templateAliasGroups: { ...(config.templateAliasGroups || FALLBACK_ONLINE_AUDIO_CONFIG.templateAliasGroups) },
+    templateCatalog: (config.templateCatalog || FALLBACK_ONLINE_AUDIO_CONFIG.templateCatalog).map((item) => ({
+      ...item,
+      supportingRoles: [...(item.supportingRoles || [])],
+      discussionAxes: [...(item.discussionAxes || [])]
+    }))
+  };
+}
+
+function currentOnlineAudioConfig() {
+  return state.onlineAudioConfig || FALLBACK_ONLINE_AUDIO_CONFIG;
+}
+
+function currentTemplateCatalog() {
+  return currentOnlineAudioConfig().templateCatalog || [];
+}
+
+function templateLabelOrder() {
+  return currentTemplateCatalog().map((item) => String(item.label || "").trim()).filter(Boolean);
+}
+
+function defaultFolderOption() {
+  return currentOnlineAudioConfig().defaults?.folder || FALLBACK_ONLINE_AUDIO_CONFIG.defaults.folder;
+}
+
+function defaultWordCountLimit() {
+  return String(currentOnlineAudioConfig().defaults?.wordCount || DEFAULT_WORD_COUNT);
+}
+
+function wordCountRange() {
+  return {
+    min: Number(currentOnlineAudioConfig().defaults?.wordCountMin || 100),
+    max: Number(currentOnlineAudioConfig().defaults?.wordCountMax || 3000)
+  };
+}
+
+function currentTemplateContextMap() {
+  return Object.fromEntries(currentTemplateCatalog().map((item) => [String(item.label || "").trim(), item]));
+}
+
 function normalizeText(value) {
   return String(value || "").replace(/\r\n/g, "\n").trim();
 }
@@ -233,6 +341,20 @@ function templateOptionByLabel(label) {
   return state.templateOptions.find((item) => item.label === label) || null;
 }
 
+function normalizeTemplateDropdownLabel(label) {
+  const normalized = String(label || "").trim();
+  if (!normalized) return "";
+  return currentOnlineAudioConfig().templateAliasGroups?.[normalized] || normalized;
+}
+
+function templateDisplayLabelFromPreset(preset) {
+  const displayTitle = String(preset?.display_title || "").trim();
+  if (displayTitle) return normalizeTemplateDropdownLabel(displayTitle);
+  const templateLabel = String(preset?.template_label || "").trim();
+  if (templateLabel) return normalizeTemplateDropdownLabel(templateLabel);
+  return "";
+}
+
 function dynamicTemplateValue(label) {
   const code = Array.from(String(label || "其他"))
     .map((char) => char.codePointAt(0).toString(16))
@@ -242,7 +364,7 @@ function dynamicTemplateValue(label) {
 }
 
 function ensureTemplateOption(label) {
-  const normalized = String(label || "").trim();
+  const normalized = normalizeTemplateDropdownLabel(label);
   if (!normalized) {
     return state.templateOptions[0]?.value || BASE_TEMPLATE_OPTIONS[0].value;
   }
@@ -251,6 +373,158 @@ function ensureTemplateOption(label) {
   const next = { value: dynamicTemplateValue(normalized), label: normalized };
   state.templateOptions = [...state.templateOptions, next];
   return next.value;
+}
+
+function uniqueStrings(items) {
+  const result = [];
+  (items || []).forEach((item) => {
+    const normalized = String(item || "").trim();
+    if (normalized && !result.includes(normalized)) {
+      result.push(normalized);
+    }
+  });
+  return result;
+}
+
+function splitTemplateLabelParts(label) {
+  const parts = String(label || "")
+    .split("｜")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) {
+    return { domain: parts[0], sceneType: parts.slice(1).join("｜") };
+  }
+  return { domain: "", sceneType: String(label || "").trim() || "业务场景" };
+}
+
+function templateContextForLabel(templateLabel, topic, keywordTerms = []) {
+  const normalizedLabel = normalizeTemplateDropdownLabel(templateLabel);
+  const base = currentTemplateContextMap()[normalizedLabel] || {};
+  const { domain, sceneType } = splitTemplateLabelParts(normalizedLabel);
+  const topicText = String(topic || "").trim() || sceneType || "业务议题";
+  const discussionAxes = uniqueStrings([
+    ...(base.discussionAxes || []),
+    ...keywordTerms
+  ]);
+  return {
+    label: normalizedLabel,
+    domain: base.domain || domain || "通用业务",
+    sceneType: base.sceneType || sceneType || "场景讨论",
+    primaryRole: base.primaryRole || `${domain || "业务"}负责人`,
+    supportingRoles: uniqueStrings(base.supportingRoles || ["执行负责人", "协作方代表", "数据或质量代表"]),
+    discussionAxes: discussionAxes.length ? discussionAxes : ["当前现状", "主要风险", "推进节奏", "验收标准"],
+    deliverable: base.deliverable || `形成围绕${topicText}的下一步方案、责任分工和验证口径`,
+    goalStem: base.goalStem || `围绕${topicText}中的现状、风险、方案选择和推进节奏展开讨论`
+  };
+}
+
+function buildRoleBriefs(templateContext, speakerCount) {
+  const roles = uniqueStrings([templateContext.primaryRole, ...(templateContext.supportingRoles || [])]);
+  while (roles.length < speakerCount) {
+    roles.push(`相关协作方${roles.length}`);
+  }
+  return roles.slice(0, speakerCount);
+}
+
+function buildRoleObjectives(templateContext, roleBriefs, topic, keywordTerms = []) {
+  const axes = uniqueStrings([...(templateContext.discussionAxes || []), ...keywordTerms]);
+  const normalizedTopic = String(topic || "").trim() || templateContext.sceneType || "当前议题";
+  const deliverable = templateContext.deliverable || `形成围绕${normalizedTopic}的明确结论和行动项`;
+  return roleBriefs.map((role, index) => {
+    const leadAxis = axes[index % Math.max(axes.length, 1)] || normalizedTopic;
+    const supportAxis = axes[(index + 2) % Math.max(axes.length, 1)] || deliverable;
+    if (index === 0) {
+      return `${role}：负责把${leadAxis}、${supportAxis}和最终输出口径讲透，推动大家收敛结论`;
+    }
+    const patterns = [
+      `从${role}角度补充${leadAxis}的现状、问题和约束，不只表态，要给出具体信息`,
+      `从${role}角度判断${leadAxis}与${supportAxis}的风险边界，并明确最担心的卡点`,
+      `从${role}角度推动${leadAxis}的执行动作、时间点和协作配合，避免只说空话`,
+      `从${role}角度说明${leadAxis}的验证方式、验收标准和失败兜底，不重复别人说过的话`
+    ];
+    return `${role}：${patterns[(index - 1) % patterns.length]}`;
+  });
+}
+
+function buildStagePrompts(templateContext, topic, keywordTerms = []) {
+  const axes = uniqueStrings([...(templateContext.discussionAxes || []), ...keywordTerms]);
+  const normalizedTopic = String(topic || "").trim() || templateContext.sceneType || "当前议题";
+  const firstAxis = axes[0] || normalizedTopic;
+  const secondAxis = axes[1] || templateContext.sceneType || normalizedTopic;
+  const thirdAxis = axes[2] || templateContext.deliverable || "后续动作";
+  return uniqueStrings([
+    `先对齐${normalizedTopic}的现状、目标和关键背景`,
+    `围绕${firstAxis}、${secondAxis}拆开主要风险、约束和分歧`,
+    `比较可执行方案，明确${thirdAxis}涉及的优先级、取舍与资源投入`,
+    `收敛责任分工、时间点、验收标准和下一步动作`
+  ]);
+}
+
+function buildRiskChecks(templateContext, keywordTerms = []) {
+  const axes = uniqueStrings([...(templateContext.discussionAxes || []), ...keywordTerms]);
+  return uniqueStrings([
+    ...(axes.slice(0, 4).map((axis) => `${axis}是否存在风险边界不清或执行落空`)),
+    `最终输出是否能落到${templateContext.deliverable || "明确结论和行动项"}`
+  ]);
+}
+
+function buildSuccessSignals(templateContext, keywordTerms = []) {
+  const axes = uniqueStrings([...(templateContext.discussionAxes || []), ...keywordTerms]);
+  return uniqueStrings([
+    templateContext.deliverable || "形成明确结论和分工",
+    ...(axes.slice(0, 3).map((axis) => `${axis}有明确负责人、验证方式和时间点`))
+  ]);
+}
+
+function buildGenerationContext(templateLabel, topic, keywordTerms = []) {
+  const templateContext = templateContextForLabel(templateLabel, topic, keywordTerms);
+  const roleBriefs = buildRoleBriefs(templateContext, speakerCountValue());
+  const roleObjectives = buildRoleObjectives(templateContext, roleBriefs, topic, keywordTerms);
+  const stagePrompts = buildStagePrompts(templateContext, topic, keywordTerms);
+  const riskChecks = buildRiskChecks(templateContext, keywordTerms);
+  const successSignals = buildSuccessSignals(templateContext, keywordTerms);
+  return {
+    domain: templateContext.domain,
+    scene_type: templateContext.sceneType,
+    scene_goal: `${templateContext.goalStem}，主题聚焦“${String(topic || "").trim() || templateContext.sceneType}”`,
+    deliverable: templateContext.deliverable,
+    discussion_axes: templateContext.discussionAxes,
+    role_briefs: roleBriefs,
+    role_objectives: roleObjectives,
+    stage_prompts: stagePrompts,
+    risk_checks: riskChecks,
+    success_signals: successSignals,
+    quality_constraints: [
+      "必须口语化、真实、避免套话",
+      "每个说话人都要有明确立场和信息量",
+      "避免中英混杂和空洞重复",
+      "对话要围绕事实、风险、动作和结论推进",
+      "不同说话人不能只做附和或重复总结"
+    ]
+  };
+}
+
+function buildTemplateOptionsFromPresets(presets) {
+  const labelsFromPresets = new Set();
+
+  (Array.isArray(presets) ? presets : []).forEach((preset) => {
+    const label = templateDisplayLabelFromPreset(preset);
+    if (label) {
+      labelsFromPresets.add(label);
+    }
+  });
+
+  const orderedTemplateLabels = templateLabelOrder();
+  const orderedLabels = orderedTemplateLabels.filter((label) => labelsFromPresets.has(label));
+  const extraLabels = [...labelsFromPresets].filter((label) => !orderedTemplateLabels.includes(label)).sort();
+  const finalLabels = [...orderedLabels, ...extraLabels];
+
+  return finalLabels.length
+    ? finalLabels.map((label) => ({
+        value: dynamicTemplateValue(label),
+        label
+      }))
+    : [...BASE_TEMPLATE_OPTIONS];
 }
 
 function presetTopicById(id) {
@@ -279,6 +553,9 @@ window.setMode = setMode;
 function setTopicInputMode(mode) {
   state.form.topicInputMode = mode === "preset" ? "preset" : "manual";
   renderAll();
+  if (state.form.topicInputMode === "preset") {
+    void refreshPresetTopicsIfNeeded(true);
+  }
 }
 
 function currentLanguageBackend() {
@@ -302,6 +579,65 @@ function currentTitle() {
 
 function currentWorkingText() {
   return currentMode() === "llm" ? normalizeText(el.previewText.value) : normalizeText(el.manualText.value);
+}
+
+function parseTaskTime(task) {
+  const timestamp = Date.parse(String(task?.createdAt || ""));
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function isTaskStale(task) {
+  const timestamp = parseTaskTime(task);
+  return timestamp > 0 && Date.now() - timestamp >= STALE_TASK_MS;
+}
+
+function cloneVoiceAssignments(assignments = {}) {
+  return Object.fromEntries(Object.entries(assignments).map(([key, value]) => [String(key), String(value || "")]));
+}
+
+function snapshotCurrentForm() {
+  readFormFromDom();
+  return {
+    ...state.form,
+    keywords: [...state.form.keywords],
+    tags: [...state.form.tags],
+    voiceAssignments: cloneVoiceAssignments(state.form.voiceAssignments)
+  };
+}
+
+function resolvedModalDimensions() {
+  const maxWidth = Math.max(760, window.innerWidth - 24);
+  const maxHeight = Math.max(560, window.innerHeight - 24);
+  return {
+    width: Math.min(maxWidth, Math.max(760, Number(state.modalSize?.width) || 960)),
+    height: Math.min(maxHeight, Math.max(560, Number(state.modalSize?.height) || 760))
+  };
+}
+
+function clampModalOffset(offset = state.modalOffset || { x: 0, y: 0 }) {
+  const { width, height } = resolvedModalDimensions();
+  const maxX = Math.max(0, Math.floor((window.innerWidth - width) / 2) - 12);
+  const maxY = Math.max(0, Math.floor((window.innerHeight - height) / 2) - 12);
+  return {
+    x: Math.max(-maxX, Math.min(maxX, Number(offset.x) || 0)),
+    y: Math.max(-maxY, Math.min(maxY, Number(offset.y) || 0))
+  };
+}
+
+function applyModalSize() {
+  if (!el.modalPanel) return;
+  const { width, height } = resolvedModalDimensions();
+  state.modalOffset = clampModalOffset();
+  el.modalPanel.style.width = `${width}px`;
+  el.modalPanel.style.height = `${height}px`;
+  el.modalPanel.style.transform = `translate(${state.modalOffset.x}px, ${state.modalOffset.y}px)`;
+}
+
+function resetModalLayout() {
+  state.modalSize = null;
+  state.modalOffset = { x: 0, y: 0 };
+  applyModalSize();
+  persistState();
 }
 
 function speakerCountValue() {
@@ -352,7 +688,11 @@ function showToast(type, message) {
 function openModal() {
   state.modalOpen = true;
   el.modalOverlay.classList.add("open");
+  applyModalSize();
   persistState();
+  if (state.form.mode === "llm") {
+    void refreshPresetTopicsIfNeeded(state.presetTopics.length === 0);
+  }
 }
 
 function closeModal() {
@@ -399,7 +739,9 @@ function syncFormToDom() {
   el.templateSelect.value = templateOptionByValue(state.form.template).value;
   el.customPrompt.value = state.form.customPrompt || "";
   el.llmLanguage.value = state.form.llmLanguage || LANGUAGE_OPTIONS[0].backend;
-  el.wordCountLimit.value = state.form.wordCountLimit || DEFAULT_WORD_COUNT;
+  el.wordCountLimit.min = String(wordCountRange().min);
+  el.wordCountLimit.max = String(wordCountRange().max);
+  el.wordCountLimit.value = state.form.wordCountLimit || defaultWordCountLimit();
   el.manualTopic.value = state.form.manualTopic || "";
   el.manualLanguage.value = state.form.manualLanguage || LANGUAGE_OPTIONS[0].backend;
   el.manualText.value = state.form.manualText || "";
@@ -407,7 +749,7 @@ function syncFormToDom() {
   el.previewText.value = state.form.previewText || "";
   el.outputFormat.value = state.form.outputFormat || "MP3";
   el.preciseDuration.value = state.form.preciseDuration || "";
-  el.folderSelect.value = state.form.folder || "默认目录";
+  el.folderSelect.value = state.form.folder || defaultFolderOption();
   el.includeScripts.checked = Boolean(state.form.includeScripts);
 }
 
@@ -416,6 +758,10 @@ function persistState() {
   const payload = {
     modalOpen: state.modalOpen,
     tasks: state.tasks,
+    taskFilters: state.taskFilters,
+    advancedSearchOpen: state.advancedSearchOpen,
+    modalSize: state.modalSize,
+    modalOffset: state.modalOffset,
     form: {
       ...state.form,
       keywords: [...state.form.keywords],
@@ -432,7 +778,11 @@ function restoreState() {
     if (!raw) return;
     const cached = JSON.parse(raw);
     state.modalOpen = cached.modalOpen !== false;
-    state.tasks = Array.isArray(cached.tasks) ? cached.tasks : [];
+    state.tasks = Array.isArray(cached.tasks) ? cached.tasks.map(normalizeTask) : [];
+    state.taskFilters = { ...createDefaultTaskFilters(), ...(cached.taskFilters || {}) };
+    state.advancedSearchOpen = Boolean(cached.advancedSearchOpen);
+    state.modalSize = cached.modalSize || null;
+    state.modalOffset = cached.modalOffset || { x: 0, y: 0 };
     state.form = {
       ...createDefaultFormState(),
       ...(cached.form || {}),
@@ -529,6 +879,17 @@ function renderTemplates() {
   el.templateSelect.innerHTML = state.templateOptions
     .map((option) => `<option value="${option.value}">${option.label}</option>`)
     .join("");
+}
+
+function renderFolderOptions() {
+  const folderOptions = [...(currentOnlineAudioConfig().folderOptions || [defaultFolderOption()])];
+  if (state.form.folder && !folderOptions.includes(state.form.folder)) {
+    folderOptions.push(state.form.folder);
+  }
+  const options = folderOptions.map(
+    (option) => `<option value="${escapeHtml(option)}">${escapeHtml(option)}</option>`
+  );
+  el.folderSelect.innerHTML = options.join("");
 }
 
 function renderLanguages() {
@@ -652,6 +1013,9 @@ function renderSubmitState() {
 
 function renderModalVisibility() {
   el.modalOverlay.classList.toggle("open", state.modalOpen);
+  if (state.modalOpen) {
+    applyModalSize();
+  }
 }
 
 function statusBadgeClass(status) {
@@ -661,8 +1025,47 @@ function statusBadgeClass(status) {
   return "status-wait";
 }
 
+function taskCanOpen(task) {
+  return Boolean(task?.snapshot?.form || task?.dialogueId || task?.title);
+}
+
+function filteredTasks() {
+  const query = normalizeText(state.taskFilters.query || "").toLocaleLowerCase();
+  return [...state.tasks]
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
+    .filter((task) => {
+      if (state.taskFilters.status !== "all" && task.status !== state.taskFilters.status) return false;
+      if (state.taskFilters.source !== "all" && (task.sourceLabel === "上传" ? "上传" : "生成") !== state.taskFilters.source) return false;
+      if (state.taskFilters.staleOnly && !isTaskStale(task)) return false;
+      if (!query) return true;
+      const haystack = [
+        task.title,
+        task.fileName,
+        task.textFileName,
+        task.status,
+        task.sourceLabel,
+        formatTimestamp(task.createdAt)
+      ]
+        .join(" ")
+        .toLocaleLowerCase();
+      return haystack.includes(query);
+    });
+}
+
+function renderTaskSearchUi() {
+  el.taskSearchInput.value = state.taskFilters.query || "";
+  el.taskStatusFilter.value = state.taskFilters.status || "all";
+  el.taskSourceFilter.value = state.taskFilters.source || "all";
+  el.staleOnlyFilter.checked = Boolean(state.taskFilters.staleOnly);
+  el.taskFilterBar.classList.toggle("hidden", !state.advancedSearchOpen);
+  el.advancedSearchBtn.textContent = state.advancedSearchOpen ? "收起筛选" : "高级筛选";
+  const total = state.tasks.length;
+  const shown = filteredTasks().length;
+  el.taskSummary.textContent = total ? `当前显示 ${shown} / ${total} 条任务` : "当前暂无任务";
+}
+
 function renderTasks() {
-  const tasks = [...state.tasks].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const tasks = filteredTasks();
   el.taskTableBody.innerHTML = tasks
     .map(
       (task) => `
@@ -676,6 +1079,9 @@ function renderTasks() {
       <td><span class="status-badge ${statusBadgeClass(task.status)}">${escapeHtml(task.status)}</span></td>
       <td>
         <div class="row-actions">
+          <button class="btn btn-secondary btn-sm" type="button" data-action="view-task" data-id="${task.id}" ${
+            taskCanOpen(task) ? "" : "disabled"
+          }>查看任务</button>
           <button class="btn btn-secondary btn-sm" type="button" data-action="download-text" data-id="${task.id}" ${
             task.textDownloadUrl ? "" : "disabled"
           }>下载文本</button>
@@ -685,6 +1091,7 @@ function renderTasks() {
           <button class="btn btn-secondary btn-sm" type="button" data-action="show-error" data-id="${task.id}" ${
             task.status === "生成失败" ? "" : "disabled"
           }>查看原因</button>
+          <button class="btn btn-secondary btn-sm" type="button" data-action="delete-task" data-id="${task.id}">删除</button>
         </div>
       </td>
     </tr>
@@ -692,6 +1099,13 @@ function renderTasks() {
     )
     .join("");
   el.taskEmpty.classList.toggle("hidden", tasks.length > 0);
+  if (!tasks.length && state.tasks.length > 0) {
+    el.taskEmpty.querySelector(".empty-title").textContent = "当前筛选条件下暂无任务";
+    el.taskEmpty.querySelector(".empty-desc").textContent = "可以清空搜索或筛选条件后，再查看已有任务。";
+  } else {
+    el.taskEmpty.querySelector(".empty-title").textContent = "暂无生成任务";
+    el.taskEmpty.querySelector(".empty-desc").textContent = "点击右上角“在线生成音频”，按原型流程提交一条生成任务。";
+  }
 }
 
 function renderShareBox(payload) {
@@ -705,6 +1119,7 @@ function renderShareBox(payload) {
 function renderAll() {
   renderTemplates();
   renderLanguages();
+  renderFolderOptions();
   renderPresetTopics();
   syncFormToDom();
   renderTagEditor(el.keywordWrap, el.keywordInput, state.form.keywords, removeKeyword);
@@ -713,6 +1128,7 @@ function renderAll() {
   renderVoiceRows();
   renderKeywordHighlightPreview();
   renderSubmitState();
+  renderTaskSearchUi();
   renderTasks();
   renderModalVisibility();
   setModalMessage(state.form.modalMessage, state.form.modalMessageType);
@@ -791,6 +1207,7 @@ function validateLlmBeforeGenerateText() {
   const topic = resolvedLlmTopic();
   const templateValue = el.templateSelect.value;
   const wordCount = Number(el.wordCountLimit.value || 0);
+  const { min: minWordCount, max: maxWordCount } = wordCountRange();
 
   if (topicMode === "preset" && !el.presetTopicSelect.value) {
     return "请选择预置文本主题";
@@ -810,8 +1227,8 @@ function validateLlmBeforeGenerateText() {
   if (speakerCountValue() < 2) {
     return "LLM 生成对话时，说话人数至少需要 2 人";
   }
-  if (!Number.isInteger(wordCount) || wordCount < 100 || wordCount > 3000) {
-    return "字数限制需在 100 到 3000 之间";
+  if (!Number.isInteger(wordCount) || wordCount < minWordCount || wordCount > maxWordCount) {
+    return `字数限制需在 ${minWordCount} 到 ${maxWordCount} 之间`;
   }
   return "";
 }
@@ -849,32 +1266,41 @@ function validateBeforeSubmit() {
   return validateSpeakerConsistency(el.manualText.value);
 }
 
-function buildProfileFromTemplate(templateLabel, topic) {
-  const normalizedTemplate = String(templateLabel || "通用对话").trim() || "通用对话";
+function buildProfileFromTemplate(templateLabel, topic, generationContext = null) {
+  const context = generationContext || buildGenerationContext(templateLabel, topic, []);
   const normalizedTopic = String(topic || "在线生成音频").trim() || "在线生成音频";
   return {
-    job_function: normalizedTemplate,
+    job_function: context.primaryRole || context.label || "通用对话",
     work_content: normalizedTopic,
-    seniority: "标准",
-    use_case: normalizedTemplate
+    seniority: "资深",
+    use_case: `${context.domain || "通用业务"}｜${context.scene_type || context.label || "场景讨论"}`
   };
 }
 
-function buildManualTopicScenario(templateLabel, topic) {
-  const normalizedTemplate = String(templateLabel || "通用对话").trim() || "通用对话";
-  const normalizedTopic = String(topic || "").trim();
-  if (!normalizedTopic) {
-    return `${normalizedTemplate}场景对话`;
-  }
-  return `${normalizedTemplate}：围绕“${normalizedTopic}”展开真实自然的多轮场景对话`;
+function buildManualTopicScenario(templateLabel, topic, generationContext = null) {
+  const context = generationContext || buildGenerationContext(templateLabel, topic, []);
+  const normalizedTopic = String(topic || "").trim() || context.scene_type || "业务议题";
+  const roles = (context.role_briefs || []).join("、");
+  const axes = (context.discussion_axes || []).slice(0, 5).join("、");
+  const stages = (context.stage_prompts || []).join("；");
+  return `场景：${context.scene_goal}。参与角色：${roles}。重点讨论：${axes}。推进阶段：${stages}。最终目标：${context.deliverable}。主题：${normalizedTopic}。`;
 }
 
-function buildManualTopicCoreContent(templateLabel, topic) {
+function buildManualTopicCoreContent(templateLabel, topic, generationContext = null) {
+  const context = generationContext || buildGenerationContext(templateLabel, topic, state.form.keywords);
   const keywordTerms = [...state.form.keywords];
   const contentParts = [
     `文本主题：${topic}`,
     `主题模板：${templateLabel}`,
-    `请生成自然、真实、口语化的多轮对话文本`
+    `行业场景：${context.domain}，场景类型：${context.scene_type}`,
+    `角色分工：${(context.role_briefs || []).join("、")}`,
+    `角色目标：${(context.role_objectives || []).join("；")}`,
+    `讨论重点：${(context.discussion_axes || []).join("、")}`,
+    `推进阶段：${(context.stage_prompts || []).join("；")}`,
+    `风险检查点：${(context.risk_checks || []).join("；")}`,
+    `成功标准：${(context.success_signals || []).join("；")}`,
+    `目标输出：${context.deliverable}`,
+    `写作要求：${(context.quality_constraints || []).join("；")}`
   ];
 
   if (keywordTerms.length) {
@@ -893,12 +1319,21 @@ function buildGenerateTextPayload() {
   const wordCount = Number(el.wordCountLimit.value || DEFAULT_WORD_COUNT);
   const keywordTerms = [...state.form.keywords];
   const preset = currentPresetTopic();
+  const generationContext = buildGenerationContext(template.label, topic, keywordTerms);
 
   if (currentTopicInputMode() === "preset" && preset) {
     const coreParts = [];
     if (preset.core_content) {
       coreParts.push(preset.core_content);
     }
+    coreParts.push(`角色分工：${generationContext.role_briefs.join("、")}`);
+    coreParts.push(`角色目标：${generationContext.role_objectives.join("；")}`);
+    coreParts.push(`讨论重点：${generationContext.discussion_axes.join("、")}`);
+    coreParts.push(`推进阶段：${generationContext.stage_prompts.join("；")}`);
+    coreParts.push(`风险检查点：${generationContext.risk_checks.join("；")}`);
+    coreParts.push(`成功标准：${generationContext.success_signals.join("；")}`);
+    coreParts.push(`目标输出：${generationContext.deliverable}`);
+    coreParts.push(`写作要求：${generationContext.quality_constraints.join("；")}`);
     if (keywordTerms.length) {
       coreParts.push(`核心对话内容：请在最终文本中明确体现这些关键词——${keywordTerms.join("，")}`);
     }
@@ -908,8 +1343,8 @@ function buildGenerateTextPayload() {
 
     return {
       title: preset.topic_text || topic,
-      profile: preset.profile || buildProfileFromTemplate(template.label, preset.topic_text || topic),
-      scenario: preset.scenario || buildManualTopicScenario(template.label, preset.topic_text || topic),
+      profile: preset.profile || buildProfileFromTemplate(template.label, preset.topic_text || topic, generationContext),
+      scenario: `${preset.scenario || buildManualTopicScenario(template.label, preset.topic_text || topic, generationContext)} 参与角色：${generationContext.role_briefs.join("、")}。`,
       core_content: coreParts.join("；"),
       people_count: speakerCountValue(),
       word_count: wordCount,
@@ -920,16 +1355,18 @@ function buildGenerateTextPayload() {
       folder: el.folderSelect.value,
       source_mode: "llm",
       keyword_terms: keywordTerms,
+      topic_input_mode: "preset",
       preset_id: preset.id,
-      preset_source_title: preset.source_title || ""
+      preset_source_title: preset.source_title || "",
+      generation_context: generationContext
     };
   }
 
   return {
     title: topic,
-    profile: buildProfileFromTemplate(template.label, topic),
-    scenario: buildManualTopicScenario(template.label, topic),
-    core_content: buildManualTopicCoreContent(template.label, topic),
+    profile: buildProfileFromTemplate(template.label, topic, generationContext),
+    scenario: buildManualTopicScenario(template.label, topic, generationContext),
+    core_content: buildManualTopicCoreContent(template.label, topic, generationContext),
     people_count: speakerCountValue(),
     word_count: wordCount,
     language: el.llmLanguage.value,
@@ -938,7 +1375,9 @@ function buildGenerateTextPayload() {
     tags: state.form.tags,
     folder: el.folderSelect.value,
     source_mode: "llm",
-    keyword_terms: keywordTerms
+    keyword_terms: keywordTerms,
+    topic_input_mode: "manual",
+    generation_context: generationContext
   };
 }
 
@@ -951,6 +1390,7 @@ function buildManualCreatePayload() {
     people_count: speakerCountValue(),
     scenario: el.manualTopic.value.trim(),
     template_label: "直接输入",
+    keyword_terms: [...state.form.keywords],
     tags: state.form.tags,
     folder: el.folderSelect.value,
     source_mode: "manual"
@@ -972,9 +1412,24 @@ function buildAudioPayload(dialogueId, dialogueText) {
 async function fetchJson(url, options = {}) {
   const response = await fetch(url, options);
   const contentType = response.headers.get("content-type") || "";
-  const payload = contentType.includes("application/json")
-    ? await response.json()
-    : { success: false, error: await response.text() };
+  const rawText = await response.text();
+  let payload;
+
+  if (contentType.includes("application/json")) {
+    try {
+      payload = rawText ? JSON.parse(rawText) : {};
+    } catch (error) {
+      const compact = rawText.replace(/\s+/g, " ").trim();
+      payload = {
+        success: false,
+        error: compact.startsWith("<")
+          ? `接口返回了非 JSON 错误页（${response.status}）`
+          : compact || `请求失败: ${response.status}`
+      };
+    }
+  } else {
+    payload = { success: false, error: rawText };
+  }
 
   if (!response.ok || payload.ok === false || payload.success === false) {
     throw new Error(payload.error || payload.reason || `请求失败: ${response.status}`);
@@ -982,7 +1437,258 @@ async function fetchJson(url, options = {}) {
   return payload;
 }
 
+function buildTaskSnapshot(dialogueId, dialogueText, textFileName) {
+  const formSnapshot = snapshotCurrentForm();
+  return {
+    dialogueId,
+    textFileName,
+    dialogueText,
+    form: {
+      ...formSnapshot,
+      dialogueId,
+      generatedTextFileName: textFileName || formSnapshot.generatedTextFileName || "",
+      previewText: currentMode() === "llm" ? dialogueText : formSnapshot.previewText,
+      manualText: currentMode() === "manual" ? dialogueText : formSnapshot.manualText
+    }
+  };
+}
+
+function taskSnapshotToForm(snapshot) {
+  if (!snapshot || !snapshot.form) return null;
+  const form = snapshot.form;
+  return {
+    ...createDefaultFormState(),
+    ...form,
+    keywords: Array.isArray(form.keywords) ? [...form.keywords] : [],
+    tags: Array.isArray(form.tags) ? [...form.tags] : [],
+    voiceAssignments: cloneVoiceAssignments(form.voiceAssignments || {}),
+    isGeneratingText: false,
+    isSubmittingAudio: false,
+    modalMessage: "已载入历史任务，可继续查看、编辑并重新生成音频。",
+    modalMessageType: "info"
+  };
+}
+
+function legacyTaskToForm(task) {
+  const title = String(task?.title || "").trim();
+  if (!title) return null;
+  return {
+    ...createDefaultFormState(),
+    mode: "llm",
+    llmTopic: title,
+    manualTopic: title,
+    dialogueId: String(task?.dialogueId || ""),
+    generatedTextFileName: String(task?.textFileName || ""),
+    outputFormat: String(task?.outputFormat || "MP3"),
+    modalMessage: task?.errorMessage
+      ? `已恢复历史失败任务的基础信息。原失败原因：${task.errorMessage}`
+      : "已恢复历史任务的基础信息。",
+    modalMessageType: task?.errorMessage ? "error" : "info"
+  };
+}
+
+function normalizeTask(task) {
+  const normalized = {
+    id: task?.id || `${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
+    title: String(task?.title || "未命名任务"),
+    createdAt: String(task?.createdAt || nowIsoString()),
+    sourceLabel: task?.sourceLabel === "上传" ? "上传" : "生成",
+    status: String(task?.status || "文本生成中"),
+    fileName: String(task?.fileName || ""),
+    textFileName: String(task?.textFileName || ""),
+    textDownloadUrl: String(task?.textDownloadUrl || ""),
+    audioDownloadUrl: String(task?.audioDownloadUrl || ""),
+    errorMessage: String(task?.errorMessage || ""),
+    dialogueId: String(task?.dialogueId || ""),
+    snapshot: task?.snapshot && task.snapshot.form ? task.snapshot : null
+  };
+  if (!normalized.snapshot && normalized.title) {
+    normalized.snapshot = {
+      dialogueId: normalized.dialogueId,
+      textFileName: normalized.textFileName,
+      dialogueText: "",
+      form: legacyTaskToForm(normalized)
+    };
+  }
+  return normalized;
+}
+
+function detailPayloadToForm(payload) {
+  const manifest = payload?.manifest || {};
+  const sourceMode = manifest.source_mode === "manual" ? "manual" : "llm";
+  const templateValue = manifest.template_label
+    ? ensureTemplateOption(normalizeTemplateDropdownLabel(manifest.template_label))
+    : BASE_TEMPLATE_OPTIONS[0].value;
+  const outputFormat = String(manifest.audio_output_format || "mp3").toUpperCase();
+  const normalizedKeywords = Array.isArray(manifest.keyword_terms) ? manifest.keyword_terms : [];
+  const normalizedTags = Array.isArray(manifest.tags) ? manifest.tags : [];
+  const topicInputMode = manifest.topic_input_mode === "preset" && manifest.preset_id ? "preset" : "manual";
+
+  return {
+    ...createDefaultFormState(),
+    mode: sourceMode,
+    topicInputMode,
+    llmTopic: sourceMode === "llm" ? String(manifest.title || "") : "",
+    selectedPresetId: topicInputMode === "preset" ? String(manifest.preset_id || "") : "",
+    template: templateValue,
+    llmLanguage: String(manifest.audio_language || LANGUAGE_OPTIONS[0].backend),
+    wordCountLimit: String(manifest.word_count || DEFAULT_WORD_COUNT),
+    keywords: [...normalizedKeywords],
+    manualTopic: sourceMode === "manual" ? String(manifest.title || "") : "",
+    manualLanguage: String(manifest.audio_language || LANGUAGE_OPTIONS[0].backend),
+    manualText: sourceMode === "manual" ? String(payload.dialogue_text || "") : "",
+    speakerCount: Math.min(10, Math.max(1, Number(manifest.people_count) || 2)),
+    previewText: sourceMode === "llm" ? String(payload.dialogue_text || "") : "",
+    dialogueId: String(payload.dialogue_id || ""),
+    generatedTextFileName: String(payload.text_file_name || ""),
+    voiceAssignments: cloneVoiceAssignments(manifest.voice_map || {}),
+    outputFormat: ["MP3", "WAV", "M4A"].includes(outputFormat) ? outputFormat : "MP3",
+    preciseDuration: String(manifest.precise_duration || ""),
+    folder: String(manifest.folder || "默认目录"),
+    tags: [...normalizedTags],
+    includeScripts: Boolean(manifest.include_scripts),
+    isGeneratingText: false,
+    isSubmittingAudio: false,
+    modalMessage: "已从任务列表恢复该任务，可继续查看或调整参数。",
+    modalMessageType: "info"
+  };
+}
+
+async function fetchTaskDetail(dialogueId) {
+  return fetchJson(`/api/dialogue_detail?dialogue_id=${encodeURIComponent(dialogueId)}`);
+}
+
+function isNetworkFetchError(error) {
+  const message = String(error?.message || "");
+  return error instanceof TypeError || /Failed to fetch|NetworkError|Load failed|网络/i.test(message);
+}
+
+async function openTaskInModal(task) {
+  let nextForm = taskSnapshotToForm(task.snapshot);
+  if (!nextForm && task.dialogueId) {
+    try {
+      const detail = await fetchTaskDetail(task.dialogueId);
+      nextForm = detailPayloadToForm(detail);
+    } catch (error) {
+      if (isNetworkFetchError(error)) {
+        throw new Error("当前 demo 服务未连接，且该任务没有本地快照。请先启动服务后再查看任务。");
+      }
+      nextForm = legacyTaskToForm(task);
+      if (!nextForm) {
+        throw error;
+      }
+      nextForm.modalMessage = `该任务无法完整回放，已恢复基础参数。原错误：${error.message}`;
+      nextForm.modalMessageType = "error";
+    }
+  }
+  if (!nextForm) {
+    nextForm = legacyTaskToForm(task);
+  }
+  if (!nextForm) {
+    throw new Error("该任务缺少可恢复的参数信息");
+  }
+
+  state.form = nextForm;
+  state.modalOpen = true;
+  renderAll();
+  openModal();
+}
+
+function triggerBrowserDownload(blob, fileName) {
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = fileName || "download";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+}
+
+async function downloadTaskAsset(task, kind) {
+  const url = kind === "audio" ? task.audioDownloadUrl : task.textDownloadUrl;
+  if (!url) {
+    throw new Error(kind === "audio" ? "当前任务暂无可下载音频" : "当前任务暂无可下载文本");
+  }
+  const response = await fetch(url);
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(detail || `下载失败: ${response.status}`);
+  }
+  const blob = await response.blob();
+  const fileName = kind === "audio" ? task.fileName : task.textFileName;
+  triggerBrowserDownload(blob, fileName);
+}
+
+function initModalResize() {
+  if (!el.modalPanel || !el.modalResizeHandle) return;
+
+  el.modalResizeHandle.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const rect = el.modalPanel.getBoundingClientRect();
+    const startWidth = rect.width;
+    const startHeight = rect.height;
+
+    const move = (moveEvent) => {
+      const maxWidth = Math.max(760, window.innerWidth - 24);
+      const maxHeight = Math.max(560, window.innerHeight - 24);
+      state.modalSize = {
+        width: Math.min(maxWidth, Math.max(760, startWidth + moveEvent.clientX - startX)),
+        height: Math.min(maxHeight, Math.max(560, startHeight + moveEvent.clientY - startY))
+      };
+      applyModalSize();
+    };
+
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      persistState();
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+  });
+}
+
+function initModalDrag() {
+  if (!el.modalPanel || !el.modalHeader) return;
+
+  el.modalHeader.addEventListener("dblclick", (event) => {
+    if (event.target.closest("button")) return;
+    resetModalLayout();
+  });
+
+  el.modalHeader.addEventListener("pointerdown", (event) => {
+    if (event.target.closest("button")) return;
+    event.preventDefault();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startOffset = { ...(state.modalOffset || { x: 0, y: 0 }) };
+
+    const move = (moveEvent) => {
+      state.modalOffset = clampModalOffset({
+        x: startOffset.x + moveEvent.clientX - startX,
+        y: startOffset.y + moveEvent.clientY - startY
+      });
+      applyModalSize();
+    };
+
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      persistState();
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+  });
+}
+
 function createTaskPlaceholder() {
+  const workingText = currentWorkingText();
+  const textFileName = state.form.generatedTextFileName || "";
   const task = {
     id: `${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
     title: currentTitle() || "未命名任务",
@@ -994,7 +1700,8 @@ function createTaskPlaceholder() {
     textDownloadUrl: "",
     audioDownloadUrl: "",
     errorMessage: "",
-    dialogueId: ""
+    dialogueId: "",
+    snapshot: buildTaskSnapshot("", workingText, textFileName)
   };
   state.tasks = [task, ...state.tasks];
   renderTasks();
@@ -1002,8 +1709,75 @@ function createTaskPlaceholder() {
   return task.id;
 }
 
+function removeTasksLocally(taskIds) {
+  const idSet = new Set(taskIds);
+  state.tasks = state.tasks.filter((task) => !idSet.has(task.id));
+  renderTasks();
+  persistState();
+}
+
+async function deleteTaskRemotely(dialogueId) {
+  if (!dialogueId) {
+    return { deleted: false, not_found: true };
+  }
+  return fetchJson("/api/delete_task", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dialogue_id: dialogueId })
+  });
+}
+
+async function handleDeleteTask(task) {
+  const confirmed = window.confirm(`确认删除任务“${task.title || "未命名任务"}”？`);
+  if (!confirmed) return;
+
+  let remoteError = "";
+  if (task.dialogueId) {
+    try {
+      await deleteTaskRemotely(task.dialogueId);
+    } catch (error) {
+      remoteError = error.message;
+    }
+  }
+
+  removeTasksLocally([task.id]);
+  if (remoteError) {
+    showToast("error", `任务已从列表移除，但服务端文件清理失败：${remoteError}`);
+    return;
+  }
+  showToast("success", "任务已删除");
+}
+
+async function cleanupOldTasks() {
+  const staleTasks = state.tasks.filter((task) => isTaskStale(task));
+  if (!staleTasks.length) {
+    showToast("info", "当前没有需要清理的过时任务");
+    return;
+  }
+
+  const confirmed = window.confirm(`确认清理 ${staleTasks.length} 条过时任务？这会同时清理可找到的本地生成文件。`);
+  if (!confirmed) return;
+
+  let remoteFailures = 0;
+  for (const task of staleTasks) {
+    if (!task.dialogueId) continue;
+    try {
+      await deleteTaskRemotely(task.dialogueId);
+    } catch (error) {
+      remoteFailures += 1;
+    }
+  }
+
+  removeTasksLocally(staleTasks.map((task) => task.id));
+  if (remoteFailures) {
+    showToast("error", `已清理 ${staleTasks.length} 条过时任务，其中 ${remoteFailures} 条服务端文件未成功删除`);
+    return;
+  }
+  showToast("success", `已清理 ${staleTasks.length} 条过时任务`);
+}
+
 function updateTask(taskId, patch) {
-  state.tasks = state.tasks.map((task) => (task.id === taskId ? { ...task, ...patch } : task));
+  state.tasks = state.tasks.map((task) => (task.id === taskId ? normalizeTask({ ...task, ...patch }) : task));
   renderTasks();
   persistState();
 }
@@ -1014,6 +1788,7 @@ async function loadServerInfo() {
     state.serverInfo = payload;
     renderShareBox(payload);
   } catch (error) {
+    state.serverInfo = null;
     el.sharePrimaryLink.textContent = "获取失败";
     el.sharePrimaryLink.href = "#";
     el.copyShareBtn.disabled = true;
@@ -1025,12 +1800,9 @@ async function loadPresetTopics() {
   try {
     const payload = await fetchJson("/api/preset_topics");
     state.presetTopics = Array.isArray(payload.presets) ? payload.presets : [];
-    state.templateOptions = [...BASE_TEMPLATE_OPTIONS];
-    state.presetTopics.forEach((preset) => {
-      if (preset.template_label) {
-        ensureTemplateOption(preset.template_label);
-      }
-    });
+    const currentTemplateLabel = normalizeTemplateDropdownLabel(templateOptionByValue(state.form.template)?.label || "");
+    state.templateOptions = buildTemplateOptionsFromPresets(state.presetTopics);
+    state.form.template = currentTemplateLabel ? ensureTemplateOption(currentTemplateLabel) : state.templateOptions[0]?.value || "";
 
     if (state.form.selectedPresetId && !presetTopicById(state.form.selectedPresetId)) {
       state.form.selectedPresetId = "";
@@ -1042,9 +1814,38 @@ async function loadPresetTopics() {
   } catch (error) {
     state.presetTopics = [];
     state.templateOptions = [...BASE_TEMPLATE_OPTIONS];
+    state.form.template = state.templateOptions[0]?.value || "";
     console.warn("loadPresetTopics failed", error);
     setModalMessage(`预置文本主题加载失败：${error.message}`, "error");
   }
+}
+
+async function loadOnlineAudioConfig() {
+  try {
+    const payload = await fetchJson("/api/online_audio_config");
+    const config = cloneOnlineAudioConfig(payload.config || FALLBACK_ONLINE_AUDIO_CONFIG);
+    state.onlineAudioConfig = config;
+    const currentTemplateLabel = normalizeTemplateDropdownLabel(templateOptionByValue(state.form.template)?.label || "");
+    state.templateOptions = (config.templateCatalog || []).map((item) => ({
+      value: dynamicTemplateValue(item.label),
+      label: item.label
+    }));
+    state.form.template = currentTemplateLabel ? ensureTemplateOption(currentTemplateLabel) : state.templateOptions[0]?.value || "";
+    state.form.wordCountLimit = state.form.wordCountLimit || defaultWordCountLimit();
+    state.form.folder = state.form.folder || defaultFolderOption();
+  } catch (error) {
+    state.onlineAudioConfig = cloneOnlineAudioConfig(FALLBACK_ONLINE_AUDIO_CONFIG);
+    console.warn("loadOnlineAudioConfig failed", error);
+    setModalMessage(`在线音频配置加载失败，已使用默认配置：${error.message}`, "error");
+  }
+}
+
+async function refreshPresetTopicsIfNeeded(force = false) {
+  if (!force && state.presetTopics.length) {
+    return;
+  }
+  await loadPresetTopics();
+  renderAll();
 }
 
 function applyPresetSelection(preset, options = {}) {
@@ -1056,17 +1857,21 @@ function applyPresetSelection(preset, options = {}) {
   }
 
   state.form.selectedPresetId = preset.id;
-  if (preset.template_label) {
-    state.form.template = ensureTemplateOption(preset.template_label);
+  const templateLabel = templateDisplayLabelFromPreset(preset);
+  if (templateLabel) {
+    state.form.template = ensureTemplateOption(templateLabel);
   }
   if (preset.language) {
     state.form.llmLanguage = preset.language;
   }
-  if (preset.default_word_count) {
-    state.form.wordCountLimit = String(preset.default_word_count);
+  if (preset.word_count || preset.default_word_count) {
+    state.form.wordCountLimit = String(preset.word_count || preset.default_word_count);
   }
-  if (preset.recommended_people_count) {
-    state.form.speakerCount = Math.min(10, Math.max(1, Number(preset.recommended_people_count) || state.form.speakerCount || 2));
+  if (preset.people_count || preset.recommended_people_count) {
+    state.form.speakerCount = Math.min(
+      10,
+      Math.max(1, Number(preset.people_count || preset.recommended_people_count) || state.form.speakerCount || 2)
+    );
   }
   if (render) {
     renderAll();
@@ -1144,17 +1949,16 @@ async function submitAudioGeneration() {
   }
 
   const taskId = createTaskPlaceholder();
+  let dialogueId = state.form.dialogueId;
+  let workingText = currentWorkingText();
+  let textDownloadUrl = "";
+  let textFileName = state.form.generatedTextFileName || "";
   state.form.isSubmittingAudio = true;
   setModalMessage("任务已提交，正在生成音频...", "info");
   renderSubmitState();
   persistState();
 
   try {
-    let dialogueId = state.form.dialogueId;
-    let workingText = currentWorkingText();
-    let textDownloadUrl = "";
-    let textFileName = state.form.generatedTextFileName || "";
-
     if (currentMode() === "manual") {
       const createPayload = await fetchJson("/api/create_dialogue_from_text", {
         method: "POST",
@@ -1206,7 +2010,8 @@ async function submitAudioGeneration() {
       fileName: audioPayload.file_name || basenameFromPath(audioPayload.audio_file_path),
       textFileName: textFileName || basenameFromPath(state.form.generatedTextFileName),
       textDownloadUrl: textDownloadUrl || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=text`,
-      audioDownloadUrl: audioPayload.audio_download_url || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=audio`
+      audioDownloadUrl: audioPayload.audio_download_url || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=audio`,
+      snapshot: buildTaskSnapshot(dialogueId, workingText, textFileName || basenameFromPath(state.form.generatedTextFileName))
     });
 
     state.modalOpen = false;
@@ -1215,7 +2020,11 @@ async function submitAudioGeneration() {
   } catch (requestError) {
     updateTask(taskId, {
       status: "生成失败",
-      errorMessage: requestError.message
+      errorMessage: requestError.message,
+      dialogueId,
+      textFileName,
+      textDownloadUrl,
+      snapshot: buildTaskSnapshot(dialogueId, workingText, textFileName)
     });
     setModalMessage(`音频生成失败：${requestError.message}`, "error");
     showToast("error", `音频生成失败：${requestError.message}`);
@@ -1225,27 +2034,104 @@ async function submitAudioGeneration() {
   }
 }
 
-function handleTaskTableClick(event) {
+async function handleTaskTableClick(event) {
   const button = event.target.closest("button[data-action]");
   if (!button) return;
   const task = state.tasks.find((item) => item.id === button.dataset.id);
   if (!task) return;
 
-  if (button.dataset.action === "download-text" && task.textDownloadUrl) {
-    window.location.href = task.textDownloadUrl;
-    return;
-  }
-  if (button.dataset.action === "download-audio" && task.audioDownloadUrl) {
-    window.location.href = task.audioDownloadUrl;
-    return;
-  }
-  if (button.dataset.action === "show-error" && task.errorMessage) {
-    showToast("error", task.errorMessage);
+  try {
+    if (button.dataset.action === "view-task" && taskCanOpen(task)) {
+      await openTaskInModal(task);
+      return;
+    }
+    if (button.dataset.action === "download-text" && task.textDownloadUrl) {
+      await downloadTaskAsset(task, "text");
+      return;
+    }
+    if (button.dataset.action === "download-audio" && task.audioDownloadUrl) {
+      await downloadTaskAsset(task, "audio");
+      return;
+    }
+    if (button.dataset.action === "show-error" && task.errorMessage) {
+      showToast("error", task.errorMessage);
+      return;
+    }
+    if (button.dataset.action === "delete-task") {
+      await handleDeleteTask(task);
+    }
+  } catch (error) {
+    const actionLabelMap = {
+      "view-task": "任务回看",
+      "download-text": "文本下载",
+      "download-audio": "音频下载",
+      "delete-task": "任务删除"
+    };
+    const actionLabel = actionLabelMap[button.dataset.action] || "操作";
+    showToast("error", `${actionLabel}失败：${error.message}`);
   }
 }
 
 function bindEvents() {
+  initModalResize();
+  initModalDrag();
+  window.addEventListener("resize", applyModalSize);
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.modalOpen) {
+      closeModal();
+    }
+  });
+  el.modalOverlay.addEventListener("click", (event) => {
+    if (event.target === el.modalOverlay) {
+      closeModal();
+    }
+  });
+  el.resetModalLayoutBtn.addEventListener("click", resetModalLayout);
   el.copyShareBtn.addEventListener("click", copyShareLink);
+  el.taskSearchInput.addEventListener("input", () => {
+    state.taskFilters.query = el.taskSearchInput.value;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.taskSearchBtn.addEventListener("click", () => {
+    state.taskFilters.query = el.taskSearchInput.value;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.advancedSearchBtn.addEventListener("click", () => {
+    state.advancedSearchOpen = !state.advancedSearchOpen;
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.taskStatusFilter.addEventListener("change", () => {
+    state.taskFilters.status = el.taskStatusFilter.value;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.taskSourceFilter.addEventListener("change", () => {
+    state.taskFilters.source = el.taskSourceFilter.value;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.staleOnlyFilter.addEventListener("change", () => {
+    state.taskFilters.staleOnly = el.staleOnlyFilter.checked;
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.clearTaskFiltersBtn.addEventListener("click", () => {
+    state.taskFilters = createDefaultTaskFilters();
+    renderTasks();
+    renderTaskSearchUi();
+    persistState();
+  });
+  el.cleanupOldTasksBtn.addEventListener("click", () => {
+    void cleanupOldTasks();
+  });
   el.uploadBtn.addEventListener("click", () => {
     showToast("info", "演示版当前只开放“在线生成音频”流程。");
   });
@@ -1278,6 +2164,11 @@ function bindEvents() {
   });
   el.topicModeManual.addEventListener("change", readAndRender);
   el.topicModePreset.addEventListener("change", readAndRender);
+  el.presetTopicSelect.addEventListener("pointerdown", () => {
+    if (!state.presetTopics.length) {
+      void refreshPresetTopicsIfNeeded(true);
+    }
+  });
 
   el.templateSelect.addEventListener("change", readAndRender);
   el.llmLanguage.addEventListener("change", readAndRender);
@@ -1340,6 +2231,7 @@ function bindEvents() {
 
 async function init() {
   restoreState();
+  await loadOnlineAudioConfig();
   await loadPresetTopics();
   bindEvents();
   renderAll();

@@ -18,7 +18,8 @@ import yaml
 
 LOGGER = logging.getLogger("project_guard")
 
-DEFAULT_RULES_FILE = "project_guard_rules.yaml"
+ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_RULES_FILE = str(ROOT / "config" / "project_guard_rules.yaml")
 DEFAULT_IGNORE_FILE = ".cleanupignore"
 DEFAULT_REPORT_FILE = "project_guard_report.md"
 TEXT_EXTENSIONS = {

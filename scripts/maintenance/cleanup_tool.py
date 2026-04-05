@@ -12,5 +12,5 @@ from project_guard import main
 
 
 if __name__ == "__main__":
-    print("[DEPRECATED] cleanup_tool.py is a compatibility wrapper. Use 'python project_guard.py' instead.")
+    print("[DEPRECATED] cleanup_tool.py is a compatibility wrapper. Use 'python scripts/maintenance/project_guard.py' instead.")
     raise SystemExit(main(["cleanup-compat", *sys.argv[1:]]))

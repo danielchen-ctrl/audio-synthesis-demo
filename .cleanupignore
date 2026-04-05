@@ -1,10 +1,7 @@
-﻿# core entrypoints
-app.py
+# core entrypoints
 server.py
-run.py
-project_guard.py
-cleanup_tool.py
-sitecustomize.py
+scripts/maintenance/project_guard.py
+scripts/maintenance/cleanup_tool.py
 
 # core modules
 runtime_patches.py
