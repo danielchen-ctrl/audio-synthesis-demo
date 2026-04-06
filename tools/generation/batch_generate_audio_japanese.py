@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 批量生成日语对话音频（多角色语音版本）
@@ -36,7 +36,7 @@ if sys.stdout.encoding.lower() != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8')
 
 # 项目根目录
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 # 日语语音池（6种不同的日语语音）
 VOICE_POOL_JA = {
@@ -357,3 +357,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

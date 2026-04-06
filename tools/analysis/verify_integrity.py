@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 验证删除文件后的完整性检查脚本
 """
@@ -6,7 +6,8 @@
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 
 def test_imports():
     """测试核心模块导入"""
@@ -53,8 +54,7 @@ def test_imports():
     
     # 4. 测试音频生成脚本
     try:
-        sys.path.insert(0, str(Path(__file__).parent))
-        from generate_payment_5step_audio import parse_dialogue_text, clean_tts_text
+        from tools.generation.generate_payment_5step_audio import parse_dialogue_text, clean_tts_text
         print("[OK] generate_payment_5step_audio.py 导入成功")
     except Exception as e:
         errors.append(f"generate_payment_5step_audio.py 导入失败: {e}")
@@ -121,3 +121,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+

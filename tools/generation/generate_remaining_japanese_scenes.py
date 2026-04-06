@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 继续生成剩余的日语场景（6-13）
@@ -7,11 +7,11 @@
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 # 导入主脚本的函数
-from tools.batch_generate_13_professions_japanese import (
+from tools.generation.batch_generate_13_professions_japanese import (
     parse_input_file,
     process_one_job_ja,
     INPUT_FILE,
@@ -58,3 +58,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

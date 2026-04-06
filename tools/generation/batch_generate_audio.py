@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """批量生成对话音频（Edge TTS）"""
 
@@ -17,7 +17,7 @@ if sys.platform == "win32":
         pass
 
 # 添加项目根目录到 sys.path
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 try:
@@ -426,3 +426,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
