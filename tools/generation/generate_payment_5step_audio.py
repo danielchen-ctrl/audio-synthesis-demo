@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 为payment_5step的5个Step对话文本生成音频
 """
@@ -11,7 +11,8 @@ from pathlib import Path
 from typing import List, Tuple, Dict, Any
 
 # 添加项目根目录到路径
-sys.path.insert(0, str(Path(__file__).parent.parent))
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 try:
     import edge_tts
@@ -204,7 +205,7 @@ async def generate_audio_for_step(
 
 async def main():
     """主函数：为所有5个Step生成音频"""
-    base_dir = Path(__file__).parent.parent
+    base_dir = PROJECT_ROOT
     payment_5step_dir = base_dir / "output" / "payment_5step"
     
     if not payment_5step_dir.exists():
@@ -283,3 +284,4 @@ async def main():
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
     sys.exit(exit_code)
+

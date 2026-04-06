@@ -530,7 +530,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.1 LLM 模式默认态
 
-![LLM 模式默认态，含弹窗入口与顶部结构](./assets/online-audio-prd/01-llm-default.png)
+![LLM 模式默认态，含弹窗入口与顶部结构](./online-audio-prd-assets/01-llm-default.png)
 
 关键信息：
 
@@ -541,7 +541,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.2 主题模板选项展开态
 
-![主题模板下拉展开态](./assets/online-audio-prd/02-template-options.png)
+![主题模板下拉展开态](./online-audio-prd-assets/02-template-options.png)
 
 关键信息：
 
@@ -550,7 +550,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.3 文本语言选项展开态
 
-![LLM 模式下的文本语言下拉展开态](./assets/online-audio-prd/03-language-options-llm.png)
+![LLM 模式下的文本语言下拉展开态](./online-audio-prd-assets/03-language-options-llm.png)
 
 关键信息：
 
@@ -559,7 +559,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.4 说话人数与生成文本按钮
 
-![说话人数与根据配置生成文本按钮](./assets/online-audio-prd/04-speaker-and-generate-text.png)
+![说话人数与根据配置生成文本按钮](./online-audio-prd-assets/04-speaker-and-generate-text.png)
 
 关键信息：
 
@@ -568,7 +568,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.5 语音配置默认态
 
-![语音配置默认态](./assets/online-audio-prd/05-voice-config-default.png)
+![语音配置默认态](./online-audio-prd-assets/05-voice-config-default.png)
 
 关键信息：
 
@@ -578,7 +578,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.6 Speaker 1 音色列表展开态
 
-![Speaker 1 音色列表展开态](./assets/online-audio-prd/06-voice-options-speaker-1.png)
+![Speaker 1 音色列表展开态](./online-audio-prd-assets/06-voice-options-speaker-1.png)
 
 关键信息：
 
@@ -587,7 +587,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.7 Speaker 2 音色列表展开态
 
-![Speaker 2 音色列表展开态](./assets/online-audio-prd/07-voice-options-speaker-2.png)
+![Speaker 2 音色列表展开态](./online-audio-prd-assets/07-voice-options-speaker-2.png)
 
 关键信息：
 
@@ -596,7 +596,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.8 音频输出格式展开态
 
-![音频输出格式下拉展开态](./assets/online-audio-prd/08-output-format-options.png)
+![音频输出格式下拉展开态](./online-audio-prd-assets/08-output-format-options.png)
 
 关键信息：
 
@@ -604,7 +604,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.9 直接输入模式默认态
 
-![直接输入文本模式默认态](./assets/online-audio-prd/09-manual-default.png)
+![直接输入文本模式默认态](./online-audio-prd-assets/09-manual-default.png)
 
 关键信息：
 
@@ -613,7 +613,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.10 直接输入模式的语言下拉展开态
 
-![直接输入模式的语言下拉展开态](./assets/online-audio-prd/10-manual-language-options.png)
+![直接输入模式的语言下拉展开态](./online-audio-prd-assets/10-manual-language-options.png)
 
 关键信息：
 
@@ -621,7 +621,7 @@ S2: 你好，今天我们讨论什么话题？
 
 ### 18.11 直接输入模式下的说话人数与语音配置
 
-![直接输入模式下的下半段结构](./assets/online-audio-prd/11-manual-speaker-and-voice.png)
+![直接输入模式下的下半段结构](./online-audio-prd-assets/11-manual-speaker-and-voice.png)
 
 关键信息：
 

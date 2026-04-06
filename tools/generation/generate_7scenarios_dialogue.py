@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 为7个同项目对话场景生成对话文本与音频
 参数：字数2000-3000，人物数量4，语言中文（普通话）
@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import List, Tuple, Dict, Any
 
 # 添加项目根目录到路径
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 # 动态导入 server.py
@@ -532,3 +532,4 @@ def main():
 if __name__ == "__main__":
     exit_code = main()
     sys.exit(exit_code)
+

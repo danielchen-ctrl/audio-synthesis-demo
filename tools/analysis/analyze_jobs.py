@@ -1,10 +1,13 @@
-import json
+﻿import json
 from pathlib import Path
 from collections import Counter
 
 # 读取前1000个任务
 jobs = []
-with open('training_jobs_full.jsonl', encoding='utf-8') as f:
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_FILE = PROJECT_ROOT / 'training' / 'data' / 'training_jobs_full.jsonl'
+
+with open(DATA_FILE, encoding='utf-8') as f:
     for i, line in enumerate(f):
         if i >= 1000:
             break
@@ -60,3 +63,4 @@ for key in unique_keys:
 print('\n按语言统计唯一文件数:')
 for lang, count in sorted(lang_counter.items()):
     print(f'  {lang}: {count}个')
+

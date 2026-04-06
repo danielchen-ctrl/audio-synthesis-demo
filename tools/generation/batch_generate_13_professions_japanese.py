@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 批量生成13个职业场景的日语对话文本和音频
@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Any
 
 # 添加项目根目录到 sys.path
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 # 导入 server.py 核心函数
@@ -384,3 +384,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
