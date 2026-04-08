@@ -16,7 +16,8 @@ const LANGUAGE_OPTIONS = [
   { label: "意大利语", backend: "Italian", code: "it" },
   { label: "俄语", backend: "Russian", code: "ru" },
   { label: "阿拉伯语", backend: "Arabic", code: "ar" },
-  { label: "印度尼西亚语", backend: "Indonesian", code: "id" }
+  { label: "印度尼西亚语", backend: "Indonesian", code: "id" },
+  { label: "粤语", backend: "Cantonese", code: "yue" }
 ];
 
 const FALLBACK_ONLINE_AUDIO_CONFIG = {
@@ -70,10 +71,18 @@ const BASE_TEMPLATE_OPTIONS = FALLBACK_ONLINE_AUDIO_CONFIG.templateCatalog.map((
 
 const VOICE_LIBRARY = {
   Chinese: [
-    { value: "zh-CN-XiaoxiaoNeural", label: "晓晓（女，中文）" },
-    { value: "zh-CN-YunxiNeural", label: "云希（男，中文）" },
-    { value: "zh-CN-XiaoyiNeural", label: "晓伊（女，中文）" },
-    { value: "zh-CN-YunyangNeural", label: "云扬（男，中文）" }
+    { value: "zh-CN-XiaoxiaoNeural", label: "晓晓（女，青年，中文）" },
+    { value: "zh-CN-YunxiNeural",    label: "云希（男，青年，中文）" },
+    { value: "zh-CN-XiaoyiNeural",   label: "晓伊（女，青年，中文）" },
+    { value: "zh-CN-YunyangNeural",  label: "云扬（男，中年，中文）" },
+    { value: "zh-CN-XiaohanNeural",  label: "晓涵（女，青年，中文）" },
+    { value: "zh-CN-YunxiaNeural",   label: "云夏（男，青年，中文）" },
+    { value: "zh-CN-XiaoxuanNeural", label: "晓萱（女，中年，中文）" },
+    { value: "zh-CN-YunjianNeural",  label: "云健（男，中年，中文）" },
+    { value: "zh-CN-XiaoqiuNeural",  label: "晓秋（女，中年，中文）" },
+    { value: "zh-CN-YunhaoNeural",   label: "云皓（男，老年，中文）" },
+    { value: "zh-CN-XiaoruiNeural",  label: "晓睿（女，老年，中文）" },
+    { value: "zh-CN-YunzeNeural",    label: "云泽（男，老年，中文）" }
   ],
   English: [
     { value: "en-US-JennyNeural", label: "Jenny（女，英语）" },
@@ -120,6 +129,11 @@ const VOICE_LIBRARY = {
   Indonesian: [
     { value: "id-ID-GadisNeural", label: "Gadis（女，印度尼西亚语）" },
     { value: "id-ID-ArdiNeural", label: "Ardi（男，印度尼西亚语）" }
+  ],
+  Cantonese: [
+    { value: "zh-HK-HiuGaaiNeural", label: "晓佳（女，粤语）" },
+    { value: "zh-HK-WanLungNeural", label: "云龙（男，粤语）" },
+    { value: "zh-HK-HiuMaanNeural", label: "晓曼（女，粤语）" }
   ]
 };
 
@@ -211,10 +225,8 @@ const el = {
   manualSection: document.getElementById("manualSection"),
   generateTextRow: document.getElementById("generateTextRow"),
   previewSection: document.getElementById("previewSection"),
-  topicModeCardManual: document.getElementById("topicModeCardManual"),
-  topicModeCardPreset: document.getElementById("topicModeCardPreset"),
-  topicModeManual: document.getElementById("topicModeManual"),
-  topicModePreset: document.getElementById("topicModePreset"),
+  presetPickerBtn: document.getElementById("presetPickerBtn"),
+  clearPresetBtn: document.getElementById("clearPresetBtn"),
   topicManualGroup: document.getElementById("topicManualGroup"),
   topicPresetGroup: document.getElementById("topicPresetGroup"),
   presetTopicResolvedGroup: document.getElementById("presetTopicResolvedGroup"),
@@ -247,7 +259,11 @@ const el = {
   tagInput: document.getElementById("tagInput"),
   includeScripts: document.getElementById("includeScripts"),
   modalMessage: document.getElementById("modalMessage"),
-  submitAudioBtn: document.getElementById("submitAudioBtn")
+  submitAudioBtn: document.getElementById("submitAudioBtn"),
+  confirmDialog: document.getElementById("confirmDialog"),
+  confirmMessage: document.getElementById("confirmMessage"),
+  confirmOkBtn: document.getElementById("confirmOkBtn"),
+  confirmCancelBtn: document.getElementById("confirmCancelBtn")
 };
 
 function cloneOnlineAudioConfig(config = FALLBACK_ONLINE_AUDIO_CONFIG) {
@@ -685,6 +701,23 @@ function showToast(type, message) {
   window.setTimeout(() => toast.remove(), 3600);
 }
 
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    el.confirmMessage.textContent = message;
+    function handleOk() { cleanup(true); }
+    function handleCancel() { cleanup(false); }
+    function cleanup(result) {
+      el.confirmOkBtn.removeEventListener("click", handleOk);
+      el.confirmCancelBtn.removeEventListener("click", handleCancel);
+      el.confirmDialog.close();
+      resolve(result);
+    }
+    el.confirmOkBtn.addEventListener("click", handleOk);
+    el.confirmCancelBtn.addEventListener("click", handleCancel);
+    el.confirmDialog.showModal();
+  });
+}
+
 function openModal() {
   state.modalOpen = true;
   el.modalOverlay.classList.add("open");
@@ -710,7 +743,6 @@ function resetForm() {
 
 function readFormFromDom() {
   state.form.mode = el.modeManual.checked ? "manual" : "llm";
-  state.form.topicInputMode = el.topicModePreset.checked ? "preset" : "manual";
   state.form.llmTopic = el.llmTopic.value;
   state.form.selectedPresetId = el.presetTopicSelect.value;
   state.form.template = el.templateSelect.value;
@@ -731,8 +763,6 @@ function readFormFromDom() {
 function syncFormToDom() {
   el.modeLlm.checked = state.form.mode === "llm";
   el.modeManual.checked = state.form.mode === "manual";
-  el.topicModeManual.checked = currentTopicInputMode() === "manual";
-  el.topicModePreset.checked = currentTopicInputMode() === "preset";
   el.llmTopic.value = state.form.llmTopic || "";
   el.presetTopicSelect.value = state.form.selectedPresetId || "";
   el.presetTopicResolved.value = currentPresetTopic()?.topic_text || "";
@@ -910,10 +940,22 @@ function renderPresetTopics() {
 
 function ensureVoiceAssignmentsShape() {
   const voices = activeVoiceOptions().map((item) => item.value);
+  const count = speakerCountValue();
+  const prevCount = Object.keys(state.form.voiceAssignments).length;
   const nextAssignments = {};
-  for (let speaker = 1; speaker <= speakerCountValue(); speaker += 1) {
-    const current = state.form.voiceAssignments[String(speaker)];
-    nextAssignments[String(speaker)] = voices.includes(current) ? current : "";
+  if (prevCount !== count) {
+    // 人数变化：对所有说话人重新分配，循环不同音色
+    for (let speaker = 1; speaker <= count; speaker += 1) {
+      nextAssignments[String(speaker)] = voices[(speaker - 1) % voices.length] || "";
+    }
+  } else {
+    // 人数未变：保留已有合法音色，仅修复无效项
+    for (let speaker = 1; speaker <= count; speaker += 1) {
+      const current = state.form.voiceAssignments[String(speaker)];
+      nextAssignments[String(speaker)] = voices.includes(current)
+        ? current
+        : voices[(speaker - 1) % voices.length] || "";
+    }
   }
   state.form.voiceAssignments = nextAssignments;
 }
@@ -968,8 +1010,6 @@ function renderModeUi() {
   el.previewSection.classList.toggle("hidden", !(isLlm && hasPreviewText));
   el.customPromptGroup.classList.toggle("hidden", el.templateSelect.value !== "custom");
 
-  el.topicModeCardManual.classList.toggle("selected", !isPresetTopic);
-  el.topicModeCardPreset.classList.toggle("selected", isPresetTopic);
   el.topicManualGroup.classList.toggle("hidden", !isLlm || isPresetTopic);
   el.topicPresetGroup.classList.toggle("hidden", !isLlm || !isPresetTopic);
   el.presetTopicResolvedGroup.classList.toggle("hidden", !isLlm || !isPresetTopic);
@@ -1703,7 +1743,7 @@ function createTaskPlaceholder() {
     dialogueId: "",
     snapshot: buildTaskSnapshot("", workingText, textFileName)
   };
-  state.tasks = [task, ...state.tasks];
+  state.tasks = [task, ...state.tasks].slice(0, 50);
   renderTasks();
   persistState();
   return task.id;
@@ -1728,7 +1768,7 @@ async function deleteTaskRemotely(dialogueId) {
 }
 
 async function handleDeleteTask(task) {
-  const confirmed = window.confirm(`确认删除任务“${task.title || "未命名任务"}”？`);
+  const confirmed = await showConfirm(`确认删除任务”${task.title || “未命名任务”}”？`);
   if (!confirmed) return;
 
   let remoteError = "";
@@ -1755,18 +1795,13 @@ async function cleanupOldTasks() {
     return;
   }
 
-  const confirmed = window.confirm(`确认清理 ${staleTasks.length} 条过时任务？这会同时清理可找到的本地生成文件。`);
+  const confirmed = await showConfirm(`确认清理 ${staleTasks.length} 条过时任务？这会同时清理可找到的本地生成文件。`);
   if (!confirmed) return;
 
-  let remoteFailures = 0;
-  for (const task of staleTasks) {
-    if (!task.dialogueId) continue;
-    try {
-      await deleteTaskRemotely(task.dialogueId);
-    } catch (error) {
-      remoteFailures += 1;
-    }
-  }
+  const results = await Promise.allSettled(
+    staleTasks.filter((task) => task.dialogueId).map((task) => deleteTaskRemotely(task.dialogueId))
+  );
+  const remoteFailures = results.filter((r) => r.status === "rejected").length;
 
   removeTasksLocally(staleTasks.map((task) => task.id));
   if (remoteFailures) {
@@ -1796,9 +1831,9 @@ async function loadServerInfo() {
   }
 }
 
-async function loadPresetTopics() {
+async function loadPresetTopics(fetchPromise) {
   try {
-    const payload = await fetchJson("/api/preset_topics");
+    const payload = await (fetchPromise || fetchJson("/api/preset_topics"));
     state.presetTopics = Array.isArray(payload.presets) ? payload.presets : [];
     const currentTemplateLabel = normalizeTemplateDropdownLabel(templateOptionByValue(state.form.template)?.label || "");
     state.templateOptions = buildTemplateOptionsFromPresets(state.presetTopics);
@@ -1820,9 +1855,9 @@ async function loadPresetTopics() {
   }
 }
 
-async function loadOnlineAudioConfig() {
+async function loadOnlineAudioConfig(fetchPromise) {
   try {
-    const payload = await fetchJson("/api/online_audio_config");
+    const payload = await (fetchPromise || fetchJson("/api/online_audio_config"));
     const config = cloneOnlineAudioConfig(payload.config || FALLBACK_ONLINE_AUDIO_CONFIG);
     state.onlineAudioConfig = config;
     const currentTemplateLabel = normalizeTemplateDropdownLabel(templateOptionByValue(state.form.template)?.label || "");
@@ -1894,12 +1929,11 @@ async function handleGenerateText() {
   const error = validateLlmBeforeGenerateText();
   if (error) {
     setModalMessage(error, "error");
-    showToast("error", error);
     return;
   }
 
   if (normalizeText(el.previewText.value)) {
-    const confirmed = window.confirm("确认重新生成文本？当前文本将被覆盖。");
+    const confirmed = await showConfirm("确认重新生成文本？当前文本将被覆盖。");
     if (!confirmed) return;
   }
 
@@ -1931,7 +1965,6 @@ async function handleGenerateText() {
     }
   } catch (requestError) {
     setModalMessage(`文本生成失败：${requestError.message}`, "error");
-    showToast("error", `文本生成失败：${requestError.message}`);
   } finally {
     state.form.isGeneratingText = false;
     renderAll();
@@ -1943,7 +1976,6 @@ async function submitAudioGeneration() {
   const validationError = validateBeforeSubmit();
   if (validationError) {
     setModalMessage(validationError, "error");
-    showToast("error", validationError);
     renderSubmitState();
     return;
   }
@@ -2027,7 +2059,6 @@ async function submitAudioGeneration() {
       snapshot: buildTaskSnapshot(dialogueId, workingText, textFileName)
     });
     setModalMessage(`音频生成失败：${requestError.message}`, "error");
-    showToast("error", `音频生成失败：${requestError.message}`);
   } finally {
     state.form.isSubmittingAudio = false;
     renderAll();
@@ -2132,9 +2163,7 @@ function bindEvents() {
   el.cleanupOldTasksBtn.addEventListener("click", () => {
     void cleanupOldTasks();
   });
-  el.uploadBtn.addEventListener("click", () => {
-    showToast("info", "演示版当前只开放“在线生成音频”流程。");
-  });
+  // uploadBtn 已设为 disabled，无需事件绑定
   el.openOnlineAudioBtn.addEventListener("click", openModal);
   el.closeModalBtn.addEventListener("click", closeModal);
   el.cancelModalBtn.addEventListener("click", closeModal);
@@ -2152,31 +2181,56 @@ function bindEvents() {
   el.modeLlm.addEventListener("change", readAndRender);
   el.modeManual.addEventListener("change", readAndRender);
 
-  el.topicModeCardManual.addEventListener("click", (event) => {
-    event.preventDefault();
-    if (state.form.isGeneratingText || state.form.isSubmittingAudio) return;
-    setTopicInputMode("manual");
-  });
-  el.topicModeCardPreset.addEventListener("click", (event) => {
-    event.preventDefault();
+  el.presetPickerBtn.addEventListener("click", () => {
     if (state.form.isGeneratingText || state.form.isSubmittingAudio) return;
     setTopicInputMode("preset");
+    void refreshPresetTopicsIfNeeded(state.presetTopics.length === 0);
   });
-  el.topicModeManual.addEventListener("change", readAndRender);
-  el.topicModePreset.addEventListener("change", readAndRender);
+  el.clearPresetBtn.addEventListener("click", () => {
+    if (state.form.isGeneratingText || state.form.isSubmittingAudio) return;
+    state.form.selectedPresetId = "";
+    setTopicInputMode("manual");
+  });
   el.presetTopicSelect.addEventListener("pointerdown", () => {
     if (!state.presetTopics.length) {
       void refreshPresetTopicsIfNeeded(true);
     }
   });
 
-  el.templateSelect.addEventListener("change", readAndRender);
-  el.llmLanguage.addEventListener("change", readAndRender);
-  el.manualLanguage.addEventListener("change", readAndRender);
-  el.speakerCount.addEventListener("change", readAndRender);
-  el.speakerCount.addEventListener("input", readAndRender);
-  el.outputFormat.addEventListener("change", readAndRender);
-  el.includeScripts.addEventListener("change", readAndRender);
+  el.templateSelect.addEventListener("change", () => {
+    readFormFromDom();
+    renderModeUi();
+    renderSubmitState();
+    persistState();
+  });
+  el.llmLanguage.addEventListener("change", () => {
+    renderVoiceRows();
+    renderSubmitState();
+    persistState();
+  });
+  el.manualLanguage.addEventListener("change", () => {
+    renderVoiceRows();
+    renderSubmitState();
+    persistState();
+  });
+  el.speakerCount.addEventListener("change", () => {
+    renderVoiceRows();
+    renderSubmitState();
+    persistState();
+  });
+  el.speakerCount.addEventListener("input", () => {
+    renderVoiceRows();
+    renderSubmitState();
+    persistState();
+  });
+  el.outputFormat.addEventListener("change", () => {
+    readFormFromDom();
+    persistState();
+  });
+  el.includeScripts.addEventListener("change", () => {
+    readFormFromDom();
+    persistState();
+  });
 
   el.llmTopic.addEventListener("input", () => {
     state.form.llmTopic = el.llmTopic.value;
@@ -2231,11 +2285,14 @@ function bindEvents() {
 
 async function init() {
   restoreState();
-  await loadOnlineAudioConfig();
-  await loadPresetTopics();
+  // 两个接口同时发出请求，顺序处理（presets 依赖 config 设置的 templateCatalog）
+  const configFetch = fetchJson("/api/online_audio_config");
+  const presetsFetch = fetchJson("/api/preset_topics");
+  await loadOnlineAudioConfig(configFetch);
+  await loadPresetTopics(presetsFetch);
   bindEvents();
   renderAll();
-  await loadServerInfo();
+  loadServerInfo(); // 不阻塞 init，share box 异步更新
   if (state.modalOpen) {
     openModal();
   }

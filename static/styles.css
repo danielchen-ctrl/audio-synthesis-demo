@@ -351,6 +351,12 @@ a {
 
 .status-run::before {
   background: var(--primary);
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 .status-ok {
@@ -679,35 +685,62 @@ a {
   color: var(--gray-500);
 }
 
-.topic-mode-switch {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+/* 输入主题：relative 容器让按钮可以绝对定位在 input 内部 */
+.topic-input-container {
+  position: relative;
 }
 
-.topic-mode-card {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 0 12px;
-  border: 1px solid var(--gray-300);
-  border-radius: var(--r-md);
-  background: #fff;
-  color: var(--gray-700);
+.topic-with-action {
+  padding-right: 76px;
+}
+
+/* "预置主题" 按钮：嵌在 input 框右侧内部 */
+.topic-preset-inline-btn {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  padding: 0 10px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--gray-200);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  color: var(--primary);
+  font-size: 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  white-space: nowrap;
+  line-height: 1;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.topic-mode-card.selected,
-.topic-mode-card:hover {
-  border-color: var(--primary);
+.topic-preset-inline-btn:hover {
   background: var(--primary-light);
   color: var(--primary-hover);
 }
 
-.topic-mode-card input {
-  margin: 0;
+/* 预置模式：切回手动输入的操作行 */
+.topic-preset-actions {
+  margin-top: 8px;
+}
+
+.topic-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  background: #fff;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--r-sm);
+  color: var(--gray-700);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.topic-clear-btn:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-400);
+  color: var(--gray-700);
 }
 
 .form-group {
@@ -963,6 +996,33 @@ a {
   color: #991b1b;
 }
 
+.confirm-dialog {
+  border: none;
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  padding: 24px 28px;
+  min-width: 300px;
+  max-width: 460px;
+  width: 90vw;
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.confirm-message {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gray-700);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 @media (max-width: 1080px) {
   .topbar {
     height: auto;
@@ -985,8 +1045,8 @@ a {
     align-items: stretch;
   }
 
-  .topic-mode-switch {
-    grid-template-columns: 1fr;
+  .topic-with-action {
+    padding-right: 68px;
   }
 
   .filter-grid {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>音频语料生成平台 Demo</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260403a" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260408d" />
   </head>
   <body>
     <div class="app-shell">
@@ -40,7 +40,7 @@
             <button id="advancedSearchBtn" class="btn btn-secondary btn-sm" type="button">高级筛选</button>
           </div>
           <div class="toolbar-actions">
-            <button id="uploadBtn" class="btn btn-secondary" type="button">上传文件</button>
+            <button id="uploadBtn" class="btn btn-secondary" type="button" disabled title="演示版暂不开放上传">上传文件</button>
             <button id="openOnlineAudioBtn" class="btn btn-primary" type="button">+ 在线生成音频</button>
           </div>
         </section>
@@ -143,26 +143,19 @@
 
           <section id="llmSection" class="modal-section">
             <div class="section-title">内容配置</div>
-            <div class="form-group">
-              <label class="form-label">文本主题<span class="req">*</span></label>
-              <div class="topic-mode-switch" id="topicModeSwitch">
-                <label id="topicModeCardManual" class="topic-mode-card selected">
-                  <input id="topicModeManual" type="radio" name="topicInputMode" value="manual" checked />
-                  <span>方式一：手动输入</span>
-                </label>
-                <label id="topicModeCardPreset" class="topic-mode-card">
-                  <input id="topicModePreset" type="radio" name="topicInputMode" value="preset" />
-                  <span>方式二：预置文本主题</span>
-                </label>
+            <div id="topicManualGroup" class="form-group">
+              <label class="form-label" for="llmTopic">输入主题<span class="req">*</span></label>
+              <div class="topic-input-container">
+                <input id="llmTopic" class="input-field topic-with-action" type="text" maxlength="255" placeholder="如：季度复盘会议讨论" />
+                <button id="presetPickerBtn" class="topic-preset-inline-btn" type="button">预置主题</button>
               </div>
             </div>
-            <div id="topicManualGroup" class="form-group">
-              <label class="form-label" for="llmTopic">手动输入主题</label>
-              <input id="llmTopic" class="input-field" type="text" maxlength="255" placeholder="如：季度复盘会议讨论" />
-            </div>
             <div id="topicPresetGroup" class="form-group hidden">
-              <label class="form-label" for="presetTopicSelect">预置文本主题</label>
+              <label class="form-label" for="presetTopicSelect">输入主题<span class="req">*</span></label>
               <select id="presetTopicSelect" class="select-field"></select>
+              <div class="topic-preset-actions">
+                <button id="clearPresetBtn" class="topic-clear-btn" type="button">← 返回手动输入</button>
+              </div>
               <div class="form-hint">选项内容来自预置对话情景摘要，选择后会自动联动主题模板。</div>
             </div>
             <div id="presetTopicResolvedGroup" class="form-group hidden">
@@ -248,6 +241,14 @@
               <input id="speakerCount" class="input-field compact-input" type="number" min="1" max="10" value="2" />
               <div class="form-hint">范围 1–10，须与文本中 Speaker 数量一致</div>
             </div>
+            <div class="form-group">
+              <label class="form-label">音色配置<span class="req">*</span></label>
+              <div class="voice-language-hint">
+                当前语言：<span id="voiceLanguageLabel">中文（普通话）</span> — 音色列表已按语言筛选
+              </div>
+              <div id="speakerVoiceRows" class="speaker-rows"></div>
+              <div id="voiceWarning" class="inline-warning hidden">请为所有说话人选择音色</div>
+            </div>
             <div id="generateTextRow">
               <button id="generateTextBtn" class="btn-generate" type="button">✨ 根据以上配置生成文本</button>
             </div>
@@ -266,15 +267,7 @@
           </section>
 
           <section class="modal-section">
-            <div class="section-title">语音配置</div>
-            <div class="form-group">
-              <label class="form-label">音色配置<span class="req">*</span></label>
-              <div class="voice-language-hint">
-                当前语言：<span id="voiceLanguageLabel">中文（普通话）</span> — 音色列表已按语言筛选
-              </div>
-              <div id="speakerVoiceRows" class="speaker-rows"></div>
-              <div id="voiceWarning" class="inline-warning hidden">请为所有说话人选择音色</div>
-            </div>
+            <div class="section-title">音频配置</div>
 
             <div class="form-grid">
               <div class="form-group">
@@ -327,6 +320,14 @@
       </div>
     </div>
 
-    <script src="/static/app.js?v=20260403a"></script>
+    <dialog id="confirmDialog" class="confirm-dialog">
+      <p id="confirmMessage" class="confirm-message"></p>
+      <div class="confirm-actions">
+        <button id="confirmCancelBtn" class="btn btn-secondary" type="button">取消</button>
+        <button id="confirmOkBtn" class="btn btn-primary" type="button">确认</button>
+      </div>
+    </dialog>
+
+    <script src="/static/app.js?v=20260408d"></script>
   </body>
 </html>
