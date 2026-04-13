@@ -1,4 +1,4 @@
-"""
+﻿"""
 验证职业差异 - P0-1验收脚本
 
 生成同一scenario但不同职业的对话，对比术语差异
@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 import sys
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from training.run_training_generation_mvp import generate_for_training
 
@@ -198,3 +198,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
