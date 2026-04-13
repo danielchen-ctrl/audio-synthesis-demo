@@ -41,16 +41,26 @@ _DOMAIN_TO_ID: dict[str, str] = {
 
 # ─── 语言 → 文件名 short code ─────────────────────────────────────────────
 _LANG_TO_SHORT: dict[str, str] = {
-    "Chinese":  "zh",
-    "中文":     "zh",
-    "English":  "en",
-    "英语":     "en",
-    "Japanese": "ja",
-    "日语":     "ja",
-    "日本語":   "ja",
-    "Korean":   "ko",
-    "韩语":     "ko",
-    "한국어":   "ko",
+    "Chinese":    "zh",
+    "中文":       "zh",
+    "English":    "en",
+    "英语":       "en",
+    "Japanese":   "ja",
+    "日语":       "ja",
+    "日本語":     "ja",
+    "Korean":     "ko",
+    "韩语":       "ko",
+    "한국어":     "ko",
+    "French":     "fr",
+    "法语":       "fr",
+    "German":     "de",
+    "德语":       "de",
+    "Spanish":    "es",
+    "西班牙语":   "es",
+    "Portuguese": "pt",
+    "葡萄牙语":   "pt",
+    "Cantonese":  "yue",
+    "粤语":       "yue",
 }
 
 # 每次注入的最大字符数（太长会稀释 prompt 指令）
