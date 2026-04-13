@@ -653,20 +653,38 @@ def _is_chinese_contamination_ko(text: str) -> bool:
     return cjk_count >= 4
 
 
+def _is_chinese_contamination_latin(text: str) -> bool:
+    """
+    True if a Latin-script language line (FR/DE/ES/PT) contains ≥4 CJK characters.
+    These languages use zero CJK; any CJK presence of 4+ chars is Chinese leakage.
+    """
+    chars = [c for c in text if not c.isspace()]
+    if not chars:
+        return False
+    cjk_count = sum(1 for c in chars if "\u4e00" <= c <= "\u9fff")
+    return cjk_count >= 4
+
+
+_LATIN_SCRIPT_LANGUAGES = frozenset({"French", "German", "Spanish", "Portuguese"})
+
+
 def _filter_cjk_contamination(
     lines: list[tuple[str, str]],
     language: str,
 ) -> tuple[list[tuple[str, str]], int]:
     """
-    Remove lines that are Chinese contamination for Japanese or Korean dialogues.
+    Remove lines that are Chinese contamination for Japanese, Korean, or Latin-script dialogues.
     Returns (filtered_lines, removed_count).
     Japanese: keep lines that have kana (genuine JA); remove CJK-only lines.
     Korean:   keep lines that have Hangul (genuine KO); remove CJK-only lines.
+    FR/DE/ES/PT: remove any line with ≥4 CJK chars (these use pure Latin script).
     """
     if language == "Japanese":
         check = _is_chinese_contamination_ja
     elif language == "Korean":
         check = _is_chinese_contamination_ko
+    elif language in _LATIN_SCRIPT_LANGUAGES:
+        check = _is_chinese_contamination_latin
     else:
         return lines, 0
 
@@ -911,7 +929,7 @@ def polish_generated_lines(
     # YAML replacements above already generated meaningful JA/KO content, so even a
     # short filtered result is usable).
     cjk_lines_removed = 0
-    if canonical in ("Japanese", "Korean"):
+    if canonical in ("Japanese", "Korean") or canonical in _LATIN_SCRIPT_LANGUAGES:
         filtered2, removed2 = _filter_cjk_contamination(rewritten, canonical)
         if removed2 and filtered2 and len(filtered2) >= 3:
             rewritten = filtered2
