@@ -727,20 +727,21 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 14px;
-  background: #fff;
-  border: 1px solid var(--gray-300);
+  padding: 6px 16px;
+  background: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: var(--r-sm);
-  color: var(--gray-700);
+  color: #fff;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
 .topic-clear-btn:hover {
-  background: var(--gray-50);
-  border-color: var(--gray-400);
-  color: var(--gray-700);
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: #fff;
 }
 
 .form-group {
