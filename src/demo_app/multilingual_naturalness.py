@@ -67,43 +67,58 @@ _GENERIC_FOCUS_TERMS = {
 
 _ROLE_SPECIFIC_PACKS: list[tuple[tuple[str, ...], dict[str, list[str]]]] = [
     (
-        ("服务端", "后端"),
+        ("服务端", "后端", "技术", "执行风险", "上线节奏", "回滚"),
         {
-            "facts": ["接口返回码与幂等处理", "回调状态机与补单链路", "服务日志与异常兜底"],
-            "risks": ["回调状态回写不一致", "异步通知漏测", "异常单补偿缺口"],
-            "outputs": ["服务端测试范围", "接口校验点", "回滚与补偿方案"],
+            "facts": ["接口返回码与幂等处理", "回调状态机与补单链路", "服务日志与异常兜底",
+                      "灰度窗口与流量切换方案", "监控告警阈值设置"],
+            "risks": ["回调状态回写不一致", "异步通知漏测", "异常单补偿缺口",
+                      "灰度与回滚预案不完整", "上线窗口与业务高峰冲突"],
+            "outputs": ["服务端测试范围", "接口校验点", "回滚与补偿方案",
+                        "上线前置条件清单", "监控与告警配置"],
         },
     ),
     (
-        ("客户端", "前端", "App"),
+        ("客户端", "前端", "App", "用户体验", "体验", "反馈", "宣导"),
         {
-            "facts": ["端侧唤起与结果页提示", "弱网重试与重复点击", "埋点回传与状态刷新"],
-            "risks": ["端侧提示与服务端状态不一致", "弱网场景体验失真", "埋点遗漏影响复盘"],
-            "outputs": ["端侧验证清单", "交互验收口径", "端到端回归范围"],
+            "facts": ["端侧唤起与结果页提示", "弱网重试与重复点击", "埋点回传与状态刷新",
+                      "用户反馈渠道与响应机制", "关键路径可用性数据"],
+            "risks": ["端侧提示与服务端状态不一致", "弱网场景体验失真", "埋点遗漏影响复盘",
+                      "用户认知偏差导致误操作", "宣导节奏与上线时间错配"],
+            "outputs": ["端侧验证清单", "交互验收口径", "端到端回归范围",
+                        "用户反馈收集方案", "宣导材料准备清单"],
         },
     ),
     (
-        ("产品", "业务负责人"),
+        ("产品", "业务负责人", "增长", "现状和问题", "现状"),
         {
-            "facts": ["业务规则边界", "异常流程与用户提示", "上线验收口径"],
-            "risks": ["规则口径反复变更", "验收标准不统一", "异常路径没有业务兜底"],
-            "outputs": ["需求冻结清单", "规则确认稿", "上线验收标准"],
+            "facts": ["业务规则边界", "异常流程与用户提示", "上线验收口径",
+                      "当前业务目标完成情况", "主要阻塞点与依赖项"],
+            "risks": ["规则口径反复变更", "验收标准不统一", "异常路径没有业务兜底",
+                      "业务目标与执行进度脱节", "跨部门依赖未提前对齐"],
+            "outputs": ["需求冻结清单", "规则确认稿", "上线验收标准",
+                        "业务进展汇报", "跨部门协同行动项"],
         },
     ),
     (
-        ("数据", "分析"),
+        ("数据", "分析", "指标", "验证"),
         {
-            "facts": ["指标口径与样本范围", "监控看板与异常阈值", "复盘所需数据留痕"],
-            "risks": ["指标口径不统一", "监控阈值失真", "复盘数据缺口"],
-            "outputs": ["数据口径说明", "监控指标清单", "效果复盘模板"],
+            "facts": ["指标口径与样本范围", "监控看板与异常阈值", "复盘所需数据留痕",
+                      "实验对照组设计与样本量", "数据回收完整性"],
+            "risks": ["指标口径不统一", "监控阈值失真", "复盘数据缺口",
+                      "实验样本量不足影响结论", "数据回收延迟导致决策滞后"],
+            "outputs": ["数据口径说明", "监控指标清单", "效果复盘模板",
+                        "实验结果报告", "数据质量验收标准"],
         },
     ),
     (
-        ("运营", "会员运营", "活动运营"),
+        ("运营", "会员运营", "活动运营", "时间", "资源约束", "排期", "协作", "分工", "外部依赖", "配合"),
         {
-            "facts": ["活动触达节奏", "用户分层与触达路径", "资源位与内容准备度"],
-            "risks": ["触达节奏与资源位错配", "活动口径前后台不一致", "复盘数据断层"],
-            "outputs": ["执行排期表", "运营口径说明", "触达与复购复盘表"],
+            "facts": ["活动触达节奏", "用户分层与触达路径", "资源位与内容准备度",
+                      "时间节点与资源分配情况", "跨部门协作依赖清单"],
+            "risks": ["触达节奏与资源位错配", "活动口径前后台不一致", "复盘数据断层",
+                      "资源排期与优先级冲突", "外部依赖交付不及时"],
+            "outputs": ["执行排期表", "运营口径说明", "触达与复购复盘表",
+                        "资源分配方案", "跨部门协作确认清单"],
         },
     ),
     (
@@ -242,6 +257,26 @@ def _context_topic_fragment(title: str, scenario: str, core_content: str, profil
             if fragment and fragment not in {"在线生成音频", "这件事"}:
                 return fragment
     return "这件事"
+
+
+def _topic_ref(topic: str, index: int) -> str:
+    """Return varied references to the topic to avoid mechanical repetition.
+
+    index % 4 == 0  → full topic (e.g., "AI产品付费转化策略讨论")
+    index % 4 == 1  → pronoun  "这件事" / "这块"
+    index % 4 == 2  → first meaningful phrase extracted from topic
+    index % 4 == 3  → "这个议题"
+    """
+    bucket = index % 4
+    if bucket == 0:
+        return topic
+    if bucket == 1:
+        return "这块" if len(topic) <= 8 else "这件事"
+    if bucket == 2:
+        pieces = _split_meaningful_pieces(topic)
+        short = pieces[0] if pieces else topic
+        return short if short and short != topic else "这个问题"
+    return "这个议题"
 
 
 def _core_focus_fragment(title: str, core_content: str, scenario: str, profile: dict[str, Any] | None) -> str:
@@ -500,6 +535,313 @@ def enforce_keywords_in_lines(
     return [*lines, (speaker_label, appended_text)], missing_keywords
 
 
+_EN_BUSINESS_NAMES = [
+    "Alex Chen", "Sarah Johnson", "Michael Zhang", "Emma Liu", "Kevin Wang",
+    "Lisa Park", "David Kim", "Jennifer Wu", "Robert Lee", "Amy Brown",
+    "James Scott", "Rachel Tang", "Brian Xu", "Cynthia Ho", "Daniel Yu",
+]
+
+# ── Varied fallback lines for English CJK-replacement ────────────────────────
+# Lead (primary speaker): assertive, agenda-driving
+_EN_FALLBACK_LEAD: list[str] = [
+    "Let me walk everyone through where we stand on this.",
+    "I want to make sure we're aligned on the key priorities before we go further.",
+    "Let's keep our focus on the deliverable and work backwards from there.",
+    "There are a few angles here — let me break them down one by one.",
+    "We should nail down the decision criteria before we finalize anything.",
+    "Let me flag a couple of dependencies we need to resolve first.",
+    "I'd like to get everyone's read on the risk exposure here.",
+    "Before we move on, let me clarify the scope boundary.",
+    "Let's make sure the next actions are specific and have owners.",
+    "I want to double-check our assumptions before we commit to this direction.",
+    "Let me surface the two main trade-offs and we can decide together.",
+    "We need to be honest about the timeline pressure here.",
+    "Let me make sure we capture this as a formal action item.",
+    "I want to revisit the success criteria to make sure they're realistic.",
+    "Let me pull in some context that might change how we frame this.",
+    "We should separate the short-term fix from the longer-term solution.",
+    "Let me be direct — there are resource constraints we need to work around.",
+    "I'll summarize what I'm hearing and we can course-correct if needed.",
+    "Let's stay focused on what we can actually decide in this meeting.",
+    "Before we close this topic, I want to make sure nothing is left hanging.",
+    "Let me take that offline and come back with a concrete recommendation.",
+    "There's an important constraint I haven't mentioned yet — let me bring it up now.",
+    "I want to make sure we document the rationale, not just the decision.",
+    "Let me check if we have consensus on this before we proceed.",
+    "I'd like to propose a clear decision framework here.",
+    "Let me set the context for why this matters right now.",
+    "We should define what a good outcome looks like before we debate the path.",
+    "Let me be specific about what I need from the team on this.",
+    "I want to validate our assumptions with real data before we finalize.",
+    "Let's pressure-test this plan and identify the weak spots.",
+]
+
+# Support (non-primary speakers): responsive, collaborative
+_EN_FALLBACK_SUPPORT: list[str] = [
+    "That makes sense — I'll align my workstream with that direction.",
+    "Agreed. Let me add what I'm seeing from our side.",
+    "I can take that on — let me share my current read on it first.",
+    "Good point. I'll need to loop in my team before we commit.",
+    "That's consistent with what we've been tracking.",
+    "I see the trade-off — let me weigh in on the implementation side.",
+    "I'll follow up on that and get you a concrete answer by end of week.",
+    "From our perspective, the main blocker is the dependency on the upstream team.",
+    "That's a valid concern — here's how I'd approach it.",
+    "I can support that direction, but I want to flag a potential complication.",
+    "Makes sense to me. I'll own the coordination on our end.",
+    "I'll confirm the details and report back at the next checkpoint.",
+    "I want to make sure I understand the ask correctly before I commit.",
+    "Let me think through the downstream impact of that decision.",
+    "I'm on board with that. Let me check on timeline feasibility.",
+    "I'll raise this with the relevant stakeholders and come back with a position.",
+    "That's a fair point — I'll factor that into our planning.",
+    "I can get you a clearer picture after I pull the latest data.",
+    "I'll take note of that and make sure it's reflected in my deliverable.",
+    "Happy to dive deeper on that — it's been a concern on our side too.",
+    "I'll align with the team and confirm we're on the same page.",
+    "That approach works for me. I'll coordinate accordingly.",
+    "I want to add some context that might be relevant here.",
+    "Let me push back gently on one point — I think there's a better framing.",
+    "Understood. I'll factor that into the updated timeline.",
+    "That's helpful framing. Let me think about what it means for our side.",
+    "I'll make sure this gets communicated clearly downstream.",
+    "Good call — I was going to raise the same concern.",
+    "I can absorb that scope, but I'll need to adjust my other priorities.",
+    "Let me confirm ownership on that action so nothing falls through the cracks.",
+]
+
+# ── Japanese & Korean contamination filter ───────────────────────────────────
+
+def _is_chinese_contamination_ja(text: str) -> bool:
+    """
+    True if the line is Chinese contamination in a Japanese dialogue.
+
+    Key insight: legitimate Japanese sentences almost always contain kana
+    (hiragana/katakana) for grammar particles (は、が、を、の、で...) and
+    verb endings (ます、です...). A line with substantial CJK content but
+    ZERO kana is virtually always a Chinese-leaked line, even when mixed
+    with English technical terms (which dilute the CJK ratio below naive
+    percentage thresholds).
+
+    Rule: no kana AND ≥4 CJK chars → Chinese contamination.
+    The min-count guard (≥4) prevents false-positives on lines that contain
+    only 1-3 CJK chars in otherwise English / non-CJK text.
+    """
+    chars = [c for c in text if not c.isspace()]
+    if not chars:
+        return False
+    kana_count = sum(1 for c in chars if "\u3040" <= c <= "\u30ff")
+    if kana_count:
+        return False  # any kana → legitimate Japanese content
+    cjk_count = sum(1 for c in chars if "\u4e00" <= c <= "\u9fff")
+    return cjk_count >= 4
+
+
+def _is_chinese_contamination_ko(text: str) -> bool:
+    """
+    True if line has significant CJK but negligible Hangul — Chinese leakage in a KO dialogue.
+    Korean does not use CJK characters, so any CJK presence with low Hangul is suspect.
+    The min-count guard (≥4 CJK) avoids false-positives on lines with only 1-3 CJK chars.
+    """
+    chars = [c for c in text if not c.isspace()]
+    if not chars:
+        return False
+    cjk_count    = sum(1 for c in chars if "\u4e00" <= c <= "\u9fff")
+    hangul_count = sum(1 for c in chars if "\uac00" <= c <= "\ud7a3")
+    if hangul_count:
+        return False  # any Hangul → legitimate Korean content
+    return cjk_count >= 4
+
+
+def _filter_cjk_contamination(
+    lines: list[tuple[str, str]],
+    language: str,
+) -> tuple[list[tuple[str, str]], int]:
+    """
+    Remove lines that are Chinese contamination for Japanese or Korean dialogues.
+    Returns (filtered_lines, removed_count).
+    Japanese: keep lines that have kana (genuine JA); remove CJK-only lines.
+    Korean:   keep lines that have Hangul (genuine KO); remove CJK-only lines.
+    """
+    if language == "Japanese":
+        check = _is_chinese_contamination_ja
+    elif language == "Korean":
+        check = _is_chinese_contamination_ko
+    else:
+        return lines, 0
+
+    filtered: list[tuple[str, str]] = []
+    removed = 0
+    for speaker, text in lines:
+        normalized = _normalize_line_text(text)
+        if normalized and check(normalized):
+            removed += 1
+        else:
+            filtered.append((speaker, normalized or text))
+    return filtered, removed
+
+_EN_TEMPLATE_REWRITES: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"^Based on (?:our previous discussion|the discussion so far),?\s*I (?:suggest|recommend) we have a few (?:options|choices)[.:]?", re.I), "Let me lay out the key options on the table."),
+    (re.compile(r"^Let me summarize what we[''']ve discussed[.:]?$", re.I), "Let me quickly recap the key points before we move on."),
+    (re.compile(r"^I(?:'ll| will) need to look into this further and get back to you[.:]?$", re.I), "Let me follow up on this and come back with specifics."),
+    (re.compile(r"^Option\s*1\s*[:：]", re.I), "One approach would be to start with the most critical piece and iterate from there."),
+    (re.compile(r"^Option\s*2\s*[:：]", re.I), "Alternatively, we could prepare the full plan first before rolling out."),
+    (re.compile(r"^(?:Okay|OK|Good),?\s*let(?:'s| us) (?:summarize|wrap up)[.:]?$", re.I), "Let me pull together the key takeaways."),
+    (re.compile(r"^I (?:understand|see)\.\s*That(?:'s| is) (?:indeed )?something to note\.$", re.I), "Got it — let's make sure this gets properly tracked going forward."),
+    (re.compile(r"^I (?:understand|see)\.\s*That(?:'s| is) indeed something to note\.$", re.I), "Noted — I'll make sure that's reflected in the plan."),
+]
+
+
+def _build_english_speaker_names(lines: list[tuple[str, str]]) -> dict[str, str]:
+    order = _speaker_order(lines)
+    rng = random.Random(random.SystemRandom().randrange(1, 2**32))
+    used: set[str] = set()
+    mapping: dict[str, str] = {}
+    for speaker in order:
+        available = [n for n in _EN_BUSINESS_NAMES if n not in used] or _EN_BUSINESS_NAMES
+        chosen = rng.choice(available)
+        used.add(chosen)
+        mapping[speaker] = chosen
+    return mapping
+
+
+def _context_topic_fragment_en(title: str, scenario: str, core_content: str) -> str:
+    """Return a short English topic phrase for use in English dialogue rewrites."""
+    for candidate in (title, scenario, core_content):
+        text = str(candidate or "").strip()
+        if not text or _contains_cjk(text):
+            continue
+        # Take first sentence or first ~40 chars
+        first = re.split(r"[.!?\n]", text)[0].strip()
+        first = re.sub(r"\s+", " ", first)
+        if 6 <= len(first) <= 80:
+            return first[:60]
+    return "the agenda items"
+
+
+def _rewrite_english_line(
+    speaker: str,
+    raw_text: str,
+    primary_speaker: str,
+    speaker_names: dict[str, str],
+    topic: str,
+) -> str:
+    original = _normalize_line_text(raw_text)
+    if not original:
+        return ""
+
+    # <<Core:...>> or "The most important thing is" → remove the marker line entirely
+    # (caller skips empty returns)
+    if _CORE_MARKER_RE.search(original) or re.search(r"the most important thing is", original, re.IGNORECASE):
+        return ""
+
+    # Risk Alert lines → remove
+    if _RISK_ALERT_RE.search(original):
+        return ""
+
+    # Lines containing placeholder role names → replace with proper English intro
+    if _PLACEHOLDER_ROLE_RE.search(original):
+        if speaker == primary_speaker:
+            return f"Good morning everyone. Let's get started and align on {topic} today."
+        return f"Happy to be here. I'll be focused on key constraints and risk areas around {topic}."
+
+    # Template rewrites for known verbose English boilerplate
+    for pattern, replacement in _EN_TEMPLATE_REWRITES:
+        if pattern.match(original):
+            return replacement
+
+    # Lines with heavy CJK content are Chinese leakage from a mixed-language prompt.
+    # Return a sentinel tuple so the caller can pick a varied fallback from the pool.
+    non_space = [c for c in original if not c.isspace()]
+    if non_space:
+        cjk_count = sum(1 for c in non_space if "\u4e00" <= c <= "\u9fff")
+        if cjk_count / len(non_space) > 0.25:
+            return "\x00CJK_FALLBACK\x00"  # sentinel — handled in caller
+
+    return _normalize_line_text(original)
+
+
+def _polish_english_generated_lines(
+    lines: list[tuple[str, str]],
+    scenario: str,
+    core_content: str,
+    profile: dict[str, Any] | None,
+    *,
+    title: str = "",
+) -> tuple[list[tuple[str, str]], dict[str, Any]]:
+    if not lines:
+        return [], {"language": "English", "rewrite_count": 0, "rewrites": []}
+
+    topic = _context_topic_fragment_en(title, scenario, core_content)
+    speaker_names = _build_english_speaker_names(lines)
+    primary_speaker = _speaker_order(lines)[0]
+
+    rewritten: list[tuple[str, str]] = []
+    rewrite_meta: list[dict[str, str]] = []
+
+    # Varied fallback pools — shuffle once per document, then drain in order
+    rng = random.Random(random.SystemRandom().randrange(1, 2**32))
+    lead_pool    = _EN_FALLBACK_LEAD[:]
+    support_pool = _EN_FALLBACK_SUPPORT[:]
+    rng.shuffle(lead_pool)
+    rng.shuffle(support_pool)
+    lead_idx    = 0
+    support_idx = 0
+    used_lines: set[str] = set()
+
+    def _next_fallback(is_lead: bool) -> str:
+        nonlocal lead_idx, support_idx
+        pool = lead_pool if is_lead else support_pool
+        idx  = lead_idx  if is_lead else support_idx
+        # Cycle through pool avoiding already-used lines
+        for offset in range(len(pool)):
+            candidate = pool[(idx + offset) % len(pool)]
+            if candidate not in used_lines:
+                if is_lead:
+                    lead_idx = (idx + offset + 1) % len(pool)
+                else:
+                    support_idx = (idx + offset + 1) % len(pool)
+                used_lines.add(candidate)
+                return candidate
+        # All exhausted — just advance index
+        fallback_text = pool[idx % len(pool)]
+        if is_lead:
+            lead_idx = (idx + 1) % len(pool)
+        else:
+            support_idx = (idx + 1) % len(pool)
+        return fallback_text
+
+    for speaker, raw_text in lines:
+        original = _normalize_line_text(raw_text)
+        updated = _rewrite_english_line(speaker, raw_text, primary_speaker, speaker_names, topic)
+        if not updated:
+            continue
+        if updated == "\x00CJK_FALLBACK\x00":
+            updated = _next_fallback(speaker == primary_speaker)
+        if updated in used_lines and updated not in (
+            # Allow opening lines to repeat if pool is tiny
+            lead_pool[:2] + support_pool[:2]
+        ):
+            updated = _next_fallback(speaker == primary_speaker)
+        used_lines.add(updated)
+        rewritten.append((speaker, updated))
+        if updated != original:
+            rewrite_meta.append({"speaker": speaker, "before": original, "after": updated})
+
+    if not rewritten:
+        fallback = f"Let's get started and make sure we cover all the key points on {topic} today."
+        rewritten = [(primary_speaker, fallback)]
+        rewrite_meta.append({"speaker": primary_speaker, "before": "", "after": fallback})
+
+    return rewritten, {
+        "language": "English",
+        # Always >= 1 so the caller replaces original lines with polished ones.
+        "rewrite_count": max(1, len(rewrite_meta)),
+        "rewrites": rewrite_meta,
+        "speaker_names": speaker_names,
+    }
+
+
 def polish_generated_lines(
     lines: list[tuple[str, str]],
     language: str,
@@ -513,16 +855,20 @@ def polish_generated_lines(
     if canonical == "Chinese":
         return _polish_chinese_generated_lines(lines, scenario, core_content, profile, title=title)
     if canonical in {"", "English"}:
-        return list(lines), {"language": canonical, "rewrite_count": 0, "rewrites": []}
+        return _polish_english_generated_lines(lines, scenario, core_content, profile, title=title)
 
     rules = load_text_naturalness_rules().get("languages", {}).get(canonical, {})
     if not isinstance(rules, dict):
-        return list(lines), {"language": canonical, "rewrite_count": 0, "rewrites": []}
+        rules = {}
 
     exact_replacements = rules.get("exact_replacements") or {}
     speaker_variants = rules.get("speaker_variants") or {}
     regex_replacements = rules.get("regex_replacements") or []
 
+    # Step 1: Apply YAML exact/regex rules to replace known contamination patterns
+    # with proper target-language equivalents.  We do this BEFORE the CJK filter so
+    # that formerly-Chinese lines that were converted by the rules have kana/hangul
+    # and are not immediately filtered away.
     rewritten: list[tuple[str, str]] = []
     rewrite_meta: list[dict[str, str]] = []
 
@@ -557,10 +903,35 @@ def polish_generated_lines(
         if updated != original:
             rewrite_meta.append({"speaker": speaker, "before": original, "after": updated})
 
+    # Step 2: CJK contamination filter on the YAML-processed lines.
+    # After YAML rules, formerly-Chinese lines converted to JA/KO now contain kana/hangul
+    # and will pass the filter.  Only lines that were NOT covered by YAML rules AND are
+    # still Chinese are removed here.
+    # Threshold: keep filtered result if ≥3 lines survive (no percentage floor — the
+    # YAML replacements above already generated meaningful JA/KO content, so even a
+    # short filtered result is usable).
+    cjk_lines_removed = 0
+    if canonical in ("Japanese", "Korean"):
+        filtered2, removed2 = _filter_cjk_contamination(rewritten, canonical)
+        if removed2 and filtered2 and len(filtered2) >= 3:
+            rewritten = filtered2
+            cjk_lines_removed = removed2
+
+    if not rules:
+        # No YAML rules path — just return (possibly filtered) lines
+        return list(rewritten), {
+            "language": canonical,
+            "rewrite_count": cjk_lines_removed,
+            "rewrites": [],
+            "cjk_lines_removed": cjk_lines_removed,
+        }
+
     return rewritten, {
         "language": canonical,
-        "rewrite_count": len(rewrite_meta),
+        # Count CJK removals as rewrites so the caller replaces original lines with cleaned ones
+        "rewrite_count": len(rewrite_meta) + cjk_lines_removed,
         "rewrites": rewrite_meta,
+        "cjk_lines_removed": cjk_lines_removed,
     }
 
 
@@ -625,24 +996,36 @@ _DOMAIN_ROLE_HINTS = {
 
 _DOMAIN_REALISM_GUIDE = {
     "医疗健康": {
-        "facts": ["这段时间的症状变化", "检查指标和复查结果", "用药执行情况", "家属配合度"],
-        "risks": ["复查节点拖延", "症状变化判断偏差", "用药依从性不足", "风险提示没有同步到位"],
-        "outputs": ["复查安排", "观察重点", "异常处理提醒", "家庭配合动作"],
+        "facts": ["这段时间的症状变化", "检查指标和复查结果", "用药执行情况", "家属配合度",
+                  "随访时间窗口合理性", "患者依从性评估", "并发症风险排查", "生活方式干预执行"],
+        "risks": ["复查节点拖延", "症状变化判断偏差", "用药依从性不足", "风险提示没有同步到位",
+                  "依从性干预缺失", "随访间隔过长漏诊", "家属信息传递错位", "多科室协作断层"],
+        "outputs": ["复查安排", "观察重点", "异常处理提醒", "家庭配合动作",
+                    "用药调整方案", "随访提醒安排", "生活方式干预建议", "家属沟通要点"],
     },
     "人力资源与招聘": {
-        "facts": ["岗位缺口和业务优先级", "候选人画像匹配度", "渠道转化效率", "到岗时间压力"],
-        "risks": ["画像不清导致投放失焦", "业务需求反复变化", "关键岗位补位过慢", "offer转化不稳定"],
-        "outputs": ["招聘推进节奏", "渠道分配方案", "候选人筛选标准", "业务对齐口径"],
+        "facts": ["岗位缺口和业务优先级", "候选人画像匹配度", "渠道转化效率", "到岗时间压力",
+                  "HC审批进度", "内推激活情况", "面试通过率趋势", "同类岗位竞争薪酬"],
+        "risks": ["画像不清导致投放失焦", "业务需求反复变化", "关键岗位补位过慢", "offer转化不稳定",
+                  "HC冻结风险上升", "面试官配合度不足", "候选人放弃率偏高", "内推池质量下滑"],
+        "outputs": ["招聘推进节奏", "渠道分配方案", "候选人筛选标准", "业务对齐口径",
+                    "面试安排节奏", "薪酬竞争力方案", "内推激励机制", "JD优化建议"],
     },
     "娱乐/媒体": {
-        "facts": ["内容资源和排期情况", "品牌合作匹配度", "流量投放节奏", "商务回报预期"],
-        "risks": ["资源投入回收不成正比", "传播节奏失控", "品牌调性不匹配", "执行落地反复返工"],
-        "outputs": ["商务推进策略", "内容合作口径", "投放节奏安排", "复盘指标"],
+        "facts": ["内容资源和排期情况", "品牌合作匹配度", "流量投放节奏", "商务回报预期",
+                  "本周业务目标完成率", "跨部门协作阻塞点梳理", "重点项目里程碑偏差", "预算执行与计划偏差"],
+        "risks": ["资源投入回收不成正比", "传播节奏失控", "品牌调性不匹配", "执行落地反复返工",
+                  "目标进展滞后未及时升级", "资源配置与业务优先级错位", "跨团队对齐存在断层", "关键决策被搁置不推进"],
+        "outputs": ["商务推进策略", "内容合作口径", "投放节奏安排", "复盘指标",
+                    "战略周会决策纪要", "跨部门协同行动清单", "下周优先级排期", "风险跟进责任确认表"],
     },
     "建筑与工程行业": {
-        "facts": ["现场进度和交付节点", "甲方反馈", "成本与采购情况", "施工配合条件"],
-        "risks": ["交付节奏失控", "现场问题反复出现", "成本偏差扩大", "验收节点卡住"],
-        "outputs": ["交付问题清单", "现场整改动作", "验收准备安排", "责任分工"],
+        "facts": ["现场进度和交付节点", "甲方反馈", "成本与采购情况", "施工配合条件",
+                  "分包商配合情况", "材料到场时间", "安全检查记录", "天气与施工窗口影响"],
+        "risks": ["交付节奏失控", "现场问题反复出现", "成本偏差扩大", "验收节点卡住",
+                  "分包商拖期连锁", "材料质量不达标", "安全事故隐患升级", "业主变更需求频繁"],
+        "outputs": ["交付问题清单", "现场整改动作", "验收准备安排", "责任分工",
+                    "分包协调动作", "材料验收标准", "安全整改清单", "变更管理流程"],
     },
     "汽车行业": {
         "facts": ["车型投放节奏", "渠道准备度", "库存与区域反馈", "卖点表达和市场认知"],
@@ -650,49 +1033,92 @@ _DOMAIN_REALISM_GUIDE = {
         "outputs": ["投放节奏表", "区域协同安排", "渠道沟通口径", "销售跟进动作"],
     },
     "咨询/专业服务": {
-        "facts": ["客户真实诉求", "方案切入点", "关系推进状态", "交付能力匹配"],
-        "risks": ["方案太泛导致竞争力不足", "客户关系推进停滞", "交付承诺过度", "报价缺乏支撑"],
-        "outputs": ["客户拓展策略", "提案主线", "推进节奏", "角色分工"],
+        "facts": ["客户真实诉求", "方案切入点", "关系推进状态", "交付能力匹配",
+                  "决策链和核心利益方", "竞对方案对比", "项目里程碑对齐", "行业参考案例"],
+        "risks": ["方案太泛导致竞争力不足", "客户关系推进停滞", "交付承诺过度", "报价缺乏支撑",
+                  "关键人离场风险", "多方利益冲突升级", "项目延期影响续签", "交付标准理解偏差"],
+        "outputs": ["客户拓展策略", "提案主线", "推进节奏", "角色分工",
+                    "利益方沟通策略", "方案差异化要点", "项目节点确认表", "成功案例引用口径"],
     },
     "法律服务": {
-        "facts": ["证据材料准备度", "风险边界判断", "合规要求", "客户关注点"],
-        "risks": ["表述越界", "证据链不完整", "整改建议难执行", "上线前合规把关不足"],
-        "outputs": ["法律判断结论", "整改建议", "审核口径", "落地安排"],
+        "facts": ["证据材料准备度", "风险边界判断", "合规要求", "客户关注点",
+                  "客户损失量化依据", "对方证据瑕疵点", "司法解释适用范围", "和解可行性评估"],
+        "risks": ["表述越界", "证据链不完整", "整改建议难执行", "上线前合规把关不足",
+                  "证据链被质疑", "时效性风险", "对方主动推进节奏加快", "和解条件被拉低"],
+        "outputs": ["法律判断结论", "整改建议", "审核口径", "落地安排",
+                    "证据补全清单", "谈判底线设定", "诉讼推进节点", "和解方案框架"],
     },
     "金融/投资": {
-        "facts": ["风险偏好和收益目标", "资金安排", "资产组合现状", "调整窗口"],
-        "risks": ["收益预期过高", "风险暴露集中", "配置节奏失衡", "客户理解偏差"],
-        "outputs": ["配置建议", "风险提示", "组合调整动作", "沟通口径"],
+        "facts": ["风险偏好和收益目标", "资金安排", "资产组合现状", "调整窗口",
+                  "市场波动区间", "行业集中度判断", "流动性管理状态", "客户持仓期限偏好"],
+        "risks": ["收益预期过高", "风险暴露集中", "配置节奏失衡", "客户理解偏差",
+                  "持仓集中度过高", "流动性错配风险", "市场突发事件冲击", "客户风险承受误判"],
+        "outputs": ["配置建议", "风险提示", "组合调整动作", "沟通口径",
+                    "仓位调整建议", "流动性缓冲安排", "情景压力测试结论", "持仓期限匹配方案"],
     },
     "零售行业": {
-        "facts": ["会员分层现状", "活动触达效果", "门店配合度", "复购转化数据"],
-        "risks": ["活动策略不分层", "门店执行不到位", "优惠投入回收偏弱", "效果验证口径不统一"],
-        "outputs": ["复购方案", "活动策略", "门店配合动作", "效果验证标准"],
+        "facts": ["会员分层现状", "活动触达效果", "门店配合度", "复购转化数据",
+                  "新会员获取成本", "会员等级流失情况", "跨渠道购买行为", "节假日流量预测"],
+        "risks": ["活动策略不分层", "门店执行不到位", "优惠投入回收偏弱", "效果验证口径不统一",
+                  "促销依赖型消费习惯固化", "线上线下价格冲突", "会员权益感知下降", "节假日备货不足"],
+        "outputs": ["复购方案", "活动策略", "门店配合动作", "效果验证标准",
+                    "会员等级激励优化", "跨渠道联动方案", "节假日营销节奏", "消费频次提升路径"],
     },
     "保险行业": {
-        "facts": ["销售表现", "录音质检结果", "客户反馈", "培训执行情况"],
-        "risks": ["话术触碰红线", "培训改进未闭环", "团队差异扩大", "问题重复发生"],
-        "outputs": ["质检结论", "培训改进动作", "管理要求", "复盘标准"],
+        "facts": ["销售表现", "录音质检结果", "客户反馈", "培训执行情况",
+                  "合规风险分类统计", "高频问题话术记录", "培训参与度数据", "客诉响应时效"],
+        "risks": ["话术触碰红线", "培训改进未闭环", "团队差异扩大", "问题重复发生",
+                  "误导性表述批量扩散", "质检覆盖率不足", "培训和实际行为脱节", "客诉升级影响声誉"],
+        "outputs": ["质检结论", "培训改进动作", "管理要求", "复盘标准",
+                    "合规红线话术更新", "质检覆盖扩展方案", "培训有效性验证方法", "客诉处理标准流程"],
     },
     "房地产": {
-        "facts": ["客源结构", "案场转化情况", "渠道效率", "价格反馈"],
-        "risks": ["渠道投入回报失衡", "案场转化下滑", "客群匹配偏差", "价格策略迟滞"],
-        "outputs": ["去化提效方案", "渠道动作", "案场配合安排", "短期目标"],
+        "facts": ["客源结构", "案场转化情况", "渠道效率", "价格反馈",
+                  "竞品楼盘去化节奏", "按揭贷款利率变化", "案场到访量趋势", "成交客户特征分析"],
+        "risks": ["渠道投入回报失衡", "案场转化下滑", "客群匹配偏差", "价格策略迟滞",
+                  "竞品降价压力传导", "政策调控节点不确定", "案场人效下滑", "成交周期拉长"],
+        "outputs": ["去化提效方案", "渠道动作", "案场配合安排", "短期目标",
+                    "渠道费用结构优化", "按揭政策利用方案", "案场人效提升措施", "月度去化目标分解"],
     },
     "人工智能/科技": {
-        "facts": ["漏斗转化数据", "试用和付费表现", "用户价值感知", "实验结果"],
-        "risks": ["转化门槛设置不当", "价值感知不足", "数据回收不完整", "实验节奏失控"],
-        "outputs": ["转化方案", "实验计划", "产品优化方向", "验证指标"],
+        "facts": ["漏斗转化数据", "试用和付费表现", "用户价值感知", "实验结果",
+                  "付费门槛满意度调研结论", "免费功能使用深度数据", "竞品定价策略对比", "付费用户续订率趋势"],
+        "risks": ["转化门槛设置不当", "价值感知不足", "数据回收不完整", "实验节奏失控",
+                  "免费用户滥用关键功能", "A/B测试样本量不足", "付费与免费功能边界模糊", "实验结论被提前采纳"],
+        "outputs": ["转化方案", "实验计划", "产品优化方向", "验证指标",
+                    "付费门槛调整建议", "试用期策略迭代方案", "用户分层付费路径", "价值传递改进计划"],
     },
     "制造业": {
-        "facts": ["瓶颈工序情况", "设备效率", "良率波动", "排产协同状态"],
-        "risks": ["瓶颈工序拖慢节奏", "设备异常反复出现", "良率波动放大", "异常处置滞后"],
-        "outputs": ["提效动作", "排产调整建议", "设备改善安排", "质量跟踪口径"],
+        "facts": ["瓶颈工序情况", "设备效率", "良率波动", "排产协同状态",
+                  "原材料库存与供应商情况", "质量检验批次合格率", "工单完成率与交期达成", "班组人员出勤情况"],
+        "risks": ["瓶颈工序拖慢节奏", "设备异常反复出现", "良率波动放大", "异常处置滞后",
+                  "原材料短缺连锁停产", "质检不合格批次扩散", "交期承诺无法履行", "关键班组技能流失"],
+        "outputs": ["提效动作", "排产调整建议", "设备改善安排", "质量跟踪口径",
+                    "物料采购优先级安排", "质检标准与返工流程", "交期达成保障方案", "技能培训和备岗计划"],
     },
     "测试开发": {
-        "facts": ["链路覆盖情况", "灰度与压测结果", "监控告警准备度", "回滚与兜底方案"],
-        "risks": ["异常链路漏测", "回调和幂等处理不完整", "灰度窗口与回滚预案不清", "准入标准和告警阈值模糊"],
-        "outputs": ["测试范围清单", "准入结论", "风险清单", "上线前动作"],
+        "facts": ["链路覆盖情况", "灰度与压测结果", "监控告警准备度", "回滚与兜底方案",
+                  "接口契约与版本兼容性", "数据一致性与幂等验证", "依赖服务稳定性", "上线审批与发布窗口"],
+        "risks": ["异常链路漏测", "回调和幂等处理不完整", "灰度窗口与回滚预案不清", "准入标准和告警阈值模糊",
+                  "接口版本兼容遗漏", "依赖服务故障传导未兜底", "压测场景与线上差异", "发布后监控盲区扩大"],
+        "outputs": ["测试范围清单", "准入结论", "风险清单", "上线前动作",
+                    "接口契约确认表", "幂等与补偿机制方案", "灰度发布节点设定", "监控告警规则更新"],
+    },
+    "商业化": {
+        "facts": ["艺人/IP商业定位", "品牌匹配度评估", "报价策略与市场参考", "执行风险识别",
+                  "转化目标与KPI设定", "合同关键条款", "独家与非独家授权范围", "合作方资源投入承诺"],
+        "risks": ["品牌调性冲突", "报价过高导致谈判破裂", "执行兑现能力不足", "转化目标虚高",
+                  "独家条款约束过严", "合作方资源落空", "档期与竞品冲突", "舆情风险预判缺失"],
+        "outputs": ["商业化推进策略", "合作判断结论", "报价方案与谈判底线", "执行安排与分工",
+                    "KPI拆解与验收标准", "合同关键条款清单", "风险对冲预案", "短期与长期合作路径"],
+    },
+    "医疗行业": {
+        "facts": ["这段时间的症状变化", "检查指标和复查结果", "用药执行情况", "家属配合度",
+                  "随访时间窗口合理性", "患者依从性评估", "并发症风险排查", "生活方式干预执行"],
+        "risks": ["复查节点拖延", "症状变化判断偏差", "用药依从性不足", "风险提示没有同步到位",
+                  "依从性干预缺失", "随访间隔过长漏诊", "家属信息传递错位", "多科室协作断层"],
+        "outputs": ["复查安排", "观察重点", "异常处理提醒", "家庭配合动作",
+                    "用药调整方案", "随访提醒安排", "生活方式干预建议", "家属沟通要点"],
     },
 }
 
@@ -1111,7 +1537,9 @@ def _primary_response_line(point: str, round_index: int, medical: bool) -> str:
             f"这个点我认可，围绕{point}不能只停在判断上，还得把执行条件和校验口径讲透。",
             f"那我们就按{point}来拆，先确认事实，再决定方案优先级和推进节奏。",
             f"{point}这部分我会讲细一点，关键不是喊口号，而是把真正会影响结果的地方说透。",
-    ]
+            f"刚才说的{point}我都听清楚了，我整合一下，先把最影响推进的卡点说清楚，再决定怎么往下走。",
+            f"围绕{point}，大家提到了几个不同层面的关切，核心是现状和目标之间的差距，我们先把这个差距的主要原因对齐。",
+        ]
     return variants[round_index % len(variants)]
 
 
@@ -1123,10 +1551,14 @@ def _primary_plan_line(point: str, topic: str, round_index: int, medical: bool) 
             f"你们刚才提到的点我都记住了，后面会围绕{point}把结论、节奏和注意事项说得更落地一些。",
         ]
     else:
+        topic_ref = _topic_ref(topic, round_index + 1)
         variants = [
             f"所以围绕{point}，我的建议是先把事实、责任人和验收标准定住，再安排后续推进节奏。",
-            f"接下来我们就按{topic}这条主线往下走，先收敛关键风险，再决定资源和上线窗口怎么排。",
+            f"接下来我们就按{topic_ref}这条主线往下走，先收敛关键风险，再决定资源和上线窗口怎么排。",
             f"你们刚才提到的点我都记住了，后面会围绕{point}把动作、边界和兜底方案讲得更落地一些。",
+            f"这一段先收口，{point}的主要矛盾我们已经摆出来了，下一步按优先级逐项推进，不要一次全铺开。",
+            f"围绕{topic_ref}，我们先把{point}这一段落稳，确认清楚执行条件和验收标准，再往后延伸。",
+            f"我来整合一下，{point}相关的事实、责任和节奏基本对齐了，后面就按这个框架继续推，有偏差再及时调。",
         ]
     return variants[round_index % len(variants)]
 
@@ -1149,10 +1581,14 @@ def _primary_realism_line(
             f"围绕{topic}，我们最后一定要落到{output_hint}，否则前面关于{point}的讨论就很难真正帮到后续处理。",
         ]
     else:
+        topic_ref = _topic_ref(topic, round_index)
         variants = [
             f"再往前走一步，{point}不能只停在判断层面，像{fact_hint}、{fact_hint_secondary}和{risk_hint}这些都要对应到后面的{output_hint}上。",
             f"如果现在就准备推进，我更希望先把{fact_hint}和{fact_hint_secondary}核实清楚，不然{risk_hint}这类问题后面还是会反复返工。",
-            f"围绕{topic}，我们最后一定要落到{output_hint}，否则前面关于{point}的讨论很容易停在口头上。",
+            f"围绕{topic_ref}，我们最后一定要落到{output_hint}，否则前面关于{point}的讨论很容易停在口头上。",
+            f"我补充一点，{point}这块如果{risk_hint}没有提前设防，后面{output_hint}的推进就会一直被卡住，所以{fact_hint}要现在就确认清楚。",
+            f"说到底，{topic_ref}能不能顺利推进，很大程度上看{fact_hint}和{fact_hint_secondary}有没有讲到位，这是后面{output_hint}的前提。",
+            f"最后提醒一下，{risk_hint}这类问题在{topic_ref}推进过程中很容易被忽视，但它直接影响{output_hint}，必须提前纳入{point}的讨论范围。",
         ]
     return variants[round_index % len(variants)]
 
@@ -1183,6 +1619,9 @@ def _secondary_commit_line(
             f"明白了，那我这边会先把和{point}有关的{fact_hint}、现状数据和阻塞项整理出来，再把{output_hint}对给大家。",
             f"好，那围绕{point}我会从{role_hint}这个角度先把责任人、时间点、验证方式和{success_hint}补齐，避免后面再来回改。",
             f"这样我就更清楚了，后面关于{point}我会先把{fact_hint}和{output_hint}准备扎实，再推进下一步。",
+            f"明白，围绕{point}我先核实{fact_hint}，把阻塞项和边界条件理清楚，再跟大家同步{output_hint}的推进计划。",
+            f"好的，那我从{role_hint}这边先把{point}对应的关键节点和验证口径整理一遍，{success_hint}这块在下次同步前确认到位。",
+            f"我先跟进{fact_hint}和{output_hint}，有问题及时拉上{role_hint}一起处理，不等到最后才说堵住了。",
         ]
     return variants[(round_index + speaker_variant) % len(variants)]
 
@@ -1209,10 +1648,12 @@ def _primary_stage_open_line(
         ]
     else:
         variants = [
-            f"这一轮我们先按“{stage_prompt}”往下推，先把{point}和{scene_hint}这两件事讲透。",
+            f"这一轮我们先按「{stage_prompt}」往下推，先把{point}和{scene_hint}这两件事讲透。",
             f"我想先围绕{point}展开，不只是判断对错，还要把会影响推进的关键约束一起摆出来。",
             f"先别急着往结论跳，先把{stage_prompt}这一段聊扎实，最后才能把{deliverable_hint}落到实处。",
             f"围绕{topic}，这一段先聚焦{point}，把事实、风险和动作一次对齐。",
+            f"下面这一段聚焦{point}，{scene_hint}这部分最容易出现判断分歧，现在对齐比后面补救要省力。",
+            f"{point}这块我多说几句，这里的取舍和优先级如果现在不讲清楚，{deliverable_hint}就很难落地。",
         ]
     return variants[round_index % len(variants)]
 
@@ -1253,6 +1694,10 @@ def _secondary_stage_line(
             f"我补充一个执行层面的判断，围绕{point}如果现在不把{fact_hint}和{output_hint}说到位，后面就算大家表面同意了，真正落到{success_hint}时也会反复返工。",
             f"如果按{objective_hint}这个思路往下走，那{point}最好先拆到可执行，比如谁负责、什么时候验证、出了问题怎么兜底，同时把{fact_hint_secondary}讲清楚。",
             f"站在{role_hint}角度，我希望这轮别只讲原则，最好直接把{point}对应的{fact_hint}、{risk_hint}和{output_hint}说到能执行，不然{stage_prompt}这一段就会悬着。",
+            f"我先把{point}这块说具体一点，{fact_hint}必须先对齐，不然后续{output_hint}很容易只停在口头上，{risk_hint}的问题也容易被掩盖。",
+            f"围绕{point}，我有个执行层面的关切：{risk_detail}如果{stage_prompt}这一段不提前设防，等问题暴露再补救代价会更大，所以我想先把{fact_hint_secondary}说透。",
+            f"从{role_hint}这边看，{point}现在的主要卡点是{risk_hint}，要真正推进就得先把{output_hint}的边界和条件一次性说清楚，不能留到后面再扯。",
+            f"我补充一个数据层面的判断，{point}如果{fact_hint}和{fact_hint_secondary}的口径没有先对齐，后续{success_hint}就很难量化验证，大家各说各的只会更乱。",
         ]
     return variants[(round_index + speaker_variant) % len(variants)]
 
@@ -1280,6 +1725,8 @@ def _primary_stage_close_line(
             f"你们刚才补得比较完整，下一步就按{stage_prompt}继续走，把{success_hint}也一并讲到能执行。",
             f"这轮先到这里，围绕{point}我已经听到比较清楚的分歧和风险了，下面我们继续把{deliverable_hint}细化下来。",
             f"我先做个小结，{point}这块不能再停在判断层面了，后面要直接落到{success_hint}和具体动作。",
+            f"围绕{point}，这一段我们至少已经把主要矛盾摆出来了，后面就按{deliverable_hint}方向继续往下走，别再停在原地绕。",
+            f"先收一下，{point}这块的事实和风险基本清楚了，接下来核心任务就是把{success_hint}落到有人负责、有时间节点的具体动作上。",
         ]
     return variants[round_index % len(variants)]
 
@@ -1611,8 +2058,23 @@ def repair_dialogue_quality(
     canonical = canonical_language(language)
     expected_people = max(1, int(people_count or len(_speaker_order(lines)) or 1))
     target = max(100, int(target_word_count or 1000))
+
+    # Universal cleanup for all languages: strip <<Core:...>> / <<核心:...>> / Risk Alert lines
+    # that the LLM occasionally echoes back from the prompt template.
+    _universal_cleaned = [
+        (spk, txt) for spk, txt in lines
+        if not _CORE_MARKER_RE.search(txt) and not _RISK_ALERT_RE.search(txt)
+    ]
+    _universal_changed = bool(_universal_cleaned) and len(_universal_cleaned) != len(lines)
+    if _universal_cleaned:
+        lines = _universal_cleaned
+
     if canonical != "Chinese":
-        return list(lines), {"language": canonical, "repaired": False, "reason": "non_chinese"}
+        return list(lines), {
+            "language": canonical,
+            "repaired": _universal_changed,
+            "reason": "marker_cleanup" if _universal_changed else "non_chinese",
+        }
 
     context = _normalize_generation_context(generation_context)
     force_rebuild = bool(context.get("discussion_axes") or context.get("role_briefs") or target >= 700)

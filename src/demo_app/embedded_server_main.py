@@ -32,6 +32,7 @@ if str(SRC_DIR) not in sys.path:
 
 from demo_app.multilingual_naturalness import enforce_keywords_in_lines as merge_keywords_into_lines
 from demo_app.multilingual_naturalness import polish_generated_lines, repair_dialogue_quality, stabilize_dialogue_constraints
+from demo_app.few_shot_selector import get_few_shot_example
 
 RUNTIME_CACHE = ROOT / "runtime" / "cache" / "embedded_bundle"
 MODULE_CACHE = RUNTIME_CACHE / "modules"
@@ -282,13 +283,142 @@ def _safe_generation_context(payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _merge_text_parts(*parts: str) -> str:
+# ── 行业名中→英映射（profile / generation_context 字段净化用）────────────────
+_INDUSTRY_ZH_TO_EN: dict[str, str] = {
+    "人工智能/科技":   "AI / Technology",
+    "娱乐/媒体":       "Entertainment / Media",
+    "商业化":          "Commercialization",
+    "测试开发":        "Software Testing & Development",
+    "人力资源与招聘":  "HR & Recruitment",
+    "建筑与工程行业":  "Construction & Engineering",
+    "咨询/专业服务":   "Consulting / Professional Services",
+    "法律服务":        "Legal Services",
+    "金融/投资":       "Finance / Investment",
+    "零售行业":        "Retail",
+    "保险行业":        "Insurance",
+    "医疗行业":        "Healthcare",
+    "医疗健康":        "Healthcare",
+    "房地产":          "Real Estate",
+    "制造业":          "Manufacturing",
+    "汽车行业":        "Automotive",
+}
+
+# 场景类型中→英（use_case 后缀部分）
+_SCENE_ZH_TO_EN: dict[str, str] = {
+    "付费转化":     "Paid Conversion",
+    "战略周会":     "Strategic Weekly Meeting",
+    "支付项目":     "Payment Project",
+    "招聘补岗":     "Recruitment",
+    "艺人商业化":   "Artist Commercialization",
+    "项目交付":     "Project Delivery",
+    "客户拓展":     "Client Development",
+    "法顾专项":     "Legal Advisory",
+    "资产配置":     "Asset Allocation",
+    "会员复购":     "Member Repurchase",
+    "理赔服务":     "Claims Service",
+    "医疗咨询":     "Medical Consultation",
+    "项目融资":     "Project Financing",
+    "产线提效":     "Production Line Efficiency",
+    "场景讨论":     "Scene Discussion",
+    "会议讨论":     "Meeting Discussion",
+}
+
+
+def _cjk_heavy(text: str, threshold: float = 0.15) -> bool:
+    """Return True if text is predominantly CJK (Chinese)."""
+    chars = [c for c in text if not c.isspace()]
+    if not chars:
+        return False
+    return sum(1 for c in chars if "\u4e00" <= c <= "\u9fff") / len(chars) >= threshold
+
+
+def _translate_field(value: str, mapping: dict[str, str]) -> str:
+    """Replace a known Chinese value with its English equivalent; keep original if unknown."""
+    return mapping.get(value, value)
+
+
+def _sanitize_profile_for_language(profile: dict[str, Any], generation_context: dict[str, Any], language: str) -> None:
+    """
+    For non-Chinese languages, replace Chinese strings in profile and generation_context
+    with English equivalents so the LLM prompt stays in the target language.
+    Mutates both dicts in-place.
+    """
+    if language == "Chinese":
+        return
+
+    # profile.job_function
+    jf = str(profile.get("job_function") or "")
+    if _cjk_heavy(jf):
+        profile["job_function"] = _translate_field(jf, _INDUSTRY_ZH_TO_EN)
+
+    # profile.use_case  (pattern: "行业｜场景" or plain industry)
+    uc = str(profile.get("use_case") or "")
+    if _cjk_heavy(uc) and uc not in ("general_use_case",):
+        if "｜" in uc:
+            industry_part, scene_part = uc.split("｜", 1)
+            en_industry = _translate_field(industry_part, _INDUSTRY_ZH_TO_EN)
+            en_scene    = _translate_field(scene_part,    _SCENE_ZH_TO_EN)
+            profile["use_case"] = f"{en_industry} | {en_scene}"
+        else:
+            profile["use_case"] = _translate_field(uc, _INDUSTRY_ZH_TO_EN)
+
+    # profile.work_content
+    wc = str(profile.get("work_content") or "")
+    if _cjk_heavy(wc):
+        profile["work_content"] = _translate_field(wc, _INDUSTRY_ZH_TO_EN)
+
+    # generation_context.domain
+    domain = str(generation_context.get("domain") or "")
+    if _cjk_heavy(domain):
+        generation_context["domain"] = _translate_field(domain, _INDUSTRY_ZH_TO_EN)
+
+    # generation_context.scene_type
+    st = str(generation_context.get("scene_type") or "")
+    if _cjk_heavy(st):
+        generation_context["scene_type"] = _translate_field(st, _SCENE_ZH_TO_EN)
+
+
+def _merge_text_parts(*parts: str, sep: str = "；") -> str:
     merged: list[str] = []
     for part in parts:
         normalized = str(part or "").strip()
         if normalized and normalized not in merged:
             merged.append(normalized)
-    return "；".join(merged)
+    return sep.join(merged)
+
+
+def _prompt_labels(language: str) -> dict[str, str]:
+    """Return prompt construction labels in the target language.
+    Non-Chinese languages use English labels to avoid Chinese injection."""
+    if language == "Chinese":
+        return {
+            "scene_type_default": "场景讨论",
+            "participants":       "参与角色：",
+            "discussion":         "重点讨论：",
+            "role_objectives":    "角色目标：",
+            "stages":             "推进阶段：",
+            "risk_checks":        "风险检查点：",
+            "success_signals":    "成功标准：",
+            "deliverable":        "目标输出：",
+            "quality_constraints":"写作要求：",
+            "title_default":      "对话",
+            "sep":                "；",
+            "enum_sep":           "、",
+        }
+    return {
+        "scene_type_default": "Scene Discussion",
+        "participants":       "Participants: ",
+        "discussion":         "Key discussion points: ",
+        "role_objectives":    "Role objectives: ",
+        "stages":             "Progression stages: ",
+        "risk_checks":        "Risk checkpoints: ",
+        "success_signals":    "Success criteria: ",
+        "deliverable":        "Target output: ",
+        "quality_constraints":"Writing requirements: ",
+        "title_default":      "Dialogue",
+        "sep":                "; ",
+        "enum_sep":           ", ",
+    }
 
 
 def _safe_int(value: Any, default: int) -> int:
@@ -538,7 +668,7 @@ def _load_preset_topics() -> list[dict[str, Any]]:
                 "core_content": core_content,
                 "template_label": template_label,
                 "people_count": max(2, min(10, _safe_int(people_match.group(1) if people_match else None, 3))),
-                "word_count": min(3000, max(100, _extract_word_count(block))),
+                "word_count": min(5000, max(300, _extract_word_count(block))),
                 "language": _canonical_language(language_match.group(1) if language_match else "Chinese"),
                 "profile": _preset_profile(title, topic_text, template_label),
             }
@@ -566,21 +696,37 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     scenario = str(payload.get("scenario") or "").strip()
     core_content = str(payload.get("core_content") or "").strip()
     people_count = max(2, min(10, _safe_int(payload.get("people_count"), 3)))
-    word_count = min(3000, max(100, _safe_int(payload.get("word_count"), 1000)))
+    word_count = min(5000, max(300, _safe_int(payload.get("word_count"), 1000)))
     language = _canonical_language(str(payload.get("audio_language") or payload.get("language") or "Chinese"))
-    title = str(payload.get("title") or f"{profile['job_function']}_{profile['seniority']}").strip()
+    lbl = _prompt_labels(language)
+
+    # Sanitize Chinese strings in profile/generation_context for non-Chinese languages
+    _sanitize_profile_for_language(profile, generation_context, language)
+
+    title = str(
+        payload.get("title") or
+        payload.get("scenario") or
+        profile.get("work_content") or
+        profile.get("job_function") or
+        lbl["title_default"]
+    ).strip()
     template_label = str(payload.get("template_label") or "").strip()
     tags = payload.get("tags") or []
     keyword_terms = _safe_str_list(payload.get("keyword_terms"))
     folder = str(payload.get("folder") or "默认目录").strip() or "默认目录"
 
     if generation_context.get("domain") and profile["use_case"] == "general_use_case":
-        scene_type = generation_context.get("scene_type") or template_label or "场景讨论"
+        scene_type = generation_context.get("scene_type") or template_label or lbl["scene_type_default"]
         profile["use_case"] = f"{generation_context['domain']}｜{scene_type}"
     if generation_context.get("role_briefs") and profile["job_function"] == "unknown_job_function":
         profile["job_function"] = generation_context["role_briefs"][0]
     if generation_context.get("scene_goal"):
-        scenario = _merge_text_parts(scenario, generation_context["scene_goal"], f"参与角色：{'、'.join(generation_context.get('role_briefs', []))}")
+        scenario = _merge_text_parts(
+            scenario,
+            generation_context["scene_goal"],
+            f"{lbl['participants']}{lbl['enum_sep'].join(generation_context.get('role_briefs', []))}",
+            sep=lbl["sep"],
+        )
     if (
         generation_context.get("discussion_axes")
         or generation_context.get("deliverable")
@@ -592,14 +738,23 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     ):
         core_content = _merge_text_parts(
             core_content,
-            f"重点讨论：{'、'.join(generation_context.get('discussion_axes', []))}" if generation_context.get("discussion_axes") else "",
-            f"角色目标：{'；'.join(generation_context.get('role_objectives', []))}" if generation_context.get("role_objectives") else "",
-            f"推进阶段：{'；'.join(generation_context.get('stage_prompts', []))}" if generation_context.get("stage_prompts") else "",
-            f"风险检查点：{'；'.join(generation_context.get('risk_checks', []))}" if generation_context.get("risk_checks") else "",
-            f"成功标准：{'；'.join(generation_context.get('success_signals', []))}" if generation_context.get("success_signals") else "",
-            f"目标输出：{generation_context.get('deliverable', '')}" if generation_context.get("deliverable") else "",
-            f"写作要求：{'；'.join(generation_context.get('quality_constraints', []))}" if generation_context.get("quality_constraints") else "",
+            f"{lbl['discussion']}{lbl['enum_sep'].join(generation_context.get('discussion_axes', []))}" if generation_context.get("discussion_axes") else "",
+            f"{lbl['role_objectives']}{lbl['sep'].join(generation_context.get('role_objectives', []))}" if generation_context.get("role_objectives") else "",
+            f"{lbl['stages']}{lbl['sep'].join(generation_context.get('stage_prompts', []))}" if generation_context.get("stage_prompts") else "",
+            f"{lbl['risk_checks']}{lbl['sep'].join(generation_context.get('risk_checks', []))}" if generation_context.get("risk_checks") else "",
+            f"{lbl['success_signals']}{lbl['sep'].join(generation_context.get('success_signals', []))}" if generation_context.get("success_signals") else "",
+            f"{lbl['deliverable']}{generation_context.get('deliverable', '')}" if generation_context.get("deliverable") else "",
+            f"{lbl['quality_constraints']}{lbl['sep'].join(generation_context.get('quality_constraints', []))}" if generation_context.get("quality_constraints") else "",
+            sep=lbl["sep"],
         )
+
+    # Few-shot 注入：从训练语料取同行业示例，引导 LLM 对齐行业对话风格
+    _fs_domain = generation_context.get("domain", "")
+    if _fs_domain:
+        _fs_example = get_few_shot_example(_fs_domain, language)
+        if _fs_example:
+            _fs_label = "Reference dialogue style (match the tone and rhythm, do not copy content):" if language in ("English", "Japanese", "Korean") else "参考对话风格示例（仅参考语气和节奏，请勿照抄内容）："
+            core_content = core_content + f"\n\n{_fs_label}\n---\n{_fs_example}\n---"
 
     lines, rewrite_info = bundle_server._generate_dialogue_lines(
         profile,
@@ -1554,7 +1709,7 @@ def load_bundle_server():
                 polished_lines, naturalness = polish_generated_lines(
                     lines,
                     language,
-                    title=str(profile.get("work_content") or scenario or ""),
+                    title=str(scenario or profile.get("work_content") or ""),
                     scenario=scenario,
                     core_content=core,
                     profile=profile,

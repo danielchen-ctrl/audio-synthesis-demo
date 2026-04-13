@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>音频语料生成平台 Demo</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260408d" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260408f" />
   </head>
   <body>
     <div class="app-shell">
@@ -176,6 +176,7 @@
               <div class="form-group">
                 <label class="form-label" for="llmLanguage">文本语言<span class="req">*</span></label>
                 <select id="llmLanguage" class="select-field"></select>
+                <div id="languageHint" class="form-hint hidden">文本以中文生成，音频将以所选语言合成（文本中可能保留少量中文字符）</div>
               </div>
             </div>
             <div id="customPromptGroup" class="form-group hidden">
@@ -194,10 +195,10 @@
                   id="wordCountLimit"
                   class="input-field"
                   type="number"
-                  min="100"
-                  max="3000"
+                  min="300"
+                  max="5000"
                   value="1000"
-                  placeholder="100–3000"
+                  placeholder="300–5000"
                 />
               </div>
               <div class="form-group">
@@ -278,11 +279,8 @@
                   <option>M4A</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label class="form-label" for="preciseDuration">精准时长控制</label>
-                <input id="preciseDuration" class="input-field" type="number" min="0" placeholder="秒（可选，±5% 误差）" />
-              </div>
             </div>
+            <input id="preciseDuration" type="hidden" value="" />
 
             <div class="form-grid">
               <div class="form-group">
@@ -328,6 +326,6 @@
       </div>
     </dialog>
 
-    <script src="/static/app.js?v=20260408d"></script>
+    <script src="/static/app.js?v=20260408f"></script>
   </body>
 </html>

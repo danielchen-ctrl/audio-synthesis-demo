@@ -23,8 +23,8 @@ const LANGUAGE_OPTIONS = [
 const FALLBACK_ONLINE_AUDIO_CONFIG = {
   defaults: {
     wordCount: DEFAULT_WORD_COUNT,
-    wordCountMin: 100,
-    wordCountMax: 3000,
+    wordCountMin: 300,
+    wordCountMax: 5000,
     folder: "默认目录"
   },
   folderOptions: ["默认目录", "项目 A / 会议语料", "项目 A / 访谈语料", "项目 B"],
@@ -1156,6 +1156,14 @@ function renderShareBox(payload) {
   el.shareHint.textContent = payload.share_hint || "可把地址发给同一局域网内的其他电脑使用。";
 }
 
+function renderLanguageHint() {
+  const hintEl = document.getElementById("languageHint");
+  if (!hintEl) return;
+  const lang = el.llmLanguage ? el.llmLanguage.value : state.form.llmLanguage;
+  const isChinese = lang === "Chinese" || lang === "Cantonese";
+  hintEl.classList.toggle("hidden", isChinese);
+}
+
 function renderAll() {
   renderTemplates();
   renderLanguages();
@@ -1166,6 +1174,7 @@ function renderAll() {
   renderTagEditor(el.tagWrap, el.tagInput, state.form.tags, removeTag);
   renderModeUi();
   renderVoiceRows();
+  renderLanguageHint();
   renderKeywordHighlightPreview();
   renderSubmitState();
   renderTaskSearchUi();
@@ -1768,7 +1777,7 @@ async function deleteTaskRemotely(dialogueId) {
 }
 
 async function handleDeleteTask(task) {
-  const confirmed = await showConfirm(`确认删除任务”${task.title || “未命名任务”}”？`);
+  const confirmed = await showConfirm(`确认删除任务”${task.title || "未命名任务"}”？`);
   if (!confirmed) return;
 
   let remoteError = "";
@@ -2206,6 +2215,7 @@ function bindEvents() {
   el.llmLanguage.addEventListener("change", () => {
     renderVoiceRows();
     renderSubmitState();
+    renderLanguageHint();
     persistState();
   });
   el.manualLanguage.addEventListener("change", () => {
