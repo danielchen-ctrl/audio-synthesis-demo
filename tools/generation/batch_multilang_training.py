@@ -284,13 +284,12 @@ def _cjk_ratio(text: str) -> float:
 
 def _normalize_speaker_labels(text: str) -> str:
     """
-    After translation, speaker labels get translated too (e.g. "Intervenant 1 :" in French).
-    Normalize any "word(s) + N + colon" pattern at line start back to "Speaker N:".
-    Handles non-breaking spaces (\xa0) that Google Translate injects around colons.
+    After translation, speaker labels get translated too (e.g. "Haut-parleur 1 :" in French,
+    "Sprecher 1:" in German). Normalize any "word(s) + N + colon" pattern at line start
+    back to "Speaker N:". Handles hyphens, non-breaking spaces (\xa0), and diacritics.
     """
-    # Match translated speaker labels: one or more words, then a digit, then colon/spaces
     return re.sub(
-        r"^[A-Za-zÀ-ÿäöüÄÖÜß\s\xa0]+?\s*(\d+)\s*[\xa0\s]*:\s*",
+        r"^[A-Za-zÀ-ÿäöüÄÖÜß\-\s\xa0]+?\s*(\d+)\s*[\xa0\s]*:\s*",
         r"Speaker \1: ",
         text,
         flags=re.MULTILINE,
