@@ -25,6 +25,12 @@ from PyInstaller.loader.pyimod01_archive import PYZ_ITEM_MODULE, PYZ_ITEM_PKG
 from tornado.web import HTTPError, RequestHandler
 
 
+try:
+    from deep_translator import GoogleTranslator as _GoogleTranslator
+    _HAS_DEEP_TRANSLATOR = True
+except ImportError:
+    _HAS_DEEP_TRANSLATOR = False
+
 ROOT = Path(__file__).resolve().parents[2]
 SRC_DIR = ROOT / "src"
 if str(SRC_DIR) not in sys.path:
@@ -690,6 +696,93 @@ def _new_dialogue_id() -> str:
     return "".join(secrets.choice(alphabet) for _ in range(8))
 
 
+# ── Latin-language translation fallback ──────────────────────────────────────
+# When the bundle LLM generates CJK for a Latin-script language (FR/DE/ES/PT),
+# we generate English first and translate via deep_translator.
+
+_LATIN_LANG_GT_CODE: dict[str, str] = {
+    "French": "fr", "German": "de", "Spanish": "es", "Portuguese": "pt",
+}
+
+
+def _translate_dialogue_lines(
+    lines: list[tuple[str, str]], target_language: str
+) -> list[tuple[str, str]]:
+    """
+    Translate dialogue lines (already in English) to a Latin-script target language.
+    Renders as 'Speaker N: text' block, translates in chunks, normalises speaker
+    labels, then re-parses back into (original_speaker, translated_text) tuples.
+    Returns the original lines unchanged if translation is unavailable or fails.
+    """
+    if not _HAS_DEEP_TRANSLATOR:
+        return lines
+    gt_code = _LATIN_LANG_GT_CODE.get(target_language)
+    if not gt_code or not lines:
+        return lines
+
+    import time as _time
+
+    # Render with stable Speaker N: labels so we can re-parse after translation
+    text_block = "\n".join(f"Speaker {i}: {text}" for i, (_, text) in enumerate(lines, 1))
+    idx_to_speaker = {i: spk for i, (spk, _) in enumerate(lines, 1)}
+
+    # Split into ≤4500-char chunks on line boundaries
+    CHUNK_SIZE = 4500
+    raw_lines = text_block.splitlines(keepends=True)
+    chunks: list[str] = []
+    current = ""
+    for raw_line in raw_lines:
+        if len(current) + len(raw_line) > CHUNK_SIZE and current:
+            chunks.append(current)
+            current = raw_line
+        else:
+            current += raw_line
+    if current:
+        chunks.append(current)
+
+    translated_parts: list[str] = []
+    for idx, chunk in enumerate(chunks):
+        for attempt in range(3):
+            try:
+                t = _GoogleTranslator(source="auto", target=gt_code).translate(chunk)
+                if t:
+                    translated_parts.append(t)
+                    break
+            except Exception:
+                _time.sleep(10 * (attempt + 1))
+        else:
+            translated_parts.append(chunk)   # keep original chunk on total failure
+        if idx < len(chunks) - 1:
+            _time.sleep(1.5)
+
+    translated_text = "".join(translated_parts)
+
+    # Normalise translated speaker labels (e.g. "Haut-parleur 1 :", "Sprecher 1:")
+    normalised = re.sub(
+        r"^[A-Za-z\xc0-\xff\-\s\xa0]+?\s*(\d+)\s*[\xa0\s]*[:\uff1a]\s*",
+        r"Speaker \1: ",
+        translated_text,
+        flags=re.MULTILINE,
+    )
+
+    result: list[tuple[str, str]] = []
+    for line in normalised.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        m = re.match(r"^Speaker\s+(\d+):\s*(.+)$", line)
+        if m:
+            spk_num = int(m.group(1))
+            text = m.group(2).strip()
+            orig_speaker = idx_to_speaker.get(spk_num, f"说话人{spk_num}")
+            result.append((orig_speaker, text))
+
+    # Reject result if too few lines parsed (likely translation/parse failure)
+    if len(result) < max(3, len(lines) // 2):
+        return lines
+    return result
+
+
 # ── Long-dialogue multi-segment generation ────────────────────────────────────
 # The bundle LLM generates ~3 000 chars per call.  For word_count > 5 000 we
 # make multiple calls and concatenate the results, deduplicating on the text
@@ -827,6 +920,27 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         word_count,
         language,
     )
+
+    # Bug 3 fix: if LLM generated CJK for a Latin-script language, fall back to
+    # generating English first and translating via deep_translator.
+    if (rewrite_info or {}).get("cjk_heavy") and language in _LATIN_LANG_GT_CODE:
+        en_lines, _ = _generate_long_dialogue_lines(
+            bundle_server,
+            profile,
+            scenario,
+            core_content,
+            people_count,
+            word_count,
+            "English",
+        )
+        if en_lines:
+            translated = _translate_dialogue_lines(en_lines, language)
+            if translated:
+                lines = translated
+                rewrite_info = dict(rewrite_info or {})
+                rewrite_info["used_translate_fallback"] = True
+                rewrite_info["cjk_heavy"] = False
+
     repaired_lines, repair_meta = repair_dialogue_quality(
         lines,
         language,
@@ -1783,6 +1897,9 @@ def load_bundle_server():
                     rewrite_info["naturalness_applied"] = True
                     rewrite_info["naturalness_language"] = naturalness.get("language")
                     rewrite_info["naturalness_rewrites"] = naturalness.get("rewrite_count")
+                if naturalness.get("cjk_heavy"):
+                    rewrite_info = dict(rewrite_info or {})
+                    rewrite_info["cjk_heavy"] = True
             except Exception as exc:
                 rewrite_info = dict(rewrite_info or {})
                 rewrite_info["naturalness_error"] = f"{type(exc).__name__}:{exc}"
