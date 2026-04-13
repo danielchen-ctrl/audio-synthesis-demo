@@ -14,7 +14,7 @@ Generation matrix:
   14 templates × 5 languages × 5 speaker counts = 350 files
 
 Usage:
-  cd D:/ui_auto_test/demo_app
+  cd D:/ui_auto_test/audio-synthesis-demo
   python tools/generation/batch_multilang_training.py
 """
 

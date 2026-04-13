@@ -16,7 +16,7 @@
   再按字数切分，导出 6 个档位文件 → 总 840 个文件
 
 用法：
-  cd D:/ui_auto_test/demo_app
+  cd D:/ui_auto_test/audio-synthesis-demo
   python tools/generation/batch_long_dialogue_training.py
 """
 
