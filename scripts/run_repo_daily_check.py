@@ -87,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
     project_guard = _run(
         [
             sys.executable,
-            "project_guard.py",
+            "scripts/maintenance/project_guard.py",
             "--report-only",
             "--report",
             str(guard_report),

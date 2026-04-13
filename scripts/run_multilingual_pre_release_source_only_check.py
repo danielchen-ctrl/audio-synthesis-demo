@@ -96,7 +96,7 @@ def _start_server() -> tuple[subprocess.Popen[str], str, Path]:
     env["PYTHONUNBUFFERED"] = "1"
     log_file = log_path.open("w", encoding="utf-8")
     proc = subprocess.Popen(
-        [sys.executable, "embedded_server.py"],
+        [sys.executable, "server.py"],
         cwd=ROOT,
         env=env,
         stdout=log_file,
