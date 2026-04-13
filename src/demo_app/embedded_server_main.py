@@ -690,13 +690,75 @@ def _new_dialogue_id() -> str:
     return "".join(secrets.choice(alphabet) for _ in range(8))
 
 
+# ── Long-dialogue multi-segment generation ────────────────────────────────────
+# The bundle LLM generates ~3 000 chars per call.  For word_count > 5 000 we
+# make multiple calls and concatenate the results, deduplicating on the text
+# content of each line so the same sentence doesn't appear twice.
+
+_LONG_DIALOGUE_SEGMENT_TARGET = 3000   # chars requested per segment call
+_LONG_DIALOGUE_THRESHOLD      = 5000   # above this, switch to multi-segment
+
+
+def _generate_long_dialogue_lines(
+    bundle_server: Any,
+    profile: dict,
+    scenario: str,
+    core_content: str,
+    people_count: int,
+    total_target: int,
+    language: str,
+) -> tuple[list[tuple[str, str]], dict]:
+    """
+    Single call for total_target ≤ _LONG_DIALOGUE_THRESHOLD.
+    Multi-segment (loop) for larger targets: repeatedly calls
+    _generate_dialogue_lines with segment-sized targets and concatenates
+    unique lines until the accumulated character count meets total_target.
+    """
+    if total_target <= _LONG_DIALOGUE_THRESHOLD:
+        return bundle_server._generate_dialogue_lines(
+            profile, scenario, core_content, people_count, total_target, language
+        )
+
+    accumulated: list[tuple[str, str]] = []
+    seen_texts: set[str] = set()
+    last_rewrite_info: dict = {}
+    consecutive_empty = 0
+
+    while True:
+        current_chars = sum(len(t) for _, t in accumulated)
+        if current_chars >= total_target:
+            break
+
+        seg_lines, rewrite_info = bundle_server._generate_dialogue_lines(
+            profile, scenario, core_content, people_count,
+            _LONG_DIALOGUE_SEGMENT_TARGET, language,
+        )
+        last_rewrite_info = rewrite_info
+
+        added = 0
+        for spk, text in (seg_lines or []):
+            if text and text not in seen_texts:
+                seen_texts.add(text)
+                accumulated.append((spk, text))
+                added += 1
+
+        if added == 0:
+            consecutive_empty += 1
+            if consecutive_empty >= 3:
+                break   # LLM is looping; give up rather than spinning forever
+        else:
+            consecutive_empty = 0
+
+    return accumulated, last_rewrite_info
+
+
 def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[str, Any]:
     profile = _safe_profile(payload)
     generation_context = _safe_generation_context(payload)
     scenario = str(payload.get("scenario") or "").strip()
     core_content = str(payload.get("core_content") or "").strip()
     people_count = max(2, min(10, _safe_int(payload.get("people_count"), 3)))
-    word_count = min(5000, max(300, _safe_int(payload.get("word_count"), 1000)))
+    word_count = min(50000, max(300, _safe_int(payload.get("word_count"), 1000)))
     language = _canonical_language(str(payload.get("audio_language") or payload.get("language") or "Chinese"))
     lbl = _prompt_labels(language)
 
@@ -756,7 +818,8 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
             _fs_label = "Reference dialogue style (match the tone and rhythm, do not copy content):" if language in ("English", "Japanese", "Korean") else "参考对话风格示例（仅参考语气和节奏，请勿照抄内容）："
             core_content = core_content + f"\n\n{_fs_label}\n---\n{_fs_example}\n---"
 
-    lines, rewrite_info = bundle_server._generate_dialogue_lines(
+    lines, rewrite_info = _generate_long_dialogue_lines(
+        bundle_server,
         profile,
         scenario,
         core_content,

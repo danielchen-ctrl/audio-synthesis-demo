@@ -777,6 +777,43 @@ a {
   color: var(--gray-500);
 }
 
+.word-count-presets {
+  display: flex;
+  gap: 5px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.wc-preset {
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.wc-preset:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.wc-preset.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.long-dialogue-hint {
+  color: var(--warning, #f59e0b);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 .compact-group {
   max-width: 160px;
 }

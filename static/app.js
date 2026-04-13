@@ -24,7 +24,7 @@ const FALLBACK_ONLINE_AUDIO_CONFIG = {
   defaults: {
     wordCount: DEFAULT_WORD_COUNT,
     wordCountMin: 300,
-    wordCountMax: 5000,
+    wordCountMax: 50000,
     folder: "默认目录"
   },
   folderOptions: ["默认目录", "项目 A / 会议语料", "项目 A / 访谈语料", "项目 B"],
@@ -302,8 +302,21 @@ function defaultWordCountLimit() {
 function wordCountRange() {
   return {
     min: Number(currentOnlineAudioConfig().defaults?.wordCountMin || 100),
-    max: Number(currentOnlineAudioConfig().defaults?.wordCountMax || 3000)
+    max: Number(currentOnlineAudioConfig().defaults?.wordCountMax || 50000)
   };
+}
+
+function updateLongDialogueHint() {
+  const wc = Number(el.wordCountLimit?.value || 0);
+  const hint = document.getElementById("longDialogueHint");
+  if (hint) hint.style.display = wc > 5000 ? "" : "none";
+}
+
+function updateWordCountPresetActive() {
+  const wc = String(el.wordCountLimit?.value || "");
+  document.querySelectorAll(".wc-preset").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.wc === wc);
+  });
 }
 
 function currentTemplateContextMap() {
@@ -723,6 +736,8 @@ function openModal() {
   el.modalOverlay.classList.add("open");
   applyModalSize();
   persistState();
+  updateLongDialogueHint();
+  updateWordCountPresetActive();
   if (state.form.mode === "llm") {
     void refreshPresetTopicsIfNeeded(state.presetTopics.length === 0);
   }
@@ -781,6 +796,8 @@ function syncFormToDom() {
   el.preciseDuration.value = state.form.preciseDuration || "";
   el.folderSelect.value = state.form.folder || defaultFolderOption();
   el.includeScripts.checked = Boolean(state.form.includeScripts);
+  updateLongDialogueHint();
+  updateWordCountPresetActive();
 }
 
 function persistState() {
@@ -2252,7 +2269,21 @@ function bindEvents() {
   });
   el.wordCountLimit.addEventListener("input", () => {
     state.form.wordCountLimit = el.wordCountLimit.value;
+    updateLongDialogueHint();
+    updateWordCountPresetActive();
     persistState();
+  });
+
+  // Word-count preset quick-select buttons
+  document.querySelectorAll(".wc-preset").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const wc = btn.dataset.wc;
+      el.wordCountLimit.value = wc;
+      state.form.wordCountLimit = wc;
+      updateLongDialogueHint();
+      updateWordCountPresetActive();
+      persistState();
+    });
   });
   el.presetTopicSelect.addEventListener("change", () => {
     applyPresetSelection(presetTopicById(el.presetTopicSelect.value));
