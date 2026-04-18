@@ -9,7 +9,7 @@ repetitive fallback content (top line appears > 4 times).
 Only overwrites files that fail quality check; passes are left untouched.
 
 Usage:
-  cd D:/ui_auto_test/demo_app
+  cd D:/ui_auto_test/audio-synthesis-demo
   python tools/generation/repair_en_wc5000.py
 """
 

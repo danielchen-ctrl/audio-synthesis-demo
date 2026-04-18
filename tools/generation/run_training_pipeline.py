@@ -8,7 +8,7 @@
 3. 大说话人压力测试（batch_stress_test_large_speakers.py）若尚未完成
 
 用法:
-  cd D:/ui_auto_test/demo_app
+  cd D:/ui_auto_test/audio-synthesis-demo
   python tools/generation/run_training_pipeline.py
 """
 
