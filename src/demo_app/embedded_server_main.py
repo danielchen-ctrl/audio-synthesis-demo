@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import functools
 import importlib.util
 import json
 import mimetypes
@@ -13,6 +15,7 @@ import shutil
 import socket
 import sys
 import tempfile
+import threading
 import urllib.parse
 from datetime import datetime
 from importlib._bootstrap_external import _code_to_timestamp_pyc
@@ -62,6 +65,16 @@ SELECTED_MODULES = [
 ]
 
 _BUNDLE_SERVER: Any | None = None
+
+# ── Manifest index ─────────────────────────────────────────────────────────────
+# Lazily populated on first access; keeps O(1) lookup by dialogue_id.
+_manifest_cache: dict[str, tuple[Path, dict]] = {}
+_manifest_cache_lock = threading.Lock()
+_manifest_cache_loaded = False
+
+# ── Config / preset caches (refresh requires server restart) ───────────────────
+_ONLINE_AUDIO_CONFIG_CACHE: dict[str, Any] | None = None
+_PRESET_TOPICS_CACHE: list[dict[str, Any]] | None = None
 
 VOICE_CATALOG = {
     "Chinese": ["zh-CN-YunxiNeural", "zh-CN-XiaoxiaoNeural", "zh-CN-YunyangNeural", "zh-CN-XiaoyiNeural"],
@@ -683,14 +696,6 @@ def _load_preset_topics() -> list[dict[str, Any]]:
     return presets
 
 
-def _keyword_in_text(text: str, keyword: str) -> bool:
-    return keyword.casefold() in text.casefold()
-
-
-def _enforce_keywords_in_lines(lines: list[tuple[str, str]], keywords: list[str], language: str) -> tuple[list[tuple[str, str]], list[str]]:
-    return merge_keywords_into_lines(lines, keywords, language)
-
-
 def _new_dialogue_id() -> str:
     alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
     return "".join(secrets.choice(alphabet) for _ in range(8))
@@ -1017,6 +1022,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         "edited_text": False,
     }
     _write_json(save_dir / "manifest.json", manifest)
+    _register_manifest(dialogue_id, save_dir / "manifest.json", manifest)
 
     debug_payload = {
         "generator_version": "embedded_server.generate_text/v2",
@@ -1056,20 +1062,50 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         "text": dialogue_text,
         "lines": normalized_lines,
         "debug": debug_payload,
-        "debug_info": debug_payload,
         "text_download_url": _download_url(dialogue_id, "text"),
     }
 
 
+def _ensure_manifest_cache() -> None:
+    global _manifest_cache_loaded
+    if _manifest_cache_loaded:
+        return
+    with _manifest_cache_lock:
+        if _manifest_cache_loaded:
+            return
+        demo_root = ROOT / "demo"
+        if demo_root.exists():
+            for manifest_path in demo_root.glob("*/manifest.json"):
+                try:
+                    manifest = _read_json(manifest_path)
+                    did = manifest.get("dialogue_id")
+                    if did:
+                        _manifest_cache[did] = (manifest_path, manifest)
+                except Exception:
+                    continue
+        _manifest_cache_loaded = True
+
+
+def _register_manifest(dialogue_id: str, manifest_path: Path, manifest: dict[str, Any]) -> None:
+    _ensure_manifest_cache()
+    with _manifest_cache_lock:
+        _manifest_cache[dialogue_id] = (manifest_path, manifest)
+
+
+def _evict_manifest(dialogue_id: str) -> None:
+    with _manifest_cache_lock:
+        _manifest_cache.pop(dialogue_id, None)
+
+
 def _find_manifest(dialogue_id: str) -> tuple[Path, dict[str, Any]]:
-    manifests = sorted((ROOT / "demo").glob("*/manifest.json"), key=lambda item: item.stat().st_mtime, reverse=True)
-    for manifest_path in manifests:
-        try:
-            manifest = _read_json(manifest_path)
-        except Exception:
-            continue
-        if manifest.get("dialogue_id") == dialogue_id:
+    _ensure_manifest_cache()
+    with _manifest_cache_lock:
+        entry = _manifest_cache.get(dialogue_id)
+    if entry:
+        manifest_path, manifest = entry
+        if manifest_path.exists():
             return manifest_path, manifest
+        _evict_manifest(dialogue_id)
     raise FileNotFoundError(f"dialogue_id not found: {dialogue_id}")
 
 
@@ -1210,6 +1246,7 @@ def _create_manual_dialogue_payload(bundle_server: Any, payload: dict[str, Any])
         "edited_text": True,
     }
     _write_json(save_dir / "manifest.json", manifest)
+    _register_manifest(dialogue_id, save_dir / "manifest.json", manifest)
 
     return {
         "ok": True,
@@ -1312,6 +1349,7 @@ def _delete_task_artifacts(dialogue_id: str) -> dict[str, Any]:
         manifest_path.unlink()
         deleted = True
 
+    _evict_manifest(dialogue_id)
     return {
         "dialogue_id": dialogue_id,
         "deleted": deleted,
@@ -1335,6 +1373,25 @@ def _format_vtt_ts(seconds: float) -> str:
     return f"{hours:02d}:{minutes:02d}:{secs:02d}.{millis:03d}"
 
 
+def _build_scripts(save_dir: Path, basename: str, segments: list[dict[str, Any]], language: str) -> tuple[str, str]:
+    """Write transcript JSON and SRT file; return (segments_path, srt_path)."""
+    segments_target = save_dir / f"{basename}_transcript.json"
+    _write_json(segments_target, {"segments": segments, "language": _canonical_language(language)})
+
+    srt_target = save_dir / f"{basename}_transcript.srt"
+    srt_lines: list[str] = []
+    for idx, item in enumerate(segments, start=1):
+        srt_lines.append(str(idx))
+        srt_lines.append(
+            f"{_format_vtt_ts(item['start_sec']).replace('.', ',')} --> "
+            f"{_format_vtt_ts(item['end_sec']).replace('.', ',')}"
+        )
+        srt_lines.append(f"S{_speaker_numeric_id(item['speaker'])}: {item['text']}")
+        srt_lines.append("")
+    srt_target.write_text("\n".join(srt_lines), encoding="utf-8")
+    return str(segments_target), str(srt_target)
+
+
 async def _synthesize_audio_from_lines(
     lines: list[tuple[str, str]],
     language: str,
@@ -1356,39 +1413,52 @@ async def _synthesize_audio_from_lines(
     if normalized_output_format not in {"mp3", "wav", "m4a"}:
         normalized_output_format = "mp3"
 
-    combined = AudioSegment.silent(duration=120)
-    segments: list[dict[str, Any]] = []
-    voice_map: dict[str, str] = {}
-    debug_lines: list[str] = []
-    cursor_sec = 0.12
+    # Build ordered segment list (skip blank lines)
+    valid_segments: list[tuple[int, str, str, str, str, Path]] = []
+    for idx, (speaker, text) in enumerate(lines, start=1):
+        cleaned = text.strip()
+        if not cleaned:
+            continue
+        voice = _voice_for_speaker(language, speaker, selected_voice_map)
+        speaker_id = str(_speaker_numeric_id(speaker))
+        segment_file = tmp_dir / f"line_{idx:03d}.mp3"
+        valid_segments.append((idx, speaker, cleaned, voice, speaker_id, segment_file))
 
     warning_message = None
     try:
-        for idx, (speaker, text) in enumerate(lines, start=1):
-            cleaned = text.strip()
-            if not cleaned:
-                continue
-            voice = _voice_for_speaker(language, speaker, selected_voice_map)
-            speaker_id = str(_speaker_numeric_id(speaker))
-            voice_map[speaker_id] = voice
-            segment_file = tmp_dir / f"line_{idx:03d}.mp3"
-            communicate = edge_tts.Communicate(cleaned, voice)
-            await communicate.save(str(segment_file))
+        # Synthesize all segments concurrently (rate-limited to 5 parallel requests)
+        sem = asyncio.Semaphore(5)
 
+        async def _tts_one(voice: str, text: str, path: Path) -> None:
+            async with sem:
+                await edge_tts.Communicate(text, voice).save(str(path))
+
+        await asyncio.gather(*[
+            _tts_one(voice, cleaned, segment_file)
+            for (_, _, cleaned, voice, _, segment_file) in valid_segments
+        ])
+
+        # Combine in order and build metadata
+        combined = AudioSegment.silent(duration=120)
+        segments: list[dict[str, Any]] = []
+        voice_map: dict[str, str] = {}
+        debug_lines: list[str] = []
+        cursor_sec = 0.12
+
+        for idx, speaker, cleaned, voice, speaker_id, segment_file in valid_segments:
+            voice_map[speaker_id] = voice
             audio = AudioSegment.from_file(segment_file)
             start_sec = cursor_sec
             duration_sec = len(audio) / 1000.0
             end_sec = start_sec + duration_sec
-            segments.append(
-                {
-                    "speaker": speaker,
-                    "start_sec": round(start_sec, 3),
-                    "end_sec": round(end_sec, 3),
-                    "text": cleaned,
-                    "voice": voice,
-                    "line_index": idx - 1,
-                }
-            )
+            segments.append({
+                "speaker": speaker,
+                "start_sec": round(start_sec, 3),
+                "end_sec": round(end_sec, 3),
+                "text": cleaned,
+                "voice": voice,
+                "line_index": idx - 1,
+            })
             debug_lines.append(f"{speaker}\t{voice}\t{cleaned}")
             combined += audio + AudioSegment.silent(duration=220)
             cursor_sec = end_sec + 0.22
@@ -1399,25 +1469,9 @@ async def _synthesize_audio_from_lines(
         combined.export(selected_audio_path, format=export_format)
         _cleanup_extra_audio_formats(audio_paths, normalized_output_format)
 
-        segments_path = ""
-        srt_path = ""
+        segments_path, srt_path = ("", "")
         if include_scripts:
-            segments_target = save_dir / f"{basename}_transcript.json"
-            _write_json(segments_target, {"segments": segments, "language": _canonical_language(language)})
-            segments_path = str(segments_target)
-
-            srt_target = save_dir / f"{basename}_transcript.srt"
-            srt_lines: list[str] = []
-            for idx, item in enumerate(segments, start=1):
-                srt_lines.append(str(idx))
-                srt_lines.append(
-                    f"{_format_vtt_ts(item['start_sec']).replace('.', ',')} --> "
-                    f"{_format_vtt_ts(item['end_sec']).replace('.', ',')}"
-                )
-                srt_lines.append(f"S{_speaker_numeric_id(item['speaker'])}: {item['text']}")
-                srt_lines.append("")
-            srt_target.write_text("\n".join(srt_lines), encoding="utf-8")
-            srt_path = str(srt_target)
+            segments_path, srt_path = _build_scripts(save_dir, basename, segments, language)
 
         debug_path = save_dir / "tts_input_debug.txt"
         debug_path.write_text("\n".join(debug_lines), encoding="utf-8")
@@ -1448,53 +1502,33 @@ async def _synthesize_audio_from_lines(
             AudioSegment.from_wav(temp_wav_path).export(selected_audio_path, format=export_format)
         _cleanup_extra_audio_formats(audio_paths, normalized_output_format)
 
-        segments: list[dict[str, Any]] = []
-        cursor_sec = 0.0
+        fallback_segments: list[dict[str, Any]] = []
         fallback_voice_map: dict[str, str] = {}
+        cursor_sec = 0.0
         for idx, (speaker, text) in enumerate(lines, start=1):
             duration = max(1.2, min(6.0, len(text) / 8.0))
             voice = _voice_for_speaker(language, speaker, selected_voice_map)
             speaker_id = str(_speaker_numeric_id(speaker))
             fallback_voice_map[speaker_id] = voice
-            segments.append(
-                {
-                    "speaker": speaker,
-                    "start_sec": round(cursor_sec, 3),
-                    "end_sec": round(cursor_sec + duration, 3),
-                    "text": text,
-                    "voice": f"synthetic_fallback:{voice}",
-                    "line_index": idx - 1,
-                }
-            )
+            fallback_segments.append({
+                "speaker": speaker,
+                "start_sec": round(cursor_sec, 3),
+                "end_sec": round(cursor_sec + duration, 3),
+                "text": text,
+                "voice": f"synthetic_fallback:{voice}",
+                "line_index": idx - 1,
+            })
             cursor_sec += duration
 
-        segments_path = ""
-        srt_path = ""
+        segments_path, srt_path = ("", "")
         if include_scripts:
-            segments_target = save_dir / f"{basename}_transcript.json"
-            _write_json(segments_target, {"segments": segments, "language": _canonical_language(language)})
-            segments_path = str(segments_target)
-
-            srt_target = save_dir / f"{basename}_transcript.srt"
-            srt_lines: list[str] = []
-            for idx, item in enumerate(segments, start=1):
-                srt_lines.append(str(idx))
-                srt_lines.append(
-                    f"{_format_vtt_ts(item['start_sec']).replace('.', ',')} --> "
-                    f"{_format_vtt_ts(item['end_sec']).replace('.', ',')}"
-                )
-                srt_lines.append(f"S{_speaker_numeric_id(item['speaker'])}: {item['text']}")
-                srt_lines.append("")
-            srt_target.write_text("\n".join(srt_lines), encoding="utf-8")
-            srt_path = str(srt_target)
+            segments_path, srt_path = _build_scripts(save_dir, basename, fallback_segments, language)
 
         debug_path = save_dir / "tts_input_debug.txt"
         debug_path.write_text(
             "\n".join(
-                [
-                    f"{speaker}\tsynthetic_fallback:{_voice_for_speaker(language, speaker, selected_voice_map)}\t{text}"
-                    for speaker, text in lines
-                ]
+                f"{spk}\tsynthetic_fallback:{_voice_for_speaker(language, spk, selected_voice_map)}\t{txt}"
+                for spk, txt in lines
             ),
             encoding="utf-8",
         )
@@ -1567,24 +1601,18 @@ class ServerInfoHandler(JsonHandler):
 
 class OnlineAudioConfigHandler(JsonHandler):
     def get(self) -> None:
-        self.write_json(
-            {
-                "ok": True,
-                "success": True,
-                "config": _load_online_audio_config(),
-            }
-        )
+        global _ONLINE_AUDIO_CONFIG_CACHE
+        if _ONLINE_AUDIO_CONFIG_CACHE is None:
+            _ONLINE_AUDIO_CONFIG_CACHE = _load_online_audio_config()
+        self.write_json({"ok": True, "success": True, "config": _ONLINE_AUDIO_CONFIG_CACHE})
 
 
 class PresetTopicsHandler(JsonHandler):
     def get(self) -> None:
-        self.write_json(
-            {
-                "ok": True,
-                "success": True,
-                "presets": _load_preset_topics(),
-            }
-        )
+        global _PRESET_TOPICS_CACHE
+        if _PRESET_TOPICS_CACHE is None:
+            _PRESET_TOPICS_CACHE = _load_preset_topics()
+        self.write_json({"ok": True, "success": True, "presets": _PRESET_TOPICS_CACHE})
 
 
 class UpdateDialogueHandler(JsonHandler):
@@ -1909,13 +1937,17 @@ def load_bundle_server():
         module._embedded_naturalness_patched = True
 
     if not getattr(module, "_embedded_generate_text_handler_patched", False):
-        def _patched_generate_text_post(self):
+        async def _patched_generate_text_post(self):
             try:
                 payload = json.loads(self.request.body.decode("utf-8") or "{}")
             except Exception as exc:
                 raise HTTPError(400, reason=f"Invalid JSON body: {exc}") from exc
 
-            response = _generate_text_payload(module, payload)
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(
+                None,
+                functools.partial(_generate_text_payload, module, payload),
+            )
             self.set_header("Content-Type", "application/json; charset=utf-8")
             self.finish(json.dumps(response, ensure_ascii=False))
 
@@ -1958,6 +1990,9 @@ def main() -> None:
 
     app = make_app()
     app.listen(port, address=host)
+
+    # Pre-warm the manifest index in the background so the first request doesn't stall
+    threading.Thread(target=_ensure_manifest_cache, daemon=True, name="manifest-cache-warmer").start()
 
     print(f"[START] Demo server is running at http://{host}:{port}/")
     for url in local_urls(port):
