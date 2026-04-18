@@ -750,11 +750,13 @@ def _translate_dialogue_lines(
     if current:
         chunks.append(current)
 
+    # Create one translator instance for the entire request instead of one per chunk
+    translator = _GoogleTranslator(source="auto", target=gt_code)
     translated_parts: list[str] = []
     for idx, chunk in enumerate(chunks):
         for attempt in range(3):
             try:
-                t = _GoogleTranslator(source="auto", target=gt_code).translate(chunk)
+                t = translator.translate(chunk)
                 if t:
                     translated_parts.append(t)
                     break
@@ -1551,6 +1553,7 @@ async def _synthesize_audio_from_lines(
         temp_wav_path = tmp_dir / f"{basename}.wav"
         audio = bundle_server._generate_wave_for_lines(lines)
         bundle_server._write_wav(audio, temp_wav_path)
+        del audio  # release the raw wave buffer immediately after writing to disk
         if normalized_output_format == "wav":
             shutil.copyfile(temp_wav_path, selected_audio_path)
         else:
@@ -1874,31 +1877,43 @@ def _reset_cache() -> None:
 
 def _extract_bundle_modules() -> None:
     archive = CArchiveReader(str(SERVER_ARCHIVE))
-    pyz = archive.open_embedded_archive("PYZ.pyz")
-    for module_name in SELECTED_MODULES:
-        if module_name not in pyz.toc:
-            raise RuntimeError(f"Embedded module not found: {module_name}")
-        typecode = pyz.toc[module_name][0]
-        code = pyz.extract(module_name)
-        destination = MODULE_CACHE.joinpath(*module_name.split("."))
-        if typecode == PYZ_ITEM_PKG:
-            destination = destination / "__init__.pyc"
-        elif typecode == PYZ_ITEM_MODULE:
-            destination = destination.with_suffix(".pyc")
-        else:
-            continue
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes(_code_to_timestamp_pyc(code, 0, 0))
+    try:
+        pyz = archive.open_embedded_archive("PYZ.pyz")
+        try:
+            for module_name in SELECTED_MODULES:
+                if module_name not in pyz.toc:
+                    raise RuntimeError(f"Embedded module not found: {module_name}")
+                typecode = pyz.toc[module_name][0]
+                code = pyz.extract(module_name)
+                destination = MODULE_CACHE.joinpath(*module_name.split("."))
+                if typecode == PYZ_ITEM_PKG:
+                    destination = destination / "__init__.pyc"
+                elif typecode == PYZ_ITEM_MODULE:
+                    destination = destination.with_suffix(".pyc")
+                else:
+                    continue
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(_code_to_timestamp_pyc(code, 0, 0))
+        finally:
+            if hasattr(pyz, "close"):
+                pyz.close()
+    finally:
+        if hasattr(archive, "close"):
+            archive.close()
 
 
 def _extract_static_assets() -> None:
     archive = CArchiveReader(str(ASSET_ARCHIVE))
-    for name in archive.toc:
-        if not name.startswith("static\\"):
-            continue
-        destination = ASSET_CACHE / name.replace("\\", os.sep)
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes(archive.extract(name))
+    try:
+        for name in archive.toc:
+            if not name.startswith("static\\"):
+                continue
+            destination = ASSET_CACHE / name.replace("\\", os.sep)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(archive.extract(name))
+    finally:
+        if hasattr(archive, "close"):
+            archive.close()
 
 
 def ensure_embedded_runtime() -> None:
