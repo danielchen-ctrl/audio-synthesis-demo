@@ -6,6 +6,8 @@ from __future__ import annotations
 import asyncio
 import functools
 import importlib.util
+import subprocess
+from collections import OrderedDict
 import json
 import mimetypes
 import os
@@ -67,8 +69,11 @@ SELECTED_MODULES = [
 _BUNDLE_SERVER: Any | None = None
 
 # ── Manifest index ─────────────────────────────────────────────────────────────
-# Lazily populated on first access; keeps O(1) lookup by dialogue_id.
-_manifest_cache: dict[str, tuple[Path, dict]] = {}
+# Lazily populated on first access; bounded LRU keeps O(1) lookup by dialogue_id.
+# Entries are evicted oldest-first once the cap is reached, so memory stays
+# proportional to _MANIFEST_CACHE_MAX rather than to total historical dialogues.
+_MANIFEST_CACHE_MAX = 500
+_manifest_cache: OrderedDict[str, tuple[Path, dict]] = OrderedDict()
 _manifest_cache_lock = threading.Lock()
 _manifest_cache_loaded = False
 
@@ -1075,7 +1080,14 @@ def _ensure_manifest_cache() -> None:
             return
         demo_root = ROOT / "demo"
         if demo_root.exists():
-            for manifest_path in demo_root.glob("*/manifest.json"):
+            # Sort by mtime desc and cap at _MANIFEST_CACHE_MAX so that
+            # large historical demo/ trees don't fill memory on startup.
+            all_manifests = sorted(
+                demo_root.glob("*/manifest.json"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True,
+            )[:_MANIFEST_CACHE_MAX]
+            for manifest_path in all_manifests:
                 try:
                     manifest = _read_json(manifest_path)
                     did = manifest.get("dialogue_id")
@@ -1090,6 +1102,10 @@ def _register_manifest(dialogue_id: str, manifest_path: Path, manifest: dict[str
     _ensure_manifest_cache()
     with _manifest_cache_lock:
         _manifest_cache[dialogue_id] = (manifest_path, manifest)
+        _manifest_cache.move_to_end(dialogue_id)
+        # Evict oldest entry once we exceed the cap
+        while len(_manifest_cache) > _MANIFEST_CACHE_MAX:
+            _manifest_cache.popitem(last=False)
 
 
 def _evict_manifest(dialogue_id: str) -> None:
@@ -1101,6 +1117,8 @@ def _find_manifest(dialogue_id: str) -> tuple[Path, dict[str, Any]]:
     _ensure_manifest_cache()
     with _manifest_cache_lock:
         entry = _manifest_cache.get(dialogue_id)
+        if entry:
+            _manifest_cache.move_to_end(dialogue_id)  # mark as recently used
     if entry:
         manifest_path, manifest = entry
         if manifest_path.exists():
@@ -1438,8 +1456,9 @@ async def _synthesize_audio_from_lines(
             for (_, _, cleaned, voice, _, segment_file) in valid_segments
         ])
 
-        # Combine in order and build metadata
-        combined = AudioSegment.silent(duration=120)
+        # ── Phase 1: measure durations one segment at a time ──────────────────
+        # Load each AudioSegment solely to read its length, then release it
+        # immediately so we never accumulate all audio in memory at once.
         segments: list[dict[str, Any]] = []
         voice_map: dict[str, str] = {}
         debug_lines: list[str] = []
@@ -1447,26 +1466,63 @@ async def _synthesize_audio_from_lines(
 
         for idx, speaker, cleaned, voice, speaker_id, segment_file in valid_segments:
             voice_map[speaker_id] = voice
-            audio = AudioSegment.from_file(segment_file)
-            start_sec = cursor_sec
-            duration_sec = len(audio) / 1000.0
-            end_sec = start_sec + duration_sec
+            _probe = AudioSegment.from_file(segment_file)
+            duration_sec = len(_probe) / 1000.0
+            del _probe  # release immediately after reading duration
+            end_sec = cursor_sec + duration_sec
             segments.append({
                 "speaker": speaker,
-                "start_sec": round(start_sec, 3),
+                "start_sec": round(cursor_sec, 3),
                 "end_sec": round(end_sec, 3),
                 "text": cleaned,
                 "voice": voice,
                 "line_index": idx - 1,
             })
             debug_lines.append(f"{speaker}\t{voice}\t{cleaned}")
-            combined += audio + AudioSegment.silent(duration=220)
             cursor_sec = end_sec + 0.22
 
+        # ── Phase 2: concatenate on disk via ffmpeg (no large in-memory buffer) ──
         audio_paths = _audio_output_paths(save_dir, basename)
         selected_audio_path = audio_paths[normalized_output_format]
         export_format = {"mp3": "mp3", "wav": "wav", "m4a": "mp4"}[normalized_output_format]
-        combined.export(selected_audio_path, format=export_format)
+
+        _ffmpeg = _ffmpeg_path()
+        if _ffmpeg:
+            # Write tiny silence clips to disk (one-time cost, negligible RAM)
+            _sil_lead = tmp_dir / "_sil_lead.mp3"
+            _sil_gap  = tmp_dir / "_sil_gap.mp3"
+            AudioSegment.silent(duration=120).export(str(_sil_lead), format="mp3", bitrate="48k")
+            AudioSegment.silent(duration=220).export(str(_sil_gap),  format="mp3", bitrate="48k")
+
+            # Build ffmpeg concat list (lead silence + [segment + gap] * N)
+            _concat_txt = tmp_dir / "_concat.txt"
+            _entries = [f"file '{_sil_lead.as_posix()}'"]
+            for _, _, _, _, _, _seg_file in valid_segments:
+                _entries.append(f"file '{_seg_file.as_posix()}'")
+                _entries.append(f"file '{_sil_gap.as_posix()}'")
+            _concat_txt.write_text("\n".join(_entries), encoding="utf-8")
+
+            # Choose output codec; ffmpeg handles decode+resample internally
+            _codec_args: list[str] = {
+                "mp3": ["-c:a", "libmp3lame", "-q:a", "4"],
+                "wav": ["-c:a", "pcm_s16le"],
+                "m4a": ["-c:a", "aac"],
+            }[normalized_output_format]
+            subprocess.run(
+                [_ffmpeg, "-y", "-f", "concat", "-safe", "0",
+                 "-i", str(_concat_txt)] + _codec_args + [str(selected_audio_path)],
+                check=True, capture_output=True, timeout=300,
+            )
+        else:
+            # Fallback: pydub in-memory, but free each segment after appending
+            combined = AudioSegment.silent(duration=120)
+            for _, _, _, _, _, segment_file in valid_segments:
+                _seg = AudioSegment.from_file(segment_file)
+                combined = combined + _seg + AudioSegment.silent(duration=220)
+                del _seg
+            combined.export(selected_audio_path, format=export_format)
+            del combined
+
         _cleanup_extra_audio_formats(audio_paths, normalized_output_format)
 
         segments_path, srt_path = ("", "")
