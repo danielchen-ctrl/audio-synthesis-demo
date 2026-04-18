@@ -14,12 +14,32 @@ Few-shot 示例选择器
 
 import re
 import random
-from collections import Counter
+from collections import Counter, OrderedDict
 from pathlib import Path
 
 # ─── 路径 ─────────────────────────────────────────────────────────────────
 _ROOT         = Path(__file__).resolve().parents[2]
 _TRAINING_DIR = _ROOT / "demo" / "training_long_dialogue"
+
+# ─── 训练文件内容缓存 ──────────────────────────────────────────────────────
+# Bounded cache so repeated calls with the same domain/language don't hit disk.
+# Keyed by str(path); oldest entry evicted when cap is reached.
+_TRAINING_FILE_CACHE_MAX = 32
+_training_file_cache: OrderedDict[str, str] = OrderedDict()
+
+
+def _read_training_file(path: Path) -> str:
+    """Return file contents, reading from disk only on first access per path."""
+    key = str(path)
+    if key in _training_file_cache:
+        _training_file_cache.move_to_end(key)
+        return _training_file_cache[key]
+    text = path.read_text(encoding="utf-8")
+    _training_file_cache[key] = text
+    _training_file_cache.move_to_end(key)
+    while len(_training_file_cache) > _TRAINING_FILE_CACHE_MAX:
+        _training_file_cache.popitem(last=False)
+    return text
 
 # ─── 领域 → 训练文件 ID ───────────────────────────────────────────────────
 _DOMAIN_TO_ID: dict[str, str] = {
@@ -177,7 +197,7 @@ def get_few_shot_example(domain: str, language: str) -> str:
         clean_candidates: list[Path] = []
         for p in candidates:
             try:
-                sample = p.read_text(encoding="utf-8")[:2000]
+                sample = _read_training_file(p)[:2000]
                 if lang_short == "ko":
                     # Korean: confirm Hangul presence rather than CJK absence
                     if _hangul_ratio(sample) >= 0.08:
@@ -216,7 +236,7 @@ def get_few_shot_example(domain: str, language: str) -> str:
         path = random.choice(remaining)
         tried.add(path)
         try:
-            text  = path.read_text(encoding="utf-8")
+            text  = _read_training_file(path)
             lines = [l for l in text.splitlines() if l.strip()]
             if not lines:
                 continue
