@@ -5,15 +5,15 @@
 ==============================
 生成矩阵：
   - 14 个行业模板
-  - 6  个字数档位：5000 / 10000 / 20000 / 30000 / 40000 / 50000
+  - 1  个字数档位：5000（运行时仅使用 wc5000，其余档位已移除）
   - 2  种语言：中文 / 英语
   - 5  种说话人数：2 / 3 / 4 / 5 / 6
-  = 14 × 6 × 2 × 5 = 840 个训练文件
+  = 14 × 1 × 2 × 5 = 140 个训练文件
 
 策略：
   每个 (模板 × 语言 × 说话人数) 组合共 140 个 base job
   每个 base job 调用 API 生成多段（每段 3000 字），拼接至 ≥50000 字
-  再按字数切分，导出 6 个档位文件 → 总 840 个文件
+  按字数切分，仅导出 wc5000 档位（few_shot_selector 唯一使用的档位）
 
 用法：
   cd D:/ui_auto_test/audio-synthesis-demo
@@ -38,7 +38,11 @@ RETRY_TIMES        = 3
 RETRY_SLEEP        = 8           # 失败重试等待秒数
 INTER_CALL_SLEEP   = 2           # 正常调用间隔秒数
 
-WORD_COUNT_LEVELS = [5000, 10000, 20000, 30000, 40000, 50000]
+# Only wc5000 is used at runtime (few_shot_selector.py exclusively loads wc5000
+# files to minimise LLM context pressure). Higher tiers are no longer generated
+# to keep the demo/ directory lean. Restore the full list here if you ever need
+# to regenerate the larger training corpus for research/eval purposes.
+WORD_COUNT_LEVELS = [5000]
 
 LANGUAGES = [
     {"short": "zh", "backend": "Chinese",  "display": "中文"},
