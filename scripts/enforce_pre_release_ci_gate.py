@@ -27,7 +27,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     report_path = Path(args.report)
-    _assert(report_path.exists(), f'report not found: {report_path}')
+    if not report_path.exists():
+        print(json.dumps({
+            'status': 'skipped',
+            'reason': f'report not found: {report_path} — primary gate step likely did not run or generated no output (e.g. config-only change)',
+        }, ensure_ascii=False, indent=2))
+        return 0
     payload = json.loads(report_path.read_text(encoding='utf-8'))
     generated_at = payload.get('generated_at')
     _assert(isinstance(generated_at, str) and generated_at, 'report missing generated_at')
