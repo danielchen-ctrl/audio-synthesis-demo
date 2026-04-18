@@ -34,7 +34,7 @@ training/
 
 ```powershell
 # Windows PowerShell
-cd D:\ui_auto_test\demo_app
+cd D:\ui_auto_test\audio-synthesis-demo
 python -m training.build_training_jobs_mvp --out training/data/training_jobs_mvp.jsonl --seed 20260126
 ```
 
@@ -306,7 +306,7 @@ python -m pytest tests/test_training_pipeline_smoke.py -v
 
 ```powershell
 # Windows PowerShell
-cd D:\ui_auto_test\demo_app
+cd D:\ui_auto_test\audio-synthesis-demo
 python -m training.build_training_jobs_full --out training/data/training_jobs_full.jsonl --seed 20260126
 ```
 

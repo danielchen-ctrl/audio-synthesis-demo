@@ -16,7 +16,7 @@
   few_shot_selector 已扩展支持 ja / ko 映射
 
 用法：
-  cd D:/ui_auto_test/demo_app
+  cd D:/ui_auto_test/audio-synthesis-demo
   python tools/generation/batch_ja_ko_training.py
 """
 

@@ -7,18 +7,18 @@ cd /d "%ROOT%"
 if "%DEMO_APP_HOST%"=="" set "DEMO_APP_HOST=0.0.0.0"
 
 set "PY_CMD="
-where python >nul 2>&1
+py -3.11 --version >nul 2>&1
 if not errorlevel 1 (
-    set "PY_CMD=python"
+    set "PY_CMD=py -3.11"
 ) else (
-    where py >nul 2>&1
+    where python3.11 >nul 2>&1
     if not errorlevel 1 (
-        set "PY_CMD=py -3"
+        set "PY_CMD=python3.11"
     )
 )
 
 if "%PY_CMD%"=="" (
-    echo [ERROR] Python was not found. Install Python 3.8+ and retry.
+    echo [ERROR] Python 3.11 was not found. The server bundle requires Python 3.11. Install it from https://python.org and retry.
     pause
     exit /b 1
 )

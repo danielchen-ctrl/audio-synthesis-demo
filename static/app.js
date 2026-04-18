@@ -706,6 +706,15 @@ function setModalMessage(message, type = "info") {
   if (type === "success") el.modalMessage.classList.add("is-success");
 }
 
+let _persistTimer = null;
+function debouncedPersistState() {
+  if (_persistTimer) clearTimeout(_persistTimer);
+  _persistTimer = setTimeout(() => {
+    persistState();
+    _persistTimer = null;
+  }, 300);
+}
+
 function showToast(type, message) {
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
@@ -1109,7 +1118,7 @@ function filteredTasks() {
     });
 }
 
-function renderTaskSearchUi() {
+function renderTaskSearchUi(shownCount) {
   el.taskSearchInput.value = state.taskFilters.query || "";
   el.taskStatusFilter.value = state.taskFilters.status || "all";
   el.taskSourceFilter.value = state.taskFilters.source || "all";
@@ -1117,12 +1126,12 @@ function renderTaskSearchUi() {
   el.taskFilterBar.classList.toggle("hidden", !state.advancedSearchOpen);
   el.advancedSearchBtn.textContent = state.advancedSearchOpen ? "收起筛选" : "高级筛选";
   const total = state.tasks.length;
-  const shown = filteredTasks().length;
+  const shown = shownCount !== undefined ? shownCount : filteredTasks().length;
   el.taskSummary.textContent = total ? `当前显示 ${shown} / ${total} 条任务` : "当前暂无任务";
 }
 
-function renderTasks() {
-  const tasks = filteredTasks();
+function renderTasks(tasks) {
+  if (!tasks) tasks = filteredTasks();
   el.taskTableBody.innerHTML = tasks
     .map(
       (task) => `
@@ -1194,8 +1203,9 @@ function renderAll() {
   renderLanguageHint();
   renderKeywordHighlightPreview();
   renderSubmitState();
-  renderTaskSearchUi();
-  renderTasks();
+  const tasks = filteredTasks();
+  renderTaskSearchUi(tasks.length);
+  renderTasks(tasks);
   renderModalVisibility();
   setModalMessage(state.form.modalMessage, state.form.modalMessageType);
   persistState();
@@ -1964,15 +1974,23 @@ async function handleGenerateText() {
   }
 
   state.form.isGeneratingText = true;
-  setModalMessage("正在根据当前配置生成文本...", "info");
+  const wc = Number(el.wordCountLimit?.value || 0);
+  const waitMsg = wc > 5000
+    ? `正在生成文本（${wc} 字，需多轮 LLM 调用，请耐心等待约 3-8 分钟）...`
+    : "正在根据当前配置生成文本...";
+  setModalMessage(waitMsg, "info");
   renderSubmitState();
   persistState();
+
+  const abortCtrl = new AbortController();
+  const abortTimer = setTimeout(() => abortCtrl.abort(), 15 * 60 * 1000);
 
   try {
     const payload = await fetchJson("/api/generate_text", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(buildGenerateTextPayload())
+      body: JSON.stringify(buildGenerateTextPayload()),
+      signal: abortCtrl.signal
     });
 
     state.form.dialogueId = payload.dialogue_id || "";
@@ -1990,8 +2008,12 @@ async function handleGenerateText() {
       showToast("success", "文本生成完成，可在下方预览和编辑");
     }
   } catch (requestError) {
-    setModalMessage(`文本生成失败：${requestError.message}`, "error");
+    const msg = requestError.name === "AbortError"
+      ? "文本生成超时（超过 15 分钟），请减少字数或检查网络连接。"
+      : `文本生成失败：${requestError.message}`;
+    setModalMessage(msg, "error");
   } finally {
+    clearTimeout(abortTimer);
     state.form.isGeneratingText = false;
     renderAll();
   }
@@ -2016,12 +2038,16 @@ async function submitAudioGeneration() {
   renderSubmitState();
   persistState();
 
+  const audioAbortCtrl = new AbortController();
+  const audioAbortTimer = setTimeout(() => audioAbortCtrl.abort(), 20 * 60 * 1000);
+
   try {
     if (currentMode() === "manual") {
       const createPayload = await fetchJson("/api/create_dialogue_from_text", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildManualCreatePayload())
+        body: JSON.stringify(buildManualCreatePayload()),
+        signal: audioAbortCtrl.signal
       });
       dialogueId = createPayload.dialogue_id;
       state.form.dialogueId = dialogueId;
@@ -2044,7 +2070,8 @@ async function submitAudioGeneration() {
           tags: state.form.tags,
           folder: el.folderSelect.value,
           source_mode: "llm"
-        })
+        }),
+        signal: audioAbortCtrl.signal
       });
       dialogueId = recoveryPayload.dialogue_id;
       state.form.dialogueId = dialogueId;
@@ -2058,7 +2085,8 @@ async function submitAudioGeneration() {
     const audioPayload = await fetchJson("/api/generate_audio_custom", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(buildAudioPayload(dialogueId, workingText))
+      body: JSON.stringify(buildAudioPayload(dialogueId, workingText)),
+      signal: audioAbortCtrl.signal
     });
 
     updateTask(taskId, {
@@ -2076,16 +2104,20 @@ async function submitAudioGeneration() {
     showToast("success", "任务已提交，请在生成任务列表查看进度");
     resetForm();
   } catch (requestError) {
+    const audioErrMsg = requestError.name === "AbortError"
+      ? "音频生成超时（超过 20 分钟），请检查服务状态后重试。"
+      : requestError.message;
     updateTask(taskId, {
       status: "生成失败",
-      errorMessage: requestError.message,
+      errorMessage: audioErrMsg,
       dialogueId,
       textFileName,
       textDownloadUrl,
       snapshot: buildTaskSnapshot(dialogueId, workingText, textFileName)
     });
-    setModalMessage(`音频生成失败：${requestError.message}`, "error");
+    setModalMessage(`音频生成失败：${audioErrMsg}`, "error");
   } finally {
+    clearTimeout(audioAbortTimer);
     state.form.isSubmittingAudio = false;
     renderAll();
   }
@@ -2145,16 +2177,20 @@ function bindEvents() {
   });
   el.resetModalLayoutBtn.addEventListener("click", resetModalLayout);
   el.copyShareBtn.addEventListener("click", copyShareLink);
+  function renderTasksAndSearch() {
+    const tasks = filteredTasks();
+    renderTaskSearchUi(tasks.length);
+    renderTasks(tasks);
+  }
+
   el.taskSearchInput.addEventListener("input", () => {
     state.taskFilters.query = el.taskSearchInput.value;
-    renderTasks();
-    renderTaskSearchUi();
+    renderTasksAndSearch();
     persistState();
   });
   el.taskSearchBtn.addEventListener("click", () => {
     state.taskFilters.query = el.taskSearchInput.value;
-    renderTasks();
-    renderTaskSearchUi();
+    renderTasksAndSearch();
     persistState();
   });
   el.advancedSearchBtn.addEventListener("click", () => {
@@ -2164,26 +2200,22 @@ function bindEvents() {
   });
   el.taskStatusFilter.addEventListener("change", () => {
     state.taskFilters.status = el.taskStatusFilter.value;
-    renderTasks();
-    renderTaskSearchUi();
+    renderTasksAndSearch();
     persistState();
   });
   el.taskSourceFilter.addEventListener("change", () => {
     state.taskFilters.source = el.taskSourceFilter.value;
-    renderTasks();
-    renderTaskSearchUi();
+    renderTasksAndSearch();
     persistState();
   });
   el.staleOnlyFilter.addEventListener("change", () => {
     state.taskFilters.staleOnly = el.staleOnlyFilter.checked;
-    renderTasks();
-    renderTaskSearchUi();
+    renderTasksAndSearch();
     persistState();
   });
   el.clearTaskFiltersBtn.addEventListener("click", () => {
     state.taskFilters = createDefaultTaskFilters();
-    renderTasks();
-    renderTaskSearchUi();
+    renderTasksAndSearch();
     persistState();
   });
   el.cleanupOldTasksBtn.addEventListener("click", () => {
@@ -2261,17 +2293,17 @@ function bindEvents() {
 
   el.llmTopic.addEventListener("input", () => {
     state.form.llmTopic = el.llmTopic.value;
-    persistState();
+    debouncedPersistState();
   });
   el.customPrompt.addEventListener("input", () => {
     state.form.customPrompt = el.customPrompt.value;
-    persistState();
+    debouncedPersistState();
   });
   el.wordCountLimit.addEventListener("input", () => {
     state.form.wordCountLimit = el.wordCountLimit.value;
     updateLongDialogueHint();
     updateWordCountPresetActive();
-    persistState();
+    debouncedPersistState();
   });
 
   // Word-count preset quick-select buttons
@@ -2291,22 +2323,22 @@ function bindEvents() {
 
   el.manualTopic.addEventListener("input", () => {
     state.form.manualTopic = el.manualTopic.value;
-    persistState();
+    debouncedPersistState();
   });
   el.manualText.addEventListener("input", () => {
     state.form.manualText = el.manualText.value;
-    persistState();
+    debouncedPersistState();
   });
   el.previewText.addEventListener("input", () => {
     state.form.previewText = el.previewText.value;
     renderModeUi();
     renderKeywordHighlightPreview();
     renderSubmitState();
-    persistState();
+    debouncedPersistState();
   });
   el.preciseDuration.addEventListener("input", () => {
     state.form.preciseDuration = el.preciseDuration.value;
-    persistState();
+    debouncedPersistState();
   });
   el.folderSelect.addEventListener("change", () => {
     state.form.folder = el.folderSelect.value;

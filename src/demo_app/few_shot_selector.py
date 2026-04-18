@@ -14,6 +14,7 @@ Few-shot 示例选择器
 
 import re
 import random
+from collections import Counter
 from pathlib import Path
 
 # ─── 路径 ─────────────────────────────────────────────────────────────────
@@ -194,7 +195,6 @@ def get_few_shot_example(domain: str, language: str) -> str:
                     # Check for repetitive fallback patterns (LLM drift artifacts)
                     lines = [l for l in sample.splitlines() if l.strip()]
                     contents = [re.sub(r"^(Speaker|说話人)\s*\d+:\s*", "", l).strip() for l in lines]
-                    from collections import Counter
                     if contents:
                         most_common_count = Counter(contents).most_common(1)[0][1]
                         if most_common_count > _MAX_REPEAT_LINES_EN:

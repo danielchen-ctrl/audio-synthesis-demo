@@ -922,18 +922,27 @@ def polish_generated_lines(
             rewrite_meta.append({"speaker": speaker, "before": original, "after": updated})
 
     # Step 2: CJK contamination filter on the YAML-processed lines.
-    # After YAML rules, formerly-Chinese lines converted to JA/KO now contain kana/hangul
-    # and will pass the filter.  Only lines that were NOT covered by YAML rules AND are
-    # still Chinese are removed here.
-    # Threshold: keep filtered result if ≥3 lines survive (no percentage floor — the
-    # YAML replacements above already generated meaningful JA/KO content, so even a
-    # short filtered result is usable).
+    # JA/KO: YAML rules already converted many lines to kana/hangul, so require ≥3
+    #   surviving lines before applying (avoids discarding a nearly-complete dialogue).
+    # Latin (FR/DE/ES/PT): these languages use ZERO CJK.  Any CJK line is wrong LLM
+    #   output; apply the filter unconditionally and set cjk_heavy=True when the
+    #   majority of lines were contaminated so callers can trigger a translate fallback.
     cjk_lines_removed = 0
-    if canonical in ("Japanese", "Korean") or canonical in _LATIN_SCRIPT_LANGUAGES:
+    cjk_heavy = False
+    if canonical in ("Japanese", "Korean"):
         filtered2, removed2 = _filter_cjk_contamination(rewritten, canonical)
         if removed2 and filtered2 and len(filtered2) >= 3:
             rewritten = filtered2
             cjk_lines_removed = removed2
+    elif canonical in _LATIN_SCRIPT_LANGUAGES:
+        filtered2, removed2 = _filter_cjk_contamination(rewritten, canonical)
+        if removed2:
+            if filtered2:
+                rewritten = filtered2
+            cjk_lines_removed = removed2
+            total = removed2 + len(filtered2)
+            if total > 0 and removed2 / total > 0.5:
+                cjk_heavy = True
 
     if not rules:
         # No YAML rules path — just return (possibly filtered) lines
@@ -942,6 +951,7 @@ def polish_generated_lines(
             "rewrite_count": cjk_lines_removed,
             "rewrites": [],
             "cjk_lines_removed": cjk_lines_removed,
+            "cjk_heavy": cjk_heavy,
         }
 
     return rewritten, {
@@ -950,6 +960,7 @@ def polish_generated_lines(
         "rewrite_count": len(rewrite_meta) + cjk_lines_removed,
         "rewrites": rewrite_meta,
         "cjk_lines_removed": cjk_lines_removed,
+        "cjk_heavy": cjk_heavy,
     }
 
 

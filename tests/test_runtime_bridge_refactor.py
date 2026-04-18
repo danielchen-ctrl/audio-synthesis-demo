@@ -17,7 +17,7 @@ from demo_app.runtime_bridge import get_runtime_server, reset_runtime_server
 
 class RuntimeBridgeRefactorTests(unittest.TestCase):
     def test_runtime_import_paths_include_expected_locations(self) -> None:
-        project_root = Path(r'D:\ui_auto_test\demo_app')
+        project_root = ROOT
         package_root = project_root / 'src' / 'demo_app'
         paths = runtime_import_paths(project_root=project_root, package_root=package_root)
         self.assertEqual(paths[0], project_root / 'src')

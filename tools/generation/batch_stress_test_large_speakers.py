@@ -17,7 +17,7 @@
   = 3 × 2 × 2 × 6 = 72 个文件
 
 用法：
-  cd D:/ui_auto_test/demo_app
+  cd D:/ui_auto_test/audio-synthesis-demo
   python tools/generation/batch_stress_test_large_speakers.py
 """
 
