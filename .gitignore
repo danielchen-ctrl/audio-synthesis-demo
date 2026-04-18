@@ -30,6 +30,7 @@ logs/
 
 # Tool local state
 .claude/
+!.claude/settings.json
 .autogate/
 
 # Test caches
@@ -47,3 +48,6 @@ Thumbs.db
 # Secrets
 .env
 .env.*
+
+# Claude Code local settings (personal overrides, not for team)
+.claude/settings.local.json
