@@ -1,0 +1,125 @@
+openapi: "3.1.0"
+
+info:
+  title: generate-demo-docs
+  version: "1.0.0"
+  description: |
+    自动为 demo / 脚本项目生成结构化说明文档的 Claude Code Skill。
+    文档面向人类阅读和 AI 二次分析双重场景设计。
+
+agent:
+  name: generate-demo-docs
+  display_name: "项目说明文档生成器"
+  slug: generate-demo-docs
+  version: "1.0.0"
+  description: |
+    当用户希望为 demo 项目、脚本集合、原型代码或功能验证项目生成系统说明文档时使用。
+    当用户需要把项目结构、脚本功能、调用关系、复杂实现整理成文档时使用。
+    当用户需要给 AI 准备高质量项目说明材料时使用。
+  author: "daniel.chen@plaud.ai"
+  license: MIT
+  created_at: "2026-04-20"
+
+  triggers:
+    keywords:
+      - "生成说明文档"
+      - "帮我生成一份demo说明文档"
+      - "说明文档"
+      - "generate docs"
+      - "generate documentation"
+    slash_commands:
+      - "/generate-docs"
+    description: |
+      当用户输入以上关键词，或显式调用 /generate-docs 斜杠命令时触发。
+
+  capabilities:
+    - id: scan_directory
+      name: "目录扫描"
+      description: "扫描项目目录，生成带标签的树状文件地图"
+
+    - id: analyze_scripts
+      name: "脚本分析"
+      description: "读取并分析项目中的关键脚本，提取功能、依赖、调用关系"
+
+    - id: detect_entrypoint
+      name: "入口识别"
+      description: "自动识别项目主入口脚本（规则见 references/entrypoint_detection.md）"
+
+    - id: build_callgraph
+      name: "调用链生成"
+      description: "提取模块间调用关系，生成简化版调用链文本图"
+
+    - id: generate_document
+      name: "文档生成"
+      description: "按 7 章节结构生成 PROJECT_EXPLANATION.md"
+
+  output:
+    primary:
+      filename: "PROJECT_EXPLANATION.md"
+      location: "目标项目根目录"
+      format: "Markdown"
+    sections:
+      - order: 1
+        id: executive_summary
+        title: "项目总览 / Executive Summary"
+        required: true
+      - order: 2
+        id: feature_breakdown
+        title: "功能清单 / Feature Breakdown"
+        required: true
+      - order: 3
+        id: project_file_map
+        title: "文件与脚本地图 / Project File Map"
+        required: true
+      - order: 4
+        id: script_capabilities
+        title: "脚本能力说明 / What Each Script Can Do"
+        required: true
+      - order: 5
+        id: strengths_limitations
+        title: "优缺点分析 / Strengths and Limitations"
+        required: true
+      - order: 6
+        id: internal_flow
+        title: "内部调用与实现逻辑 / Internal Flow and Call Graph"
+        required: true
+      - order: 7
+        id: deep_technical_notes
+        title: "复杂脚本深度解读 / Deep Technical Notes for AI and Maintainers"
+        required: true
+
+  supported_languages:
+    - Python
+    - JavaScript
+    - TypeScript
+    - Shell / Bash
+    - Go
+    - Rust
+
+  references:
+    - path: "../references/doc_template.md"
+      description: "完整文档骨架模板"
+    - path: "../references/analysis_rules.md"
+      description: "脚本分析优先级规则"
+    - path: "../references/entrypoint_detection.md"
+      description: "主入口脚本识别规则"
+    - path: "../references/callgraph_rules.md"
+      description: "调用关系追踪规则"
+    - path: "../references/ai_readable_notes.md"
+      description: "适合 AI 阅读的写作规范"
+
+  helper_scripts:
+    - path: "../scripts/scan_project.py"
+      usage: "python scan_project.py [目标目录]"
+      description: "扫描目录，生成文件地图"
+    - path: "../scripts/extract_imports.py"
+      usage: "python extract_imports.py [目标目录]"
+      description: "提取 import 依赖，识别公共模块"
+
+  quality_requirements:
+    - "文档首屏（章节 1）必须让读者在 1 分钟内理解项目用途"
+    - "章节 7 必须足够详细，支持 AI 基于文档进行代码分析和改造"
+    - "不确定的功能必须标注为「推测用途」或「[待确认]」"
+    - "不得将大段源码原样复制进文档"
+    - "每个关键脚本必须有使用示例"
+    - "主入口脚本必须有完整的调用示例"
