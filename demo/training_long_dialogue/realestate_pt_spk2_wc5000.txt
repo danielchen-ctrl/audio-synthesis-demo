@@ -1,0 +1,86 @@
+Speaker 1: Bom dia a todos. Vamos começar e alinhar os itens da agenda hoje.
+Speaker 2: Feliz por estar aqui. Estarei focado nas principais restrições e áreas de risco em torno dos itens da agenda.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 2: Fico feliz em aprofundar isso - também tem sido uma preocupação da nossa parte.
+Speaker 1: Deixe-me definir o contexto de por que isso é importante agora.
+Speaker 2: Boa decisão – eu iria levantar a mesma preocupação.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 1: Vamos testar este plano e identificar os pontos fracos.
+Speaker 2: Entendido. Vou levar isso em consideração no cronograma atualizado.
+Speaker 1: Antes de prosseguirmos, deixe-me esclarecer os limites do escopo.
+Speaker 2: Deixe-me confirmar a propriedade dessa ação para que nada passe despercebido.
+Speaker 1: Deixe-me sinalizar algumas dependências que precisamos resolver primeiro.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 1: Deixe-me ser específico sobre o que preciso da equipe sobre isso.
+Speaker 1: Deixe-me apresentar algum contexto que possa mudar a forma como enquadramos isso.
+Speaker 1: Antes de encerrarmos este tópico, quero ter certeza de que nada ficará pendente.
+Speaker 2: Bom ponto. Precisarei reunir minha equipe antes de nos comprometermos.
+Speaker 1: Deixe-me garantir que capturamos isso como um item de ação formal.
+Speaker 2: Quero ter certeza de que entendi a pergunta corretamente antes de me comprometer.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 1: Deixe-me verificar se temos consenso sobre isso antes de prosseguirmos.
+Speaker 1: Vamos manter nosso foco na entrega e trabalhar de trás para frente a partir daí.
+Speaker 2: Essa abordagem funciona para mim. Eu coordenarei adequadamente.
+Speaker 1: Gostaria de propor aqui um quadro de decisão claro.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 2: Concordo com isso. Deixe-me verificar a viabilidade do cronograma.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 1: Deixe-me definir o contexto de por que isso é importante agora.
+Speaker 2: Esse é um ponto justo – vou levar isso em consideração em nosso planejamento.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 1: Vamos testar este plano e identificar os pontos fracos.
+Speaker 2: Vou levantar esta questão com as partes interessadas relevantes e retornar com uma posição.
+Speaker 1: Antes de prosseguirmos, deixe-me esclarecer os limites do escopo.
+Speaker 1: Deixe-me sinalizar algumas dependências que precisamos resolver primeiro.
+Speaker 2: Esse é um enquadramento útil. Deixe-me pensar no que isso significa para o nosso lado.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 1: Deixe-me ser específico sobre o que preciso da equipe sobre isso.
+Speaker 2: Faz sentido para mim. Eu assumirei a coordenação do nosso lado.
+Speaker 1: Deixe-me apresentar algum contexto que possa mudar a forma como enquadramos isso.
+Speaker 1: Antes de encerrarmos este tópico, quero ter certeza de que nada ficará pendente.
+Speaker 2: Entendo a compensação – deixe-me avaliar o lado da implementação.
+Speaker 1: Deixe-me garantir que capturamos isso como um item de ação formal.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 2: Essa é uma preocupação válida – eis como eu abordaria isso.
+Speaker 1: Deixe-me verificar se temos consenso sobre isso antes de prosseguirmos.
+Speaker 1: Vamos manter nosso foco na entrega e trabalhar de trás para frente a partir daí.
+Speaker 2: Deixe-me pensar no impacto posterior dessa decisão.
+Speaker 1: Gostaria de propor aqui um quadro de decisão claro.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 2: Darei seguimento a isso e darei uma resposta concreta até o final da semana.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 1: Deixe-me definir o contexto de por que isso é importante agora.
+Speaker 2: Fico feliz em aprofundar isso - também tem sido uma preocupação da nossa parte.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 1: Vamos testar este plano e identificar os pontos fracos.
+Speaker 2: Boa decisão – eu iria levantar a mesma preocupação.
+Speaker 1: Antes de prosseguirmos, deixe-me esclarecer os limites do escopo.
+Speaker 1: Deixe-me sinalizar algumas dependências que precisamos resolver primeiro.
+Speaker 2: Entendido. Vou levar isso em consideração no cronograma atualizado.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.Speaker 1: Deixe-me ser específico sobre o que preciso da equipe sobre isso.
+Speaker 2: Deixe-me confirmar a propriedade dessa ação para que nada passe despercebido.
+Speaker 1: Deixe-me apresentar algum contexto que possa mudar a forma como enquadramos isso.
+Speaker 1: Antes de encerrarmos este tópico, quero ter certeza de que nada ficará pendente.
+Speaker 2: Bom ponto. Precisarei reunir minha equipe antes de nos comprometermos.
+Speaker 1: Deixe-me garantir que capturamos isso como um item de ação formal.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 2: Quero ter certeza de que entendi a pergunta corretamente antes de me comprometer.
+Speaker 1: Deixe-me verificar se temos consenso sobre isso antes de prosseguirmos.
+Speaker 1: Vamos manter nosso foco na entrega e trabalhar de trás para frente a partir daí.
+Speaker 2: Essa abordagem funciona para mim. Eu coordenarei adequadamente.
+Speaker 1: Gostaria de propor aqui um quadro de decisão claro.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 2: Concordo com isso. Deixe-me verificar a viabilidade do cronograma.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 1: Deixe-me definir o contexto de por que isso é importante agora.
+Speaker 2: Esse é um ponto justo – vou levar isso em consideração em nosso planejamento.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 1: Vamos testar este plano e identificar os pontos fracos.
+Speaker 2: Vou levantar esta questão com as partes interessadas relevantes e retornar com uma posição.
+Speaker 1: Antes de prosseguirmos, deixe-me esclarecer os limites do escopo.
+Speaker 1: Deixe-me sinalizar algumas dependências que precisamos resolver primeiro.
+Speaker 2: Esse é um enquadramento útil. Deixe-me pensar no que isso significa para o nosso lado.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 1: Deixe-me ser específico sobre o que preciso da equipe sobre isso.
+Speaker 2: Faz sentido para mim. Eu assumirei a coordenação do nosso lado.
+Speaker 1: Deixe-me apresentar algum contexto que possa mudar a forma como enquadramos isso.

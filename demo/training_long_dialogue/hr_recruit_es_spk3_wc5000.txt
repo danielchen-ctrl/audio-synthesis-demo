@@ -1,0 +1,94 @@
+Speaker 1: Buenos días a todos. Comencemos y alineemos la estrategia para cubrir brechas de reclutamiento y el canal de discusión; Par hoy.
+Speaker 2: Feliz de estar aquí. Me centraré en las limitaciones clave y las áreas de riesgo en torno a la estrategia para cubrir las brechas de contratación y la discusión del canal; Par.
+Speaker 3: Ese es un marco útil. Permítanme pensar en lo que significa para nuestro lado.
+Speaker 1: Mantengamos nuestro enfoque en el resultado final y trabajemos hacia atrás desde allí.
+Speaker 2: Feliz de profundizar en eso; también ha sido una preocupación de nuestra parte.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 3: Veo la compensación; permítanme opinar sobre el lado de la implementación.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 2: Me alinearé con el equipo y confirmaré que estamos en la misma página.
+Speaker 1: Quiero volver a verificar nuestras suposiciones antes de comprometernos en esta dirección.
+Speaker 2: Eso es consistente con lo que hemos estado rastreando.
+Speaker 1: Probemos este plan e identifiquemos los puntos débiles.
+Speaker 3: Permítanme retroceder suavemente en un punto: creo que hay un mejor marco.
+Speaker 1: Quiero validar nuestras suposiciones con datos reales antes de finalizar.
+Speaker 1: Antes de cerrar este tema, quiero asegurarme de que no quede nada pendiente.
+Speaker 2: Confirmaré los detalles e informaré en el próximo punto de control.
+Speaker 1: Permítanme ser directo: existen limitaciones de recursos que debemos solucionar.
+Speaker 3: Eso tiene sentido: alinearé mi flujo de trabajo en esa dirección.
+Speaker 1: Deberíamos separar la solución a corto plazo de la solución a largo plazo.
+Speaker 1: Permítanme ser específico sobre lo que necesito del equipo sobre esto.
+Speaker 2: Ésa es una preocupación válida; así es como yo la abordaría.
+Speaker 1: Quiero asegurarme de que documentemos el fundamento, no solo la decisión.
+Speaker 3: Puedo apoyar esa dirección, pero quiero señalar una posible complicación.
+Speaker 1: Deberíamos definir cómo es un buen resultado antes de debatir el camino.
+Speaker 1: Aquí hay algunos ángulos; permítanme analizarlos uno por uno.
+Speaker 1: Permítanme establecer el contexto de por qué esto es importante en este momento.
+Speaker 2: Haré un seguimiento de eso y les daré una respuesta concreta al final de la semana.
+Speaker 3: Está bien, cooperaré.
+Speaker 1: Permítanme desconectarlo y volver con una recomendación concreta.
+Speaker 1: Resumiré lo que estoy escuchando y podemos corregir el rumbo si es necesario.
+Speaker 2: Desde nuestra perspectiva, el principal obstáculo es la dependencia del equipo upstream.
+Speaker 1: Mantengamos nuestro enfoque en el resultado final y trabajemos hacia atrás desde allí.
+Speaker 3: Esta explicación es muy clara, ahora la entiendo.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 2: Puedo brindarle una imagen más clara después de obtener los datos más recientes.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 3: De hecho, estos detalles necesitan atención.
+Speaker 1: Quiero volver a verificar nuestras suposiciones antes de comprometernos en esta dirección.
+Speaker 2: Puedo encargarme de eso; primero permítanme compartir mi lectura actual.
+Speaker 1: Probemos este plan e identifiquemos los puntos débiles.
+Speaker 3: Está bien, me prepararé cuidadosamente.
+Speaker 1: Quiero validar nuestras suposiciones con datos reales antes de finalizar.
+Speaker 2: Permítanme pensar en el impacto posterior de esa decisión.
+Speaker 1: Antes de cerrar este tema, quiero asegurarme de que no quede nada pendiente.
+Speaker 3: Entendido, cooperaré por mi parte.
+Speaker 1: Permítanme ser directo: existen limitaciones de recursos que debemos solucionar.
+Speaker 2: Entendido. Lo incluiré en la línea de tiempo actualizada.
+Speaker 1: Deberíamos separar la solución a corto plazo de la solución a largo plazo.
+Speaker 3: Esta sugerencia es muy útil, gracias.
+Speaker 1: Permítanme ser específico sobre lo que necesito del equipo sobre esto.
+Speaker 2: Ese es un marco útil. Permítanme pensar en lo que significa para nuestro lado.
+Speaker 1: Quiero asegurarme de que documentemos el fundamento, no solo la decisión.
+Speaker 3: A mí también me gustaría entender este aspecto.
+Speaker 1: Deberíamos definir cómo es un buen resultado antes de debatir el camino.
+Speaker 2: Feliz de profundizar en eso; también ha sido una preocupación de nuestra parte.
+Speaker 1: Aquí hay algunos ángulos; permítanme analizarlos uno por uno.
+Speaker 1: Permítanme establecer el contexto de por qué esto es importante en este momento.
+Speaker 2: Veo la compensación; permítanme opinar sobre el lado de la implementación.Speaker 1: Permítanme desconectarlo y volver con una recomendación concreta.
+Speaker 1: Resumiré lo que estoy escuchando y podemos corregir el rumbo si es necesario.
+Speaker 2: Me alinearé con el equipo y confirmaré que estamos en la misma página.
+Speaker 1: Mantengamos nuestro enfoque en el resultado final y trabajemos hacia atrás desde allí.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 2: Eso es consistente con lo que hemos estado rastreando.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 1: Quiero volver a verificar nuestras suposiciones antes de comprometernos en esta dirección.
+Speaker 2: Permítanme retroceder suavemente en un punto: creo que hay un mejor marco.
+Speaker 1: Probemos este plan e identifiquemos los puntos débiles.
+Speaker 1: Quiero validar nuestras suposiciones con datos reales antes de finalizar.
+Speaker 2: Confirmaré los detalles e informaré en el próximo punto de control.
+Speaker 1: Antes de cerrar este tema, quiero asegurarme de que no quede nada pendiente.
+Speaker 1: Permítanme ser directo: existen limitaciones de recursos que debemos solucionar.
+Speaker 2: Eso tiene sentido: alinearé mi flujo de trabajo en esa dirección.
+Speaker 1: Deberíamos separar la solución a corto plazo de la solución a largo plazo.
+Speaker 1: Permítanme ser específico sobre lo que necesito del equipo sobre esto.
+Speaker 2: Ésa es una preocupación válida; así es como yo la abordaría.
+Speaker 1: Quiero asegurarme de que documentemos el fundamento, no solo la decisión.
+Speaker 1: Deberíamos definir cómo es un buen resultado antes de debatir el camino.
+Speaker 2: Puedo apoyar esa dirección, pero quiero señalar una posible complicación.
+Speaker 1: Aquí hay algunos ángulos; permítanme analizarlos uno por uno.
+Speaker 1: Permítanme establecer el contexto de por qué esto es importante en este momento.
+Speaker 2: Haré un seguimiento de eso y les daré una respuesta concreta al final de la semana.
+Speaker 1: Permítanme desconectarlo y volver con una recomendación concreta.
+Speaker 1: Resumiré lo que estoy escuchando y podemos corregir el rumbo si es necesario.
+Speaker 2: Desde nuestra perspectiva, el principal obstáculo es la dependencia del equipo upstream.
+Speaker 1: Mantengamos nuestro enfoque en el resultado final y trabajemos hacia atrás desde allí.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 2: Puedo brindarle una imagen más clara después de obtener los datos más recientes.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 1: Quiero volver a verificar nuestras suposiciones antes de comprometernos en esta dirección.
+Speaker 2: Puedo encargarme de eso; primero permítanme compartir mi lectura actual.
+Speaker 1: Probemos este plan e identifiquemos los puntos débiles.
+Speaker 1: Quiero validar nuestras suposiciones con datos reales antes de finalizar.
+Speaker 2: Permítanme pensar en el impacto posterior de esa decisión.
+Speaker 1: Antes de cerrar este tema, quiero asegurarme de que no quede nada pendiente.

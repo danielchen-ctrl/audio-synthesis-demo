@@ -1,0 +1,101 @@
+Speaker 1: Bonjour à tous. Commençons et alignons-nous sur l'avancement de la réalisation du projet de construction et la discussion sur les risques ;  aujourd'hui.
+Speaker 2: Heureux d’être ici. Je me concentrerai sur les principales contraintes et zones de risque liées à l'avancement de la réalisation du projet de construction et à la discussion sur les risques ; .
+Speaker 3: J'en prendrai note et m'assurerai que cela se reflète dans mon livrable.
+Speaker 1: J'aimerais que tout le monde ait l'information sur l'exposition aux risques ici.
+Speaker 2: je ferai un suivi à ce sujet et je vous donnerai une réponse concrète d'ici la fin de la semaine.
+Speaker 1: Permettez-moi de m'assurer que nous considérons cela comme une mesure à prendre formellement.
+Speaker 3: Je suis d'accord avec cela. Laissez-moi vérifier la faisabilité du calendrier.
+Speaker 1: Je veux m'assurer que nous documentons la justification, pas seulement la décision.
+Speaker 2: Je peux absorber cette portée, mais je devrai ajuster mes autres priorités.
+Speaker 1: Permettez-moi de vous présenter un contexte qui pourrait changer la façon dont nous encadrons cela.
+Speaker 2: De notre point de vue, le principal bloqueur est la dépendance à l’égard de l’équipe en amont.
+Speaker 4: Je souhaite ajouter un peu de contexte qui pourrait être pertinent ici.
+Speaker 5: Speaker 1: Testons ce plan sous pression et identifions les points faibles.
+Speaker 3: Je veux m'assurer de bien comprendre la demande avant de m'engager.
+Speaker 1: Nous devons être honnêtes quant à la pression du calendrier.
+Speaker 1: Nous devrions séparer la solution à court terme de la solution à long terme.
+Speaker 2: D’accord. Permettez-moi d'ajouter ce que je vois de notre côté.
+Speaker 5: Je vois le compromis – permettez-moi d'intervenir sur la mise en œuvre.
+Speaker 4: C'est un bon point – j'en tiendrai compte dans notre planification.
+Speaker 1: Je souhaite revoir les critères de réussite pour m'assurer qu'ils sont réalistes.
+Speaker 3: Laissez-moi réfléchir à l’impact en aval de cette décision.
+Speaker 1: Avant de continuer, permettez-moi de clarifier les limites de la portée.
+Speaker 1: Gardons notre concentration sur le livrable et travaillons à rebours à partir de là.
+Speaker 2: Bon appel – J'allais soulever la même préoccupation.
+Speaker 1: Assurons-nous que les prochaines actions sont spécifiques et ont des propriétaires.
+Speaker 3: je soulèverai ce sujet avec les parties prenantes concernées et je reviendrai avec une position.
+Speaker 1: Permettez-moi de vérifier si nous avons un consensus sur ce point avant de continuer.
+Speaker 1: Permettez-moi de signaler quelques dépendances que nous devons d'abord résoudre.
+Speaker 1: Il y a une contrainte importante que je n'ai pas encore mentionnée – permettez-moi d'en parler maintenant.
+Speaker 2: Je peux m'en charger – permettez-moi d'abord de partager ma lecture actuelle à ce sujet.
+Speaker 3: D’accord, je vais coopérer.
+Speaker 1: Avant de clôturer ce sujet, je veux m'assurer que rien n'est laissé en suspens.
+Speaker 1: Je vais résumer ce que j'entends et nous pourrons corriger le tir si nécessaire.
+Speaker 2: Permettez-moi de confirmer que je suis propriétaire de cette action afin que rien ne passe entre les mailles du filet.
+Speaker 1: J'aimerais que tout le monde ait l'information sur l'exposition aux risques ici.
+Speaker 3: Cette explication est très claire, je comprends maintenant.
+Speaker 1: Permettez-moi de m'assurer que nous considérons cela comme une mesure à prendre formellement.
+Speaker 2: Heureux d'approfondir ce sujet – cela a également été une préoccupation de notre côté.
+Speaker 1: Je veux m'assurer que nous documentons la justification, pas seulement la décision.
+Speaker 3: En effet, ces détails nécessitent une attention particulière.
+Speaker 4: D’accord, je vais me préparer soigneusement.
+Speaker 5: Entendu, je coopérerai de mon côté.
+Speaker 1: Permettez-moi de vous présenter un contexte qui pourrait changer la façon dont nous encadrons cela.
+Speaker 2: J'en prendrai note et m'assurerai que cela se reflète dans mon livrable.
+Speaker 1: Testons ce plan sous pression et identifions les points faibles.
+Speaker 3: Cette suggestion est très utile, merci.
+Speaker 4: J’aimerais également comprendre cet aspect.
+Speaker 5: je ferai un suivi à ce sujet et je vous donnerai une réponse concrète d'ici la fin de la semaine.
+Speaker 1: Nous devons être honnêtes quant à la pression du calendrier.
+Speaker 2: Je suis d'accord avec cela. Laissez-moi vérifier la faisabilité du calendrier.
+Speaker 1: Nous devrions séparer la solution à court terme de la solution à long terme.
+Speaker 1: Je souhaite revoir les critères de réussite pour m'assurer qu'ils sont réalistes.
+Speaker 2: Je peux absorber cette portée, mais je devrai ajuster mes autres priorités.
+Speaker 1: Avant de continuer, permettez-moi de clarifier les limites de la portée.
+Speaker 1: Gardons notre concentration sur le livrable et travaillons à rebours à partir de là.
+Speaker 2: De notre point de vue, le principal bloqueur est la dépendance à l’égard de l’équipe en amont.
+Speaker 1: Assurons-nous que les prochaines actions sont spécifiques et ont des propriétaires.
+Speaker 1: Permettez-moi de vérifier si nous avons un consensus sur ce point avant de continuer.
+Speaker 2: Je souhaite ajouter un peu de contexte qui pourrait être pertinent ici.Speaker 1: Permettez-moi de signaler quelques dépendances que nous devons d'abord résoudre.
+Speaker 1: Il y a une contrainte importante que je n'ai pas encore mentionnée – permettez-moi d'en parler maintenant.
+Speaker 2: Je veux m'assurer de bien comprendre la demande avant de m'engager.
+Speaker 1: Avant de clôturer ce sujet, je veux m'assurer que rien n'est laissé en suspens.
+Speaker 1: Je vais résumer ce que j'entends et nous pourrons corriger le tir si nécessaire.
+Speaker 2: D’accord. Permettez-moi d'ajouter ce que je vois de notre côté.
+Speaker 1: J'aimerais que tout le monde ait l'information sur l'exposition aux risques ici.
+Speaker 1: Permettez-moi de m'assurer que nous considérons cela comme une mesure à prendre formellement.
+Speaker 2: Je vois le compromis – permettez-moi d'intervenir sur la mise en œuvre.
+Speaker 1: Je veux m'assurer que nous documentons la justification, pas seulement la décision.
+Speaker 1: Permettez-moi de vous présenter un contexte qui pourrait changer la façon dont nous encadrons cela.
+Speaker 2: C'est un bon point – j'en tiendrai compte dans notre planification.
+Speaker 1: Testons ce plan sous pression et identifions les points faibles.
+Speaker 1: Nous devons être honnêtes quant à la pression du calendrier.
+Speaker 2: Laissez-moi réfléchir à l'impact en aval de cette décision.
+Speaker 1: Nous devrions séparer la solution à court terme de la solution à long terme.
+Speaker 1: Je souhaite revoir les critères de réussite pour m'assurer qu'ils sont réalistes.
+Speaker 2: Bon appel – J'allais soulever la même préoccupation.
+Speaker 1: Avant de continuer, permettez-moi de clarifier les limites de la portée.
+Speaker 1: Gardons notre concentration sur le livrable et travaillons à rebours à partir de là.
+Speaker 2: je soulèverai ce sujet avec les parties prenantes concernées et je reviendrai avec une position.
+Speaker 1: Assurons-nous que les prochaines actions sont spécifiques et ont des propriétaires.
+Speaker 1: Permettez-moi de vérifier si nous avons un consensus sur ce point avant de continuer.
+Speaker 2: Je peux m'en charger – permettez-moi d'abord de partager ma lecture actuelle à ce sujet.
+Speaker 1: Permettez-moi de signaler quelques dépendances que nous devons d'abord résoudre.
+Speaker 1: Il y a une contrainte importante que je n'ai pas encore mentionnée – permettez-moi d'en parler maintenant.
+Speaker 2: Permettez-moi de confirmer que je suis propriétaire de cette action afin que rien ne passe entre les mailles du filet.
+Speaker 1: Avant de clôturer ce sujet, je veux m'assurer que rien n'est laissé en suspens.
+Speaker 1: Je vais résumer ce que j'entends et nous pourrons corriger le tir si nécessaire.
+Speaker 2: Heureux d'approfondir ce sujet – cela a également été une préoccupation de notre côté.
+Speaker 1: J'aimerais que tout le monde ait l'information sur l'exposition aux risques ici.
+Speaker 1: Permettez-moi de m'assurer que nous considérons cela comme une mesure à prendre formellement.
+Speaker 2: J'en prendrai note et m'assurerai que cela se reflète dans mon livrable.
+Speaker 1: Je veux m'assurer que nous documentons la justification, pas seulement la décision.
+Speaker 1: Permettez-moi de vous présenter un contexte qui pourrait changer la façon dont nous encadrons cela.
+Speaker 2: je ferai un suivi à ce sujet et je vous donnerai une réponse concrète d'ici la fin de la semaine.
+Speaker 1: Testons ce plan sous pression et identifions les points faibles.
+Speaker 1: Nous devons être honnêtes quant à la pression du calendrier.
+Speaker 2: Je suis d'accord avec cela. Laissez-moi vérifier la faisabilité du calendrier.
+Speaker 1: Nous devrions séparer la solution à court terme de la solution à long terme.
+Speaker 1: Je souhaite revoir les critères de réussite pour m'assurer qu'ils sont réalistes.
+Speaker 2: Je peux absorber cette portée, mais je devrai ajuster mes autres priorités.
+Speaker 1: Avant de continuer, permettez-moi de clarifier les limites de la portée.

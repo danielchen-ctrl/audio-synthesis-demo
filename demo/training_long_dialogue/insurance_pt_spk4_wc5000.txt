@@ -1,0 +1,97 @@
+Speaker 1: Bom dia a todos. Vamos começar e alinhar a revisão do problema de inspeção de qualidade de vendas de seguros; Participe hoje.
+Speaker 2: Feliz por estar aqui. Estarei focado nas principais restrições e áreas de risco em torno da revisão de problemas de inspeção de qualidade de vendas de seguros; Participe.
+Speaker 3: Esse é um ponto justo – vou levar isso em consideração em nosso planejamento.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 2: Essa é uma preocupação válida – eis como eu abordaria isso.
+Speaker 1: Deixe-me verificar se temos consenso sobre isso antes de prosseguirmos.
+Speaker 3: Concordo. Deixe-me acrescentar o que estou vendo do nosso lado.
+Speaker 1: Existem alguns ângulos aqui – deixe-me analisá-los um por um.
+Speaker 2: Quero ter certeza de que entendi a pergunta corretamente antes de me comprometer.
+Speaker 1: Precisamos ser honestos sobre a pressão do cronograma aqui.
+Speaker 2: Deixe-me confirmar a propriedade dessa ação para que nada passe despercebido.
+Speaker 4: 補足ですが、スケジュールについて調整します。
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 3: Entendido. Vou levar isso em consideração no cronograma atualizado.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 2: Posso assumir isso - deixe-me compartilhar minha leitura atual sobre isso primeiro.
+Speaker 4: Tomarei nota disso e garantirei que isso esteja refletido em meu produto final.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 3: Confirmarei os detalhes e reportarei no próximo posto de controle.
+Speaker 1: Gostaria que todos lessem sobre a exposição ao risco aqui.
+Speaker 1: Vamos manter o foco no que podemos realmente decidir nesta reunião.
+Speaker 2: Deixe-me recuar suavemente em um ponto – acho que há um enquadramento melhor.
+Speaker 1: Quero validar nossas suposições com dados reais antes de finalizarmos.
+Speaker 3: Isso é consistente com o que temos monitorado.
+Speaker 1: Deixe-me ser direto – há restrições de recursos que precisamos contornar.
+Speaker 1: Deixe-me expor as duas principais soluções de compromisso e poderemos decidir juntos.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 2: Quero acrescentar algum contexto que possa ser relevante aqui.
+Speaker 3: Ok, vou cooperar.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 1: Deveríamos definir o que seria um bom resultado antes de debatermos o caminho.
+Speaker 2: Posso absorver esse escopo, mas precisarei ajustar minhas outras prioridades.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 3: Essa explicação é muito clara, agora entendi.
+Speaker 1: Deixe-me verificar se temos consenso sobre isso antes de prosseguirmos.
+Speaker 2: Bom ponto. Precisarei reunir minha equipe antes de nos comprometermos.
+Speaker 1: Existem alguns ângulos aqui – deixe-me analisá-los um por um.
+Speaker 3: Na verdade, estes detalhes precisam de atenção.
+Speaker 4: Ok, vou me preparar com cuidado.
+Speaker 1: Precisamos ser honestos sobre a pressão do cronograma aqui.
+Speaker 2: Esse é um enquadramento útil. Deixe-me pensar no que isso significa para o nosso lado.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 3: Entendido, cooperarei da minha parte.
+Speaker 4: Esta sugestão é muito útil, obrigado.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 2: Do nosso ponto de vista, o principal bloqueador é a dependência da equipe upstream.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 3: Eu também gostaria de entender esse aspecto.
+Speaker 4: Esse é um ponto justo – vou levar isso em consideração em nosso planejamento.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 2: Essa é uma preocupação válida – eis como eu abordaria isso.
+Speaker 1: Gostaria que todos lessem sobre a exposição ao risco aqui.
+Speaker 1: Vamos manter o foco no que podemos realmente decidir nesta reunião.
+Speaker 2: Concordo. Deixe-me acrescentar o que estou vendo do nosso lado.
+Speaker 1: Quero validar nossas suposições com dados reais antes de finalizarmos.
+Speaker 1: Deixe-me ser direto – há restrições de recursos que precisamos contornar.
+Speaker 2: Quero ter certeza de que entendi a pergunta corretamente antes de me comprometer.
+Speaker 1: Deixe-me expor as duas principais soluções de compromisso e poderemos decidir juntos.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.Speaker 2: Deixe-me confirmar a propriedade dessa ação para que nada passe despercebido.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 1: Deveríamos definir o que seria um bom resultado antes de debatermos o caminho.
+Speaker 2: Entendido. Vou levar isso em consideração no cronograma atualizado.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 1: Deixe-me verificar se temos consenso sobre isso antes de prosseguirmos.
+Speaker 2: Posso assumir isso - deixe-me compartilhar minha leitura atual sobre isso primeiro.
+Speaker 1: Existem alguns ângulos aqui – deixe-me analisá-los um por um.
+Speaker 1: Precisamos ser honestos sobre a pressão do cronograma aqui.
+Speaker 2: Tomarei nota disso e garantirei que isso esteja refletido em meu produto final.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 2: Confirmarei os detalhes e reportarei no próximo posto de controle.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 2: Deixe-me recuar suavemente em um ponto – acho que há um enquadramento melhor.
+Speaker 1: Gostaria que todos lessem sobre a exposição ao risco aqui.
+Speaker 1: Vamos manter o foco no que podemos realmente decidir nesta reunião.
+Speaker 2: Isso é consistente com o que temos monitorado.
+Speaker 1: Quero validar nossas suposições com dados reais antes de finalizarmos.
+Speaker 1: Deixe-me ser direto – há restrições de recursos que precisamos contornar.
+Speaker 2: Quero acrescentar algum contexto que possa ser relevante aqui.
+Speaker 1: Deixe-me expor as duas principais soluções de compromisso e poderemos decidir juntos.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 2: Posso absorver esse escopo, mas precisarei ajustar minhas outras prioridades.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 1: Deveríamos definir o que seria um bom resultado antes de debatermos o caminho.
+Speaker 2: Bom ponto. Precisarei reunir minha equipe antes de nos comprometermos.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 1: Deixe-me verificar se temos consenso sobre isso antes de prosseguirmos.
+Speaker 2: Esse é um enquadramento útil. Deixe-me pensar no que isso significa para o nosso lado.
+Speaker 1: Existem alguns ângulos aqui – deixe-me analisá-los um por um.
+Speaker 1: Precisamos ser honestos sobre a pressão do cronograma aqui.
+Speaker 2: Do nosso ponto de vista, o principal bloqueador é a dependência da equipe upstream.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 2: Esse é um ponto justo – vou levar isso em consideração em nosso planejamento.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
