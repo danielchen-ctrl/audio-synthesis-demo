@@ -14,6 +14,10 @@ def _count_chinese_chars(text: str) -> int:
     return len(re.findall(r"[\u4e00-\u9fa5]", text))
 
 
+def _count_japanese_kana(text: str) -> int:
+    return len(re.findall(r"[\u3040-\u309f\u30a0-\u30ff]", text))
+
+
 def score_dialogue(
     task: TrainingTask,
     lines: DialogueLines,
@@ -56,21 +60,31 @@ def score_dialogue(
             )
         )
 
-    if task.language != "中文":
+    if task.language == "中文":
+        chinese_ratio = 1.0
+    elif task.language == "粤语":
+        chinese_ratio = 0.0
+    else:
         chinese_ratio = _count_chinese_chars(full_text) / max(len(full_text), 1)
         allowed_ratio = 0.70 if task.meta.get("translate_fallback") else 0.15
-        if chinese_ratio > allowed_ratio:
+        should_flag_high_ratio = chinese_ratio > allowed_ratio
+        details = {"ratio": round(chinese_ratio, 4), "allowed_ratio": allowed_ratio}
+
+        if task.language == "日语":
+            kana_ratio = _count_japanese_kana(full_text) / max(len(full_text), 1)
+            details["kana_ratio"] = round(kana_ratio, 4)
+            should_flag_high_ratio = chinese_ratio > 0.35 and kana_ratio < 0.05
+
+        if should_flag_high_ratio:
             score -= 20
             findings.append(
                 ValidationFinding(
                     code="high_chinese_ratio",
                     severity="error",
                     message=f"中文占比过高: {chinese_ratio:.1%}",
-                    details={"ratio": round(chinese_ratio, 4), "allowed_ratio": allowed_ratio},
+                    details=details,
                 )
             )
-    else:
-        chinese_ratio = 1.0
 
     target_min = task.word_count * 0.7
     target_max = task.word_count * 1.3
