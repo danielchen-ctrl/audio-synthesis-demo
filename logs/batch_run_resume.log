@@ -1,0 +1,82 @@
+[20:28:59] ===== 批量长对话训练数据生成 =====
+[20:28:59] Base jobs: 140 | Output files: 840
+[20:28:59] Output dir: D:\ui_auto_test\demo_app\demo\training_long_dialogue
+[20:28:59] Word count levels: [5000, 10000, 20000, 30000, 40000, 50000]
+[20:28:59] ========================================
+[20:28:59] [1/140] SKIP  ai_tech_zh_spk2
+[20:28:59] [2/140] SKIP  ai_tech_zh_spk3
+[20:28:59] [3/140] SKIP  ai_tech_zh_spk4
+[20:28:59] [4/140] SKIP  ai_tech_zh_spk5
+[20:28:59] [5/140] SKIP  ai_tech_zh_spk6
+[20:28:59] [6/140] START ai_tech_en_spk2  (行业=人工智能/科技, 语言=英语, 说话人=2)
+[20:29:17]   片段 1/17 +12434字 → 累计12434字
+[20:29:36]   片段 2/17 +12432字 → 累计24866字
+[20:29:55]   片段 3/17 +12435字 → 累计37301字
+[20:30:14]   片段 4/17 +12430字 → 累计49731字
+[20:30:37]   片段 5/17 +12433字 → 累计62164字
+[20:30:39]   ? 已保存: wc5000(4903字), wc10000(9920字), wc20000(19753字), wc30000(29947字), wc40000(39678字), wc50000(49878字)  | 耗时 1.7min | 预计剩余 3:43:16
+[20:30:39] [7/140] START ai_tech_en_spk3  (行业=人工智能/科技, 语言=英语, 说话人=3)
+[20:30:58]   片段 1/17 +12419字 → 累计12419字
+[20:31:17]   片段 2/17 +12431字 → 累计24850字
+[20:31:35]   片段 3/17 +12417字 → 累计37267字
+[20:31:54]   片段 4/17 +12427字 → 累计49694字
+[20:32:16]   片段 5/17 +12419字 → 累计62113字
+[20:32:18]   ? 已保存: wc5000(4870字), wc10000(9819字), wc20000(19989字), wc30000(29948字), wc40000(39795字), wc50000(49993字)  | 耗时 3.3min | 预计剩余 3:40:06
+[20:32:18] [8/140] START ai_tech_en_spk4  (行业=人工智能/科技, 语言=英语, 说话人=4)
+[20:32:36]   片段 1/17 +12640字 → 累计12640字
+[20:32:54]   片段 2/17 +12630字 → 累计25270字
+[20:33:12]   片段 3/17 +12623字 → 累计37893字
+[20:33:29]   片段 4/17 +12639字 → 累计50532字
+[20:33:40]   [翻译] 第1次失败: 502 Server Error: Bad Gateway for url: https://translate.googleapis.com/translate_a/single
+[20:33:49]   片段 5/17 +12632字 → 累计63164字
+[20:33:51]   ? 已保存: wc5000(4691字), wc10000(9740字), wc20000(19995字), wc30000(29948字), wc40000(39750字), wc50000(49858字)  | 耗时 4.9min | 预计剩余 3:34:15
+[20:33:51] [9/140] START ai_tech_en_spk5  (行业=人工智能/科技, 语言=英语, 说话人=5)
+[20:34:08]   片段 1/17 +12542字 → 累计12542字
+[20:34:24]   片段 2/17 +12526字 → 累计25068字
+[20:34:40]   片段 3/17 +12527字 → 累计37595字
+[20:34:56]   片段 4/17 +12534字 → 累计50129字
+[20:35:14]   片段 5/17 +12512字 → 累计62641字
+[20:35:16]   ? 已保存: wc5000(4830字), wc10000(9940字), wc20000(19762字), wc30000(29887字), wc40000(39586字), wc50000(49824字)  | 耗时 6.3min | 预计剩余 3:25:38
+[20:35:16] [10/140] START ai_tech_en_spk6  (行业=人工智能/科技, 语言=英语, 说话人=6)
+[20:35:35]   片段 1/17 +12444字 → 累计12444字
+[20:35:51]   [翻译] 第1次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGKeX2c4GIjD6G2AIyZoATEjIN7z0DIoaikhBNIsfj_0HmT91Q19e9tXZuRaxSbO7s8Kv2BWmfoMyAnJSWgFD
+[20:35:55]   [翻译] 第2次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGKyX2c4GIjDO2GH-rtrDFqYaM5ayVMy5VPz4dRzqjk1pvCLeove8fKnvSrT2XK2Otg07-1G-lF4yAnJSWgFD
+[20:36:00]   [翻译] 第3次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGLGX2c4GIjAd2ME6h8hRxaVm5_bkHx6hyWAFOzHb9nYFuYvujTdb7ApsL_gEklEW2CodSjjxeHcyAnJSWgFD
+[20:36:06]   [翻译] 第1次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGLaX2c4GIjDfMz6eSEnkkpA0ehzsE2lXdGwZVQExBEYUpSu9dXnzSfpMnQuYXC6BJE07IsQOhEwyAnJSWgFD
+[20:36:11]   [翻译] 第2次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGLuX2c4GIjCHkvQlcClAFeG73GXAKBgHITHQdS_E38EZkxMr8MqVBOWP7FeF9ZihogKlpp0gSgAyAnJSWgFD
+[20:36:16]   [翻译] 第3次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGMCX2c4GIjCw3spEbrOYpzkLcM35mtm6eeWGw1SWqnX6aDwrQRmIlamyHNRLAh5t20csHvFm7lwyAnJSWgFD
+[20:36:19]   片段 2/17 +9222字 → 累计21666字
+[20:36:32]   [翻译] 第1次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGNCX2c4GIjBhMb55d0HqPdrAxjv51glVqvm98nQHr985OZmdQiYTv8wMxnwFXInHuDGSMxkOOmMyAnJSWgFD
+[20:36:37]   [翻译] 第2次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGNWX2c4GIjBDINV_DYeME_ISFh-HrHOrLih2oPWjuwxYa7b7VOdZzJiz_dqsLL1J_abJuYoJte0yAnJSWgFD
+[20:36:42]   [翻译] 第3次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGNqX2c4GIjBza4A2mlWQjGe094RQUw22UIiZrp0bRtcboEUVdDyTmDPG-bnKPH2N-uwFA7DyE2EyAnJSWgFD
+[20:36:47]   [翻译] 第1次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGOCX2c4GIjBjKu513D_Zl8fXx9xT-ioAAPDpe6nRx5eUBSUdJOYuG8SNqtgfFDYruRqxWosTAS8yAnJSWgFD
+[20:36:52]   [翻译] 第2次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGOSX2c4GIjD2xGhFdvEHEXN5s9zNCFiLNfaOhrohWG6PBEKcTQnrc7yz1NpeD3aPRyaPPTyR9xoyAnJSWgFD
+[20:36:57]   [翻译] 第3次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGOqX2c4GIjA8TQw8j-8niPu1GGiAT8MRysra3Is2YGyFWcMW1Xo5Xab7aaG7NUEvpzO5MdNzgMAyAnJSWgFD
+[20:37:03]   [翻译] 第1次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGO-X2c4GIjDUw_hlDRJUVz-KXsthrYUj9f2KMUkIABEuVtHZWA0DMk6OGvl_JujcSRNGJu3BY8wyAnJSWgFD
+[20:37:08]   [翻译] 第2次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGPSX2c4GIjDF9LyddIcjDGLgzqgEZWUX5UOk8OZBRx-WufpPWyGmanp7PadujtNAmjHdprmnd4QyAnJSWgFD
+[20:37:13]   [翻译] 第3次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGPqX2c4GIjAlSfrxHb5qOC_6SPxtk5MyJ-_JILxMFmM3JQbiPm7eGnO5b-VGXqv5Cxb9fF3wxksyAnJSWgFD
+[20:37:19]   [翻译] 第1次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGP-X2c4GIjDrsQE5cDj0lWlq_MbL3O_oleL1t6sCjIgF1PynWqnJr-6XMFvY8C9KU7GZJvE9KYAyAnJSWgFD
+[20:37:24]   [翻译] 第2次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGISY2c4GIjCGpWhRg-adeYqBk2zq531HJd9N3KlMyv61LeXmhos0x4kuQ5Osl8PlUyfdxxUQcjQyAnJSWgFD
+[20:37:29]   [翻译] 第3次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGImY2c4GIjAbDEXKq9ojXUtevKGwfOCfmDxckmWz8P-1jizAXe5wPr9zQq5weEqip4-ojUAfTWkyAnJSWgFD
+[20:37:35]   [翻译] 第1次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGI-Y2c4GIjBl3n8lcWNv6SLZOOwyRRNNtBb0FaXqJ3HwgqanJm59A9ODVN_G0T0xCMoB3fOG9h4yAnJSWgFD
+[20:37:40]   [翻译] 第2次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGJSY2c4GIjBeFHFZLW32SwYV44BqE3wB2Q-p3774Ham2NvixA_AySYWcN1QFLvdBYU_VmZ3BZCEyAnJSWgFD
+[20:37:45]   [翻译] 第3次失败: 429 Client Error: Too Many Requests for url: https://www.google.com/sorry/index?continue=https://translate.googleapis.com/translate_a/single&q=EgR6C8IxGJmY2c4GIjCE66pbo1nirjolgY3dkOsYzhkRIeXo8gPec-nuFZm5U_eYhec_MZBODh_wFZC6J6kyAnJSWgFD
+[20:37:48]   片段 3/17 +3575字 → 累计25241字
+[20:38:48] ===== 批量长对话训练数据生成 =====
+[20:38:48] Base jobs: 140 | Output files: 840
+[20:38:48] Output dir: D:\ui_auto_test\demo_app\demo\training_long_dialogue
+[20:38:48] Word count levels: [5000, 10000, 20000, 30000, 40000, 50000]
+[20:38:48] ========================================
+[20:38:48] [1/140] SKIP  ai_tech_zh_spk2
+[20:38:48] [2/140] SKIP  ai_tech_zh_spk3
+[20:38:48] [3/140] SKIP  ai_tech_zh_spk4
+[20:38:48] [4/140] SKIP  ai_tech_zh_spk5
+[20:38:48] [5/140] SKIP  ai_tech_zh_spk6
+[20:38:48] [6/140] SKIP  ai_tech_en_spk2
+[20:38:48] [7/140] SKIP  ai_tech_en_spk3
+[20:38:48] [8/140] SKIP  ai_tech_en_spk4
+[20:38:48] [9/140] SKIP  ai_tech_en_spk5
+[20:38:48] [10/140] START ai_tech_en_spk6  (行业=人工智能/科技, 语言=英语, 说话人=6)
+[20:38:59]   [翻译] 第1次429限速，等待60秒后重试...
+[20:40:02]   [翻译] 第2次429限速，等待120秒后重试...
+[20:42:05]   [翻译] 第3次429限速，等待180秒后重试...

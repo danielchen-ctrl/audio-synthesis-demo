@@ -1,0 +1,17 @@
+{
+  "server_archive": "D:\\ui_auto_test\\audio-synthesis-demo\\build\\demo_app\\SceneDialogueDemo.exe",
+  "server_mtime": 1775615117.7201116,
+  "asset_archive": "D:\\ui_auto_test\\audio-synthesis-demo\\build\\DialogDemo\\DialogDemo.pkg",
+  "asset_mtime": 1775615118.066252,
+  "modules": [
+    "app",
+    "server",
+    "resource_path_utils",
+    "dialogue_distinctness_guard",
+    "dialogue_generator_v2",
+    "dialogue_intelligence_engine",
+    "dialogue_placeholder_checker",
+    "dialogue_review_expander",
+    "industry_template_loader"
+  ]
+}

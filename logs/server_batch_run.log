@@ -1,0 +1,3822 @@
+[SERVER] STATIC_DIR: D:\ui_auto_test\demo_app\static
+[SERVER] STATIC_DIR exists: True
+[SERVER] app.js path: D:\ui_auto_test\demo_app\static\app.js
+[SERVER] app.js exists: True
+[SERVER] app.js size: 94790 bytes
+[START] Demo server is running at http://0.0.0.0:8899/
+[START] Access URL: http://10.0.154.154:8899/
+[START] Access URL: http://127.0.0.1:8899/
+[START] Access URL: http://192.168.137.1:8899/
+[START] Access URL: http://localhost:8899/
+[START] Static assets: D:\ui_auto_test\demo_app\static
+[START] Output directory: D:\ui_auto_test\demo_app\demo
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Domain KB] 加载失败 (D:\ui_auto_test\demo_app\runtime\cache\embedded_bundle\modules\domain_kb\generic.json): [Errno 2] No such file or directory: 'D:\\ui_auto_test\\demo_app\\runtime\\cache\\embedded_bundle\\modules\\domain_kb\\generic.json'
+[Fallback] 使用旧模板: 关于疼痛管理，我们有多种方法可以选择。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.11% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于预后，我需要如实告知您各种可能的情况。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.00% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于药物的储存和使用，有一些细节要求。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 134 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 13}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.63% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处高相似度：
+
+  [15行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [20行] Speaker2: 我明白了，这个确实需要注意。
+  [22行] Speaker2: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:32, 完全重复:0, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 32, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 2, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余27行
+[去重] 原始行数: 27, 去重后行数: 27
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1248, 实际字数: 211, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 2627442480 (来自 2dp5z2ly_1775651347345)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1248, 缺口: 1752, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 1360
+[扩写] 第 2 轮，当前字符数: 1360, 缺口: 1640, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 1469
+[扩写] 第 3 轮，当前字符数: 1469, 缺口: 1531, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 1574
+[扩写] 第 4 轮，当前字符数: 1574, 缺口: 1426, 目标: 2700~3150
+[Fallback] 使用旧模板: 知识管理要做好经验积累。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 1680
+[扩写] 第 5 轮，当前字符数: 1680, 缺口: 1320, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 117 字
+[扩写] 追加 4 行，当前字符数: 1787
+[扩写] 第 6 轮，当前字符数: 1787, 缺口: 1213, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 1892
+[扩写] 第 7 轮，当前字符数: 1892, 缺口: 1108, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[扩写] 追加 4 行，当前字符数: 2012
+[扩写] 第 8 轮，当前字符数: 2012, 缺口: 988, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 执行方案 / 达标率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2118
+[扩写] 第 9 轮，当前字符数: 2118, 缺口: 882, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[扩写] 追加 4 行，当前字符数: 2241
+[扩写] 第 10 轮，当前字符数: 2241, 缺口: 759, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 128 字
+[扩写] 追加 4 行，当前字符数: 2359
+[扩写] 第 11 轮，当前字符数: 2359, 缺口: 641, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2473
+[扩写] 第 12 轮，当前字符数: 2473, 缺口: 527, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2583
+[扩写] 第 13 轮，当前字符数: 2583, 缺口: 417, 目标: 2700~3150
+[Fallback] 使用旧模板: 可持续发展要纳入规划。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2693
+[扩写] 第 14 轮，当前字符数: 2693, 缺口: 307, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2807
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651347.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651347.json
+[A2-RoleKPI] 跳过（people=2 < 3）
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到84处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于用药，有几个注意事项需要特别说明。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 134 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.63% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 定期复查是监测治疗效果的重要手段。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 134 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.37% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 睡眠质量对康复非常重要，需要保证充足休息。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 137 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.78% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处高相似度：
+
+  [15行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [20行] Speaker2: 我明白了，这个确实需要注意。
+  [22行] Speaker2: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:32, 完全重复:0, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 32, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 2, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余29行
+[去重] 原始行数: 29, 去重后行数: 29
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1297, 实际字数: 219, 语言: Chinese
+[v1.4.0] InfoLedger统计: 8个槽位, 当前章节:澄清背景
+[随机性] seed = 502066855 (来自 dl7csbhy_1775651367611)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1297, 缺口: 1703, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[扩写] 追加 4 行，当前字符数: 1417
+[扩写] 第 2 轮，当前字符数: 1417, 缺口: 1583, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 1526
+[扩写] 第 3 轮，当前字符数: 1526, 缺口: 1474, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 118 字
+[扩写] 追加 4 行，当前字符数: 1634
+[扩写] 第 4 轮，当前字符数: 1634, 缺口: 1366, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 1748
+[扩写] 第 5 轮，当前字符数: 1748, 缺口: 1252, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 1862
+[扩写] 第 6 轮，当前字符数: 1862, 缺口: 1138, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 1968
+[扩写] 第 7 轮，当前字符数: 1968, 缺口: 1032, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 128 字
+[扩写] 追加 4 行，当前字符数: 2086
+[扩写] 第 8 轮，当前字符数: 2086, 缺口: 914, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2199
+[扩写] 第 9 轮，当前字符数: 2199, 缺口: 801, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2308
+[扩写] 第 10 轮，当前字符数: 2308, 缺口: 692, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2420
+[扩写] 第 11 轮，当前字符数: 2420, 缺口: 580, 目标: 2700~3150
+[Fallback] 使用旧模板: 可持续发展要纳入规划。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2530
+[扩写] 第 12 轮，当前字符数: 2530, 缺口: 470, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2640
+[扩写] 第 13 轮，当前字符数: 2640, 缺口: 360, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[扩写] 追加 4 行，当前字符数: 2763
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651367.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651367.json
+[A2-RoleKPI] 跳过（people=2 < 3）
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到82处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于用药，有几个注意事项需要特别说明。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 135 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.32% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 治疗费用方面，我们会尽量为您选择性价比高的方案。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 140 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.37% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 出院后的随访管理同样重要。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 128 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.59% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处高相似度：
+
+  [15行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [20行] Speaker2: 我明白了，这个确实需要注意。
+  [22行] Speaker2: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:32, 完全重复:0, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 32, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 2, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余29行
+[去重] 原始行数: 29, 去重后行数: 29
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1293, 实际字数: 218, 语言: Chinese
+[v1.4.0] InfoLedger统计: 8个槽位, 当前章节:澄清背景
+[随机性] seed = 808378306 (来自 w2lahv9l_1775651386643)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1293, 缺口: 1707, 目标: 2700~3150
+[Fallback] 使用旧模板: 知识管理要做好经验积累。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 1399
+[扩写] 第 2 轮，当前字符数: 1399, 缺口: 1601, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 118 字
+[扩写] 追加 4 行，当前字符数: 1507
+[扩写] 第 3 轮，当前字符数: 1507, 缺口: 1493, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 1616
+[扩写] 第 4 轮，当前字符数: 1616, 缺口: 1384, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 1725
+[扩写] 第 5 轮，当前字符数: 1725, 缺口: 1275, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 1838
+[扩写] 第 6 轮，当前字符数: 1838, 缺口: 1162, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 127 字
+[扩写] 追加 4 行，当前字符数: 1955
+[扩写] 第 7 轮，当前字符数: 1955, 缺口: 1045, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 125 字
+[扩写] 追加 4 行，当前字符数: 2070
+[扩写] 第 8 轮，当前字符数: 2070, 缺口: 930, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2180
+[扩写] 第 9 轮，当前字符数: 2180, 缺口: 820, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 执行方案 / 达标率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2285
+[扩写] 第 10 轮，当前字符数: 2285, 缺口: 715, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2397
+[扩写] 第 11 轮，当前字符数: 2397, 缺口: 603, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2508
+[扩写] 第 12 轮，当前字符数: 2508, 缺口: 492, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2619
+[扩写] 第 13 轮，当前字符数: 2619, 缺口: 381, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[扩写] 追加 4 行，当前字符数: 2742
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651386.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651386.json
+[A2-RoleKPI] 跳过（people=2 < 3）
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到82处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 定期复查是监测治疗效果的重要手段。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 134 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.85% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 我们需要安排一系列的检查来明确诊断。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 131 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.48% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于用药，有几个注意事项需要特别说明。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 135 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.74% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处高相似度：
+
+  [15行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [20行] Speaker2: 我明白了，这个确实需要注意。
+  [22行] Speaker2: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:32, 完全重复:0, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 32, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 2, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余28行
+[去重] 原始行数: 28, 去重后行数: 28
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1277, 实际字数: 216, 语言: Chinese
+[v1.4.0] InfoLedger统计: 8个槽位, 当前章节:澄清背景
+[随机性] seed = 1691597682 (来自 wjc2ufiw_1775651405481)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1277, 缺口: 1723, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 117 字
+[扩写] 追加 4 行，当前字符数: 1384
+[扩写] 第 2 轮，当前字符数: 1384, 缺口: 1616, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 1495
+[扩写] 第 3 轮，当前字符数: 1495, 缺口: 1505, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 1607
+[扩写] 第 4 轮，当前字符数: 1607, 缺口: 1393, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[扩写] 追加 4 行，当前字符数: 1730
+[扩写] 第 5 轮，当前字符数: 1730, 缺口: 1270, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 1841
+[扩写] 第 6 轮，当前字符数: 1841, 缺口: 1159, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 1947
+[扩写] 第 7 轮，当前字符数: 1947, 缺口: 1053, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2053
+[扩写] 第 8 轮，当前字符数: 2053, 缺口: 947, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2164
+[扩写] 第 9 轮，当前字符数: 2164, 缺口: 836, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2278
+[扩写] 第 10 轮，当前字符数: 2278, 缺口: 722, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 128 字
+[扩写] 追加 4 行，当前字符数: 2396
+[扩写] 第 11 轮，当前字符数: 2396, 缺口: 604, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2507
+[扩写] 第 12 轮，当前字符数: 2507, 缺口: 493, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2620
+[扩写] 第 13 轮，当前字符数: 2620, 缺口: 380, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2729
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651405.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651405.json
+[A2-RoleKPI] 跳过（people=2 < 3）
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到81处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 康复训练需要循序渐进，不能操之过急。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 135 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.59% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 睡眠质量对康复非常重要，需要保证充足休息。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 137 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 13}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.41% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 定期复查是监测治疗效果的重要手段。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 134 字
+[校验] 期望 Speaker 数量: 2
+[校验] 实际找到的 Speaker: [1, 2]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 12}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 49.19% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处高相似度：
+
+  [15行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [20行] Speaker2: 我明白了，这个确实需要注意。
+  [22行] Speaker2: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:32, 完全重复:0, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 32, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 2, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余28行
+[去重] 原始行数: 28, 去重后行数: 28
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1283, 实际字数: 216, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 157634959 (来自 ktt19slw_1775651427100)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1283, 缺口: 1717, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 1395
+[扩写] 第 2 轮，当前字符数: 1395, 缺口: 1605, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[扩写] 追加 4 行，当前字符数: 1518
+[扩写] 第 3 轮，当前字符数: 1518, 缺口: 1482, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[扩写] 追加 4 行，当前字符数: 1638
+[扩写] 第 4 轮，当前字符数: 1638, 缺口: 1362, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 1744
+[扩写] 第 5 轮，当前字符数: 1744, 缺口: 1256, 目标: 2700~3150
+[Fallback] 使用旧模板: 可持续发展要纳入规划。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 1854
+[扩写] 第 6 轮，当前字符数: 1854, 缺口: 1146, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 1965
+[扩写] 第 7 轮，当前字符数: 1965, 缺口: 1035, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2075
+[扩写] 第 8 轮，当前字符数: 2075, 缺口: 925, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 128 字
+[扩写] 追加 4 行，当前字符数: 2193
+[扩写] 第 9 轮，当前字符数: 2193, 缺口: 807, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2306
+[扩写] 第 10 轮，当前字符数: 2306, 缺口: 694, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2418
+[扩写] 第 11 轮，当前字符数: 2418, 缺口: 582, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2530
+[扩写] 第 12 轮，当前字符数: 2530, 缺口: 470, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2640
+[扩写] 第 13 轮，当前字符数: 2640, 缺口: 360, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2745
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651427.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651427.json
+[A2-RoleKPI] 跳过（people=2 < 3）
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到81处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 根据检查结果，我们需要制定个性化的治疗方案。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 188 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.86% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 出院后的随访管理同样重要。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 85%
+[扩写] 本次添加 5 行对话，注入1句术语，约 177 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.88% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于药物的副作用，我们需要提前了解。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 184 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.54% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:35, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 35, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 35, 去重后行数: 35
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1494, 实际字数: 255, 语言: Chinese
+[v1.4.0] InfoLedger统计: 10个槽位, 当前章节:澄清背景
+[随机性] seed = 1636958295 (来自 mdckwk5o_1775651448062)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1494, 缺口: 1506, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 158 字
+[扩写] 追加 5 行，当前字符数: 1638
+[扩写] 第 2 轮，当前字符数: 1638, 缺口: 1362, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 72%
+[扩写] 本次添加 5 行对话，注入1句术语，约 153 字
+[扩写] 追加 5 行，当前字符数: 1777
+[扩写] 第 3 轮，当前字符数: 1777, 缺口: 1223, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 72%
+[扩写] 本次添加 5 行对话，注入1句术语，约 162 字
+[扩写] 追加 5 行，当前字符数: 1923
+[扩写] 第 4 轮，当前字符数: 1923, 缺口: 1077, 目标: 2700~3150
+[Fallback] 使用旧模板: 知识管理要做好经验积累。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 82%
+[扩写] 本次添加 5 行对话，注入1句术语，约 159 字
+[扩写] 追加 5 行，当前字符数: 2066
+[扩写] 第 5 轮，当前字符数: 2066, 缺口: 934, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 164 字
+[扩写] 追加 5 行，当前字符数: 2214
+[扩写] 第 6 轮，当前字符数: 2214, 缺口: 786, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2323
+[扩写] 第 7 轮，当前字符数: 2323, 缺口: 677, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2433
+[扩写] 第 8 轮，当前字符数: 2433, 缺口: 567, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 117 字
+[扩写] 追加 4 行，当前字符数: 2540
+[扩写] 第 9 轮，当前字符数: 2540, 缺口: 460, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2654
+[扩写] 第 10 轮，当前字符数: 2654, 缺口: 346, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2759
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651448.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651448.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=3）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到81处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 定期复查是监测治疗效果的重要手段。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 78%
+[扩写] 本次添加 5 行对话，注入1句术语，约 184 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.86% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于药物的副作用，我们需要提前了解。...
+[Domain KB] 注入术语(1): 执行方案 / 达标率 = 85%
+[扩写] 本次添加 5 行对话，注入1句术语，约 184 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 47.51% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于预后，我需要如实告知您各种可能的情况。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 78%
+[扩写] 本次添加 5 行对话，注入1句术语，约 182 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.75% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:35, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 35, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 35, 去重后行数: 35
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1479, 实际字数: 256, 语言: Chinese
+[v1.4.0] InfoLedger统计: 8个槽位, 当前章节:澄清背景
+[随机性] seed = 4167311616 (来自 1nxx03bt_1775651468926)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1479, 缺口: 1521, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 82%
+[扩写] 本次添加 5 行对话，注入1句术语，约 156 字
+[扩写] 追加 5 行，当前字符数: 1621
+[扩写] 第 2 轮，当前字符数: 1621, 缺口: 1379, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 85%
+[扩写] 本次添加 5 行对话，注入1句术语，约 147 字
+[扩写] 追加 5 行，当前字符数: 1754
+[扩写] 第 3 轮，当前字符数: 1754, 缺口: 1246, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 163 字
+[扩写] 追加 5 行，当前字符数: 1901
+[扩写] 第 4 轮，当前字符数: 1901, 缺口: 1099, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 82%
+[扩写] 本次添加 5 行对话，注入1句术语，约 170 字
+[扩写] 追加 5 行，当前字符数: 2055
+[扩写] 第 5 轮，当前字符数: 2055, 缺口: 945, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 164 字
+[扩写] 追加 5 行，当前字符数: 2203
+[扩写] 第 6 轮，当前字符数: 2203, 缺口: 797, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2315
+[扩写] 第 7 轮，当前字符数: 2315, 缺口: 685, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2425
+[扩写] 第 8 轮，当前字符数: 2425, 缺口: 575, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2538
+[扩写] 第 9 轮，当前字符数: 2538, 缺口: 462, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[扩写] 追加 4 行，当前字符数: 2658
+[扩写] 第 10 轮，当前字符数: 2658, 缺口: 342, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2770
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651468.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651468.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=3）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到81处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 情绪管理也是治疗的重要组成部分。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 179 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.54% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于用药，有几个注意事项需要特别说明。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 47.03% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 出院后的随访管理同样重要。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 177 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.71% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:35, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 35, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 35, 去重后行数: 35
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1478, 实际字数: 254, 语言: Chinese
+[v1.4.0] InfoLedger统计: 10个槽位, 当前章节:澄清背景
+[随机性] seed = 1320588601 (来自 rgawcqlk_1775651487326)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1478, 缺口: 1522, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 执行方案 / 达标率 = 85%
+[扩写] 本次添加 5 行对话，注入1句术语，约 157 字
+[扩写] 追加 5 行，当前字符数: 1621
+[扩写] 第 2 轮，当前字符数: 1621, 缺口: 1379, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 153 字
+[扩写] 追加 5 行，当前字符数: 1760
+[扩写] 第 3 轮，当前字符数: 1760, 缺口: 1240, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 159 字
+[扩写] 追加 5 行，当前字符数: 1903
+[扩写] 第 4 轮，当前字符数: 1903, 缺口: 1097, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 78%
+[扩写] 本次添加 5 行对话，注入1句术语，约 166 字
+[扩写] 追加 5 行，当前字符数: 2053
+[扩写] 第 5 轮，当前字符数: 2053, 缺口: 947, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 78%
+[扩写] 本次添加 5 行对话，注入1句术语，约 162 字
+[扩写] 追加 5 行，当前字符数: 2199
+[扩写] 第 6 轮，当前字符数: 2199, 缺口: 801, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2312
+[扩写] 第 7 轮，当前字符数: 2312, 缺口: 688, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2425
+[扩写] 第 8 轮，当前字符数: 2425, 缺口: 575, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2531
+[扩写] 第 9 轮，当前字符数: 2531, 缺口: 469, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2642
+[扩写] 第 10 轮，当前字符数: 2642, 缺口: 358, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2751
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651487.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651487.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=3）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到81处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 睡眠质量对康复非常重要，需要保证充足休息。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 186 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 47.08% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 治疗费用方面，我们会尽量为您选择性价比高的方案。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 189 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.61% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于预后，我需要如实告知您各种可能的情况。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 82%
+[扩写] 本次添加 5 行对话，注入1句术语，约 182 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 47.11% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现4处完全重复：
+
+  [5行] Speaker2: 我会认真思考这个问题，准备好之后再向您汇报。
+  [7行] Speaker3: 我会认真思考这个问题，准备好之后再向您汇报。  <- 完全相同！
+
+  [7行] Speaker3: 我会认真思考这个问题，准备好之后再向您汇报。
+  [9行] Speaker2: 我会认真思考这个问题，准备好之后再向您汇报。  <- 完全相同！
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现5处高相似度：
+
+  [5行] Speaker2: 我会认真思考这个问题，准备好之后再向您汇报。
+  [7行] Speaker3: 我会认真思考这个问题，准备好之后再向您汇报。
+  相似度: 100%
+
+  [5行] Speaker2: 我会认真思考这个问题，准备好之后再向您汇报。
+  [9行] Speaker2: 我会认真思考这个问题，准备好之后再向您汇报。
+  相似度: 100%
+
+  [7行] Speaker3: 我会认真思考这个问题，准备好之后再向您汇报。
+  [9行] Speaker2: 我会认真思考这个问题，准备好之后再向您汇报。
+  相似度: 100%
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:35, 完全重复:4, 近重复:5, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 35, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 35, 去重后行数: 35
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1495, 实际字数: 261, 语言: Chinese
+[v1.4.0] InfoLedger统计: 8个槽位, 当前章节:澄清背景
+[随机性] seed = 1308650814 (来自 e9gju9h8_1775651506384)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1495, 缺口: 1505, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 78%
+[扩写] 本次添加 5 行对话，注入1句术语，约 152 字
+[扩写] 追加 5 行，当前字符数: 1633
+[扩写] 第 2 轮，当前字符数: 1633, 缺口: 1367, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 153 字
+[扩写] 追加 5 行，当前字符数: 1772
+[扩写] 第 3 轮，当前字符数: 1772, 缺口: 1228, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 167 字
+[扩写] 追加 5 行，当前字符数: 1923
+[扩写] 第 4 轮，当前字符数: 1923, 缺口: 1077, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 158 字
+[扩写] 追加 5 行，当前字符数: 2065
+[扩写] 第 5 轮，当前字符数: 2065, 缺口: 935, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 164 字
+[扩写] 追加 5 行，当前字符数: 2213
+[扩写] 第 6 轮，当前字符数: 2213, 缺口: 787, 目标: 2700~3150
+[Fallback] 使用旧模板: 可持续发展要纳入规划。...
+[Domain KB] 注入术语(1): 执行方案 / 达标率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2323
+[扩写] 第 7 轮，当前字符数: 2323, 缺口: 677, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2436
+[扩写] 第 8 轮，当前字符数: 2436, 缺口: 564, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2546
+[扩写] 第 9 轮，当前字符数: 2546, 缺口: 454, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2658
+[扩写] 第 10 轮，当前字符数: 2658, 缺口: 342, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 134 字
+[扩写] 追加 4 行，当前字符数: 2782
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651506.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651506.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=3）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到81处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于药物的储存和使用，有一些细节要求。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.71% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 我们需要安排一系列的检查来明确诊断。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 180 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 47.26% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于运动锻炼，我们需要制定合理的康复计划。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 189 字
+[校验] 期望 Speaker 数量: 3
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: []
+[校验] 出现次数不足 2 次的 Speaker: []
+[校验] 语言不一致：中文占比 46.98% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [16行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [18行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [21行] Speaker2: 我明白了，这个确实需要注意。
+  [23行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:35, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 35, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 35, 去重后行数: 35
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1506, 实际字数: 260, 语言: Chinese
+[v1.4.0] InfoLedger统计: 10个槽位, 当前章节:澄清背景
+[随机性] seed = 2075281140 (来自 pfdust56_1775651526090)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1506, 缺口: 1494, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 158 字
+[扩写] 追加 5 行，当前字符数: 1650
+[扩写] 第 2 轮，当前字符数: 1650, 缺口: 1350, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 148 字
+[扩写] 追加 5 行，当前字符数: 1784
+[扩写] 第 3 轮，当前字符数: 1784, 缺口: 1216, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 161 字
+[扩写] 追加 5 行，当前字符数: 1929
+[扩写] 第 4 轮，当前字符数: 1929, 缺口: 1071, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 78%
+[扩写] 本次添加 5 行对话，注入1句术语，约 158 字
+[扩写] 追加 5 行，当前字符数: 2071
+[扩写] 第 5 轮，当前字符数: 2071, 缺口: 929, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 161 字
+[扩写] 追加 5 行，当前字符数: 2216
+[扩写] 第 6 轮，当前字符数: 2216, 缺口: 784, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 127 字
+[扩写] 追加 4 行，当前字符数: 2333
+[扩写] 第 7 轮，当前字符数: 2333, 缺口: 667, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2442
+[扩写] 第 8 轮，当前字符数: 2442, 缺口: 558, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 125 字
+[扩写] 追加 4 行，当前字符数: 2557
+[扩写] 第 9 轮，当前字符数: 2557, 缺口: 443, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[扩写] 追加 4 行，当前字符数: 2677
+[扩写] 第 10 轮，当前字符数: 2677, 缺口: 323, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2786
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651526.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651526.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=3）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到81处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 治疗过程中需要密切观察病情变化。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 174 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (刘畅): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.63% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 定期复查是监测治疗效果的重要手段。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (孙毅): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.99% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 出院后的随访管理同样重要。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 177 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (赵清): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.02% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:37, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 37, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 37, 去重后行数: 37
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1532, 实际字数: 262, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 95119432 (来自 0v9icyzn_1775651546854)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1532, 缺口: 1468, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 75%
+[扩写] 本次添加 6 行对话，注入1句术语，约 192 字
+[扩写] 追加 6 行，当前字符数: 1706
+[扩写] 第 2 轮，当前字符数: 1706, 缺口: 1294, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 95%
+[扩写] 本次添加 6 行对话，注入1句术语，约 202 字
+[扩写] 追加 6 行，当前字符数: 1886
+[扩写] 第 3 轮，当前字符数: 1886, 缺口: 1114, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 95%
+[扩写] 本次添加 6 行对话，注入1句术语，约 197 字
+[扩写] 追加 6 行，当前字符数: 2061
+[扩写] 第 4 轮，当前字符数: 2061, 缺口: 939, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2170
+[扩写] 第 5 轮，当前字符数: 2170, 缺口: 830, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2281
+[扩写] 第 6 轮，当前字符数: 2281, 缺口: 719, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2393
+[扩写] 第 7 轮，当前字符数: 2393, 缺口: 607, 目标: 2700~3150
+[Fallback] 使用旧模板: 可持续发展要纳入规划。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2503
+[扩写] 第 8 轮，当前字符数: 2503, 缺口: 497, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2617
+[扩写] 第 9 轮，当前字符数: 2617, 缺口: 383, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2730
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651546.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651546.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=4）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到80处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于并发症的预防，我们需要做好提前准备。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 185 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (赵清): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.77% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 治疗费用方面，我们会尽量为您选择性价比高的方案。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 82%
+[扩写] 本次添加 5 行对话，注入1句术语，约 189 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (冯浩): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 47.35% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于运动锻炼，我们需要制定合理的康复计划。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 78%
+[扩写] 本次添加 5 行对话，注入1句术语，约 190 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (何川): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.86% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现3处完全重复：
+
+  [5行] Speaker2: 这确实需要我进一步研究，我会尽快给您一个明确的答复。
+  [7行] Speaker3: 这确实需要我进一步研究，我会尽快给您一个明确的答复。  <- 完全相同！
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现3处高相似度：
+
+  [5行] Speaker2: 这确实需要我进一步研究，我会尽快给您一个明确的答复。
+  [7行] Speaker3: 这确实需要我进一步研究，我会尽快给您一个明确的答复。
+  相似度: 100%
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:37, 完全重复:3, 近重复:3, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 37, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 37, 去重后行数: 37
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1562, 实际字数: 266, 语言: Chinese
+[v1.4.0] InfoLedger统计: 10个槽位, 当前章节:澄清背景
+[随机性] seed = 31370154 (来自 65bza8yx_1775651566204)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1562, 缺口: 1438, 目标: 2700~3150
+[Fallback] 使用旧模板: 可持续发展要纳入规划。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 85%
+[扩写] 本次添加 6 行对话，注入1句术语，约 188 字
+[扩写] 追加 6 行，当前字符数: 1732
+[扩写] 第 2 轮，当前字符数: 1732, 缺口: 1268, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 78%
+[扩写] 本次添加 6 行对话，注入1句术语，约 202 字
+[扩写] 追加 6 行，当前字符数: 1912
+[扩写] 第 3 轮，当前字符数: 1912, 缺口: 1088, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 98%
+[扩写] 本次添加 6 行对话，注入1句术语，约 199 字
+[扩写] 追加 6 行，当前字符数: 2089
+[扩写] 第 4 轮，当前字符数: 2089, 缺口: 911, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2198
+[扩写] 第 5 轮，当前字符数: 2198, 缺口: 802, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2303
+[扩写] 第 6 轮，当前字符数: 2303, 缺口: 697, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2415
+[扩写] 第 7 轮，当前字符数: 2415, 缺口: 585, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2529
+[扩写] 第 8 轮，当前字符数: 2529, 缺口: 471, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 125 字
+[扩写] 追加 4 行，当前字符数: 2644
+[扩写] 第 9 轮，当前字符数: 2644, 缺口: 356, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2749
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651566.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651566.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=4）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到80处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 在饮食方面，有一些禁忌需要特别注意。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 85%
+[扩写] 本次添加 5 行对话，注入1句术语，约 182 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (周航): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.67% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于并发症的预防，我们需要做好提前准备。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 82%
+[扩写] 本次添加 5 行对话，注入1句术语，约 186 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (许言): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.62% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于用药，有几个注意事项需要特别说明。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 85%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (何川): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.21% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现3处高相似度：
+
+  [2行] Speaker2: 您好Professional，我是Counterpart。很高兴见到您。
+  [3行] Speaker3: 您好Professional，我是Coordinator。很高兴见到您。
+  相似度: 82%
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:37, 完全重复:2, 近重复:3, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 37, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 1, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余32行
+[去重] 原始行数: 32, 去重后行数: 32
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1415, 实际字数: 243, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 3231918322 (来自 2s45zx0s_1775651584429)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1415, 缺口: 1585, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 75%
+[扩写] 本次添加 6 行对话，注入1句术语，约 187 字
+[扩写] 追加 6 行，当前字符数: 1584
+[扩写] 第 2 轮，当前字符数: 1584, 缺口: 1416, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 95%
+[扩写] 本次添加 6 行对话，注入1句术语，约 198 字
+[扩写] 追加 6 行，当前字符数: 1760
+[扩写] 第 3 轮，当前字符数: 1760, 缺口: 1240, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 85%
+[扩写] 本次添加 6 行对话，注入1句术语，约 213 字
+[扩写] 追加 6 行，当前字符数: 1951
+[扩写] 第 4 轮，当前字符数: 1951, 缺口: 1049, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 117 字
+[扩写] 追加 4 行，当前字符数: 2058
+[扩写] 第 5 轮，当前字符数: 2058, 缺口: 942, 目标: 2700~3150
+[Fallback] 使用旧模板: 知识管理要做好经验积累。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2164
+[扩写] 第 6 轮，当前字符数: 2164, 缺口: 836, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2269
+[扩写] 第 7 轮，当前字符数: 2269, 缺口: 731, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2383
+[扩写] 第 8 轮，当前字符数: 2383, 缺口: 617, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 执行方案 / 达标率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2488
+[扩写] 第 9 轮，当前字符数: 2488, 缺口: 512, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 执行方案 / 达标率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2601
+[扩写] 第 10 轮，当前字符数: 2601, 缺口: 399, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2715
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651584.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651584.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=4）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到79处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 康复训练需要循序渐进，不能操之过急。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 184 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (张昊): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.64% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于药物的储存和使用，有一些细节要求。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (王睿): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 47.08% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 在饮食方面，有一些禁忌需要特别注意。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 181 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (王睿): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.66% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:37, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 37, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 37, 去重后行数: 37
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1516, 实际字数: 264, 语言: Chinese
+[v1.4.0] InfoLedger统计: 8个槽位, 当前章节:澄清背景
+[随机性] seed = 1747137408 (来自 qe1jwbqu_1775651601847)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1516, 缺口: 1484, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 75%
+[扩写] 本次添加 6 行对话，注入1句术语，约 191 字
+[扩写] 追加 6 行，当前字符数: 1689
+[扩写] 第 2 轮，当前字符数: 1689, 缺口: 1311, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 92%
+[扩写] 本次添加 6 行对话，注入1句术语，约 198 字
+[扩写] 追加 6 行，当前字符数: 1865
+[扩写] 第 3 轮，当前字符数: 1865, 缺口: 1135, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 98%
+[扩写] 本次添加 6 行对话，注入1句术语，约 204 字
+[扩写] 追加 6 行，当前字符数: 2047
+[扩写] 第 4 轮，当前字符数: 2047, 缺口: 953, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[扩写] 追加 4 行，当前字符数: 2170
+[扩写] 第 5 轮，当前字符数: 2170, 缺口: 830, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2275
+[扩写] 第 6 轮，当前字符数: 2275, 缺口: 725, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2387
+[扩写] 第 7 轮，当前字符数: 2387, 缺口: 613, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2496
+[扩写] 第 8 轮，当前字符数: 2496, 缺口: 504, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2610
+[扩写] 第 9 轮，当前字符数: 2610, 缺口: 390, 目标: 2700~3150
+[Fallback] 使用旧模板: 知识管理要做好经验积累。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2716
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651601.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651601.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=4）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到80处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于家庭护理，有一些要点需要家属配合。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 184 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (何川): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.34% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于药物的副作用，我们需要提前了解。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 184 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (李然): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.83% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 在饮食方面，有一些禁忌需要特别注意。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 181 字
+[校验] 期望 Speaker 数量: 4
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (许言): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2}
+[校验] 语言不一致：中文占比 46.55% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [17行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [20行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [23行] Speaker2: 我明白了，这个确实需要注意。
+  [25行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:37, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 37, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 37, 去重后行数: 37
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1513, 实际字数: 264, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 554398157 (来自 l203v1uw_1775651618621)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1513, 缺口: 1487, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 98%
+[扩写] 本次添加 6 行对话，注入1句术语，约 191 字
+[扩写] 追加 6 行，当前字符数: 1686
+[扩写] 第 2 轮，当前字符数: 1686, 缺口: 1314, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 72%
+[扩写] 本次添加 6 行对话，注入1句术语，约 197 字
+[扩写] 追加 6 行，当前字符数: 1861
+[扩写] 第 3 轮，当前字符数: 1861, 缺口: 1139, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 78%
+[扩写] 本次添加 6 行对话，注入1句术语，约 199 字
+[扩写] 追加 6 行，当前字符数: 2038
+[扩写] 第 4 轮，当前字符数: 2038, 缺口: 962, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2149
+[扩写] 第 5 轮，当前字符数: 2149, 缺口: 851, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2260
+[扩写] 第 6 轮，当前字符数: 2260, 缺口: 740, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2373
+[扩写] 第 7 轮，当前字符数: 2373, 缺口: 627, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2486
+[扩写] 第 8 轮，当前字符数: 2486, 缺口: 514, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2591
+[扩写] 第 9 轮，当前字符数: 2591, 缺口: 409, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 127 字
+[扩写] 追加 4 行，当前字符数: 2708
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651618.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651618.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=4）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到80处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 治疗过程中需要密切观察病情变化。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 174 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (郑越): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.70% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于运动锻炼，我们需要制定合理的康复计划。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 72%
+[扩写] 本次添加 5 行对话，注入1句术语，约 189 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (孙毅): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 47.44% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于并发症的预防，我们需要做好提前准备。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 185 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (冯浩): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.51% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:39, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 39, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 39, 去重后行数: 39
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1583, 实际字数: 276, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 1816052385 (来自 2vh9h5o7_1775651639196)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1583, 缺口: 1417, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 75%
+[扩写] 本次添加 7 行对话，注入1句术语，约 229 字
+[扩写] 追加 7 行，当前字符数: 1788
+[扩写] 第 2 轮，当前字符数: 1788, 缺口: 1212, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 78%
+[扩写] 本次添加 7 行对话，注入1句术语，约 241 字
+[扩写] 追加 7 行，当前字符数: 2001
+[扩写] 第 3 轮，当前字符数: 2001, 缺口: 999, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2110
+[扩写] 第 4 轮，当前字符数: 2110, 缺口: 890, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2220
+[扩写] 第 5 轮，当前字符数: 2220, 缺口: 780, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[扩写] 追加 4 行，当前字符数: 2343
+[扩写] 第 6 轮，当前字符数: 2343, 缺口: 657, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 117 字
+[扩写] 追加 4 行，当前字符数: 2450
+[扩写] 第 7 轮，当前字符数: 2450, 缺口: 550, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 质量目标 / 达标率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2561
+[扩写] 第 8 轮，当前字符数: 2561, 缺口: 439, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 125 字
+[扩写] 追加 4 行，当前字符数: 2676
+[扩写] 第 9 轮，当前字符数: 2676, 缺口: 324, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[扩写] 追加 4 行，当前字符数: 2796
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651639.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651639.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=5）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到82处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于预后，我需要如实告知您各种可能的情况。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 72%
+[扩写] 本次添加 5 行对话，注入1句术语，约 182 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (王睿): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.75% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于疼痛管理，我们有多种方法可以选择。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 179 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (孙毅): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 45.94% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于疼痛管理，我们有多种方法可以选择。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 180 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (孙毅): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.61% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现3处高相似度：
+
+  [12行] Speaker4: 補足ですが、予算について検討します。
+  [13行] Speaker5: 補足ですが、予算について調整します。
+  相似度: 88%
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:39, 完全重复:2, 近重复:3, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 39, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 39, 去重后行数: 39
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1565, 实际字数: 275, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 1109829665 (来自 845l9fe8_1775651657409)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1565, 缺口: 1435, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 82%
+[扩写] 本次添加 7 行对话，注入1句术语，约 226 字
+[扩写] 追加 7 行，当前字符数: 1767
+[扩写] 第 2 轮，当前字符数: 1767, 缺口: 1233, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 82%
+[扩写] 本次添加 7 行对话，注入1句术语，约 246 字
+[扩写] 追加 7 行，当前字符数: 1985
+[扩写] 第 3 轮，当前字符数: 1985, 缺口: 1015, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2095
+[扩写] 第 4 轮，当前字符数: 2095, 缺口: 905, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2201
+[扩写] 第 5 轮，当前字符数: 2201, 缺口: 799, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 执行方案 / 达标率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2307
+[扩写] 第 6 轮，当前字符数: 2307, 缺口: 693, 目标: 2700~3150
+[Fallback] 使用旧模板: 可持续发展要纳入规划。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2417
+[扩写] 第 7 轮，当前字符数: 2417, 缺口: 583, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2529
+[扩写] 第 8 轮，当前字符数: 2529, 缺口: 471, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 131 字
+[扩写] 追加 4 行，当前字符数: 2650
+[扩写] 第 9 轮，当前字符数: 2650, 缺口: 350, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 117 字
+[扩写] 追加 4 行，当前字符数: 2757
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651657.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651657.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=5）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到82处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于预后，我需要如实告知您各种可能的情况。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (陈屿): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.30% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于运动锻炼，我们需要制定合理的康复计划。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 85%
+[扩写] 本次添加 5 行对话，注入1句术语，约 190 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (胡宁): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.81% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 出院后的随访管理同样重要。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 178 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (赵清): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 45.92% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现3处完全重复：
+
+  [7行] Speaker3: 这个问题很重要，让我核实一下具体情况再回复您。
+  [9行] Speaker2: 这个问题很重要，让我核实一下具体情况再回复您。  <- 完全相同！
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现4处高相似度：
+
+  [7行] Speaker3: 这个问题很重要，让我核实一下具体情况再回复您。
+  [9行] Speaker2: 这个问题很重要，让我核实一下具体情况再回复您。
+  相似度: 100%
+
+  [12行] Speaker4: 補足ですが、品質について検討します。
+  [13行] Speaker5: 補足ですが、品質について調整します。
+  相似度: 88%
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:39, 完全重复:3, 近重复:4, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 39, 'exact_duplicate_count': 1, 'semantic_near_duplicate_count': 1, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余35行
+[去重] 原始行数: 35, 去重后行数: 35
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1483, 实际字数: 259, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 4228582872 (来自 v5ok35kc_1775651672677)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1483, 缺口: 1517, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 92%
+[扩写] 本次添加 7 行对话，注入1句术语，约 223 字
+[扩写] 追加 7 行，当前字符数: 1682
+[扩写] 第 2 轮，当前字符数: 1682, 缺口: 1318, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 98%
+[扩写] 本次添加 7 行对话，注入1句术语，约 246 字
+[扩写] 追加 7 行，当前字符数: 1900
+[扩写] 第 3 轮，当前字符数: 1900, 缺口: 1100, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2009
+[扩写] 第 4 轮，当前字符数: 2009, 缺口: 991, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2119
+[扩写] 第 5 轮，当前字符数: 2119, 缺口: 881, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2230
+[扩写] 第 6 轮，当前字符数: 2230, 缺口: 770, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[扩写] 追加 4 行，当前字符数: 2350
+[扩写] 第 7 轮，当前字符数: 2350, 缺口: 650, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2463
+[扩写] 第 8 轮，当前字符数: 2463, 缺口: 537, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2576
+[扩写] 第 9 轮，当前字符数: 2576, 缺口: 424, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2686
+[扩写] 第 10 轮，当前字符数: 2686, 缺口: 314, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2798
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651672.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651672.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=5）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到82处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于运动锻炼，我们需要制定合理的康复计划。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 189 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (许言): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 47.02% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 我们需要安排一系列的检查来明确诊断。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 98%
+[扩写] 本次添加 5 行对话，注入1句术语，约 181 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (周航): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 47.07% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 康复训练需要循序渐进，不能操之过急。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 184 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (李然): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.65% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:39, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 39, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 39, 去重后行数: 39
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1570, 实际字数: 270, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 2705439481 (来自 q3avdu6e_1775651689377)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1570, 缺口: 1430, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 72%
+[扩写] 本次添加 7 行对话，注入1句术语，约 223 字
+[扩写] 追加 7 行，当前字符数: 1769
+[扩写] 第 2 轮，当前字符数: 1769, 缺口: 1231, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 98%
+[扩写] 本次添加 7 行对话，注入1句术语，约 245 字
+[扩写] 追加 7 行，当前字符数: 1986
+[扩写] 第 3 轮，当前字符数: 1986, 缺口: 1014, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 117 字
+[扩写] 追加 4 行，当前字符数: 2093
+[扩写] 第 4 轮，当前字符数: 2093, 缺口: 907, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2204
+[扩写] 第 5 轮，当前字符数: 2204, 缺口: 796, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 72%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2310
+[扩写] 第 6 轮，当前字符数: 2310, 缺口: 690, 目标: 2700~3150
+[Fallback] 使用旧模板: 知识管理要做好经验积累。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2416
+[扩写] 第 7 轮，当前字符数: 2416, 缺口: 584, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[扩写] 追加 4 行，当前字符数: 2539
+[扩写] 第 8 轮，当前字符数: 2539, 缺口: 461, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2651
+[扩写] 第 9 轮，当前字符数: 2651, 缺口: 349, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2762
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651689.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651689.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=5）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到82处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 营养支持对康复也很关键。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 75%
+[扩写] 本次添加 5 行对话，注入1句术语，约 181 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (孙毅): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.50% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于预后，我需要如实告知您各种可能的情况。...
+[Domain KB] 注入术语(1): 工作进度 / 效率指标 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (刘畅): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.16% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 我们需要安排一系列的检查来明确诊断。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 180 字
+[校验] 期望 Speaker 数量: 5
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (李然): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2}
+[校验] 语言不一致：中文占比 46.52% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现2处完全重复：
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现2处高相似度：
+
+  [18行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [22行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [25行] Speaker2: 我明白了，这个确实需要注意。
+  [27行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:39, 完全重复:2, 近重复:2, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ✅ 修复成功：{'total_lines': 39, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 0, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': True}
+[去重] 原始行数: 39, 去重后行数: 39
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1557, 实际字数: 271, 语言: Chinese
+[v1.4.0] InfoLedger统计: 10个槽位, 当前章节:澄清背景
+[随机性] seed = 3221996488 (来自 q9kk3hlr_1775651707191)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1557, 缺口: 1443, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 82%
+[扩写] 本次添加 7 行对话，注入1句术语，约 225 字
+[扩写] 追加 7 行，当前字符数: 1758
+[扩写] 第 2 轮，当前字符数: 1758, 缺口: 1242, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 78%
+[扩写] 本次添加 7 行对话，注入1句术语，约 247 字
+[扩写] 追加 7 行，当前字符数: 1977
+[扩写] 第 3 轮，当前字符数: 1977, 缺口: 1023, 目标: 2700~3150
+[Fallback] 使用旧模板: 文档管理要做好归档和版本控制。...
+[Domain KB] 注入术语(1): 绩效指标 / 达标率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2088
+[扩写] 第 4 轮，当前字符数: 2088, 缺口: 912, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[扩写] 追加 4 行，当前字符数: 2208
+[扩写] 第 5 轮，当前字符数: 2208, 缺口: 792, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 128 字
+[扩写] 追加 4 行，当前字符数: 2326
+[扩写] 第 6 轮，当前字符数: 2326, 缺口: 674, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于项目进度，我们需要制定明确的时间表。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 133 字
+[扩写] 追加 4 行，当前字符数: 2449
+[扩写] 第 7 轮，当前字符数: 2449, 缺口: 551, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2555
+[扩写] 第 8 轮，当前字符数: 2555, 缺口: 445, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2661
+[扩写] 第 9 轮，当前字符数: 2661, 缺口: 339, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2766
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651707.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651707.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=5）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到82处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于预后，我需要如实告知您各种可能的情况。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 182 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (赵清): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.14% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于预后，我需要如实告知您各种可能的情况。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (张昊): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.36% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 根据检查结果，我们需要制定个性化的治疗方案。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 85%
+[扩写] 本次添加 5 行对话，注入1句术语，约 188 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 19, 2: 9, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (赵清): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 19, 2: 9, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.83% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现3处完全重复：
+
+  [12行] Speaker4: 補足ですが、予算について確認が必要。
+  [13行] Speaker5: 補足ですが、予算について確認が必要。  <- 完全相同！
+
+  [19行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [24行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [27行] Speaker2: 我明白了，这个确实需要注意。
+  [29行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现4处高相似度：
+
+  [12行] Speaker4: 補足ですが、予算について確認が必要。
+  [13行] Speaker5: 補足ですが、予算について確認が必要。
+  相似度: 100%
+
+  [20行] Speaker6: 参与者の観点から、重点的に対応します。
+  [21行] Speaker5: 参与者の観点から、慎重に対応します。
+  相似度: 91%
+
+  [19行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [24行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [27行] Speaker2: 我明白了，这个确实需要注意。
+  [29行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:41, 完全重复:3, 近重复:4, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 41, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 1, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余37行
+[去重] 删除重复句子: Speaker Speaker 5: 行动项：Speaker 5跟进，T+3天给到方案并同步全组。...
+[去重] 原始行数: 37, 去重后行数: 36
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1482, 实际字数: 261, 语言: Chinese
+[v1.4.0] InfoLedger统计: 9个槽位, 当前章节:澄清背景
+[随机性] seed = 1659082718 (来自 5iuz2bdj_1775651724828)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1482, 缺口: 1518, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 82%
+[扩写] 本次添加 8 行对话，注入1句术语，约 265 字
+[扩写] 追加 8 行，当前字符数: 1717
+[扩写] 第 2 轮，当前字符数: 1717, 缺口: 1283, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 75%
+[扩写] 本次添加 8 行对话，注入1句术语，约 276 字
+[扩写] 追加 8 行，当前字符数: 1959
+[扩写] 第 3 轮，当前字符数: 1959, 缺口: 1041, 目标: 2700~3150
+[Fallback] 使用旧模板: 团队协作是项目成功的关键。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 121 字
+[扩写] 追加 4 行，当前字符数: 2070
+[扩写] 第 4 轮，当前字符数: 2070, 缺口: 930, 目标: 2700~3150
+[Fallback] 使用旧模板: 质量控制标准需要提前确定。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2183
+[扩写] 第 5 轮，当前字符数: 2183, 缺口: 817, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 127 字
+[扩写] 追加 4 行，当前字符数: 2300
+[扩写] 第 6 轮，当前字符数: 2300, 缺口: 700, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2413
+[扩写] 第 7 轮，当前字符数: 2413, 缺口: 587, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 工作进度 / 准确率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 117 字
+[扩写] 追加 4 行，当前字符数: 2520
+[扩写] 第 8 轮，当前字符数: 2520, 缺口: 480, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 95%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2629
+[扩写] 第 9 轮，当前字符数: 2629, 缺口: 371, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2735
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651724.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651724.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=6）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到81处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于预后，我需要如实告知您各种可能的情况。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 182 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (冯浩): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.59% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 根据检查结果，我们需要制定个性化的治疗方案。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 188 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (李然): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 47.44% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于住院期间的注意事项，我给您详细说明一下。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 190 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (刘畅): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.28% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现5处完全重复：
+
+  [7行] Speaker3: 这个我需要回去确认一下，明天给您答复可以吗？
+  [9行] Speaker2: 这个我需要回去确认一下，明天给您答复可以吗？  <- 完全相同！
+
+  [13行] Speaker5: 補足ですが、予算について調整します。
+  [14行] Speaker6: 補足ですが、予算について調整します。  <- 完全相同！
+
+  [20行] Speaker6: 参与者の観点から、優先的に対応します。
+  [21行] Speaker5: 参与者の観点から、優先的に対応します。  <- 完全相同！
+
+  [19行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [24行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [27行] Speaker2: 我明白了，这个确实需要注意。
+  [29行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现7处高相似度：
+
+  [7行] Speaker3: 这个我需要回去确认一下，明天给您答复可以吗？
+  [9行] Speaker2: 这个我需要回去确认一下，明天给您答复可以吗？
+  相似度: 100%
+
+  [12行] Speaker4: 補足ですが、予算について検討します。
+  [13行] Speaker5: 補足ですが、予算について調整します。
+  相似度: 88%
+
+  [12行] Speaker4: 補足ですが、予算について検討します。
+  [14行] Speaker6: 補足ですが、予算について調整します。
+  相似度: 88%
+
+  [13行] Speaker5: 補足ですが、予算について調整します。
+  [14行] Speaker6: 補足ですが、予算について調整します。
+  相似度: 100%
+
+  [20行] Speaker6: 参与者の観点から、優先的に対応します。
+  [21行] Speaker5: 参与者の観点から、優先的に対応します。
+  相似度: 100%
+
+  [19行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [24行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [27行] Speaker2: 我明白了，这个确实需要注意。
+  [29行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:41, 完全重复:5, 近重复:7, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 41, 'exact_duplicate_count': 5, 'semantic_near_duplicate_count': 6, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余37行
+[去重] 原始行数: 37, 去重后行数: 37
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1542, 实际字数: 274, 语言: Chinese
+[v1.4.0] InfoLedger统计: 8个槽位, 当前章节:澄清背景
+[随机性] seed = 2251766968 (来自 zg97g3u6_1775651744292)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1542, 缺口: 1458, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 88%
+[扩写] 本次添加 8 行对话，注入1句术语，约 265 字
+[扩写] 追加 8 行，当前字符数: 1777
+[扩写] 第 2 轮，当前字符数: 1777, 缺口: 1223, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 92%
+[扩写] 本次添加 8 行对话，注入1句术语，约 280 字
+[扩写] 追加 8 行，当前字符数: 2023
+[扩写] 第 3 轮，当前字符数: 2023, 缺口: 977, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2136
+[扩写] 第 4 轮，当前字符数: 2136, 缺口: 864, 目标: 2700~3150
+[Fallback] 使用旧模板: 总结回顾有助于持续改进。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 118 字
+[扩写] 追加 4 行，当前字符数: 2244
+[扩写] 第 5 轮，当前字符数: 2244, 缺口: 756, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 122 字
+[扩写] 追加 4 行，当前字符数: 2356
+[扩写] 第 6 轮，当前字符数: 2356, 缺口: 644, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2462
+[扩写] 第 7 轮，当前字符数: 2462, 缺口: 538, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2575
+[扩写] 第 8 轮，当前字符数: 2575, 缺口: 425, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2685
+[扩写] 第 9 轮，当前字符数: 2685, 缺口: 315, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2794
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651744.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651744.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=6）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到82处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于住院期间的注意事项，我给您详细说明一下。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 82%
+[扩写] 本次添加 5 行对话，注入1句术语，约 189 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (赵清): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.32% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 治疗费用方面，我们会尽量为您选择性价比高的方案。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 189 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (孙毅): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.41% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于住院期间的注意事项，我给您详细说明一下。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 88%
+[扩写] 本次添加 5 行对话，注入1句术语，约 190 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (邓哲): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.95% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现4处完全重复：
+
+  [7行] Speaker3: 这个我需要回去确认一下，明天给您答复可以吗？
+  [9行] Speaker2: 这个我需要回去确认一下，明天给您答复可以吗？  <- 完全相同！
+
+  [20行] Speaker6: 参与者の観点から、慎重に対応します。
+  [21行] Speaker5: 参与者の観点から、慎重に対応します。  <- 完全相同！
+
+  [19行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [24行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [27行] Speaker2: 我明白了，这个确实需要注意。
+  [29行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现4处高相似度：
+
+  [7行] Speaker3: 这个我需要回去确认一下，明天给您答复可以吗？
+  [9行] Speaker2: 这个我需要回去确认一下，明天给您答复可以吗？
+  相似度: 100%
+
+  [20行] Speaker6: 参与者の観点から、慎重に対応します。
+  [21行] Speaker5: 参与者の観点から、慎重に対応します。
+  相似度: 100%
+
+  [19行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [24行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [27行] Speaker2: 我明白了，这个确实需要注意。
+  [29行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:41, 完全重复:4, 近重复:4, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 41, 'exact_duplicate_count': 1, 'semantic_near_duplicate_count': 1, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余38行
+[去重] 原始行数: 38, 去重后行数: 38
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1526, 实际字数: 272, 语言: Chinese
+[v1.4.0] InfoLedger统计: 8个槽位, 当前章节:澄清背景
+[随机性] seed = 4257206597 (来自 62ywc25k_1775651788806)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1526, 缺口: 1474, 目标: 2700~3150
+[Fallback] 使用旧模板: 创新思维在解决问题时很重要。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 75%
+[扩写] 本次添加 8 行对话，注入1句术语，约 272 字
+[扩写] 追加 8 行，当前字符数: 1768
+[扩写] 第 2 轮，当前字符数: 1768, 缺口: 1232, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 质量目标 / 完成率 = 85%
+[扩写] 本次添加 8 行对话，注入1句术语，约 287 字
+[扩写] 追加 8 行，当前字符数: 2021
+[扩写] 第 3 轮，当前字符数: 2021, 缺口: 979, 目标: 2700~3150
+[Fallback] 使用旧模板: 可持续发展要纳入规划。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2131
+[扩写] 第 4 轮，当前字符数: 2131, 缺口: 869, 目标: 2700~3150
+[Fallback] 使用旧模板: 绩效考核要建立合理的评价体系。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 124 字
+[扩写] 追加 4 行，当前字符数: 2245
+[扩写] 第 5 轮，当前字符数: 2245, 缺口: 755, 目标: 2700~3150
+[Fallback] 使用旧模板: 风险管理要贯穿整个项目过程。...
+[Domain KB] 注入术语(1): 质量目标 / 准确率 = 92%
+[扩写] 本次添加 4 行对话，注入1句术语，约 130 字
+[扩写] 追加 4 行，当前字符数: 2365
+[扩写] 第 6 轮，当前字符数: 2365, 缺口: 635, 目标: 2700~3150
+[Fallback] 使用旧模板: 变更管理流程要规范。...
+[Domain KB] 注入术语(1): 工作进度 / 完成率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2475
+[扩写] 第 7 轮，当前字符数: 2475, 缺口: 525, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 项目计划 / 准确率 = 85%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2585
+[扩写] 第 8 轮，当前字符数: 2585, 缺口: 415, 目标: 2700~3150
+[Fallback] 使用旧模板: 相关方管理需要重视。...
+[Domain KB] 注入术语(1): 执行方案 / 效率指标 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2695
+[扩写] 第 9 轮，当前字符数: 2695, 缺口: 305, 目标: 2700~3150
+[Fallback] 使用旧模板: 我们需要系统梳理一下整体方案。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 78%
+[扩写] 本次添加 4 行对话，注入1句术语，约 115 字
+[扩写] 追加 4 行，当前字符数: 2800
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651788.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651788.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=6）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到83处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 定期复查是监测治疗效果的重要手段。...
+[Domain KB] 注入术语(1): 执行方案 / 完成率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (李然): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.54% > 10%
+[生成] 第 1 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于家庭护理，有一些要点需要家属配合。...
+[Domain KB] 注入术语(1): 质量目标 / 效率指标 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 185 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (何川): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.43% > 10%
+[生成] 第 2 次生成存在问题（scenario_leak=False, language_issue=True），重试...  输出必须是 Chinese，中文占比必须 < 10%。只输出Chinese，不要混入中文。
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于药物的储存和使用，有一些细节要求。...
+[Domain KB] 注入术语(1): 项目计划 / 完成率 = 92%
+[扩写] 本次添加 5 行对话，注入1句术语，约 183 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (张昊): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}
+[校验] 语言不一致：中文占比 46.78% > 10%
+[生成] 达到最大重试次数，但仍存在问题（scenario_leak=False, language_issue=True）
+[v1.4.0] 跨Speaker重复检测失败
+================================================================================
+跨Speaker重复检测报告
+================================================================================
+
+[X] 发现3处完全重复：
+
+  [20行] Speaker6: 参与者の観点から、重点的に対応します。
+  [21行] Speaker5: 参与者の観点から、重点的に対応します。  <- 完全相同！
+
+  [19行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [24行] Speaker3: 这个方案听起来不错，能详细说说吗？  <- 完全相同！
+
+  [27行] Speaker2: 我明白了，这个确实需要注意。
+  [29行] Speaker3: 我明白了，这个确实需要注意。  <- 完全相同！
+
+[X] 发现4处高相似度：
+
+  [5行] Speaker2: 这确实需要我进一步研究，我会尽快给您一个明确的答复。
+  [9行] Speaker2: 这确实需要我进一步研究，我会尽快给您一个明确的答复。
+  相似度: 100%
+
+  [20行] Speaker6: 参与者の観点から、重点的に対応します。
+  [21行] Speaker5: 参与者の観点から、重点的に対応します。
+  相似度: 100%
+
+  [19行] Speaker2: 这个方案听起来不错，能详细说说吗？
+  [24行] Speaker3: 这个方案听起来不错，能详细说说吗？
+  相似度: 100%
+
+  [27行] Speaker2: 我明白了，这个确实需要注意。
+  [29行] Speaker3: 我明白了，这个确实需要注意。
+  相似度: 100%
+
+================================================================================
+
+[统计] 总句数:41, 完全重复:3, 近重复:4, 模板句:0 (0.0%)
+[生成] 达到最大重试次数，仍存在跨Speaker重复
+[修复] 启动强制重复修复...
+[修复] ⚠️ 仍有问题，但已尽力修复：{'total_lines': 41, 'exact_duplicate_count': 0, 'semantic_near_duplicate_count': 1, 'low_info_filler_count': 0, 'low_info_filler_ratio': 0.0, 'is_valid': False}
+[修复] 已删除低信息句(保护前4行)，剩余37行
+[去重] 原始行数: 37, 去重后行数: 37
+[长度校验] 目标: 3000, 实际字符数（不含标签）: 1520, 实际字数: 265, 语言: Chinese
+[v1.4.0] InfoLedger统计: 10个槽位, 当前章节:澄清背景
+[随机性] seed = 3467966058 (来自 zsij17pz_1775651877899)
+[扩写] 英语模式：尝试使用 V2ReviewExpander
+[扩写] V2ReviewExpander 失败，降级到旧扩写器: name 'sys' is not defined
+[扩写] 第 1 轮，当前字符数: 1520, 缺口: 1480, 目标: 2700~3150
+[Fallback] 使用旧模板: 可持续发展要纳入规划。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 85%
+[扩写] 本次添加 8 行对话，注入1句术语，约 270 字
+[扩写] 追加 8 行，当前字符数: 1760
+[扩写] 第 2 轮，当前字符数: 1760, 缺口: 1240, 目标: 2700~3150
+[Fallback] 使用旧模板: 培训计划要根据团队需求制定。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 95%
+[扩写] 本次添加 8 行对话，注入1句术语，约 284 字
+[扩写] 追加 8 行，当前字符数: 2010
+[扩写] 第 3 轮，当前字符数: 2010, 缺口: 990, 目标: 2700~3150
+[Fallback] 使用旧模板: 让我们详细讨论一下实施细节。...
+[Domain KB] 注入术语(1): 绩效指标 / 准确率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 120 字
+[扩写] 追加 4 行，当前字符数: 2120
+[扩写] 第 4 轮，当前字符数: 2120, 缺口: 880, 目标: 2700~3150
+[Fallback] 使用旧模板: 关于资源配置，要确保关键资源到位。...
+[Domain KB] 注入术语(1): 工作进度 / 达标率 = 88%
+[扩写] 本次添加 4 行对话，注入1句术语，约 127 字
+[扩写] 追加 4 行，当前字符数: 2237
+[扩写] 第 5 轮，当前字符数: 2237, 缺口: 763, 目标: 2700~3150
+[Fallback] 使用旧模板: 最终目标要清晰明确。...
+[Domain KB] 注入术语(1): 绩效指标 / 效率指标 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2343
+[扩写] 第 6 轮，当前字符数: 2343, 缺口: 657, 目标: 2700~3150
+[Fallback] 使用旧模板: 应急预案要提前准备。...
+[Domain KB] 注入术语(1): 项目计划 / 效率指标 = 98%
+[扩写] 本次添加 4 行对话，注入1句术语，约 117 字
+[扩写] 追加 4 行，当前字符数: 2450
+[扩写] 第 7 轮，当前字符数: 2450, 缺口: 550, 目标: 2700~3150
+[Fallback] 使用旧模板: 知识管理要做好经验积累。...
+[Domain KB] 注入术语(1): 项目计划 / 达标率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 116 字
+[扩写] 追加 4 行，当前字符数: 2556
+[扩写] 第 8 轮，当前字符数: 2556, 缺口: 444, 目标: 2700~3150
+[Fallback] 使用旧模板: 沟通机制的建立很重要。...
+[Domain KB] 注入术语(1): 绩效指标 / 完成率 = 82%
+[扩写] 本次添加 4 行对话，注入1句术语，约 119 字
+[扩写] 追加 4 行，当前字符数: 2665
+[扩写] 第 9 轮，当前字符数: 2665, 缺口: 335, 目标: 2700~3150
+[Fallback] 使用旧模板: 成本预算需要合理规划。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 75%
+[扩写] 本次添加 4 行对话，注入1句术语，约 123 字
+[扩写] 追加 4 行，当前字符数: 2778
+[DEBUG] 检测结果已追加到: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[v1.4.0] Ledger debug已保存: reports/ledger_dialogue_1775651877.json
+[A3-Facts] 覆盖率: 0.0% (0/12)
+[A3-Facts] 缺失: ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+[v1.4.0] Facts debug已保存: reports/facts_dialogue_1775651877.json
+[A2-RoleKPI] 🔧 启动强制补齐闭环（people=6）
+[A2-RoleKPI] 补齐异常: name 'sys' is not defined
+[核心标记修复] 警告：Chinese输出未包含核心标记，强制插入
+[核心标记修复] 已在第5行插入核心内容
+[后处理] 检测到82处占位符姓名
+  - 行0: \bSpeaker\s+\d+\b
+  - 行1: \bSpeaker\s+\d+\b
+  - 行2: \bSpeaker\s+\d+\b
+[翻译] scenario/core/profile 已翻译为 Chinese
+[对话生成] 降级到旧生成器
+[CAST v2.0] 警告：真实姓名生成器失败，降级到旧逻辑: No module named 'generate_cast_v150'
+[CAST v1.5.0] 动态生成角色，scenario=Discussion on paid conversion strategies for AI products; participating roles:...
+[CAST v1.5.0] Owner角色: 专业人士, 明确名字: None
+[结构化对话] scene_type=medical_consult, scenario=Discussion on paid conversion strategies for AI products; pa...
+[DEBUG] 最终 prompt 和模板已写入: D:\ui_auto_test\demo_app\demo\tts_input_debug.txt
+[Fallback] 使用旧模板: 关于并发症的预防，我们需要做好提前准备。...
+[Domain KB] 注入术语(1): 执行方案 / 准确率 = 95%
+[扩写] 本次添加 5 行对话，注入1句术语，约 185 字
+[校验] 期望 Speaker 数量: 6
+[校验] 实际找到的 Speaker: [1, 2, 3]
+[校验] 每个 Speaker 出现次数: {1: 20, 2: 8, 3: 7}
+[校验] 缺失的 Speaker: [4, 5, 6]
+[校验] 出现次数不足 2 次的 Speaker: []
+[补齐] 开始补齐流程...
+[补齐] Speaker4 (刘畅): 补充2句（带信息槽位）
+[补齐] Speaker5 (Speaker5): 补充2句（带信息槽位）
+[补齐] Speaker6 (Speaker6): 补充2句（带信息槽位）
+[补齐] 补齐后统计: {1: 20, 2: 8, 3: 7, 4: 2, 5: 2, 6: 2}

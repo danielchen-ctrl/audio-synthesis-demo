@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\PLAUD\\\\.claude\\\\commands\")",
+      "Bash(cp \"D:\\\\Github\\\\audio-synthesis-demo\\\\.claude\\\\commands\\\\generate-docs.md\" \"C:\\\\Users\\\\PLAUD\\\\.claude\\\\commands\\\\generate-docs.md\")",
+      "Read(//c/Users/PLAUD/.claude/**)",
+      "Bash(mkdir -p /c/Users/PLAUD/.claude/commands)",
+      "Bash(cp /d/Github/audio-synthesis-demo/.claude/commands/generate-docs.md /c/Users/PLAUD/.claude/commands/generate-docs.md)"
+    ]
+  }
+}
