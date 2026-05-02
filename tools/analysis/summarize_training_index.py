@@ -21,6 +21,12 @@ def load_index(index_path: Path) -> List[dict]:
     return rows
 
 
+def filter_rows(rows: List[dict], stage: str = "") -> List[dict]:
+    if not stage:
+        return rows
+    return [row for row in rows if row.get("stage") == stage]
+
+
 def summarize_rows(rows: List[dict]) -> Dict[str, object]:
     by_stage: Dict[str, dict] = defaultdict(lambda: {"total": 0, "passed": 0, "failed": 0, "avg_score": 0.0})
     by_language: Dict[str, dict] = defaultdict(lambda: {"total": 0, "passed": 0, "failed": 0})
@@ -52,7 +58,7 @@ def summarize_rows(rows: List[dict]) -> Dict[str, object]:
 
         total_score += score
 
-    for stage, bucket in by_stage.items():
+    for stage_name, bucket in by_stage.items():
         bucket["avg_score"] = round(bucket["avg_score"] / max(bucket["total"], 1), 2)
 
     return {
@@ -69,12 +75,16 @@ def summarize_rows(rows: List[dict]) -> Dict[str, object]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="汇总统一训练索引 _index.jsonl")
     parser.add_argument("--index", default="output/training/unified/_index.jsonl", help="统一索引文件路径")
+    parser.add_argument("--stage", default="", help="可选：只看某个 stage，例如 scene_regression")
     parser.add_argument("--out", default="", help="可选：把汇总 JSON 写到指定文件")
     args = parser.parse_args()
 
     index_path = Path(args.index)
     rows = load_index(index_path)
+    rows = filter_rows(rows, args.stage)
     summary = summarize_rows(rows)
+    if args.stage:
+        summary["stage_filter"] = args.stage
 
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     if args.out:
