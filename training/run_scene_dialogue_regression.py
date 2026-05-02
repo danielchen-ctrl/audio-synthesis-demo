@@ -68,6 +68,17 @@ def build_scene_task(scenario_num: str, scenario_setup: str, core_content: str, 
     )
 
 
+def build_scene_summary(results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    success_count = sum(1 for r in results if r.get("status") == "success")
+    validation_passed_count = sum(1 for r in results if r.get("validation_passed", False))
+    return {
+        "total_scenarios": len(results),
+        "success_count": success_count,
+        "validation_passed_count": validation_passed_count,
+        "results": results,
+    }
+
+
 def generate_dialogue_for_scenario(
     scenario_num: str,
     scenario_setup: str,
@@ -97,7 +108,7 @@ def generate_dialogue_for_scenario(
             return False, "未生成任何对话内容", {}
 
         lines = apply_role_names_to_lines(lines, scenario_num)
-        prompt_ok, found_phrases = check_forbidden_phrases("\n".join([f"{s}: {t}" for s, t in lines]), scenario_num)
+        prompt_ok, _ = check_forbidden_phrases("\n".join([f"{s}: {t}" for s, t in lines]), scenario_num)
         is_valid, validation_errors = validate_dialogue_lines(lines, scenario_num, role_cards)
         if is_valid and prompt_ok:
             break
@@ -161,26 +172,13 @@ def main() -> int:
         )
         results.append({"scenario_num": scenario["num"], "status": "success" if success else "failed", "error": error, **info})
 
-    success_count = sum(1 for r in results if r.get("status") == "success")
-    validation_passed_count = sum(1 for r in results if r.get("validation_passed", False))
+    summary = build_scene_summary(results)
     summary_file = storage.base_dir / "scene_regression_summary.json"
-    summary_file.write_text(
-        json.dumps(
-            {
-                "total_scenarios": len(scenarios),
-                "success_count": success_count,
-                "validation_passed_count": validation_passed_count,
-                "results": results,
-            },
-            ensure_ascii=False,
-            indent=2,
-        ),
-        encoding="utf-8",
-    )
+    summary_file.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    print(f"场景回归完成: success={success_count}/{len(scenarios)} validation={validation_passed_count}/{len(scenarios)}")
+    print(f"场景回归完成: success={summary['success_count']}/{summary['total_scenarios']} validation={summary['validation_passed_count']}/{summary['total_scenarios']}")
     print(f"统一汇总: {summary_file}")
-    return 0 if success_count == len(scenarios) and validation_passed_count == len(scenarios) else 1
+    return 0 if summary["success_count"] == summary["total_scenarios"] and summary["validation_passed_count"] == summary["total_scenarios"] else 1
 
 
 if __name__ == "__main__":
