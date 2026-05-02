@@ -1,0 +1,77 @@
+Speaker 1: 안녕하세요. 오늘은 진행 방향을 먼저 정리해 보겠습니다.
+Speaker 2: 안녕하세요. 이쪽에서도 전제 조건을 확인해 두었습니다.
+Speaker 3: 안녕하세요. 필요한 논점을 함께 정리해 보겠습니다.
+Speaker 1: 지금 가장 막히는 쟁점이 무엇인지 먼저 짚어볼까요.
+Speaker 1: 이 문제는 언제부터 드러나기 시작했나요?
+Speaker 3: 실행 측 영향까지 함께 확인한 뒤 답을 드리겠습니다.
+Speaker 1: 최종적으로 어떤 결과를 기대하고 계신가요?
+Speaker 1: 从您刚才的描述来看，这个情况比较常见。我打个比方，就像感冒一样，早期发现早期处理，效果会好很多。
+Speaker 2: 那具体需要多长时间呢？
+Speaker 4: 補足ですが、予算について調整します。
+Speaker 5: 補足ですが、スケジュールについて検討します。
+Speaker 1: 根据临床经验，类似的情况我们遇到过不少。比如上个月有个患者，情况跟您差不多，经过规范治疗后恢复得不错。
+Speaker 3: 这个我理解了，还有其他需要注意的吗？
+Speaker 1: 基于刚才的讨论，我建议我们有几个选择：
+Speaker 1: 方案1: 第一个方案是药物治疗，优点是副作用小，缺点是见效可能慢一些，大概需要3-6个月。
+Speaker 5: 参与者の観点から、優先的に対応します。
+Speaker 4: 运营负责人の観点から、慎重に対応します。
+Speaker 1: 方案2: 第二个方案是结合物理治疗，效果可能更快，但需要您每周来医院2-3次，时间成本会高一些。
+Speaker 1: 在做出决定之前，我需要提醒您几个重要的注意事项：
+Speaker 1: 需要提醒您的是，任何治疗方案都不能保证100%有效，个体差异很大。建议您定期复查，根据实际情况调整。
+Speaker 2: 이해했습니다. 그 부분은 판단의 전제로 잡아 두겠습니다.
+Speaker 1: 药物治疗可能会有一些副作用，比如轻微的胃肠道反应。如果出现不适，请及时联系我。
+Speaker 3: 기술 구현 관점에서는 인터페이스 성능과 폴백 전략까지 함께 검토해야 합니다.
+Speaker 1: 좋습니다. 지금까지 논점을 정리해 보겠습니다.
+Speaker 1: 我建议我们先制定一个详细的时间表，明确每个阶段的任务和负责人。
+Speaker 1: 下周我们可以再开一次会，讨论具体的执行细节。您看什么时间方便？
+Speaker 2: 好的，我理解了。那我们什么时候开始？
+Speaker 3: Okay, I will cooperate.
+Speaker 1: 我建议我们下周再安排一次详细讨论，您看可以吗？
+Speaker 1: 关于药物的储存和使用，有一些细节要求。
+Speaker 1: 大多数药物需要阴凉干燥处保存，有些需要冷藏，注意查看说明书。
+Speaker 3: This explanation is very clear, I understand now.
+Speaker 1: 最终目标要清晰明确。
+Speaker 2: 怎么确保目标达成？
+Speaker 1: 分解目标、跟踪进度、及时调整、团队共识。
+Speaker 3: Indeed, these details need attention.
+Speaker 4: Okay, I will prepare carefully.
+Speaker 5: Understood, I will cooperate on my end.
+Speaker 1: 沟通机制的建立很重要。
+Speaker 2: 沟通机制包括什么？
+Speaker 1: 定期会议、进度报告、问题反馈渠道、决策流程等。
+Speaker 3: This suggestion is very helpful, thank you.
+Speaker 4: I'd also like to understand this aspect.
+Speaker 5: This suggestion is very helpful, thank you.
+Speaker 1: 变更管理流程要规范。
+Speaker 2: 如果需要变更怎么办？
+Speaker 1: 需要提交变更申请、评估影响、审批通过后才能执行。
+Speaker 1: 关于项目进度，我们需要制定明确的时间表。
+Speaker 2: 时间表应该怎么安排？
+Speaker 1: 建议划分几个关键里程碑，每个阶段设定具体目标和交付物。
+Speaker 1: 风险管理要贯穿整个项目过程。
+Speaker 2: 主要有哪些风险？
+Speaker 1: 包括技术风险、资源风险、时间风险等，需要提前识别并制定应对措施。
+Speaker 1: 让我们详细讨论一下实施细节。
+Speaker 2: 有哪些细节需要注意？
+Speaker 1: 主要包括时间节点、资源配置、风险预案等。
+Speaker 1: 文档管理要做好归档和版本控制。
+Speaker 2: 文档管理有什么要求？
+Speaker 1: 统一格式、及时更新、版本标记、分类存储。
+Speaker 1: 成本预算需要合理规划。
+Speaker 2: 预算应该包括哪些部分？
+Speaker 1: 主要包括人力成本、设备采购、运营费用、应急储备等。
+Speaker 1: 相关方管理需要重视。
+Speaker 2: 怎么管理相关方关系？
+Speaker 1: 识别关键相关方、了解期望、保持沟通、争取支持。
+Speaker 1: 知识管理要做好经验积累。
+Speaker 2: 怎么做知识管理？
+Speaker 1: 建立知识库、分享最佳实践、总结经验教训。
+Speaker 1: 关于资源配置，要确保关键资源到位。
+Speaker 2: 怎么保证资源充足？
+Speaker 1: 提前规划、及时申请、合理调配，必要时考虑外部资源。
+
+Speaker 1: 안녕하세요. 오늘은 전제와 진행 방식을 먼저 맞추겠습니다.
+Speaker 2: 안녕하세요. 이쪽에서도 전제 조건을 확인해 두었습니다.
+Speaker 3: 안녕하세요. 논점 정리는 바로 진행할 수 있습니다.
+Speaker 1: 지금 가장 막히는 쟁점이 무엇인지 먼저 짚어볼까요.
+Speaker 2: 그 쟁점은 중요해서 영향 범위를 확인한 뒤 정식으로 말씀드리겠습니다.

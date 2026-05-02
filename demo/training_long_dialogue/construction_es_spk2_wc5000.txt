@@ -1,0 +1,84 @@
+Speaker 1: Buenos días a todos. Comencemos y alineemos el progreso de la entrega del proyecto de construcción y la discusión de riesgos;  hoy.
+Speaker 2: Feliz de estar aquí. Me centraré en las limitaciones clave y las áreas de riesgo en torno al progreso de la entrega del proyecto de construcción y la discusión de riesgos; .
+Speaker 1: Deberíamos definir cómo es un buen resultado antes de debatir el camino.
+Speaker 2: Eso es consistente con lo que hemos estado rastreando.
+Speaker 1: Permítanme presentarles un contexto que podría cambiar la forma en que enmarcamos esto.
+Speaker 1: Asegurémonos de que las próximas acciones sean específicas y tengan propietarios.
+Speaker 1: Permítanme establecer el contexto de por qué esto es importante en este momento.
+Speaker 2: Ese enfoque funciona para mí. Coordinaré en consecuencia.
+Speaker 1: Permítanme asegurarme de capturar esto como un elemento de acción formal.
+Speaker 2: Tomaré nota de eso y me aseguraré de que quede reflejado en mi entregable.
+Speaker 1: Hay una limitación importante que aún no he mencionado; permítanme mencionarla ahora.
+Speaker 1: Permítanme ser específico sobre lo que necesito del equipo sobre esto.
+Speaker 1: Permítanme ser directo: existen limitaciones de recursos que debemos solucionar.
+Speaker 1: Permítanme exponer las dos principales compensaciones y podremos decidir juntos.
+Speaker 1: Permítanme explicarles a todos nuestra posición al respecto.
+Speaker 2: Desde nuestra perspectiva, el principal obstáculo es la dependencia del equipo upstream.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 2: Ese es un buen punto; lo tendré en cuenta en nuestra planificación.
+Speaker 1: Quiero revisar los criterios de éxito para asegurarme de que sean realistas.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 1: Necesitamos ser honestos acerca de la presión del cronograma aquí.
+Speaker 2: Permítanme retroceder suavemente en un punto: creo que hay un mejor marco.
+Speaker 1: Aquí hay algunos ángulos; permítanme analizarlos uno por uno.
+Speaker 1: Permítanme desconectarlo y volver con una recomendación concreta.
+Speaker 1: Deberíamos definir cómo es un buen resultado antes de debatir el camino.
+Speaker 1: Permítanme presentarles un contexto que podría cambiar la forma en que enmarcamos esto.
+Speaker 2: Puedo apoyar esa dirección, pero quiero señalar una posible complicación.
+Speaker 1: Asegurémonos de que las próximas acciones sean específicas y tengan propietarios.
+Speaker 1: Permítanme establecer el contexto de por qué esto es importante en este momento.
+Speaker 2: Me aseguraré de que esto se comunique claramente en el futuro.
+Speaker 1: Permítanme asegurarme de capturar esto como un elemento de acción formal.
+Speaker 1: Hay una limitación importante que aún no he mencionado; permítanme mencionarla ahora.
+Speaker 2: Permítanme pensar en el impacto posterior de esa decisión.
+Speaker 1: Permítanme ser específico sobre lo que necesito del equipo sobre esto.
+Speaker 1: Permítanme ser directo: existen limitaciones de recursos que debemos solucionar.
+Speaker 2: Confirmaré los detalles e informaré en el próximo punto de control.
+Speaker 1: Permítanme exponer las dos principales compensaciones y podremos decidir juntos.
+Speaker 1: Permítanme explicarles a todos nuestra posición al respecto.
+Speaker 2: Me alinearé con el equipo y confirmaré que estamos en la misma página.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 1: Quiero revisar los criterios de éxito para asegurarme de que sean realistas.
+Speaker 2: Entendido. Lo incluiré en la línea de tiempo actualizada.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 1: Necesitamos ser honestos acerca de la presión del cronograma aquí.
+Speaker 2: Quiero agregar algo de contexto que podría ser relevante aquí.
+Speaker 1: Aquí hay algunos ángulos; permítanme analizarlos uno por uno.
+Speaker 1: Permítanme desconectarlo y volver con una recomendación concreta.
+Speaker 2: Ésa es una preocupación válida; así es como yo la abordaría.
+Speaker 1: Deberíamos definir cómo es un buen resultado antes de debatir el camino.
+Speaker 1: Permítanme presentarles un contexto que podría cambiar la forma en que enmarcamos esto.
+Speaker 2: Puedo absorber ese alcance, pero tendré que ajustar mis otras prioridades.
+Speaker 1: Asegurémonos de que las próximas acciones sean específicas y tengan propietarios.
+Speaker 1: Permítanme establecer el contexto de por qué esto es importante en este momento.
+Speaker 2: Permítanme confirmar la propiedad de esa acción para que nada se pierda.
+Speaker 1: Permítanme asegurarme de capturar esto como un elemento de acción formal.
+Speaker 1: Hay una limitación importante que aún no he mencionado; permítanme mencionarla ahora.
+Speaker 2: Eso es consistente con lo que hemos estado rastreando.Speaker 1: Permítanme ser específico sobre lo que necesito del equipo sobre esto.
+Speaker 1: Permítanme ser directo: existen limitaciones de recursos que debemos solucionar.
+Speaker 2: Ese enfoque funciona para mí. Coordinaré en consecuencia.
+Speaker 1: Permítanme exponer las dos principales compensaciones y podremos decidir juntos.
+Speaker 1: Permítanme explicarles a todos nuestra posición al respecto.
+Speaker 2: Tomaré nota de eso y me aseguraré de que quede reflejado en mi entregable.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 1: Quiero revisar los criterios de éxito para asegurarme de que sean realistas.
+Speaker 2: Desde nuestra perspectiva, el principal obstáculo es la dependencia del equipo upstream.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 1: Necesitamos ser honestos acerca de la presión del cronograma aquí.
+Speaker 2: Ese es un buen punto; lo tendré en cuenta en nuestra planificación.
+Speaker 1: Aquí hay algunos ángulos; permítanme analizarlos uno por uno.
+Speaker 1: Permítanme desconectarlo y volver con una recomendación concreta.
+Speaker 2: Permítanme retroceder suavemente en un punto: creo que hay un mejor marco.
+Speaker 1: Deberíamos definir cómo es un buen resultado antes de debatir el camino.
+Speaker 1: Permítanme presentarles un contexto que podría cambiar la forma en que enmarcamos esto.
+Speaker 2: Puedo apoyar esa dirección, pero quiero señalar una posible complicación.
+Speaker 1: Asegurémonos de que las próximas acciones sean específicas y tengan propietarios.
+Speaker 1: Permítanme establecer el contexto de por qué esto es importante en este momento.
+Speaker 2: Me aseguraré de que esto se comunique claramente en el futuro.
+Speaker 1: Permítanme asegurarme de capturar esto como un elemento de acción formal.
+Speaker 1: Hay una limitación importante que aún no he mencionado; permítanme mencionarla ahora.
+Speaker 2: Permítanme pensar en el impacto posterior de esa decisión.
+Speaker 1: Permítanme ser específico sobre lo que necesito del equipo sobre esto.
+Speaker 1: Permítanme ser directo: existen limitaciones de recursos que debemos solucionar.
+Speaker 2: Confirmaré los detalles e informaré en el próximo punto de control.
+Speaker 1: Permítanme exponer las dos principales compensaciones y podremos decidir juntos.

@@ -1,0 +1,100 @@
+Speaker 1: Bom dia a todos. Vamos começar e alinhar os itens da agenda hoje.
+Speaker 2: Feliz por estar aqui. Estarei focado nas principais restrições e áreas de risco em torno dos itens da agenda.
+Speaker 3: Do nosso ponto de vista, o principal bloqueador é a dependência da equipe upstream.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 2: Isso é consistente com o que temos monitorado.
+Speaker 1: Quero rever os critérios de sucesso para ter certeza de que são realistas.
+Speaker 3: Isso faz sentido – alinharei meu fluxo de trabalho com essa direção.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 2: Boa decisão – eu iria levantar a mesma preocupação.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 2: Vou me alinhar com a equipe e confirmar que estamos na mesma página.
+Speaker 4: Esse é um enquadramento útil. Deixe-me pensar no que isso significa para o nosso lado.
+Speaker 1: Deixe-me ser direto – há restrições de recursos que precisamos contornar.
+Speaker 3: Deixe-me pensar no impacto posterior dessa decisão.
+Speaker 1: Vamos manter nosso foco na entrega e trabalhar de trás para frente a partir daí.
+Speaker 1: Existem alguns ângulos aqui – deixe-me analisá-los um por um.
+Speaker 2: Esse é um ponto justo – vou levar isso em consideração em nosso planejamento.
+Speaker 4: Estou de acordo com isso. Deixe-me verificar a viabilidade do cronograma.
+Speaker 1: Deixe-me apresentar algum contexto que possa mudar a forma como enquadramos isso.
+Speaker 3: Posso assumir isso - deixe-me compartilhar minha leitura atual sobre isso primeiro.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 1: Vamos manter o foco no que podemos realmente decidir nesta reunião.
+Speaker 2: Quero ter certeza de que entendi a pergunta corretamente antes de me comprometer.
+Speaker 1: Deveríamos definir o que seria um bom resultado antes de debatermos o caminho.
+Speaker 3: Faz sentido para mim. Eu assumirei a coordenação do nosso lado.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 1: Deveríamos definir os critérios de decisão antes de finalizarmos qualquer coisa.
+Speaker 2: Entendido. Vou levar isso em consideração no cronograma atualizado.
+Speaker 3: Ok, vou cooperar.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 2: Posso obter uma imagem mais clara depois de obter os dados mais recentes.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 3: Essa explicação é muito clara, agora entendi.
+Speaker 1: Quero rever os critérios de sucesso para ter certeza de que são realistas.
+Speaker 2: Quero acrescentar algum contexto que possa ser relevante aqui.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 3: Na verdade, estes detalhes precisam de atenção.
+Speaker 4: Ok, vou me preparar com cuidado.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 2: Fico feliz em aprofundar isso - também tem sido uma preocupação da nossa parte.
+Speaker 1: Deixe-me ser direto – há restrições de recursos que precisamos contornar.
+Speaker 3: Entendido, cooperarei da minha parte.
+Speaker 4: Esta sugestão é muito útil, obrigado.
+Speaker 1: Vamos manter nosso foco na entrega e trabalhar de trás para frente a partir daí.
+Speaker 2: Do nosso ponto de vista, o principal bloqueador é a dependência da equipe upstream.
+Speaker 1: Existem alguns ângulos aqui – deixe-me analisá-los um por um.
+Speaker 3: Eu também gostaria de entender esse aspecto.
+Speaker 4: Isso é consistente com o que temos monitorado.
+Speaker 1: Deixe-me apresentar algum contexto que possa mudar a forma como enquadramos isso.
+Speaker 2: Isso faz sentido – alinharei meu fluxo de trabalho com essa direção.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 1: Vamos manter o foco no que podemos realmente decidir nesta reunião.
+Speaker 2: Boa decisão – eu iria levantar a mesma preocupação.
+Speaker 1: Deveríamos definir o que seria um bom resultado antes de debatermos o caminho.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 2: Vou me alinhar com a equipe e confirmar que estamos na mesma página.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 1: Deveríamos definir os critérios de decisão antes de finalizarmos qualquer coisa.Speaker 2: Esse é um enquadramento útil. Deixe-me pensar no que isso significa para o nosso lado.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 2: Deixe-me pensar no impacto posterior dessa decisão.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 1: Quero rever os critérios de sucesso para ter certeza de que são realistas.
+Speaker 2: Esse é um ponto justo – vou levar isso em consideração em nosso planejamento.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 2: Concordo com isso. Deixe-me verificar a viabilidade do cronograma.
+Speaker 1: Deixe-me ser direto – há restrições de recursos que precisamos contornar.
+Speaker 1: Vamos manter nosso foco na entrega e trabalhar de trás para frente a partir daí.
+Speaker 2: Posso assumir isso - deixe-me compartilhar minha leitura atual sobre isso primeiro.
+Speaker 1: Existem alguns ângulos aqui – deixe-me analisá-los um por um.
+Speaker 1: Deixe-me apresentar algum contexto que possa mudar a forma como enquadramos isso.
+Speaker 2: Quero ter certeza de que entendi a pergunta corretamente antes de me comprometer.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 1: Vamos manter o foco no que podemos realmente decidir nesta reunião.
+Speaker 2: Faz sentido para mim. Eu assumirei a coordenação do nosso lado.
+Speaker 1: Deveríamos definir o que seria um bom resultado antes de debatermos o caminho.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 2: Entendido. Vou levar isso em consideração no cronograma atualizado.
+Speaker 1: Vamos garantir que as próximas ações sejam específicas e tenham proprietários.
+Speaker 1: Deveríamos definir os critérios de decisão antes de finalizarmos qualquer coisa.
+Speaker 2: Posso obter uma imagem mais clara depois de obter os dados mais recentes.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 2: Quero acrescentar algum contexto que possa ser relevante aqui.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 1: Quero rever os critérios de sucesso para ter certeza de que são realistas.
+Speaker 2: Fico feliz em aprofundar isso - também tem sido uma preocupação da nossa parte.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 2: Do nosso ponto de vista, o principal bloqueador é a dependência da equipe upstream.
+Speaker 1: Deixe-me ser direto – há restrições de recursos que precisamos contornar.
+Speaker 1: Vamos manter nosso foco na entrega e trabalhar de trás para frente a partir daí.
+Speaker 2: Isso é consistente com o que temos monitorado.
+Speaker 1: Existem alguns ângulos aqui – deixe-me analisá-los um por um.
+Speaker 1: Deixe-me apresentar algum contexto que possa mudar a forma como enquadramos isso.
+Speaker 2: Isso faz sentido – alinharei meu fluxo de trabalho com essa direção.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.

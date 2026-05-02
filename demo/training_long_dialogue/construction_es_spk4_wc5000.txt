@@ -1,0 +1,96 @@
+Speaker 1: Buenos días a todos. Comencemos y alineemos el progreso de la entrega del proyecto de construcción y la discusión de riesgos;  hoy.
+Speaker 2: Feliz de estar aquí. Me centraré en las limitaciones clave y las áreas de riesgo en torno al progreso de la entrega del proyecto de construcción y la discusión de riesgos; .
+Speaker 3: Feliz de profundizar en eso; también ha sido una preocupación de nuestra parte.
+Speaker 1: Quiero revisar los criterios de éxito para asegurarme de que sean realistas.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 3: Permítanme retroceder suavemente en un punto: creo que hay un mejor marco.
+Speaker 1: Permítanme asegurarme de capturar esto como un elemento de acción formal.
+Speaker 1: Probemos este plan e identifiquemos los puntos débiles.
+Speaker 2: Confirmaré los detalles e informaré en el próximo punto de control.
+Speaker 4: Estoy de acuerdo con eso. Déjame comprobar la viabilidad del cronograma.
+Speaker 1: Deberíamos separar la solución a corto plazo de la solución a largo plazo.
+Speaker 3: Permítanme confirmar la propiedad de esa acción para que nada se pierda.
+Speaker 1: Antes de continuar, permítanme aclarar los límites del alcance.
+Speaker 1: Quiero asegurarme de que documentemos el fundamento, no solo la decisión.
+Speaker 4: Puedo brindarle una imagen más clara después de obtener los datos más recientes.
+Speaker 1: Mantengamos nuestro enfoque en el resultado final y trabajemos hacia atrás desde allí.
+Speaker 1: Necesitamos ser honestos acerca de la presión del cronograma aquí.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 2: Me aseguraré de que esto se comunique claramente en el futuro.
+Speaker 1: Antes de cerrar este tema, quiero asegurarme de que no quede nada pendiente.
+Speaker 3: Quiero asegurarme de haber entendido correctamente la pregunta antes de comprometerme.
+Speaker 1: Quiero validar nuestras suposiciones con datos reales antes de finalizar.
+Speaker 1: Asegurémonos de que las próximas acciones sean específicas y tengan propietarios.
+Speaker 1: Hay una limitación importante que aún no he mencionado; permítanme mencionarla ahora.
+Speaker 2: Puedo encargarme de eso; primero permítanme compartir mi lectura actual.
+Speaker 3: Está bien, cooperaré.
+Speaker 1: Centrémonos en lo que realmente podemos decidir en esta reunión.
+Speaker 1: Me gustaría proponer aquí un marco de decisión claro.
+Speaker 2: Ese es un marco útil. Permítanme pensar en lo que significa para nuestro lado.
+Speaker 1: Quiero revisar los criterios de éxito para asegurarme de que sean realistas.
+Speaker 3: Esta explicación es muy clara, ahora la entiendo.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 2: Ese es un buen punto; lo tendré en cuenta en nuestra planificación.
+Speaker 1: Permítanme asegurarme de capturar esto como un elemento de acción formal.
+Speaker 3: De hecho, estos detalles necesitan atención.
+Speaker 4: Está bien, me prepararé cuidadosamente.
+Speaker 1: Probemos este plan e identifiquemos los puntos débiles.
+Speaker 2: Tiene sentido para mí. Seré responsable de la coordinación de nuestra parte.
+Speaker 1: Deberíamos separar la solución a corto plazo de la solución a largo plazo.
+Speaker 3: Entendido, cooperaré por mi parte.
+Speaker 4: Esta sugerencia es muy útil, gracias.
+Speaker 1: Antes de continuar, permítanme aclarar los límites del alcance.
+Speaker 2: Ésa es una preocupación válida; así es como yo la abordaría.
+Speaker 1: Quiero asegurarme de que documentemos el fundamento, no solo la decisión.
+Speaker 3: A mí también me gustaría entender este aspecto.
+Speaker 4: Haré un seguimiento de eso y les daré una respuesta concreta al final de la semana.
+Speaker 1: Mantengamos nuestro enfoque en el resultado final y trabajemos hacia atrás desde allí.
+Speaker 2: Desde nuestra perspectiva, el principal obstáculo es la dependencia del equipo upstream.
+Speaker 1: Necesitamos ser honestos acerca de la presión del cronograma aquí.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 2: Buena decisión. Iba a plantear la misma inquietud.
+Speaker 1: Antes de cerrar este tema, quiero asegurarme de que no quede nada pendiente.
+Speaker 1: Quiero validar nuestras suposiciones con datos reales antes de finalizar.
+Speaker 2: Feliz de profundizar en eso; también ha sido una preocupación de nuestra parte.
+Speaker 1: Asegurémonos de que las próximas acciones sean específicas y tengan propietarios.
+Speaker 1: Hay una limitación importante que aún no he mencionado; permítanme mencionarla ahora.
+Speaker 2: Permítanme retroceder suavemente en un punto: creo que hay un mejor marco.
+Speaker 1: Centrémonos en lo que realmente podemos decidir en esta reunión.
+Speaker 1: Me gustaría proponer aquí un marco de decisión claro.Speaker 2: Confirmaré los detalles e informaré en el próximo punto de control.
+Speaker 1: Quiero revisar los criterios de éxito para asegurarme de que sean realistas.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 2: Estoy de acuerdo con eso. Déjame comprobar la viabilidad del cronograma.
+Speaker 1: Permítanme asegurarme de capturar esto como un elemento de acción formal.
+Speaker 1: Probemos este plan e identifiquemos los puntos débiles.
+Speaker 2: Permítanme confirmar la propiedad de esa acción para que nada se pierda.
+Speaker 1: Deberíamos separar la solución a corto plazo de la solución a largo plazo.
+Speaker 1: Antes de continuar, permítanme aclarar los límites del alcance.
+Speaker 2: Puedo brindarle una imagen más clara después de obtener los datos más recientes.
+Speaker 1: Quiero asegurarme de que documentemos el fundamento, no solo la decisión.
+Speaker 1: Mantengamos nuestro enfoque en el resultado final y trabajemos hacia atrás desde allí.
+Speaker 2: Me aseguraré de que esto se comunique claramente en el futuro.
+Speaker 1: Necesitamos ser honestos acerca de la presión del cronograma aquí.
+Speaker 1: Permítanme señalar un par de dependencias que debemos resolver primero.
+Speaker 2: Quiero asegurarme de haber entendido correctamente la pregunta antes de comprometerme.
+Speaker 1: Antes de cerrar este tema, quiero asegurarme de que no quede nada pendiente.
+Speaker 1: Quiero validar nuestras suposiciones con datos reales antes de finalizar.
+Speaker 2: Puedo encargarme de eso; primero permítanme compartir mi lectura actual.
+Speaker 1: Asegurémonos de que las próximas acciones sean específicas y tengan propietarios.
+Speaker 1: Hay una limitación importante que aún no he mencionado; permítanme mencionarla ahora.
+Speaker 2: Ese es un marco útil. Permítanme pensar en lo que significa para nuestro lado.
+Speaker 1: Centrémonos en lo que realmente podemos decidir en esta reunión.
+Speaker 1: Me gustaría proponer aquí un marco de decisión claro.
+Speaker 2: Ese es un buen punto; lo tendré en cuenta en nuestra planificación.
+Speaker 1: Quiero revisar los criterios de éxito para asegurarme de que sean realistas.
+Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.
+Speaker 2: Tiene sentido para mí. Seré responsable de la coordinación de nuestra parte.
+Speaker 1: Permítanme asegurarme de capturar esto como un elemento de acción formal.
+Speaker 1: Probemos este plan e identifiquemos los puntos débiles.
+Speaker 2: Ésa es una preocupación válida; así es como yo la abordaría.
+Speaker 1: Deberíamos separar la solución a corto plazo de la solución a largo plazo.
+Speaker 1: Antes de continuar, permítanme aclarar los límites del alcance.
+Speaker 2: Hablaré de esto con las partes interesadas relevantes y volveré con una posición.
+Speaker 1: Quiero asegurarme de que documentemos el fundamento, no solo la decisión.
+Speaker 1: Mantengamos nuestro enfoque en el resultado final y trabajemos hacia atrás desde allí.
+Speaker 2: Puedo apoyar esa dirección, pero quiero señalar una posible complicación.
+Speaker 1: Necesitamos ser honestos acerca de la presión del cronograma aquí.

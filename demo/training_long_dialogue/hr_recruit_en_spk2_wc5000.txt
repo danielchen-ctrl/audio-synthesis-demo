@@ -1,0 +1,82 @@
+Speaker 1: Good morning everyone. Let's get started and align on Recruitment Gap-Filling Strategy and Channel Discussion; Par today.
+Speaker 2: Happy to be here. I'll be focused on key constraints and risk areas around Recruitment Gap-Filling Strategy and Channel Discussion; Par.
+Speaker 1: Let me flag a couple of dependencies we need to resolve first.
+Speaker 2: That approach works for me. I'll coordinate accordingly.
+Speaker 1: Let's keep our focus on the deliverable and work backwards from there.
+Speaker 1: I want to make sure we're aligned on the key priorities before we go further.
+Speaker 1: Before we close this topic, I want to make sure nothing is left hanging.
+Speaker 1: We should nail down the decision criteria before we finalize anything.
+Speaker 1: Let me set the context for why this matters right now.
+Speaker 1: We should define what a good outcome looks like before we debate the path.
+Speaker 1: Let me surface the two main trade-offs and we can decide together.
+Speaker 1: There's an important constraint I haven't mentioned yet — let me bring it up now.
+Speaker 1: I want to make sure we document the rationale, not just the decision.
+Speaker 2: I'll confirm the details and report back at the next checkpoint.
+Speaker 1: I'd like to propose a clear decision framework here.
+Speaker 2: Let me think through the downstream impact of that decision.
+Speaker 1: I want to double-check our assumptions before we commit to this direction.
+Speaker 1: I'll summarize what I'm hearing and we can course-correct if needed.
+Speaker 1: Let me be direct — there are resource constraints we need to work around.
+Speaker 2: Makes sense to me. I'll own the coordination on our end.
+Speaker 1: Let me check if we have consensus on this before we proceed.
+Speaker 1: Let me be specific about what I need from the team on this.
+Speaker 1: Let me flag a couple of dependencies we need to resolve first.
+Speaker 2: I see the trade-off — let me weigh in on the implementation side.
+Speaker 1: Let's keep our focus on the deliverable and work backwards from there.
+Speaker 1: I want to make sure we're aligned on the key priorities before we go further.
+Speaker 2: Agreed. Let me add what I'm seeing from our side.
+Speaker 1: Before we close this topic, I want to make sure nothing is left hanging.
+Speaker 1: We should nail down the decision criteria before we finalize anything.
+Speaker 2: That's a valid concern — here's how I'd approach it.
+Speaker 1: Let me set the context for why this matters right now.
+Speaker 1: We should define what a good outcome looks like before we debate the path.
+Speaker 2: I can support that direction, but I want to flag a potential complication.
+Speaker 1: Let me surface the two main trade-offs and we can decide together.
+Speaker 1: There's an important constraint I haven't mentioned yet — let me bring it up now.
+Speaker 2: Happy to dive deeper on that — it's been a concern on our side too.
+Speaker 1: I want to make sure we document the rationale, not just the decision.
+Speaker 1: I'd like to propose a clear decision framework here.
+Speaker 2: I can get you a clearer picture after I pull the latest data.
+Speaker 1: I want to double-check our assumptions before we commit to this direction.
+Speaker 1: I'll summarize what I'm hearing and we can course-correct if needed.
+Speaker 2: I'll raise this with the relevant stakeholders and come back with a position.
+Speaker 1: Let me be direct — there are resource constraints we need to work around.
+Speaker 1: Let me check if we have consensus on this before we proceed.
+Speaker 2: I'm on board with that. Let me check on timeline feasibility.
+Speaker 1: Let me be specific about what I need from the team on this.
+Speaker 1: Let me flag a couple of dependencies we need to resolve first.
+Speaker 2: Good call — I was going to raise the same concern.
+Speaker 1: Let's keep our focus on the deliverable and work backwards from there.
+Speaker 1: I want to make sure we're aligned on the key priorities before we go further.
+Speaker 2: Let me push back gently on one point — I think there's a better framing.
+Speaker 1: Before we close this topic, I want to make sure nothing is left hanging.
+Speaker 1: We should nail down the decision criteria before we finalize anything.
+Speaker 2: I can absorb that scope, but I'll need to adjust my other priorities.
+Speaker 1: Let me set the context for why this matters right now.
+Speaker 1: We should define what a good outcome looks like before we debate the path.
+Speaker 2: That makes sense — I'll align my workstream with that direction.
+Speaker 1: Let me surface the two main trade-offs and we can decide together.
+Speaker 1: There's an important constraint I haven't mentioned yet — let me bring it up now.
+Speaker 2: That approach works for me. I'll coordinate accordingly.
+Speaker 1: I want to make sure we document the rationale, not just the decision.
+Speaker 1: I'd like to propose a clear decision framework here.
+Speaker 2: I'll confirm the details and report back at the next checkpoint.
+Speaker 1: I want to double-check our assumptions before we commit to this direction.
+Speaker 1: I'll summarize what I'm hearing and we can course-correct if needed.
+Speaker 2: Let me think through the downstream impact of that decision.
+Speaker 1: Let me be direct — there are resource constraints we need to work around.
+Speaker 1: Let me check if we have consensus on this before we proceed.
+Speaker 2: Makes sense to me. I'll own the coordination on our end.
+Speaker 1: Let me be specific about what I need from the team on this.
+Speaker 1: Let me flag a couple of dependencies we need to resolve first.
+Speaker 2: I see the trade-off — let me weigh in on the implementation side.
+Speaker 1: Let's keep our focus on the deliverable and work backwards from there.
+Speaker 1: I want to make sure we're aligned on the key priorities before we go further.
+Speaker 2: Agreed. Let me add what I'm seeing from our side.
+Speaker 1: Before we close this topic, I want to make sure nothing is left hanging.
+Speaker 1: We should nail down the decision criteria before we finalize anything.
+Speaker 2: That's a valid concern — here's how I'd approach it.
+Speaker 1: Let me set the context for why this matters right now.
+Speaker 1: We should define what a good outcome looks like before we debate the path.
+Speaker 2: I can support that direction, but I want to flag a potential complication.
+Speaker 1: Let me surface the two main trade-offs and we can decide together.

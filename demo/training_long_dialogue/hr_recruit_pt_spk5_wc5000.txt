@@ -1,0 +1,94 @@
+Speaker 1: Bom dia a todos. Vamos começar e alinhar a estratégia de preenchimento de lacunas de recrutamento e a discussão do canal; Par hoje.
+Speaker 2: Feliz por estar aqui. Estarei focado nas principais restrições e áreas de risco em torno da Estratégia de Preenchimento de Lacunas de Recrutamento e Discussão de Canais; Par.
+Speaker 3: Tomarei nota disso e garantirei que isso seja refletido em meu produto final.
+Speaker 1: Quero rever os critérios de sucesso para ter certeza de que são realistas.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 3: Garantirei que isso seja comunicado claramente a jusante.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 4: 補足ですが、スケジュールについて検討します。
+Speaker 5: Quero acrescentar algum contexto que possa ser relevante aqui.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 5: Deixe-me confirmar a propriedade dessa ação para que nada passe despercebido.
+Speaker 4: Deixe-me recuar suavemente em um ponto – acho que há um enquadramento melhor.
+Speaker 1: Antes de encerrarmos este tópico, quero ter certeza de que nada ficará pendente.
+Speaker 1: Gostaria de propor aqui um quadro de decisão claro.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 2: Entendido. Vou levar isso em consideração no cronograma atualizado.
+Speaker 1: Deixe-me garantir que capturamos isso como um item de ação formal.
+Speaker 3: Isso faz sentido – alinharei meu fluxo de trabalho com essa direção.
+Speaker 1: Deixe-me expor as duas principais soluções de compromisso e poderemos decidir juntos.
+Speaker 1: Antes de prosseguirmos, deixe-me esclarecer os limites do escopo.
+Speaker 1: Deixe-me definir o contexto de por que isso é importante agora.
+Speaker 2: Concordo com isso. Deixe-me verificar a viabilidade do cronograma.
+Speaker 3: Ok, vou cooperar.
+Speaker 1: Deixe-me sinalizar algumas dependências que precisamos resolver primeiro.
+Speaker 1: Deixe-me ser específico sobre o que preciso da equipe sobre isso.
+Speaker 3: Essa explicação é muito clara, agora entendi.
+Speaker 1: Quero rever os critérios de sucesso para ter certeza de que são realistas.
+Speaker 2: Fico feliz em aprofundar isso - também tem sido uma preocupação da nossa parte.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 3: Na verdade, estes detalhes precisam de atenção.
+Speaker 4: Ok, vou me preparar com cuidado.
+Speaker 5: Entendido, cooperarei da minha parte.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 2: Do nosso ponto de vista, o principal bloqueador é a dependência da equipe upstream.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 3: Esta sugestão é muito útil, obrigado.
+Speaker 4: Eu também gostaria de entender esse aspecto.
+Speaker 5: Confirmarei os detalhes e reportarei no próximo posto de controle.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 2: Bom ponto. Precisarei reunir minha equipe antes de nos comprometermos.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 2: Isso é consistente com o que temos monitorado.
+Speaker 1: Antes de encerrarmos este tópico, quero ter certeza de que nada ficará pendente.
+Speaker 1: Gostaria de propor aqui um quadro de decisão claro.
+Speaker 2: Essa abordagem funciona para mim. Eu coordenarei adequadamente.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 1: Deixe-me garantir que capturamos isso como um item de ação formal.
+Speaker 2: Posso absorver esse escopo, mas precisarei ajustar minhas outras prioridades.
+Speaker 1: Deixe-me expor as duas principais soluções de compromisso e poderemos decidir juntos.
+Speaker 1: Antes de prosseguirmos, deixe-me esclarecer os limites do escopo.
+Speaker 2: Vou levantar esta questão com as partes interessadas relevantes e retornar com uma posição.
+Speaker 1: Deixe-me definir o contexto de por que isso é importante agora.
+Speaker 1: Deixe-me sinalizar algumas dependências que precisamos resolver primeiro.
+Speaker 2: Tomarei nota disso e garantirei que isso esteja refletido em meu produto final.
+Speaker 1: Deixe-me ser específico sobre o que preciso da equipe sobre isso.
+Speaker 1: Quero rever os critérios de sucesso para ter certeza de que são realistas.Speaker 2: Garantirei que isso seja comunicado claramente a jusante.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 2: Quero acrescentar algum contexto que possa ser relevante aqui.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 2: Deixe-me confirmar a propriedade dessa ação para que nada passe despercebido.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 2: Deixe-me recuar suavemente em um ponto – acho que há um enquadramento melhor.
+Speaker 1: Antes de encerrarmos este tópico, quero ter certeza de que nada ficará pendente.
+Speaker 1: Gostaria de propor aqui um quadro de decisão claro.
+Speaker 2: Entendido. Vou levar isso em consideração no cronograma atualizado.
+Speaker 1: Deixe-me mostrar a todos a nossa posição sobre isso.
+Speaker 1: Deixe-me garantir que capturamos isso como um item de ação formal.
+Speaker 2: Isso faz sentido – alinharei meu fluxo de trabalho com essa direção.
+Speaker 1: Deixe-me expor as duas principais soluções de compromisso e poderemos decidir juntos.
+Speaker 1: Antes de prosseguirmos, deixe-me esclarecer os limites do escopo.
+Speaker 2: Concordo com isso. Deixe-me verificar a viabilidade do cronograma.
+Speaker 1: Deixe-me definir o contexto de por que isso é importante agora.
+Speaker 1: Deixe-me sinalizar algumas dependências que precisamos resolver primeiro.
+Speaker 2: Fico feliz em aprofundar isso - também tem sido uma preocupação da nossa parte.
+Speaker 1: Deixe-me ser específico sobre o que preciso da equipe sobre isso.
+Speaker 1: Quero rever os critérios de sucesso para ter certeza de que são realistas.
+Speaker 2: Do nosso ponto de vista, o principal bloqueador é a dependência da equipe upstream.
+Speaker 1: Deveríamos separar a solução de curto prazo da solução de longo prazo.
+Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
+Speaker 2: Boa decisão – eu iria levantar a mesma preocupação.
+Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
+Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
+Speaker 2: Quero ter certeza de que entendi a pergunta corretamente antes de me comprometer.
+Speaker 1: Quero verificar novamente as nossas suposições antes de nos comprometermos nesta direção.
+Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
+Speaker 2: Vou me alinhar com a equipe e confirmar que estamos na mesma página.
+Speaker 1: Antes de encerrarmos este tópico, quero ter certeza de que nada ficará pendente.
