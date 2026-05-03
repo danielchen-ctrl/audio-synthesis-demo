@@ -17,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
@@ -332,7 +332,7 @@ def backfill_scenes() -> int:
     try:
         import sqlite3
         from pathlib import Path as _P
-        _db_path = _P(__file__).resolve().parents[1] / "runtime" / "platform.db"
+        _db_path = _P(__file__).resolve().parents[2] / "runtime" / "platform.db"
         if not _db_path.exists():
             return 0
         conn = sqlite3.connect(str(_db_path), check_same_thread=False)
