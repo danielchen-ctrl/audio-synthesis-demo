@@ -1,36 +1,26 @@
 @echo off
-chcp 65001 >nul
 setlocal
 
 set "ROOT=%~dp0.."
 cd /d "%ROOT%"
-
 set "DEMO_URL=http://127.0.0.1:8899/"
 set "DEMO_APP_HOST=0.0.0.0"
 
-echo [INFO] Starting legacy demo server (use start_platform.bat for the full platform)...
+echo [INFO] Starting legacy demo server...
 start "demo_app_server" /D "%ROOT%" cmd /k scripts\start_server.bat
 
-echo [INFO] Waiting for server health check...
-set "READY="
-for /l %%i in (1,1,20) do (
-    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-        "try { $r = Invoke-WebRequest -UseBasicParsing '%DEMO_URL%' -TimeoutSec 2; if ($r.StatusCode -eq 200) { exit 0 } else { exit 1 } } catch { exit 1 }" >nul 2>&1
-    if not errorlevel 1 (
-        set "READY=1"
-        goto :open_browser
-    )
-    timeout /t 1 /nobreak >nul
-)
+echo [INFO] Waiting for server (up to 20s)...
+set /a N=0
+:loop
+set /a N+=1
+if %N% GTR 20 goto :open
+powershell -NoProfile -Command "try{exit (Invoke-WebRequest -UseBasicParsing '%DEMO_URL%' -TimeoutSec 1).StatusCode}catch{exit 0}" 2>nul
+if "%ERRORLEVEL%"=="200" goto :open
+timeout /t 1 /nobreak >nul
+goto :loop
 
-:open_browser
-if not defined READY (
-    echo [WARN] Server has not returned HTTP 200 yet. Opening the page anyway...
-)
-
+:open
 echo [INFO] Opening %DEMO_URL%
 start "" "%DEMO_URL%"
-
-echo [INFO] Demo server window started.
-echo [INFO] Web URL: %DEMO_URL%
-exit /b 0
+echo [INFO] Done. Close the "demo_app_server" window to stop.
+pause
