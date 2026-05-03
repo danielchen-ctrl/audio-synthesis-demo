@@ -220,6 +220,7 @@ class FilesHandler(PlatformHandler):
             except Exception:
                 pass
         ext = fpath.suffix.lstrip(".").lower() or "mp3"
+        folder_id = data.get("folder_id") or None
         record = db.create_audio_file({
             "file_name": data.get("file_name") or fpath.name,
             "file_path": str(fpath.resolve()),
@@ -231,6 +232,7 @@ class FilesHandler(PlatformHandler):
             "speaker_count": int(data.get("speaker_count") or 0) or None,
             "scene": data.get("scene") or "other",
             "topic": data.get("topic") or "",
+            "folder_id": folder_id,
         })
         self.set_status(201)
         self.ok(record)

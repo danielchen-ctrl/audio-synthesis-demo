@@ -749,6 +749,7 @@ function openLegacyModal() {
   if (state.form.mode === "llm") {
     void refreshPresetTopicsIfNeeded(state.presetTopics.length === 0);
   }
+  void loadPlatformFolders();
 }
 
 function closeLegacyModal() {
@@ -943,6 +944,31 @@ function renderFolderOptions() {
     (option) => `<option value="${escapeHtml(option)}">${escapeHtml(option)}</option>`
   );
   el.folderSelect.innerHTML = options.join("");
+}
+
+async function loadPlatformFolders() {
+  try {
+    const r = await fetch("/api/platform/folders");
+    if (!r.ok) return;
+    const json = await r.json();
+    const folders = json.data || [];
+    function flatten(nodes, prefix) {
+      const result = [];
+      for (const n of nodes) {
+        result.push({ id: n.folder_id, name: prefix + n.name });
+        if (n.children && n.children.length) {
+          result.push(...flatten(n.children, prefix + n.name + " / "));
+        }
+      }
+      return result;
+    }
+    const flat = flatten(folders, "");
+    const prev = el.folderSelect.value;
+    el.folderSelect.innerHTML =
+      `<option value="">默认目录</option>` +
+      flat.map(f => `<option value="${escapeHtml(f.id)}">${escapeHtml(f.name)}</option>`).join("");
+    if (prev) el.folderSelect.value = prev;
+  } catch (_) {}
 }
 
 function renderLanguages() {
@@ -2110,6 +2136,7 @@ async function submitAudioGeneration() {
           source: "generated",
           scene: "other",
           format: (el.outputFormat ? el.outputFormat.value : "mp3").toLowerCase(),
+          folder_id: el.folderSelect && el.folderSelect.value ? el.folderSelect.value : undefined,
         })
       });
     } catch (_e) { /* silent */ }

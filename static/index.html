@@ -390,6 +390,30 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:22px
   .form-grid,.modal-footer,.radio-group{flex-direction:column;align-items:stretch}
   .form-grid{display:flex}
 }
+
+/* ══ Light theme ══════════════════════════════════════════════════════════════ */
+html[data-theme="light"]{
+  --bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--border:#CBD5E1;
+  --text:#0F172A;--text2:#475569;--text3:#94A3B8;
+}
+html[data-theme="light"] body{background:var(--bg);color:var(--text)}
+html[data-theme="light"] .topbar{background:var(--bg2);border-bottom-color:var(--border)}
+html[data-theme="light"] .sidebar{background:var(--bg2);border-right-color:var(--border)}
+html[data-theme="light"] .mobile-nav{background:var(--bg2)}
+html[data-theme="light"] .mo{background:var(--bg2)}
+html[data-theme="light"] .mo-hdr{border-bottom-color:var(--border)}
+html[data-theme="light"] .mo-footer{border-top-color:var(--border);background:var(--bg3)}
+html[data-theme="light"] .form-input{background:var(--bg2);color:var(--text);border-color:var(--border)}
+html[data-theme="light"] .form-input:focus{border-color:var(--primary)}
+html[data-theme="light"] select.form-input{background:var(--bg2);color:var(--text)}
+html[data-theme="light"] .detail-panel{background:var(--bg2)}
+html[data-theme="light"] .stat-card{background:var(--bg2)}
+html[data-theme="light"] .task-card{background:var(--bg2);border-color:var(--border)}
+html[data-theme="light"] .adv-panel{background:var(--bg3);border-color:var(--border)}
+html[data-theme="light"] .mini-player-row td{background:#1E293B;color:#E2E8F0}
+html[data-theme="light"] .comp-banner{background:#1e3a5f}
+/* theme toggle button */
+.theme-toggle{font-size:15px;padding:4px 8px;line-height:1}
 </style>
 </head>
 <body>
@@ -406,6 +430,7 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:22px
     <button class="nav-btn" onclick="goTo('trash')" id="nav-trash">🗑 回收站</button>
   </nav>
   <div class="topbar-right">
+    <button class="btn btn-ghost btn-sm theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换亮/暗主题">🌙</button>
     <button class="btn btn-ghost btn-sm" onclick="openModal('modal-upload')">⬆ 上传</button>
     <button class="btn btn-primary btn-sm" onclick="openLegacyModal()">✨ 生成语料</button>
   </div>
@@ -1357,144 +1382,6 @@ function openDeleteFolderModal(id,name){_deleteFolderId=id;document.getElementBy
 async function doDeleteFolder(){try{await API.del('/api/platform/folders/'+_deleteFolderId);closeModal('modal-delete-folder');showToast('ok','文件夹已删除');if(_folderId===_deleteFolderId)filterFolder(undefined,'all');await loadFolders();loadMy();}catch(e){showToast('err','删除失败');}}
 
 // ══ Generate modal — handled by app.js (legacy modal) ════════════════════════
-// ── Preset data (REMOVED — app.js provides its own) ──────────────────────────
-/* const PRESET_TEMPLATES=[
-  {label:'医疗健康｜慢病随访',      kw:['慢病管理','复诊提醒','用药依从','血糖血压','指标异常','随访计划','健康干预','病情变化','生活方式','风险预警']},
-  {label:'人力资源与招聘｜招聘补岗', kw:['岗位空缺','补岗需求','候选人筛选','面试安排','HC申请','紧急招聘','到岗周期','招聘进度','用人部门','offer沟通']},
-  {label:'娱乐/媒体｜艺人商业化',   kw:['商务合作','艺人报价','品牌代言','商业价值','粉丝画像','档期协调','宣发资源','合作权益','曝光量','ROI评估']},
-  {label:'建筑与工程行业｜项目交付', kw:['工程进度','交付节点','施工质量','验收标准','延期风险','成本控制','分包管理','现场协调','材料到货','竣工验收']},
-  {label:'汽车行业｜车型投放',       kw:['新车上市','车型规划','投放节奏','渠道铺货','竞品分析','试驾转化','销售目标','区域策略','用户画像','价格策略']},
-  {label:'咨询/专业服务｜客户拓展',  kw:['客户线索','商机挖掘','需求诊断','方案建议','客户拜访','合作机会','项目报价','决策链路','行业痛点','转化跟进']},
-  {label:'法律服务｜法顾专项',       kw:['法律顾问','专项服务','合同审查','合规咨询','风险提示','争议处理','法律意见','客户需求','服务边界','交付成果']},
-  {label:'金融/投资｜资产配置',      kw:['投资组合','风险偏好','资产分散','收益目标','市场波动','基金配置','股票债券','流动性管理','再平衡','长期规划']},
-  {label:'零售行业｜会员复购',       kw:['会员运营','复购率','优惠券','消费频次','用户分层','积分权益','沉睡唤醒','私域触达','客单价','复购转化']},
-  {label:'保险行业｜保险质检',       kw:['话术合规','销售录音','质检规则','误导销售','风险提示','客户确认','保单说明','回访检查','违规判定','整改建议']},
-  {label:'房地产｜项目去化',         kw:['去化率','楼盘销售','客户到访','成交转化','价格策略','渠道分销','库存压力','认购签约','竞品楼盘','促销政策']},
-  {label:'人工智能/科技｜付费转化',  kw:['免费试用','订阅转化','功能触达','用户留存','付费意愿','价格套餐','权益说明','转化漏斗','使用频次','增值服务']},
-  {label:'制造业｜产线提效',         kw:['产线效率','设备稼动率','瓶颈工序','良品率','工时优化','排产计划','异常停机','自动化改造','产能提升','降本增效']},
-  {label:'娱乐/媒体｜战略周会',      kw:['内容策略','平台增长','商业化进展','重点项目','数据复盘','资源协调','风险事项','下周计划','用户增长','战略目标']},
-  {label:'法律服务｜广告合规',       kw:['广告审查','合规风险','宣传用语','资质要求','极限词','误导宣传','法务审核','监管要求','投放素材','整改建议']},
-  {label:'保险行业｜销售洞察',       kw:['销售线索','客户画像','成交原因','拒保原因','异议处理','产品匹配','转化路径','销售话术','保费贡献','渠道表现']},
-  {label:'测试开发｜支付接入与交易链路',kw:['支付接入','第三方支付','接口联调','参数签名','支付网关','下单接口','支付回调','状态同步','异步通知','幂等处理']},
-  {label:'测试开发｜退款与资金安全',  kw:['退款申请','原路退回','重复退款','越权退款','金额校验','退款状态','风控拦截','退款回调','资金安全','权限校验']},
-  {label:'测试开发｜对账与稳定性准入',kw:['账单核对','交易流水','金额不一致','漏单','渠道账单','差错处理','容量评估','性能基线','错误率','熔断限流']},
-  {label:'测试开发｜朋友圈内容发布与多端分发',kw:['动态发布','内容流展示','图片视频','草稿保存','发布失败','内容校验','App端','小程序端','多端同步','数据同步']},
-  {label:'测试开发｜社交互动与状态一致性',kw:['点赞评论','点赞一致','评论同步','计数准确','状态回显','重复点击','并发互动','互动通知','多端展示','端间一致']},
-  {label:'测试开发｜隐私权限与内容审核',kw:['隐私可见','好友可见','分组可见','权限校验','敏感词检测','图片审核','视频审核','违规内容','审核拦截','黑名单']},
-];
-const PRESET_TOPICS=[
-  {topic:'高血压患者复诊后的用药和生活习惯随访沟通',         tpl:'医疗健康｜慢病随访',          kw:['高血压','复诊','用药','生活习惯','随访']},
-  {topic:'运营岗位离职后紧急补岗的招聘进度沟通',             tpl:'人力资源与招聘｜招聘补岗',     kw:['运营岗','离职','补岗','招聘进度','面试']},
-  {topic:'某艺人下季度品牌代言和商务合作机会讨论',           tpl:'娱乐/媒体｜艺人商业化',        kw:['艺人','品牌代言','商务合作','档期','报价']},
-  {topic:'工程项目临近交付前的进度风险和验收安排讨论',       tpl:'建筑与工程行业｜项目交付',     kw:['工程交付','进度风险','验收','延期','现场协调']},
-  {topic:'新能源车型上市前的区域投放和销售策略讨论',         tpl:'汽车行业｜车型投放',           kw:['新能源车','上市','区域投放','销售策略','渠道']},
-  {topic:'面向制造业客户的新咨询项目拓展沟通',               tpl:'咨询/专业服务｜客户拓展',      kw:['制造业客户','咨询项目','客户拓展','需求诊断','商机']},
-  {topic:'企业年度法律顾问专项服务内容和交付安排讨论',       tpl:'法律服务｜法顾专项',           kw:['法律顾问','专项服务','合同审查','合规','交付']},
-  {topic:'中高净值客户年度资产配置方案沟通',                 tpl:'金融/投资｜资产配置',          kw:['高净值客户','资产配置','风险偏好','收益目标','投资组合']},
-  {topic:'提升老会员复购率的运营活动方案讨论',               tpl:'零售行业｜会员复购',           kw:['会员运营','复购率','优惠券','用户分层','活动方案']},
-  {topic:'保险销售录音中的话术合规和质检问题复盘',           tpl:'保险行业｜保险质检',           kw:['保险销售','录音质检','话术合规','风险提示','整改']},
-  {topic:'新楼盘库存去化压力和渠道促销策略讨论',             tpl:'房地产｜项目去化',             kw:['楼盘去化','库存压力','渠道分销','促销','成交转化']},
-  {topic:'AI产品免费用户向付费会员转化方案讨论',             tpl:'人工智能/科技｜付费转化',      kw:['AI产品','免费用户','付费会员','转化率','订阅']},
-  {topic:'生产线效率提升和瓶颈工序优化会议讨论',             tpl:'制造业｜产线提效',             kw:['产线效率','瓶颈工序','良品率','设备稼动率','提效']},
-  {topic:'内容平台本周增长数据和商业化策略周会',             tpl:'娱乐/媒体｜战略周会',          kw:['内容平台','增长数据','商业化','战略周会','复盘']},
-  {topic:'新广告投放素材的合规风险审核讨论',                 tpl:'法律服务｜广告合规',           kw:['广告素材','合规审核','宣传用语','监管要求','风险']},
-  {topic:'保险产品销售转化数据和客户异议洞察分析',           tpl:'保险行业｜销售洞察',           kw:['保险产品','销售转化','客户异议','销售洞察','成交原因']},
-  {topic:'支付项目上线前的接入联调、下单回调和主流程验收讨论',tpl:'测试开发｜支付接入与交易链路', kw:['支付接入','第三方支付','下单','支付回调','联调验收']},
-  {topic:'支付系统上线前的退款安全、对账差错和稳定性准入评估',tpl:'测试开发｜退款与资金安全',    kw:['退款安全','重复退款','越权','支付对账','资金安全']},
-  {topic:'朋友圈动态发布、图文内容发布和多端分发一致性测试讨论',tpl:'测试开发｜朋友圈内容发布与多端分发',kw:['朋友圈','动态发布','图文发布','多端分发','状态同步']},
-  {topic:'朋友圈点赞评论、互动计数和多端状态一致性测试讨论', tpl:'测试开发｜社交互动与状态一致性',kw:['点赞','评论','互动计数','多端展示','状态回显']},
-  {topic:'朋友圈隐私可见范围、内容审核和权限控制测试讨论',   tpl:'测试开发｜隐私权限与内容审核',  kw:['隐私可见','好友可见','分组可见','权限校验','内容审核']},
-];
-
-function initGenModal(){
-  const ts=document.getElementById('tplSelect');
-  ts.innerHTML='<option value="">— 自动匹配 —</option>'+
-    PRESET_TEMPLATES.map(t=>`<option value="${esc(t.label)}">${esc(t.label)}</option>`).join('')+
-    '<option value="custom">自定义 Prompt</option>';
-  const ps=document.getElementById('presetSelect');
-  ps.innerHTML='<option value="">— 选择预置主题 —</option>'+
-    PRESET_TOPICS.map((t,i)=>`<option value="${i}">${esc(t.topic)}</option>`).join('');
-}
-function onTplChange(sel){document.getElementById('customPG').classList.toggle('hidden',sel.value!=='custom');}
-function openPresetPanel(){
-  document.getElementById('topicInputGroup').classList.add('hidden');
-  document.getElementById('presetPanel').classList.remove('hidden');
-}
-function closePresetPanel(){
-  document.getElementById('presetPanel').classList.add('hidden');
-  document.getElementById('topicInputGroup').classList.remove('hidden');
-  document.getElementById('presetSelect').value='';
-}
-function applyPreset(sel){
-  const idx=parseInt(sel.value);
-  if(isNaN(idx))return;
-  const p=PRESET_TOPICS[idx];if(!p)return;
-  document.getElementById('topicInput').value=p.topic;
-  document.getElementById('tplSelect').value=p.tpl;
-  onTplChange(document.getElementById('tplSelect'));
-  const kw=document.getElementById('kwWrap'),inp=kw.querySelector('input');
-  kw.querySelectorAll('.ti-tag').forEach(t=>t.remove());
-  p.kw.forEach(k=>addTagChip(kw,k,inp));
-  closePresetPanel();
-}
-function setWc(n){document.getElementById('wordCount').value=n;onWcInput(n);}
-function onWcInput(v){document.getElementById('longWcHint').classList.toggle('hidden',parseInt(v)<=5000);}
-async function genText(){
-  const topic=document.getElementById('topicInput').value.trim();
-  if(!topic){showToast('err','请先填写文本主题');return;}
-  const btn=document.getElementById('btnGenText');
-  btn.textContent='⏳ 生成中…';btn.disabled=true;
-  document.getElementById('secPreview').classList.remove('hidden');
-  document.getElementById('previewText').textContent='正在生成，请稍候…';
-  try{
-    const lang=document.getElementById('genLang').value;
-    const people=parseInt(document.getElementById('spCount').value)||2;
-    const words=parseInt(document.getElementById('wordCount').value)||1000;
-    const tpl=document.getElementById('tplSelect').value;
-    const cp=document.getElementById('customPrompt').value;
-    const kw=[...document.querySelectorAll('#kwWrap .ti-tag')].map(el=>el.textContent.replace('×','').trim());
-    const r=await fetch('/api/generate_text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:topic,scenario:topic,core_content:cp||topic,people_count:people,word_count:words,language:lang,audio_language:lang,template_label:tpl,keyword_terms:kw})});
-    const data=await r.json();
-    if(data.dialogue_text){document.getElementById('previewText').textContent=data.dialogue_text;_genTextResult=data;btn.innerHTML='↺ 重新生成';btn.disabled=false;}
-    else throw new Error(data.error||'生成失败');
-  }catch(e){document.getElementById('previewText').textContent='生成失败: '+e.message;btn.textContent='✨ 预览生成文本';btn.disabled=false;}
-}
-function regenText(){_genTextResult=null;genText();}
-function syncVoiceLang(lang){_voiceLang=lang||'中文（普通话）';document.getElementById('voiceLangLabel').textContent='（'+_voiceLang+'）';updateSpRows();}
-function updateSpRows(){
-  const isManual=!document.getElementById('rLLM').classList.contains('sel');
-  const n=Math.min(10,Math.max(1,parseInt(document.getElementById(isManual?'spCountManual':'spCount').value)||2));
-  const c=document.getElementById('spRows');c.innerHTML='';
-  const voices=VOICE_CATALOG[_voiceLang]||VOICE_CATALOG['中文（普通话）'];
-  for(let i=1;i<=n;i++){
-    const r=document.createElement('div');r.className='sp-row';
-    const opts=voices.map(v=>`<option value="${v.id}">${v.label}</option>`).join('');
-    r.innerHTML=`<div class="sp-badge" style="background:${SP_COLORS[i-1]}">${i}</div><select class="select-field" style="flex:1" data-sp="${i}"><option value="">— 请选择音色 —</option>${opts}</select>`;
-    if(voices[i-1])r.querySelector('select').value=voices[i-1].id;
-    c.appendChild(r);
-  }
-}
-async function submitGen(){
-  const isManual=!document.getElementById('rLLM').classList.contains('sel');
-  const lang=document.getElementById(isManual?'genLangManual':'genLang').value;
-  const spRows=document.querySelectorAll('#spRows select');
-  let voiceOk=true;const voiceMap={};
-  spRows.forEach((s,i)=>{if(!s.value)voiceOk=false;voiceMap['Speaker '+(i+1)]=s.value;});
-  if(!voiceOk){document.getElementById('spWarn').style.display='flex';return;}
-  document.getElementById('spWarn').style.display='none';
-  const btn=document.getElementById('btnSubmit');btn.textContent='提交中…';btn.disabled=true;
-  try{
-    const payload={generation_mode:isManual?'direct':'llm',language:lang,voice_map:voiceMap,output_format:document.getElementById(isManual?'outputFmtManual':'outputFmt').value,include_scripts:document.getElementById('includeScripts').checked};
-    if(isManual){payload.input_text=document.getElementById('manualText').value;payload.people_count=parseInt(document.getElementById('spCountManual').value)||2;}
-    else{payload.topic=document.getElementById('topicInput').value.trim();payload.people_count=parseInt(document.getElementById('spCount').value)||2;payload.word_count=parseInt(document.getElementById('wordCount').value)||1000;payload.template=document.getElementById('tplSelect').value;payload.custom_prompt=document.getElementById('customPrompt').value;payload.keywords=[...document.querySelectorAll('#kwWrap .ti-tag')].map(el=>el.textContent.replace('×','').trim());}
-    await API.post('/api/platform/tasks',payload);
-    closeModal('modal-gen');
-    showToast('ok','任务已提交，请在「生成任务」页查看进度');
-    loadStats();
-    if(_page==='tasks'){loadTasks();startTaskPoll();}
-  }catch(e){showToast('err','提交失败: '+e.message);}
-  btn.textContent='🎵 生成音频';btn.disabled=false;
-} */
 
 // ══ Upload ════════════════════════════════════════════════════════════════════
 function handleFSel(input){if(input.files[0])showFInfo(input.files[0]);}
@@ -1814,6 +1701,24 @@ function copyTranscript(){
 
 // ══ ESC key ══════════════════════════════════════════════════════════════════
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.mo-overlay.open').forEach(m=>m.classList.remove('open'));closeConfirm();}});
+
+// ══ Theme toggle ══════════════════════════════════════════════════════════════
+function toggleTheme(){
+  const html=document.documentElement;
+  const next=(html.dataset.theme==='light')?'dark':'light';
+  html.dataset.theme=next;
+  const btn=document.getElementById('themeToggle');
+  if(btn)btn.textContent=next==='light'?'🌙':'☀️';
+  localStorage.setItem('platform-theme',next);
+}
+(function(){
+  const saved=localStorage.getItem('platform-theme')||'dark';
+  document.documentElement.dataset.theme=saved;
+  document.addEventListener('DOMContentLoaded',()=>{
+    const btn=document.getElementById('themeToggle');
+    if(btn)btn.textContent=saved==='light'?'🌙':'☀️';
+  });
+})();
 
 // ══ Init ═════════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
