@@ -155,18 +155,33 @@ _INDEX: dict[tuple[str, str], list[tuple[float, Path]]] | None = None
 _FILE_CACHE: OrderedDict[str, str] = OrderedDict()
 _FILE_CACHE_MAX = 48
 
+# 新训练数据最低分门槛：低于此分的文件不纳入 few-shot 索引（旧语料库不受此限制）
+_MIN_NEW_SAMPLE_SCORE = 70.0
+
 # ── 低质量占位符行过滤正则 ────────────────────────────────────────────────
 _PLACEHOLDER_RE = re.compile(
+    # 中文模板占位符
     r"从(参与者|.*?)角度来看[，,](需要|可以|应该|重点)"
-    r"|根据(实际情况|行业惯例|以往经验)[，,]此类项目通常"
+    r"|根据(实际情况|行业惯例|以往经验)[，,]"
     r"|行动项：Speaker\s*\d+跟进"
     r"|T\+\d+天给到方案"
     r"|最新的(达标率|效率指标|完成率|准确率|完成情况)数据显示达到了\d+%"
-    r"|此类项目通常(耗时|涉及)[X\d]+[天周]"
+    r"|通常(耗时|涉及)[X\d]+[天周]"
+    # 英文模板占位符（LLM 降级时生成的通用角色描述）
+    r"|From a .{2,30} perspective, we should focus on"
+    r"|Scenario: A professional business discussion"
+    r"|I'll be focused on key constraints and risk areas around Scenario"
+    # 英文通用对话降级行
+    r"|What steps have you already taken to address this issue"
+    r"|I'll need to verify a few things before I can give you"
+    r"|Please review the proposed plan and let me know if you have"
 )
 
 _MAX_EXCERPT_CHARS = 600
 _SKIP_HEAD_RATIO = 0.15
+
+# CJK 字符范围（用于检测非中文文件中的中文污染）
+_CJK_RE = re.compile(r"[一-鿿]")
 
 
 # ── 内部工具 ────────────────────────────────────────────────────────────────
@@ -261,6 +276,8 @@ def _build_index() -> dict[tuple[str, str], list[tuple[float, Path]]]:
                             if not t_id:
                                 continue
                             score = _read_score(txt_file)
+                            if score < _MIN_NEW_SAMPLE_SCORE:
+                                continue  # exclude low-quality samples from few-shot
                             key = (t_id, lang_code)
                             index.setdefault(key, []).append((score, txt_file))
                             new_count += 1
@@ -299,12 +316,14 @@ def _get_index() -> dict[tuple[str, str], list[tuple[float, Path]]]:
     return _INDEX
 
 
-def _extract_excerpt(lines: list[str]) -> str:
+def _extract_excerpt(lines: list[str], lang_code: str = "zh") -> str:
     """从 lines 中取一段高质量对话片段（过滤占位符、去重、限长）。"""
     total = len(lines)
     skip = max(0, int(total * _SKIP_HEAD_RATIO))
     max_start = max(skip, total - 40)
     start = random.randint(skip, max_start)
+
+    non_zh = lang_code not in ("zh", "yue")  # non-Chinese files should not contain CJK
 
     seen: set[str] = set()
     result: list[str] = []
@@ -315,6 +334,11 @@ def _extract_excerpt(lines: list[str]) -> str:
             continue
         if _PLACEHOLDER_RE.search(line):
             continue
+        # For non-Chinese files, skip lines with significant CJK content (Chinese bleed-in)
+        if non_zh:
+            non_ws = [c for c in line if not c.isspace()]
+            if non_ws and sum(1 for c in non_ws if _CJK_RE.match(c)) / len(non_ws) > 0.05:
+                continue
         content = re.sub(r"^(Speaker|说话人)\s*\d+:\s*", "", line).strip()
         if not content or content in seen:
             continue
@@ -380,7 +404,7 @@ def get_training_few_shot(template_id: str, language: str) -> str:
         try:
             text = _read_cached(path)
             lines = [ln for ln in text.splitlines() if ln.strip()]
-            excerpt = _extract_excerpt(lines)
+            excerpt = _extract_excerpt(lines, lang_code=lang_code)
             if excerpt.strip():
                 return excerpt
         except Exception:
