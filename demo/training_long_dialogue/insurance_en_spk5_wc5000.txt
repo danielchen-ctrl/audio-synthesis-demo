@@ -10,7 +10,6 @@ Speaker 2: Let me confirm ownership on that action so nothing falls through the 
 Speaker 1: Let me make sure we capture this as a formal action item.
 Speaker 2: That's consistent with what we've been tracking.
 Speaker 4: I want to add some context that might be relevant here.
-Speaker 5: 補足ですが、スケジュールについて検討します。
 Speaker 1: Before we move on, let me clarify the scope boundary.
 Speaker 3: I'll confirm the details and report back at the next checkpoint.
 Speaker 1: Let me take that offline and come back with a concrete recommendation.

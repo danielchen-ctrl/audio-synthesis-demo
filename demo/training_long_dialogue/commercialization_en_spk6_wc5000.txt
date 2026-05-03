@@ -8,7 +8,6 @@ Speaker 3: I want to add some context that might be relevant here.
 Speaker 1: I'll summarize what I'm hearing and we can course-correct if needed.
 Speaker 2: I can absorb that scope, but I'll need to adjust my other priorities.
 Speaker 1: There's an important constraint I haven't mentioned yet — let me bring it up now.
-Speaker 4: 補足ですが、スケジュールについて検討します。
 Speaker 5: From our perspective, the main blocker is the dependency on the upstream team.
 Speaker 1: Let's keep our focus on the deliverable and work backwards from there.
 Speaker 1: Let me take that offline and come back with a concrete recommendation.

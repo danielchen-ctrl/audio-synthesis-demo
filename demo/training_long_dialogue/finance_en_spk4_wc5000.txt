@@ -9,7 +9,6 @@ Speaker 1: Let me check if we have consensus on this before we proceed.
 Speaker 2: I'll make sure this gets communicated clearly downstream.
 Speaker 1: I want to make sure we're aligned on the key priorities before we go further.
 Speaker 2: That's consistent with what we've been tracking.
-Speaker 4: 補足ですが、スケジュールについて検討します。
 Speaker 1: We should nail down the decision criteria before we finalize anything.
 Speaker 3: Let me confirm ownership on that action so nothing falls through the cracks.
 Speaker 1: Let's stay focused on what we can actually decide in this meeting.

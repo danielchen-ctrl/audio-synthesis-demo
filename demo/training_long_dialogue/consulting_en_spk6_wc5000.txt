@@ -9,7 +9,6 @@ Speaker 1: Let me be specific about what I need from the team on this.
 Speaker 2: That's helpful framing. Let me think about what it means for our side.
 Speaker 1: I'll summarize what I'm hearing and we can course-correct if needed.
 Speaker 2: I'll align with the team and confirm we're on the same page.
-Speaker 4: 補足ですが、スケジュールについて調整します。
 Speaker 5: I'll follow up on that and get you a concrete answer by end of week.
 Speaker 6: I see the trade-off — let me weigh in on the implementation side.
 Speaker 1: Let me be direct — there are resource constraints we need to work around.

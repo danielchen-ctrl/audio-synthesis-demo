@@ -10,7 +10,6 @@ Speaker 2: That's a fair point — I'll factor that into our planning.
 Speaker 1: I want to make sure we document the rationale, not just the decision.
 Speaker 2: I can support that direction, but I want to flag a potential complication.
 Speaker 4: I'll make sure this gets communicated clearly downstream.
-Speaker 5: 補足ですが、スケジュールについて検討します。
 Speaker 1: Before we move on, let me clarify the scope boundary.
 Speaker 3: I see the trade-off — let me weigh in on the implementation side.
 Speaker 1: We should nail down the decision criteria before we finalize anything.

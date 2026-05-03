@@ -8,7 +8,6 @@ Speaker 3: Ich möchte einen Kontext hinzufügen, der hier relevant sein könnte
 Speaker 1: Ich fasse zusammen, was ich höre, und wir können bei Bedarf Kurskorrekturen vornehmen.
 Speaker 2: Ich kann diesen Spielraum ausschöpfen, aber ich muss meine anderen Prioritäten anpassen.
 Speaker 1: Es gibt eine wichtige Einschränkung, die ich noch nicht erwähnt habe – lassen Sie mich sie jetzt ansprechen.
-Speaker 4: 補足ですが、スケジュールについて検討します.
 Speaker 5: Aus unserer Sicht ist der Hauptblocker die Abhängigkeit vom Upstream-Team.
 Speaker 1: Konzentrieren wir uns weiterhin auf das Ergebnis und arbeiten wir von dort aus rückwärts.
 Speaker 1: Lassen Sie mich das offline nehmen und mit einer konkreten Empfehlung zurückkommen.

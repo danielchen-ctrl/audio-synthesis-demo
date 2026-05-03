@@ -6,7 +6,6 @@ Speaker 1: There's an important constraint I haven't mentioned yet — let me br
 Speaker 1: Let me check if we have consensus on this before we proceed.
 Speaker 2: I see the trade-off — let me weigh in on the implementation side.
 Speaker 1: Let me take that offline and come back with a concrete recommendation.
-Speaker 4: 補足ですが、スケジュールについて検討します。
 Speaker 6: Good point. I'll need to loop in my team before we commit.
 Speaker 1: Before we close this topic, I want to make sure nothing is left hanging.
 Speaker 1: We should separate the short-term fix from the longer-term solution.

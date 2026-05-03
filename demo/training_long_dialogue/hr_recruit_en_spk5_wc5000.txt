@@ -6,7 +6,6 @@ Speaker 1: We should separate the short-term fix from the longer-term solution.
 Speaker 3: I'll make sure this gets communicated clearly downstream.
 Speaker 1: Let me take that offline and come back with a concrete recommendation.
 Speaker 1: I'll summarize what I'm hearing and we can course-correct if needed.
-Speaker 4: 補足ですが、スケジュールについて検討します。
 Speaker 5: I want to add some context that might be relevant here.
 Speaker 1: I want to make sure we document the rationale, not just the decision.
 Speaker 1: I want to double-check our assumptions before we commit to this direction.

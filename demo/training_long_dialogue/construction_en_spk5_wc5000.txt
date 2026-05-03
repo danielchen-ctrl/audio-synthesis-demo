@@ -10,7 +10,6 @@ Speaker 2: I can absorb that scope, but I'll need to adjust my other priorities.
 Speaker 1: Let me pull in some context that might change how we frame this.
 Speaker 2: From our perspective, the main blocker is the dependency on the upstream team.
 Speaker 4: I want to add some context that might be relevant here.
-Speaker 5: 補足ですが、スケジュールについて検討します。
 Speaker 1: Let's pressure-test this plan and identify the weak spots.
 Speaker 3: I want to make sure I understand the ask correctly before I commit.
 Speaker 1: We need to be honest about the timeline pressure here.

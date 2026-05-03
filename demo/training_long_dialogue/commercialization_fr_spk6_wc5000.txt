@@ -8,7 +8,6 @@ Speaker 3: Je souhaite ajouter un contexte qui pourrait être pertinent ici.
 Speaker 1: Je vais résumer ce que j'entends et nous pourrons corriger le tir si nécessaire.
 Speaker 2: Je peux absorber cette portée, mais je devrai ajuster mes autres priorités.
 Speaker 1: Il y a une contrainte importante que je n'ai pas encore mentionnée – permettez-moi d'en parler maintenant.
-Speaker 4: スケジュールについて検討します。
 Speaker 5: De notre point de vue, le principal bloqueur est la dépendance à l’égard de l’équipe en amont.
 Speaker 1: Gardons notre concentration sur le livrable et travaillons à rebours à partir de là.
 Speaker 1: Permettez-moi de mettre cela hors ligne et de revenir avec une recommandation concrète.

@@ -175,13 +175,41 @@ _PLACEHOLDER_RE = re.compile(
     r"|What steps have you already taken to address this issue"
     r"|I'll need to verify a few things before I can give you"
     r"|Please review the proposed plan and let me know if you have"
+    # 英文医疗模板降级行（Bundle LLM 在所有域的英语对话中都会插入，包括非医疗主题）
+    r"|Based on clinical experience.{0,40}(encountered|similar cases)"
+    r"|Based on your description, this situation is quite common"
+    r"|The symptoms you.re describing align with"
+    r"|no treatment plan can guarantee 100%"
+    r"|drug therap\w+ may trigger side effects"
+    r"|gastrointestinal (discomfort|reaction)"
+    r"|treatment outcomes vary considerably among patients"
+    r"|Think of it like maintaining a car"
+    r"|regular check-?ups help prevent bigger problems"
+    r"|Initially weekly follow-?ups are recommended"
+    r"|as (the )?condition stabilizes"
+    r"|[Hh]ow often should I come back for follow-?up"
+    r"|this follows a typical pattern we see in clinical"
+    r"|you.ve told me.{0,20}follows a typical pattern"
+    # 英文短句通用确认降级行（来自多语言文件的英文残留）
+    r"|This explanation is very clear, I understand now"
+    r"|This suggestion is very helpful, thank you"
+    r"|Understood, I will cooperate on my end"
+    r"|Indeed, these details need attention"
+    r"|Okay, I will (cooperate|prepare carefully)"
 )
 
 _MAX_EXCERPT_CHARS = 600
 _SKIP_HEAD_RATIO = 0.15
 
-# CJK 字符范围（用于检测非中文文件中的中文污染）
-_CJK_RE = re.compile(r"[一-鿿]")
+# 旧语料库文件最少行数：少于此行数的文件不纳入索引
+# 设为15：包含韩语清理后的15-19行文件（韩语原内容已大量去除中文污染）
+# 粤语清理后平均仅6行，仍然全部被过滤
+_MIN_CORPUS_LINES = 15
+
+# 字符集检测（用于旧语料和提取时的语言过滤）
+_CJK_RE    = re.compile(r"[一-鿿]")
+_KANA_RE   = re.compile(r"[぀-ヿ]")    # 平假名+片假名
+_HANGUL_RE = re.compile(r"[가-힣]")    # 韩文音节
 
 
 # ── 内部工具 ────────────────────────────────────────────────────────────────
@@ -235,6 +263,15 @@ def _index_old_corpus(index: dict[tuple[str, str], list[tuple[float, Path]]]) ->
             continue
         domain_id, lang_code = parsed
         template_ids = _OLD_DOMAIN_TO_TEMPLATES.get(domain_id, [])
+        if not template_ids:
+            continue
+        # Skip files with too few lines (mostly Korean/Cantonese files after contamination cleanup)
+        try:
+            line_count = sum(1 for l in txt_file.read_text(encoding="utf-8").splitlines() if l.strip())
+        except Exception:
+            continue
+        if line_count < _MIN_CORPUS_LINES:
+            continue
         for t_id in template_ids:
             key = (t_id, lang_code)
             index.setdefault(key, []).append((_OLD_CORPUS_BASE_SCORE, txt_file))
@@ -323,8 +360,6 @@ def _extract_excerpt(lines: list[str], lang_code: str = "zh") -> str:
     max_start = max(skip, total - 40)
     start = random.randint(skip, max_start)
 
-    non_zh = lang_code not in ("zh", "yue")  # non-Chinese files should not contain CJK
-
     seen: set[str] = set()
     result: list[str] = []
     chars = 0
@@ -334,10 +369,22 @@ def _extract_excerpt(lines: list[str], lang_code: str = "zh") -> str:
             continue
         if _PLACEHOLDER_RE.search(line):
             continue
-        # For non-Chinese files, skip lines with significant CJK content (Chinese bleed-in)
-        if non_zh:
+        # Language-specific CJK contamination filter (files already cleaned; this is a safety net)
+        if lang_code in ("en", "fr", "de", "es", "pt"):
             non_ws = [c for c in line if not c.isspace()]
             if non_ws and sum(1 for c in non_ws if _CJK_RE.match(c)) / len(non_ws) > 0.05:
+                continue
+        elif lang_code == "ja":
+            # Japanese uses CJK kanji legitimately; only filter lines that are pure Chinese (no kana)
+            non_ws = [c for c in line if not c.isspace()]
+            cjk_r = sum(1 for c in non_ws if _CJK_RE.match(c)) / len(non_ws) if non_ws else 0
+            if cjk_r > 0.15 and not _KANA_RE.search(line):
+                continue
+        elif lang_code == "ko":
+            # Korean: filter high-CJK lines without Hangul (Chinese contamination)
+            non_ws = [c for c in line if not c.isspace()]
+            cjk_r = sum(1 for c in non_ws if _CJK_RE.match(c)) / len(non_ws) if non_ws else 0
+            if cjk_r > 0.15 and not _HANGUL_RE.search(line):
                 continue
         content = re.sub(r"^(Speaker|说话人)\s*\d+:\s*", "", line).strip()
         if not content or content in seen:

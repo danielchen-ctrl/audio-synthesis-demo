@@ -9,7 +9,6 @@ Speaker 1: Let me surface the two main trade-offs and we can decide together.
 Speaker 2: I want to make sure I understand the ask correctly before I commit.
 Speaker 1: Let me pull in some context that might change how we frame this.
 Speaker 2: I'll make sure this gets communicated clearly downstream.
-Speaker 4: 補足ですが、スケジュールについて検討します。
 Speaker 5: I'll raise this with the relevant stakeholders and come back with a position.
 Speaker 1: Before we close this topic, I want to make sure nothing is left hanging.
 Speaker 3: Happy to dive deeper on that — it's been a concern on our side too.

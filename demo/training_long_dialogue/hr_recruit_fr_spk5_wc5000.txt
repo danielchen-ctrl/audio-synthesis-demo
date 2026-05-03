@@ -6,7 +6,6 @@ Speaker 1: Nous devrions séparer la solution à court terme de la solution à l
 Speaker 3: Je veillerai à ce que cela soit clairement communiqué en aval.
 Speaker 1: Permettez-moi de mettre cela hors ligne et de revenir avec une recommandation concrète.
 Speaker 1: Je vais résumer ce que j'entends et nous pourrons corriger le tir si nécessaire.
-Speaker 4: スケジュールについて検討します。
 Speaker 5: Je souhaite ajouter un contexte qui pourrait être pertinent ici.
 Speaker 1: Je veux m'assurer que nous documentons la justification, pas seulement la décision.
 Speaker 1: Je souhaite revérifier nos hypothèses avant de nous engager dans cette direction.

@@ -10,7 +10,6 @@ Speaker 2: Ich kann diesen Spielraum ausschöpfen, aber ich muss meine anderen P
 Speaker 1: Lassen Sie mich einen Kontext ansprechen, der unsere Sichtweise ändern könnte.
 Speaker 2: Aus unserer Sicht ist der Hauptblocker die Abhängigkeit vom Upstream-Team.
 Speaker 4: Ich möchte einen Kontext hinzufügen, der hier relevant sein könnte.
-Speaker 5: 補足ですが、スケジュールについて検討します。
 Speaker 1: Lassen Sie uns diesen Plan einem Drucktest unterziehen und die Schwachstellen identifizieren.
 Speaker 3: Ich möchte sicherstellen, dass ich die Frage richtig verstehe, bevor ich mich verpflichte.
 Speaker 1: Wir müssen hier ehrlich sein, was den Zeitdruck angeht.

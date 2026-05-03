@@ -10,7 +10,6 @@ Speaker 2: Esse é um ponto justo – vou levar isso em consideração em nosso 
 Speaker 1: Quero ter certeza de que documentamos a justificativa, não apenas a decisão.
 Speaker 2: Posso apoiar essa direção, mas quero assinalar uma potencial complicação.
 Speaker 4: Garantirei que isso seja comunicado claramente a jusante.
-Speaker 5: 補足ですが、スケジュールについて検討します。
 Speaker 1: Antes de prosseguirmos, deixe-me esclarecer os limites do escopo.
 Speaker 3: Entendo a compensação – deixe-me avaliar o lado da implementação.
 Speaker 1: Deveríamos definir os critérios de decisão antes de finalizarmos qualquer coisa.

@@ -10,7 +10,6 @@ Speaker 2: Ese es un buen punto; lo tendré en cuenta en nuestra planificación.
 Speaker 1: Quiero asegurarme de que documentemos el fundamento, no solo la decisión.
 Speaker 2: Puedo apoyar esa dirección, pero quiero señalar una posible complicación.
 Speaker 4: Me aseguraré de que esto se comunique claramente en el futuro.
-Speaker 5: 補足ですが、スケジュールについて検討します.
 Speaker 1: Antes de continuar, permítanme aclarar los límites del alcance.
 Speaker 3: Veo la compensación; permítanme opinar sobre el lado de la implementación.
 Speaker 1: Deberíamos definir los criterios de decisión antes de finalizar nada.

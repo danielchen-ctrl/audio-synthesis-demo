@@ -9,7 +9,6 @@ Speaker 1: We should define what a good outcome looks like before we debate the 
 Speaker 2: Good point. I'll need to loop in my team before we commit.
 Speaker 1: There are a few angles here — let me break them down one by one.
 Speaker 4: I want to add some context that might be relevant here.
-Speaker 5: 補足ですが、スケジュールについて調整します。
 Speaker 1: Let me be specific about what I need from the team on this.
 Speaker 1: Before we move on, let me clarify the scope boundary.
 Speaker 1: Let's make sure the next actions are specific and have owners.

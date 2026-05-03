@@ -9,7 +9,6 @@ Speaker 1: Precisamos ser honestos sobre a pressão do cronograma aqui.
 Speaker 1: Quero validar nossas suposições com dados reais antes de finalizarmos.
 Speaker 2: Concordo com isso. Deixe-me verificar a viabilidade do cronograma.
 Speaker 4: Esse é um enquadramento útil. Deixe-me pensar no que isso significa para o nosso lado.
-Speaker 5: 補足ですが、スケジュールについて調整します。
 Speaker 1: Quero ter certeza de que estamos alinhados nas principais prioridades antes de prosseguirmos.
 Speaker 3: Posso absorver esse escopo, mas precisarei ajustar minhas outras prioridades.
 Speaker 1: Antes de encerrarmos este tópico, quero ter certeza de que nada ficará pendente.

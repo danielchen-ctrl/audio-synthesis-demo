@@ -9,7 +9,6 @@ Speaker 1: Nous devons être honnêtes quant à la pression du calendrier.
 Speaker 1: Je souhaite valider nos hypothèses avec des données réelles avant de finaliser.
 Speaker 2: Je suis d'accord avec cela. Laissez-moi vérifier la faisabilité du calendrier.
 Speaker 4: C'est un cadrage utile. Laissez-moi réfléchir à ce que cela signifie pour notre côté.
-Speaker 5: スケジュールについて調整します。
 Speaker 1: Je veux m'assurer que nous sommes alignés sur les priorités clés avant d'aller plus loin.
 Speaker 3: Je peux absorber cette portée, mais je devrai ajuster mes autres priorités.
 Speaker 1: Avant de clôturer ce sujet, je veux m'assurer que rien n'est laissé en suspens.

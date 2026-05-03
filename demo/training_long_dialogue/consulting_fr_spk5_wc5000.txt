@@ -9,7 +9,6 @@ Speaker 1: Permettez-moi de définir le contexte expliquant pourquoi cela est im
 Speaker 2: Je souhaite ajouter un peu de contexte qui pourrait être pertinent ici.
 Speaker 1: Permettez-moi d'être direct : il existe des contraintes en matière de ressources que nous devons contourner.
 Speaker 2: Cela correspond à ce que nous avons suivi.
-Speaker 4: スケジュールについて検討します。
 Speaker 5: C'est un cadrage utile. Laissez-moi réfléchir à ce que cela signifie pour notre côté.
 Speaker 1: Permettez-moi d'expliquer à tout le monde notre position à ce sujet.
 Speaker 3: Je vois le compromis – permettez-moi d'intervenir sur la mise en œuvre.

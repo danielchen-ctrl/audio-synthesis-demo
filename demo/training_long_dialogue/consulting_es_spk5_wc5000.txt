@@ -9,7 +9,6 @@ Speaker 1: Permítanme establecer el contexto de por qué esto es importante en 
 Speaker 2: Quiero agregar algo de contexto que podría ser relevante aquí.
 Speaker 1: Permítanme ser directo: existen limitaciones de recursos que debemos solucionar.
 Speaker 2: Eso es consistente con lo que hemos estado rastreando.
-Speaker 4: 補足ですが、スケジュールについて検討します.
 Speaker 5: Ese es un marco útil. Permítanme pensar en lo que significa para nuestro lado.
 Speaker 1: Permítanme explicarles a todos nuestra posición al respecto.
 Speaker 3: Veo la compensación; permítanme opinar sobre el lado de la implementación.

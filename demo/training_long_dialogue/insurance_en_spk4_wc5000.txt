@@ -9,7 +9,6 @@ Speaker 1: There are a few angles here — let me break them down one by one.
 Speaker 2: I want to make sure I understand the ask correctly before I commit.
 Speaker 1: We need to be honest about the timeline pressure here.
 Speaker 2: Let me confirm ownership on that action so nothing falls through the cracks.
-Speaker 4: 補足ですが、スケジュールについて調整します。
 Speaker 1: I want to make sure we're aligned on the key priorities before we go further.
 Speaker 3: Understood. I'll factor that into the updated timeline.
 Speaker 1: I want to make sure we document the rationale, not just the decision.

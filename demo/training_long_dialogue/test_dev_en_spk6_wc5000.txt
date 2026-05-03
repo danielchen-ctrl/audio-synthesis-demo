@@ -9,7 +9,6 @@ Speaker 1: I want to make sure we're aligned on the key priorities before we go 
 Speaker 2: I can support that direction, but I want to flag a potential complication.
 Speaker 1: Let me take that offline and come back with a concrete recommendation.
 Speaker 2: Good call — I was going to raise the same concern.
-Speaker 4: 補足ですが、スケジュールについて検討します。
 Speaker 5: That's consistent with what we've been tracking.
 Speaker 6: I'll make sure this gets communicated clearly downstream.
 Speaker 1: We should define what a good outcome looks like before we debate the path.

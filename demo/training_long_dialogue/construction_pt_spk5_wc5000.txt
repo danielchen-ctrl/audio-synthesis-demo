@@ -10,7 +10,6 @@ Speaker 2: Posso absorver esse escopo, mas precisarei ajustar minhas outras prio
 Speaker 1: Deixe-me apresentar algum contexto que possa mudar a forma como enquadramos isso.
 Speaker 2: Do nosso ponto de vista, o principal bloqueador é a dependência da equipe upstream.
 Speaker 4: Quero acrescentar algum contexto que possa ser relevante aqui.
-Speaker 5: 補足ですが、スケジュールについて検討します。
 Speaker 1: Vamos testar este plano e identificar os pontos fracos.
 Speaker 3: Quero ter certeza de que entendi a pergunta corretamente antes de me comprometer.
 Speaker 1: Precisamos ser honestos sobre a pressão do cronograma aqui.

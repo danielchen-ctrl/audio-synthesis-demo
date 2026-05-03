@@ -9,7 +9,6 @@ Speaker 1: Let me set the context for why this matters right now.
 Speaker 2: I want to add some context that might be relevant here.
 Speaker 1: Let me be direct — there are resource constraints we need to work around.
 Speaker 2: That's consistent with what we've been tracking.
-Speaker 4: 補足ですが、スケジュールについて検討します。
 Speaker 5: That's helpful framing. Let me think about what it means for our side.
 Speaker 1: Let me walk everyone through where we stand on this.
 Speaker 3: I see the trade-off — let me weigh in on the implementation side.

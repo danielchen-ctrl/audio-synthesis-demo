@@ -9,7 +9,6 @@ Speaker 1: Il y a quelques angles ici – permettez-moi de les décomposer un p
 Speaker 2: Je veux m'assurer de bien comprendre la demande avant de m'engager.
 Speaker 1: Nous devons être honnêtes quant à la pression du calendrier.
 Speaker 2: Permettez-moi de confirmer que je suis propriétaire de cette action afin que rien ne passe entre les mailles du filet.
-Speaker 4: スケジュールについて調整します。
 Speaker 1: Je veux m'assurer que nous sommes alignés sur les priorités clés avant d'aller plus loin.
 Speaker 3: Compris. Je vais en tenir compte dans la chronologie mise à jour.
 Speaker 1: Je veux m'assurer que nous documentons la justification, pas seulement la décision.

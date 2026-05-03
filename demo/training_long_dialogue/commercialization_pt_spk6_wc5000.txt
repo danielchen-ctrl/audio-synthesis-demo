@@ -8,7 +8,6 @@ Speaker 3: Quero acrescentar algum contexto que possa ser relevante aqui.
 Speaker 1: Vou resumir o que estou ouvindo e podemos corrigir o curso, se necessário.
 Speaker 2: Posso absorver esse escopo, mas precisarei ajustar minhas outras prioridades.
 Speaker 1: Há uma restrição importante que ainda não mencionei – deixe-me abordá-la agora.
-Speaker 4: 補足ですが、スケジュールについて検討します。
 Speaker 5: Do nosso ponto de vista, o principal bloqueador é a dependência da equipe upstream.
 Speaker 1: Vamos manter nosso foco na entrega e trabalhar de trás para frente a partir daí.
 Speaker 1: Deixe-me colocar isso off-line e voltar com uma recomendação concreta.
