@@ -1,342 +1,1505 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>音频语料生成平台 Demo</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260413a" />
-  </head>
-  <body>
-    <div class="app-shell">
-      <header class="topbar">
-        <div class="brand">
-          <div class="brand-badge">AI</div>
-          <div>
-            <h1>音频语料生成平台</h1>
-            <p>在线生成音频 Demo</p>
-          </div>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>语料生成平台</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0F172A;color:#E2E8F0;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+:root{--primary:#3B82F6;--primary-dark:#2563EB;--success:#10B981;--warning:#F59E0B;--danger:#EF4444;--bg:#0F172A;--bg2:#1E293B;--bg3:#334155;--border:#334155;--text:#E2E8F0;--text2:#94A3B8;--text3:#64748B;--radius:8px}
+
+/* Topbar */
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:#1E293B;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;z-index:100}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+.brand-badge{width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.nav{display:flex;gap:4px;margin-left:16px}
+.nav-btn{padding:6px 14px;border-radius:6px;background:transparent;border:none;color:var(--text2);font-size:14px;transition:.15s}
+.nav-btn:hover{background:var(--bg3);color:var(--text)}
+.nav-btn.active{background:rgba(59,130,246,.15);color:var(--primary)}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{padding:7px 14px;border-radius:6px;border:none;font-size:13px;font-weight:500;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{opacity:.85}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.legacy-link{font-size:12px;color:var(--text3);padding:6px 10px;border-radius:6px;border:1px solid var(--border);transition:.15s}.legacy-link:hover{color:var(--text2);border-color:var(--text3)}
+
+/* Layout */
+.page-wrap{margin-top:56px;display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:220px;flex-shrink:0;background:#1E293B;border-right:1px solid var(--border);padding:16px 0;display:none}
+.sidebar.visible{display:block}
+.main{flex:1;padding:24px;overflow:auto;max-width:100%}
+
+/* Sidebar */
+.sb-label{font-size:11px;color:var(--text3);padding:4px 16px;text-transform:uppercase;letter-spacing:.05em}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;font-size:13px;color:var(--text2);transition:.12s;user-select:none}
+.sb-item:hover{background:var(--bg3);color:var(--text)}
+.sb-item.active{background:rgba(59,130,246,.1);color:var(--primary)}
+.sb-item .ic{width:16px;text-align:center;flex-shrink:0}
+.sb-actions{display:flex;gap:4px;margin-left:auto;opacity:0;transition:.1s}
+.sb-item:hover .sb-actions{opacity:1}
+.sb-act-btn{background:none;border:none;color:var(--text3);font-size:11px;padding:2px 4px;border-radius:4px}.sb-act-btn:hover{color:var(--text);background:var(--bg)}
+.add-folder-btn{display:flex;align-items:center;gap:6px;padding:6px 16px;font-size:12px;color:var(--text3);cursor:pointer;width:100%;background:none;border:none;transition:.12s}.add-folder-btn:hover{color:var(--primary)}
+
+/* Page header */
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.page-title{font-size:20px;font-weight:700}
+.page-sub{font-size:13px;color:var(--text2);margin-top:2px}
+.hdr-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* Filter bar */
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:320px}
+.search-wrap input{width:100%;padding:7px 10px 7px 32px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none}
+.search-wrap input:focus{border-color:var(--primary)}
+.search-wrap .ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px}
+.select-field{padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none;cursor:pointer;min-width:110px}
+.select-field:focus{border-color:var(--primary)}
+
+/* Table */
+.table-wrap{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{padding:10px 12px;text-align:left;font-size:12px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody td{padding:10px 12px;font-size:13px;border-bottom:1px solid rgba(51,65,85,.5);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+.cb-col{width:36px}
+.file-name{font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px}
+.ext-badge{font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(59,130,246,.2);color:var(--primary);font-weight:600;flex-shrink:0}
+.row-actions{display:flex;gap:4px;opacity:0;transition:.1s}
+tbody tr:hover .row-actions{opacity:1}
+.row-btn{background:none;border:none;color:var(--text3);padding:4px 6px;border-radius:4px;font-size:12px;white-space:nowrap}.row-btn:hover{background:var(--bg3);color:var(--text)}
+.row-btn.danger:hover{color:var(--danger)}
+.empty-row td{text-align:center;padding:40px;color:var(--text3)}
+
+/* Status */
+.status{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:500}
+.status-queued{background:rgba(100,116,139,.2);color:var(--text2)}
+.status-generating_text,.status-synthesizing{background:rgba(245,158,11,.15);color:var(--warning)}
+.status-completed{background:rgba(16,185,129,.15);color:var(--success)}
+.status-failed{background:rgba(239,68,68,.15);color:var(--danger)}
+.pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Bulk bar */
+.bulk-bar{display:none;align-items:center;gap:8px;padding:8px 12px;background:rgba(59,130,246,.1);border-radius:6px;margin-bottom:12px;font-size:13px}
+.bulk-bar.visible{display:flex}
+
+/* Task cards */
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.task-card{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:16px}
+.task-card-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.task-topic{font-weight:600;font-size:14px;flex:1;margin-right:8px;word-break:break-all}
+.task-meta{font-size:12px;color:var(--text3);margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap}
+.task-prog{height:3px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-top:8px}
+.task-prog-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .5s}
+.task-err{font-size:11px;color:var(--danger);margin-top:6px;word-break:break-all}
+
+/* Detail */
+.detail-wrap{display:flex;gap:24px;flex-wrap:wrap}
+.detail-player{flex:0 0 280px}
+.detail-meta{flex:1;min-width:260px}
+.audio-card{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:20px;text-align:center}
+.audio-waveform{height:80px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:28px;margin:12px 0}
+.audio-ctrl{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:12px}
+.play-btn{width:40px;height:40px;border-radius:50%;background:var(--primary);border:none;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center}
+.prog-bar{flex:1;height:4px;background:var(--bg3);border-radius:99px;cursor:pointer;position:relative}
+.prog-fill{height:100%;background:var(--primary);border-radius:99px;width:0;pointer-events:none}
+.time-txt{font-size:12px;color:var(--text3);white-space:nowrap}
+.meta-section{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px}
+.meta-section h4{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text2)}
+.meta-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}
+.meta-key{color:var(--text3)}
+.meta-val{color:var(--text)}
+.transcript-box{background:var(--bg3);border-radius:6px;padding:12px;font-size:12px;line-height:1.7;max-height:260px;overflow-y:auto;color:var(--text2)}
+.transcript-seg{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.transcript-seg:last-child{border:none}
+.seg-speaker{font-weight:600;color:var(--primary);flex-shrink:0;min-width:70px}
+.seg-text{flex:1}
+
+/* Modals */
+.mo-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:16px}
+.mo-overlay.open{display:flex}
+.mo{background:var(--bg2);border-radius:12px;border:1px solid var(--border);width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.mo-sm{max-width:420px}.mo-md{max-width:560px}.mo-lg{max-width:760px}
+.mo-hdr{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.mo-title{font-size:16px;font-weight:700}
+.mo-close{background:none;border:none;color:var(--text3);font-size:18px;padding:4px;border-radius:4px}.mo-close:hover{color:var(--text);background:var(--bg3)}
+.mo-body{padding:0 20px 20px}
+.mo-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none}
+.form-input:focus{border-color:var(--primary)}
+textarea.form-input{resize:vertical;min-height:100px;font-family:inherit}
+.form-err{font-size:12px;color:var(--danger);margin-top:4px;display:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode-tabs{display:flex;gap:8px;margin-bottom:16px}
+.mode-tab{flex:1;padding:10px;border-radius:8px;border:2px solid var(--border);background:transparent;color:var(--text2);font-size:13px;text-align:center;transition:.15s}
+.mode-tab.sel{border-color:var(--primary);background:rgba(59,130,246,.1);color:var(--primary)}
+.sp-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sp-badge{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:#fff}
+.preview-box{background:var(--bg3);border-radius:6px;padding:12px;font-size:12px;line-height:1.8;color:var(--text2);white-space:pre-wrap;max-height:180px;overflow-y:auto;word-break:break-word}
+.sp-warn{display:none;gap:6px;align-items:center;font-size:12px;color:var(--warning);padding:8px 10px;background:rgba(245,158,11,.1);border-radius:6px;margin-top:8px}
+.move-folder-list{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto;margin-top:8px}
+.move-folder-item{padding:8px 12px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:13px;transition:.12s}
+.move-folder-item:hover{background:var(--bg3)}
+.move-folder-item.sel{border-color:var(--primary);background:rgba(59,130,246,.1);color:var(--primary)}
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:32px;text-align:center;transition:.15s;cursor:pointer}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--primary);background:rgba(59,130,246,.05)}
+.uz-icon{font-size:32px;margin-bottom:8px}
+.uz-text{font-size:14px;font-weight:500;margin-bottom:4px}
+.uz-sub{font-size:12px;color:var(--text3)}
+.file-info-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:6px;font-size:13px}
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;min-height:36px;cursor:text}
+.tag-input-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:12px;flex:1;min-width:80px}
+.ti-tag{font-size:12px;padding:2px 6px;border-radius:99px;background:rgba(59,130,246,.2);color:var(--primary);display:flex;align-items:center;gap:4px}
+.ti-tag .rm{cursor:pointer;opacity:.6}.ti-tag .rm:hover{opacity:1}
+
+/* Mini player */
+.mini-player-row td{padding:0!important}
+.mini-player{background:#0EA5E9;padding:8px 14px;display:flex;align-items:center;gap:10px}
+.mini-play{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mini-prog{flex:1;height:3px;background:rgba(255,255,255,.3);border-radius:99px;cursor:pointer;position:relative}
+.mini-prog-fill{height:100%;background:#fff;border-radius:99px;pointer-events:none}
+
+/* Toast */
+.toast-wrap{position:fixed;top:68px;right:20px;z-index:400;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:10px 16px;border-radius:8px;font-size:13px;max-width:320px;animation:toastIn .2s ease;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast-ok{background:#064E3B;border:1px solid var(--success);color:#A7F3D0}
+.toast-err{background:#450A0A;border:1px solid var(--danger);color:#FCA5A5}
+.toast-info{background:#1E3A5F;border:1px solid var(--primary);color:#93C5FD}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+/* Confirm */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--bg2);border-radius:10px;border:1px solid var(--border);padding:24px;max-width:380px;width:100%;margin:16px}
+.confirm-title{font-size:15px;font-weight:700;margin-bottom:8px}
+.confirm-desc{font-size:13px;color:var(--text2);margin-bottom:20px}
+.confirm-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* Empty/Loading */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-state .ic{font-size:40px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Breadcrumb */
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);margin-bottom:16px}
+.breadcrumb span{cursor:pointer;transition:.12s}.breadcrumb span:hover{color:var(--text)}
+.breadcrumb .sep{color:var(--text3)}.breadcrumb .cur{color:var(--text);font-weight:500;cursor:default}
+
+.hidden{display:none!important}
+
+/* Stats bar */
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.stat-num{font-size:22px;font-weight:700;color:var(--text)}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+.stat-bar{height:3px;background:var(--bg3);border-radius:99px;margin-top:6px;overflow:hidden}
+.stat-bar-fill{height:100%;background:var(--primary);border-radius:99px}
+
+/* Advanced search panel */
+.adv-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;display:none}
+.adv-panel.open{display:block}
+.adv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:10px}
+.adv-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+.btn-adv{font-size:12px;padding:5px 10px;display:inline-flex;align-items:center;gap:4px}
+.btn-adv.open{background:rgba(59,130,246,.1);color:var(--primary);border-color:var(--primary)}
+
+/* Inline edit in detail */
+.edit-field{width:100%;padding:4px 8px;background:var(--bg3);border:1px solid var(--primary);border-radius:4px;color:var(--text);font-size:13px;outline:none;font-family:inherit}
+.edit-actions{display:inline-flex;gap:4px;margin-left:6px}
+.edit-save{background:var(--primary);border:none;color:#fff;padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer}
+.edit-cancel{background:none;border:1px solid var(--border);color:var(--text3);padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer}
+.edit-trigger{background:none;border:none;color:var(--text3);font-size:11px;padding:2px 6px;border-radius:4px;cursor:pointer;margin-left:4px}.edit-trigger:hover{background:var(--bg3);color:var(--text)}
+
+/* Tag pills in detail */
+.tag-pill{font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(100,116,139,.2);color:var(--text2);display:inline-flex;align-items:center;gap:4px}
+.tag-pill .trm{cursor:pointer;opacity:.5;font-size:10px}.tag-pill .trm:hover{opacity:1}
+
+/* Sort/order controls */
+.sort-wrap{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);white-space:nowrap}
+
+/* Upload progress */
+.upload-prog-wrap{display:none;margin-top:10px}
+.upload-prog{height:4px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.upload-prog-fill{height:100%;background:var(--primary);border-radius:99px;width:0;transition:width .3s}
+.upload-prog-label{font-size:11px;color:var(--text3);margin-top:4px;text-align:center}
+
+/* ── Phase 4 ── */
+/* Pipeline visual */
+.pipeline{display:flex;align-items:flex-start;gap:0;margin:12px 0 6px;position:relative}
+.pipeline::before{content:'';position:absolute;top:11px;left:22px;right:22px;height:2px;background:var(--bg3);z-index:0}
+.pip-step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative;z-index:1}
+.pip-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--bg3);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;transition:.3s;flex-shrink:0}
+.pip-step.done .pip-dot{background:var(--success);border-color:var(--success);color:#fff}
+.pip-step.active .pip-dot{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.25)}
+.pip-label{font-size:10px;color:var(--text3);text-align:center;white-space:nowrap;line-height:1.3}
+.pip-step.done .pip-label,.pip-step.active .pip-label{color:var(--text2)}
+/* Waveform animation */
+.waveform-anim{display:flex;align-items:center;justify-content:center;gap:3px;height:56px}
+.wb{width:4px;border-radius:3px;background:var(--primary);height:6px;transition:height .15s}
+.waveform-anim.playing .wb{animation:waveAnim 1.1s ease-in-out infinite}
+.wb:nth-child(1){animation-delay:0s}.wb:nth-child(2){animation-delay:.12s}.wb:nth-child(3){animation-delay:.24s}.wb:nth-child(4){animation-delay:.36s}.wb:nth-child(5){animation-delay:.18s}.wb:nth-child(6){animation-delay:.30s}.wb:nth-child(7){animation-delay:.06s}
+@keyframes waveAnim{0%,100%{height:6px}50%{height:36px}}
+/* Completion banner */
+.comp-banner{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#064E3B;border:1px solid var(--success);color:#A7F3D0;padding:12px 20px;border-radius:10px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:500;animation:bannerIn .3s ease;cursor:default}
+@keyframes bannerIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes bannerOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(16px)}}
+/* Language mini chart */
+.lang-bars{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.lang-bar-row{display:flex;align-items:center;gap:6px}
+.lang-bar-lbl{font-size:10px;color:var(--text3);width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;flex-shrink:0}
+.lang-bar-trk{flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.lang-bar-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .6s}
+.lang-bar-cnt{font-size:10px;color:var(--text3);width:20px;text-align:right;flex-shrink:0}
+
+/* ── Phase 5 ── */
+/* Sortable column headers */
+.th-sort{cursor:pointer;user-select:none}
+.th-sort:hover{color:var(--text)}
+.sort-ic{display:inline-block;font-size:10px;margin-left:3px;color:var(--text3);vertical-align:middle;transition:.15s}
+.th-sort.sorted .sort-ic{color:var(--primary)}
+/* kbd */
+kbd{display:inline-flex;align-items:center;justify-content:center;min-width:22px;padding:2px 6px;background:var(--bg3);border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;font-size:11px;font-family:monospace;color:var(--text2)}
+/* Shortcuts modal grid */
+.shortcut-grid{display:grid;grid-template-columns:auto 1fr;gap:10px 16px;font-size:13px;align-items:center}
+/* Hamburger / mobile nav */
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px 8px;line-height:1;margin-left:4px}
+.mobile-nav-overlay{display:none;position:fixed;inset:0;z-index:90;background:transparent}
+.mobile-nav{display:none;position:fixed;top:56px;left:0;right:0;background:var(--bg2);border-bottom:1px solid var(--border);z-index:95;padding:8px 0;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.mobile-nav.open{display:block}
+.mobile-nav .nav-btn{display:flex;width:100%;border-radius:0;padding:10px 20px;font-size:14px}
+@media(max-width:680px){
+  .hamburger{display:block}
+  .nav{display:none}
+  .topbar-right .btn-ghost,.legacy-link{display:none!important}
+}
+/* Scene distribution section divider */
+.dist-divider{height:1px;background:var(--border);margin:10px 0 8px}
+.dist-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-badge">AI</div>
+    <span>语料生成平台</span>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="goTo('home')" id="nav-home">🏠 全部文件</button>
+    <button class="nav-btn" onclick="goTo('myaudio')" id="nav-myaudio">📁 我的文件</button>
+    <button class="nav-btn" onclick="goTo('tasks')" id="nav-tasks">⚙️ 生成任务</button>
+    <button class="nav-btn" onclick="goTo('trash')" id="nav-trash">🗑 回收站</button>
+  </nav>
+  <div class="topbar-right">
+    <button class="btn btn-ghost btn-sm" onclick="openModal('modal-upload')">⬆ 上传</button>
+    <button class="btn btn-primary btn-sm" onclick="openModal('modal-gen')">✨ 生成语料</button>
+    <a href="/legacy" target="_blank" class="legacy-link">旧版Demo ↗</a>
+  </div>
+  <button class="hamburger" onclick="toggleMobileNav()" title="菜单">≡</button>
+</header>
+<!-- Mobile nav dropdown -->
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="closeMobileNav()"></div>
+<div class="mobile-nav" id="mobile-nav">
+  <button class="nav-btn" onclick="goTo('home');closeMobileNav()">🏠 全部文件</button>
+  <button class="nav-btn" onclick="goTo('myaudio');closeMobileNav()">📁 我的文件</button>
+  <button class="nav-btn" onclick="goTo('tasks');closeMobileNav()" id="mnav-tasks">⚙️ 生成任务</button>
+  <button class="nav-btn" onclick="goTo('trash');closeMobileNav()">🗑 回收站</button>
+  <button class="nav-btn" onclick="openModal('modal-gen');closeMobileNav()">✨ 生成语料</button>
+  <button class="nav-btn" onclick="openModal('modal-upload');closeMobileNav()">⬆ 上传音频</button>
+</div>
+
+<div class="page-wrap">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-label">文件夹</div>
+    <div class="sb-item active" id="sb-all" onclick="filterFolder(undefined,'all')">
+      <span class="ic">📂</span> 全部文件
+    </div>
+    <div id="folder-list"></div>
+    <button class="add-folder-btn" onclick="openCreateFolderModal()">＋ 新建文件夹</button>
+  </aside>
+
+  <main class="main">
+
+    <!-- Home Page -->
+    <div id="page-home">
+      <div class="page-hdr">
+        <div><div class="page-title">全部文件</div><div class="page-sub" id="home-sub">—</div></div>
+        <div class="hdr-actions">
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV('home')">📊 导出CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportSelected('home')">⬇ 批量下载</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteSelected('home')" style="color:var(--danger)">🗑 批量删除</button>
         </div>
-        <div class="topbar-right">
-          <div class="share-box">
-            <div class="share-label">局域网访问</div>
-            <div class="share-row">
-              <a id="sharePrimaryLink" class="share-link" href="#" target="_blank" rel="noreferrer">加载中...</a>
-              <button id="copyShareBtn" class="btn btn-secondary btn-sm" type="button" disabled>复制</button>
-            </div>
-            <div id="shareHint" class="share-hint">正在获取可访问地址...</div>
-          </div>
-          <div class="user-pill">
-            <span class="avatar">L</span>
-            <span>lucy</span>
-          </div>
+      </div>
+
+      <!-- Stats cards -->
+      <div class="stats-bar" id="home-stats">
+        <div class="stat-card"><span class="stat-num" id="stat-total">—</span><span class="stat-label">全部文件</span></div>
+        <div class="stat-card"><span class="stat-num" id="stat-dur">—</span><span class="stat-label">总时长</span></div>
+        <div class="stat-card"><span class="stat-num" id="stat-size">—</span><span class="stat-label">总大小</span></div>
+        <div class="stat-card"><span class="stat-num" id="stat-tasks">—</span><span class="stat-label">进行中任务</span></div>
+        <div class="stat-card" id="stat-lang-card"><span class="stat-label">语言分布</span><div class="lang-bars" id="stat-lang-bars"><div style="font-size:11px;color:var(--text3);margin-top:6px">—</div></div><div class="dist-divider"></div><div class="dist-label">场景分布</div><div class="lang-bars" id="stat-scene-bars"><div style="font-size:11px;color:var(--text3)">—</div></div></div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-wrap"><span class="ic">🔍</span><input type="text" placeholder="搜索文件名或主题" id="home-search" oninput="debounceLoad('home')"/></div>
+        <select class="select-field" id="home-lang" onchange="loadHome()"><option value="">全部语言</option><option>中文（普通话）</option><option>英语</option><option>日语</option><option>韩语</option><option>法语</option><option>德语</option><option>西班牙语</option><option>葡萄牙语</option><option>意大利语</option><option>俄语</option><option>阿拉伯语</option><option>印度尼西亚语</option><option>粤语</option></select>
+        <select class="select-field" id="home-scene" onchange="loadHome()"><option value="">全部场景</option><option value="meeting">会议</option><option value="interview">访谈</option><option value="medical">问诊</option><option value="other">其他</option></select>
+        <select class="select-field" id="home-source" onchange="loadHome()"><option value="">全部来源</option><option value="generated">AI生成</option><option value="uploaded">手动上传</option></select>
+        <div class="sort-wrap">
+          排序：<select class="select-field" id="home-sort" onchange="updateSortIndicators('home');loadHome()" style="min-width:100px"><option value="created_at_desc">最新优先</option><option value="created_at_asc">最旧优先</option><option value="duration_desc">时长↓</option><option value="duration_asc">时长↑</option><option value="file_name_asc">名称↑</option><option value="file_name_desc">名称↓</option></select>
         </div>
-      </header>
+        <button class="btn btn-ghost btn-adv" id="adv-btn-home" onclick="toggleAdvPanel('adv-home','adv-btn-home')">▼ 高级筛选</button>
+      </div>
 
-      <main class="workspace">
-        <section class="workspace-toolbar">
-          <div class="search-wrap">
-            <input id="taskSearchInput" class="input-field" type="text" placeholder="搜索任务标题、文件名或状态…" />
-            <button id="taskSearchBtn" class="btn btn-primary btn-sm" type="button">搜索</button>
-            <button id="advancedSearchBtn" class="btn btn-secondary btn-sm" type="button">高级筛选</button>
-          </div>
-          <div class="toolbar-actions">
-            <button id="uploadBtn" class="btn btn-secondary" type="button" disabled title="演示版暂不开放上传">上传文件</button>
-            <button id="openOnlineAudioBtn" class="btn btn-primary" type="button">+ 在线生成音频</button>
-          </div>
-        </section>
+      <!-- Advanced search panel -->
+      <div class="adv-panel" id="adv-home">
+        <div style="font-size:12px;color:var(--text2);font-weight:500">高级筛选</div>
+        <div class="adv-grid">
+          <div><label class="form-label">最小时长（秒）</label><input class="form-input" type="number" id="home-dur-min" placeholder="0" min="0"/></div>
+          <div><label class="form-label">最大时长（秒）</label><input class="form-input" type="number" id="home-dur-max" placeholder="不限" min="0"/></div>
+          <div><label class="form-label">说话人数</label><input class="form-input" type="number" id="home-spk" placeholder="不限" min="1"/></div>
+          <div><label class="form-label">创建日期（起）</label><input class="form-input" type="date" id="home-date-from"/></div>
+          <div><label class="form-label">创建日期（止）</label><input class="form-input" type="date" id="home-date-to"/></div>
+        </div>
+        <div class="adv-actions">
+          <button class="btn btn-ghost btn-sm" onclick="resetAdv('home')">重置</button>
+          <button class="btn btn-primary btn-sm" onclick="loadHome()">应用筛选</button>
+        </div>
+      </div>
 
-        <section id="taskFilterBar" class="task-filter-bar hidden">
-          <div class="filter-grid">
-            <div class="filter-field">
-              <label for="taskStatusFilter">状态</label>
-              <select id="taskStatusFilter" class="select-field">
-                <option value="all">全部状态</option>
-                <option value="生成成功">生成成功</option>
-                <option value="生成失败">生成失败</option>
-                <option value="语音合成中">语音合成中</option>
-                <option value="文本生成中">文本生成中</option>
-              </select>
-            </div>
-            <div class="filter-field">
-              <label for="taskSourceFilter">来源</label>
-              <select id="taskSourceFilter" class="select-field">
-                <option value="all">全部来源</option>
-                <option value="生成">生成</option>
-                <option value="上传">上传</option>
-              </select>
-            </div>
-            <label class="checkbox-row filter-checkbox" for="staleOnlyFilter">
-              <input id="staleOnlyFilter" type="checkbox" />
-              <span>只看过时任务（24 小时前）</span>
-            </label>
-            <div class="filter-actions">
-              <button id="clearTaskFiltersBtn" class="btn btn-secondary btn-sm" type="button">清空筛选</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="table-card">
-          <div class="table-head">
-            <div>
-              <div class="table-title">生成任务列表</div>
-              <div class="table-subtitle">提交在线生成任务后，会在这里查看状态和下载结果。</div>
-            </div>
-            <div class="table-head-actions">
-              <span id="taskSummary" class="task-summary">当前暂无任务</span>
-              <button id="cleanupOldTasksBtn" class="btn btn-secondary btn-sm" type="button">清理过时任务</button>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table class="task-table">
-              <thead>
-                <tr>
-                  <th>文本主题</th>
-                  <th>创建时间</th>
-                  <th>来源</th>
-                  <th>状态</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody id="taskTableBody"></tbody>
-            </table>
-            <div id="taskEmpty" class="empty-state">
-              <div class="empty-title">暂无生成任务</div>
-              <div class="empty-desc">点击右上角“在线生成音频”，按原型流程提交一条生成任务。</div>
-            </div>
-          </div>
-        </section>
-      </main>
+      <div class="bulk-bar" id="bulk-home"><span id="bulk-home-cnt">已选 0 项</span><button class="btn btn-ghost btn-sm" onclick="exportSelected('home')">⬇ 下载</button><button class="btn btn-ghost btn-sm" onclick="openMoveModal('home')">📂 移动</button><button class="btn btn-ghost btn-sm" onclick="deleteSelected('home')" style="color:var(--danger)">🗑 删除</button><button class="btn btn-ghost btn-sm" onclick="clearSel('home')">✕ 取消</button></div>
+      <div class="table-wrap"><table id="tbl-home">
+        <thead><tr><th class="cb-col"><input type="checkbox" onchange="toggleAll('home',this)"/></th><th class="th-sort" id="sh-home-fname" onclick="setTableSort('home','file_name_asc','file_name_desc')">文件名<span class="sort-ic" id="si-home-fname"></span></th><th class="th-sort" id="sh-home-dur" onclick="setTableSort('home','duration_desc','duration_asc')">时长<span class="sort-ic" id="si-home-dur"></span></th><th>语言</th><th>场景</th><th>来源</th><th class="th-sort" id="sh-home-date" onclick="setTableSort('home','created_at_desc','created_at_asc')">创建时间<span class="sort-ic" id="si-home-date"></span></th><th>操作</th></tr></thead>
+        <tbody id="tbody-home"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)"><span class="spinner"></span>加载中…</td></tr></tbody>
+      </table></div>
     </div>
 
-    <div id="toastContainer" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
-
-    <div id="modalOverlay" class="modal-overlay open">
-      <div id="modalPanel" class="modal-panel">
-        <div id="modalHeader" class="modal-header">
-          <div class="modal-title">在线生成音频</div>
-          <div class="modal-header-actions">
-            <button id="resetModalLayoutBtn" class="modal-header-btn" type="button">重置布局</button>
-            <button id="closeModalBtn" class="modal-close" type="button" aria-label="关闭">×</button>
-          </div>
+    <!-- My Files Page -->
+    <div id="page-myaudio" class="hidden">
+      <div class="breadcrumb"><span onclick="filterFolder(undefined,'all')">我的文件</span><span class="sep hidden" id="my-bc-sep">/</span><span class="cur" id="my-bc-cur"></span></div>
+      <div class="page-hdr">
+        <div><div class="page-title" id="my-title">我的文件</div><div class="page-sub" id="my-sub">—</div></div>
+        <div class="hdr-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openCreateFolderModal()">📁 新建文件夹</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV('my')">📊 导出CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportSelected('my')">⬇ 批量下载</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteSelected('my')" style="color:var(--danger)">🗑 批量删除</button>
         </div>
-
-        <div class="modal-body">
-          <section class="modal-section">
-            <div class="section-title">生成方式</div>
-            <div class="radio-group">
-              <label id="modeCardLlm" class="mode-card selected" onclick="setMode('llm'); return false;">
-                <input id="modeLlm" type="radio" name="generationMode" value="llm" checked />
-                <div>
-                  <div class="mode-title">LLM 生成文本并合成音频</div>
-                  <div class="mode-desc">AI 自动生成对话文本</div>
-                </div>
-              </label>
-              <label id="modeCardManual" class="mode-card" onclick="setMode('manual'); return false;">
-                <input id="modeManual" type="radio" name="generationMode" value="manual" />
-                <div>
-                  <div class="mode-title">直接输入文本生成音频</div>
-                  <div class="mode-desc">自己编写对话文本</div>
-                </div>
-              </label>
-            </div>
-          </section>
-
-          <section id="llmSection" class="modal-section">
-            <div class="section-title">内容配置</div>
-            <div id="topicManualGroup" class="form-group">
-              <label class="form-label" for="llmTopic">输入主题<span class="req">*</span></label>
-              <div class="topic-input-container">
-                <input id="llmTopic" class="input-field topic-with-action" type="text" maxlength="255" placeholder="如：季度复盘会议讨论" />
-                <button id="presetPickerBtn" class="topic-preset-inline-btn" type="button">预置主题</button>
-              </div>
-            </div>
-            <div id="topicPresetGroup" class="form-group hidden">
-              <label class="form-label" for="presetTopicSelect">输入主题<span class="req">*</span></label>
-              <select id="presetTopicSelect" class="select-field"></select>
-              <div class="topic-preset-actions">
-                <button id="clearPresetBtn" class="topic-clear-btn" type="button">← 返回手动输入</button>
-              </div>
-              <div class="form-hint">选项内容来自预置对话情景摘要，选择后会自动联动主题模板。</div>
-            </div>
-            <div id="presetTopicResolvedGroup" class="form-group hidden">
-              <label class="form-label" for="presetTopicResolved">预置主题内容</label>
-              <textarea
-                id="presetTopicResolved"
-                class="textarea-field readonly-field"
-                rows="3"
-                readonly
-                placeholder="选择预置文本主题后，这里会展示完整主题内容"
-              ></textarea>
-            </div>
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label" for="templateSelect">主题模板<span class="req">*</span></label>
-                <select id="templateSelect" class="select-field"></select>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="llmLanguage">文本语言<span class="req">*</span></label>
-                <select id="llmLanguage" class="select-field"></select>
-                <div id="languageHint" class="form-hint hidden">文本以中文生成，音频将以所选语言合成（文本中可能保留少量中文字符）</div>
-              </div>
-            </div>
-            <div id="customPromptGroup" class="form-group hidden">
-              <label class="form-label" for="customPrompt">自定义 Prompt</label>
-              <textarea
-                id="customPrompt"
-                class="textarea-field"
-                rows="3"
-                placeholder="如：生成一个两人技术讨论，讨论软件发布流程，语气自然"
-              ></textarea>
-            </div>
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label" for="wordCountLimit">字数限制<span class="req">*</span></label>
-                <input
-                  id="wordCountLimit"
-                  class="input-field"
-                  type="number"
-                  min="300"
-                  max="50000"
-                  value="1000"
-                  placeholder="300–50000"
-                />
-                <div class="word-count-presets">
-                  <span class="wc-preset" data-wc="1000">1K</span>
-                  <span class="wc-preset" data-wc="3000">3K</span>
-                  <span class="wc-preset" data-wc="5000">5K</span>
-                  <span class="wc-preset" data-wc="10000">1万</span>
-                  <span class="wc-preset" data-wc="20000">2万</span>
-                  <span class="wc-preset" data-wc="50000">5万</span>
-                </div>
-                <div id="longDialogueHint" class="form-hint long-dialogue-hint" style="display:none">
-                  ⏱ 超过5000字将多段生成，预计耗时较长
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="keywordInput">关键词</label>
-                <div id="keywordWrap" class="tag-input-wrap">
-                  <input id="keywordInput" type="text" placeholder="输入关键词，回车或逗号添加" />
-                </div>
-                <div class="form-hint">多个关键词用回车或逗号分隔</div>
-              </div>
-            </div>
-          </section>
-
-          <section id="manualSection" class="modal-section hidden">
-            <div class="section-title">文本内容</div>
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label" for="manualTopic">文本主题<span class="req">*</span></label>
-                <input id="manualTopic" class="input-field" type="text" maxlength="255" placeholder="描述文本主题" />
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="manualLanguage">文本语言<span class="req">*</span></label>
-                <select id="manualLanguage" class="select-field"></select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="manualText">文本内容<span class="req">*</span></label>
-              <textarea
-                id="manualText"
-                class="textarea-field mono-field"
-                rows="7"
-                placeholder="Speaker 1: 你好，今天我们讨论什么&#10;Speaker 2: 好的，我建议从…"
-              ></textarea>
-              <div class="form-hint">格式：每行 Speaker N: 对话内容，N 从 1 开始连续</div>
-            </div>
-          </section>
-
-          <section class="modal-section">
-            <div class="section-title">说话人数</div>
-            <div class="form-group compact-group">
-              <label class="form-label" for="speakerCount">说话人数<span class="req">*</span></label>
-              <input id="speakerCount" class="input-field compact-input" type="number" min="1" max="10" value="2" />
-              <div class="form-hint">范围 1–10，须与文本中 Speaker 数量一致</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">音色配置<span class="req">*</span></label>
-              <div class="voice-language-hint">
-                当前语言：<span id="voiceLanguageLabel">中文（普通话）</span> — 音色列表已按语言筛选
-              </div>
-              <div id="speakerVoiceRows" class="speaker-rows"></div>
-              <div id="voiceWarning" class="inline-warning hidden">请为所有说话人选择音色</div>
-            </div>
-            <div id="generateTextRow">
-              <button id="generateTextBtn" class="btn-generate" type="button">✨ 根据以上配置生成文本</button>
-            </div>
-          </section>
-
-          <section id="previewSection" class="modal-section hidden">
-            <div class="preview-head">
-              <div class="section-title no-margin">文本预览与编辑</div>
-              <button id="regenTextBtn" class="btn btn-secondary btn-sm" type="button">重新生成</button>
-            </div>
-            <textarea id="previewText" class="textarea-field mono-field" rows="7"></textarea>
-            <div id="previewKeywordGroup" class="keyword-preview-group hidden">
-              <label class="form-label" for="previewKeywordHighlight">关键词高亮预览</label>
-              <div id="previewKeywordHighlight" class="keyword-highlight-preview"></div>
-            </div>
-          </section>
-
-          <section class="modal-section">
-            <div class="section-title">音频配置</div>
-
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label" for="outputFormat">音频输出格式<span class="req">*</span></label>
-                <select id="outputFormat" class="select-field">
-                  <option>MP3</option>
-                  <option>WAV</option>
-                  <option>M4A</option>
-                </select>
-              </div>
-            </div>
-            <input id="preciseDuration" type="hidden" value="" />
-
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label" for="folderSelect">保存到文件夹</label>
-                <select id="folderSelect" class="select-field">
-                  <option>默认目录</option>
-                  <option>项目 A / 会议语料</option>
-                  <option>项目 A / 访谈语料</option>
-                  <option>项目 B</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="tagInput">标签 Tag</label>
-                <div id="tagWrap" class="tag-input-wrap">
-                  <input id="tagInput" type="text" placeholder="输入标签，回车添加" />
-                </div>
-                <div class="form-hint">可选，回车添加多个标签</div>
-              </div>
-            </div>
-
-            <label class="checkbox-row" for="includeScripts">
-              <input id="includeScripts" type="checkbox" />
-              <span>同时生成 JSON 和 SRT 脚本文件</span>
-            </label>
-          </section>
-
-          <div id="modalMessage" class="modal-message"></div>
-        </div>
-
-        <div class="modal-footer">
-          <button id="cancelModalBtn" class="btn btn-secondary" type="button">取消</button>
-          <button id="submitAudioBtn" class="btn btn-primary" type="button">生成音频</button>
-        </div>
-        <div id="modalResizeHandle" class="modal-resize-handle" aria-hidden="true" title="拖动调整弹窗大小"></div>
       </div>
+      <div class="filter-bar">
+        <div class="search-wrap"><span class="ic">🔍</span><input type="text" placeholder="搜索文件名或主题" id="my-search" oninput="debounceLoad('my')"/></div>
+        <select class="select-field" id="my-lang" onchange="loadMy()"><option value="">全部语言</option><option>中文（普通话）</option><option>英语</option><option>日语</option><option>韩语</option><option>法语</option><option>德语</option><option>西班牙语</option><option>葡萄牙语</option><option>意大利语</option><option>俄语</option><option>阿拉伯语</option><option>印度尼西亚语</option><option>粤语</option></select>
+        <select class="select-field" id="my-scene" onchange="loadMy()"><option value="">全部场景</option><option value="meeting">会议</option><option value="interview">访谈</option><option value="medical">问诊</option><option value="other">其他</option></select>
+        <div class="sort-wrap">排序：<select class="select-field" id="my-sort" onchange="updateSortIndicators('my');loadMy()" style="min-width:100px"><option value="created_at_desc">最新优先</option><option value="created_at_asc">最旧优先</option><option value="duration_desc">时长↓</option><option value="duration_asc">时长↑</option><option value="file_name_asc">名称↑</option><option value="file_name_desc">名称↓</option></select></div>
+        <button class="btn btn-ghost btn-adv" id="adv-btn-my" onclick="toggleAdvPanel('adv-my','adv-btn-my')">▼ 高级筛选</button>
+      </div>
+      <div class="adv-panel" id="adv-my">
+        <div style="font-size:12px;color:var(--text2);font-weight:500">高级筛选</div>
+        <div class="adv-grid">
+          <div><label class="form-label">最小时长（秒）</label><input class="form-input" type="number" id="my-dur-min" placeholder="0" min="0"/></div>
+          <div><label class="form-label">最大时长（秒）</label><input class="form-input" type="number" id="my-dur-max" placeholder="不限" min="0"/></div>
+          <div><label class="form-label">说话人数</label><input class="form-input" type="number" id="my-spk" placeholder="不限" min="1"/></div>
+        </div>
+        <div class="adv-actions"><button class="btn btn-ghost btn-sm" onclick="resetAdv('my')">重置</button><button class="btn btn-primary btn-sm" onclick="loadMy()">应用筛选</button></div>
+      </div>
+      <div class="bulk-bar" id="bulk-my"><span id="bulk-my-cnt">已选 0 项</span><button class="btn btn-ghost btn-sm" onclick="exportSelected('my')">⬇ 下载</button><button class="btn btn-ghost btn-sm" onclick="openMoveModal('my')">📂 移动</button><button class="btn btn-ghost btn-sm" onclick="deleteSelected('my')" style="color:var(--danger)">🗑 删除</button><button class="btn btn-ghost btn-sm" onclick="clearSel('my')">✕ 取消</button></div>
+      <div class="table-wrap"><table id="tbl-my">
+        <thead><tr><th class="cb-col"><input type="checkbox" onchange="toggleAll('my',this)"/></th><th class="th-sort" id="sh-my-fname" onclick="setTableSort('my','file_name_asc','file_name_desc')">文件名<span class="sort-ic" id="si-my-fname"></span></th><th class="th-sort" id="sh-my-dur" onclick="setTableSort('my','duration_desc','duration_asc')">时长<span class="sort-ic" id="si-my-dur"></span></th><th>文件夹</th><th>语言</th><th>场景</th><th class="th-sort" id="sh-my-date" onclick="setTableSort('my','created_at_desc','created_at_asc')">创建时间<span class="sort-ic" id="si-my-date"></span></th><th>操作</th></tr></thead>
+        <tbody id="tbody-my"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)"><span class="spinner"></span>加载中…</td></tr></tbody>
+      </table></div>
     </div>
 
-    <dialog id="confirmDialog" class="confirm-dialog">
-      <p id="confirmMessage" class="confirm-message"></p>
-      <div class="confirm-actions">
-        <button id="confirmCancelBtn" class="btn btn-secondary" type="button">取消</button>
-        <button id="confirmOkBtn" class="btn btn-primary" type="button">确认</button>
+    <!-- Tasks Page -->
+    <div id="page-tasks" class="hidden">
+      <div class="page-hdr">
+        <div><div class="page-title">⚙️ 生成任务</div><div class="page-sub" id="tasks-sub">—</div></div>
+        <div class="hdr-actions">
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-gen')">✨ 新建任务</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearCompletedTasks()">🗑 清空已完成</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadTasks()">↻ 刷新</button>
+        </div>
       </div>
-    </dialog>
+      <div id="task-grid" class="task-grid"><div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span>加载中…</div></div>
+    </div>
 
-    <script src="/static/app.js?v=20260413a"></script>
-  </body>
+    <!-- Trash Page -->
+    <div id="page-trash" class="hidden">
+      <div class="page-hdr">
+        <div><div class="page-title">🗑 回收站</div><div class="page-sub">已删除文件（30天内可还原）</div></div>
+        <div class="hdr-actions">
+          <button class="btn btn-ghost btn-sm" onclick="bulkRestore()">↩ 批量还原</button>
+          <button class="btn btn-ghost btn-sm" onclick="bulkPermDelete()" style="color:var(--danger)">永久删除</button>
+        </div>
+      </div>
+      <div class="bulk-bar" id="bulk-trash"><span id="bulk-trash-cnt">已选 0 项</span><button class="btn btn-ghost btn-sm" onclick="bulkRestore()">↩ 还原</button><button class="btn btn-ghost btn-sm" onclick="bulkPermDelete()" style="color:var(--danger)">🗑 永久删除</button><button class="btn btn-ghost btn-sm" onclick="clearSel('trash')">✕ 取消</button></div>
+      <div class="table-wrap"><table id="tbl-trash">
+        <thead><tr><th class="cb-col"><input type="checkbox" onchange="toggleAll('trash',this)"/></th><th>文件名</th><th>时长</th><th>语言</th><th>删除时间</th><th>操作</th></tr></thead>
+        <tbody id="tbody-trash"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text3)"><span class="spinner"></span>加载中…</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- Detail Page -->
+    <div id="page-detail" class="hidden">
+      <div class="page-hdr">
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn btn-ghost btn-sm" id="detail-back-btn">← 返回</button>
+          <div class="page-title" id="detail-title">文件详情</div>
+        </div>
+        <div class="hdr-actions">
+          <button class="btn btn-ghost btn-sm" id="detail-dl-btn">⬇ 下载音频</button>
+          <button class="btn btn-ghost btn-sm hidden" id="detail-dl-json">⬇ 字幕JSON</button>
+          <button class="btn btn-ghost btn-sm hidden" id="detail-dl-srt">⬇ 字幕SRT</button>
+          <button class="btn btn-ghost btn-sm" id="detail-del-btn" style="color:var(--danger)">🗑 删除</button>
+        </div>
+      </div>
+      <div id="detail-body"><div style="text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span>加载中…</div></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ Generate Modal ══ -->
+<div class="mo-overlay" id="modal-gen">
+  <div class="mo mo-lg">
+    <div class="mo-hdr"><span class="mo-title">✨ 生成语料</span><button class="mo-close" onclick="closeModal('modal-gen')">✕</button></div>
+    <div class="mo-body">
+      <div class="mode-tabs">
+        <button class="mode-tab sel" id="rLLM" onclick="selectMode('llm')">🤖 AI 生成文本</button>
+        <button class="mode-tab" id="rManual" onclick="selectMode('manual')">✏️ 直接输入文本</button>
+      </div>
+      <!-- LLM -->
+      <div id="secLLM">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">文本主题 *</label><input class="form-input" id="topicInput" placeholder="如：医院随访问诊"/></div>
+          <div class="form-group"><label class="form-label">场景模板</label><select class="form-input" id="tplSelect" onchange="onTplChange(this)"><option value="">自动匹配</option><option value="meeting">会议</option><option value="interview">访谈</option><option value="medical">问诊</option><option value="custom">自定义</option></select></div>
+        </div>
+        <div class="form-group hidden" id="customPG"><label class="form-label">自定义提示词</label><textarea class="form-input" id="customPrompt" placeholder="描述你想要的对话内容…"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">语言</label><select class="form-input" id="genLang" onchange="syncVoiceLang(this.value)"><option>中文（普通话）</option><option>英语</option><option>日语</option><option>韩语</option><option>法语</option><option>德语</option><option>西班牙语</option><option>葡萄牙语</option><option>意大利语</option><option>俄语</option><option>阿拉伯语</option><option>印度尼西亚语</option><option>粤语</option></select></div>
+          <div class="form-group"><label class="form-label">说话人数</label><input class="form-input" type="number" id="spCount" value="2" min="1" max="10" oninput="updateSpRows()"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">目标字数</label><input class="form-input" type="number" id="wordCount" value="1000" min="200" max="5000"/></div>
+          <div class="form-group"><label class="form-label">输出格式</label><select class="form-input" id="outputFmt"><option value="mp3">MP3</option><option value="wav">WAV</option></select></div>
+        </div>
+        <div class="form-group"><label class="form-label">关键词（回车添加）</label><div class="tag-input-wrap" id="kwWrap" onclick="this.querySelector('input').focus()"><input type="text" placeholder="输入关键词后按回车" onkeydown="addKw(event,this)" oninput="checkKwComma(this)"/></div></div>
+        <div id="genBtnRow" style="margin-bottom:16px"><button class="btn btn-ghost" id="btnGenText" onclick="genText()">✨ 预览生成文本（可选）</button></div>
+        <div class="form-group hidden" id="secPreview"><label class="form-label" style="display:flex;justify-content:space-between">文本预览<button class="btn btn-ghost btn-sm" onclick="regenText()">↺ 重新生成</button></label><div class="preview-box" id="previewText"></div></div>
+      </div>
+      <!-- Manual -->
+      <div id="secManual" class="hidden">
+        <div class="form-group"><label class="form-label">输入文本（格式：说话人N: 内容）</label><textarea class="form-input" id="manualText" rows="10" placeholder="说话人1: 你好，我是张医生。&#10;说话人2: 医生您好，我最近血压偏高…"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">语言</label><select class="form-input" id="genLangManual" onchange="syncVoiceLang(this.value)"><option>中文（普通话）</option><option>英语</option><option>日语</option><option>韩语</option><option>法语</option><option>德语</option><option>西班牙语</option><option>葡萄牙语</option><option>意大利语</option><option>俄语</option><option>阿拉伯语</option><option>印度尼西亚语</option><option>粤语</option></select></div>
+          <div class="form-group"><label class="form-label">说话人数</label><input class="form-input" type="number" id="spCountManual" value="2" min="1" max="10" oninput="updateSpRows()"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">输出格式</label><select class="form-input" id="outputFmtManual"><option value="mp3">MP3</option><option value="wav">WAV</option></select></div>
+          <div></div>
+        </div>
+      </div>
+      <!-- Voice assignment -->
+      <div class="form-group">
+        <label class="form-label">音色分配 <span style="color:var(--text3);font-weight:400" id="voiceLangLabel">（中文（普通话））</span></label>
+        <div id="spRows"></div>
+        <div class="sp-warn" id="spWarn">⚠ 请为每位说话人选择音色</div>
+      </div>
+      <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px"><input type="checkbox" id="includeScripts"/> 同时保存文本台本（SRT字幕）</label></div>
+    </div>
+    <div class="mo-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-gen')">取消</button>
+      <button class="btn btn-primary" id="btnSubmit" onclick="submitGen()">🎵 生成音频</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Upload Modal ══ -->
+<div class="mo-overlay" id="modal-upload">
+  <div class="mo mo-md">
+    <div class="mo-hdr"><span class="mo-title">⬆ 上传音频</span><button class="mo-close" onclick="closeModal('modal-upload')">✕</button></div>
+    <div class="mo-body">
+      <div class="upload-zone" id="uZone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)" onclick="document.getElementById('fInput').click()">
+        <div class="uz-icon">🎵</div><div class="uz-text">点击或拖拽上传音频文件</div><div class="uz-sub">支持 WAV / MP3 / M4A / MP4，最大 500MB</div>
+      </div>
+      <input type="file" id="fInput" accept=".wav,.mp3,.m4a,.mp4" style="display:none" onchange="handleFSel(this)"/>
+      <div class="file-info-row hidden" id="uInfo">
+        <span style="font-size:20px">🎵</span>
+        <div style="flex:1"><div style="font-weight:500" id="uFileName"></div><div style="font-size:12px;color:var(--text3)" id="uFileSize"></div></div>
+        <button class="btn btn-ghost btn-sm" onclick="clearFile()">✕</button>
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <div class="form-group"><label class="form-label">语言 *</label><select class="form-input" id="uLang"><option value="">— 请选择 —</option><option>中文（普通话）</option><option>英语</option><option>日语</option><option>韩语</option><option>法语</option><option>德语</option><option>西班牙语</option><option>葡萄牙语</option><option>意大利语</option><option>俄语</option><option>阿拉伯语</option><option>印度尼西亚语</option><option>粤语</option></select></div>
+        <div class="form-group"><label class="form-label">场景 *</label><select class="form-input" id="uScene"><option value="">— 请选择 —</option><option value="meeting">会议</option><option value="interview">访谈</option><option value="medical">问诊</option><option value="other">其他</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">说话人数 *</label><input class="form-input" type="number" id="uSp" value="2" min="1" max="20"/></div>
+        <div class="form-group"><label class="form-label">文件夹（可选）</label><select class="form-input" id="uFolder"><option value="">根目录</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">主题 / 备注（可选）</label><input class="form-input" id="uTopic" placeholder="如：销售团队周会录音"/></div>
+      <div class="upload-prog-wrap" id="uploadProgWrap">
+        <div class="upload-prog"><div class="upload-prog-fill" id="uploadProgFill"></div></div>
+        <div class="upload-prog-label" id="uploadProgLabel">上传中…</div>
+      </div>
+    </div>
+    <div class="mo-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-upload')">取消</button>
+      <button class="btn btn-primary" id="btnUpload" onclick="doUpload()">上传</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Folder Modals ══ -->
+<div class="mo-overlay" id="modal-folder">
+  <div class="mo mo-sm">
+    <div class="mo-hdr"><span class="mo-title">📁 新建文件夹</span><button class="mo-close" onclick="closeModal('modal-folder')">✕</button></div>
+    <div class="mo-body"><div class="form-group"><label class="form-label">文件夹名称</label><input class="form-input" id="folderName" placeholder="如：会议语料" onkeydown="if(event.key==='Enter')doCreateFolder()"/><div class="form-err" id="folderErr"></div></div></div>
+    <div class="mo-footer"><button class="btn btn-ghost" onclick="closeModal('modal-folder')">取消</button><button class="btn btn-primary" onclick="doCreateFolder()">创建</button></div>
+  </div>
+</div>
+<div class="mo-overlay" id="modal-rename-folder">
+  <div class="mo mo-sm">
+    <div class="mo-hdr"><span class="mo-title">重命名文件夹</span><button class="mo-close" onclick="closeModal('modal-rename-folder')">✕</button></div>
+    <div class="mo-body"><div class="form-group"><label class="form-label">新名称</label><input class="form-input" id="renameFolderInput" onkeydown="if(event.key==='Enter')doRenameFolder()"/><div class="form-err" id="renameFolderErr"></div></div></div>
+    <div class="mo-footer"><button class="btn btn-ghost" onclick="closeModal('modal-rename-folder')">取消</button><button class="btn btn-primary" onclick="doRenameFolder()">保存</button></div>
+  </div>
+</div>
+<div class="mo-overlay" id="modal-delete-folder">
+  <div class="mo mo-sm">
+    <div class="mo-hdr"><span class="mo-title">⚠ 删除文件夹</span><button class="mo-close" onclick="closeModal('modal-delete-folder')">✕</button></div>
+    <div class="mo-body"><p style="font-size:14px;color:var(--text2)">确定删除文件夹 <strong id="deleteFolderName"></strong>？文件夹内文件将移入回收站。</p></div>
+    <div class="mo-footer"><button class="btn btn-ghost" onclick="closeModal('modal-delete-folder')">取消</button><button class="btn btn-danger" onclick="doDeleteFolder()">删除</button></div>
+  </div>
+</div>
+
+<!-- ══ Move Modal ══ -->
+<div class="mo-overlay" id="modal-move">
+  <div class="mo mo-sm">
+    <div class="mo-hdr"><span class="mo-title" id="movModalTitle">移动文件</span><button class="mo-close" onclick="closeModal('modal-move')">✕</button></div>
+    <div class="mo-body">
+      <p style="font-size:12px;color:var(--text3);margin-bottom:8px">选择目标文件夹：</p>
+      <div class="move-folder-list" id="moveTarget"></div>
+      <div class="form-err" id="moveErr">请选择目标文件夹</div>
+    </div>
+    <div class="mo-footer"><button class="btn btn-ghost" onclick="closeModal('modal-move')">取消</button><button class="btn btn-primary" onclick="confirmMove()">移动</button></div>
+  </div>
+</div>
+
+<!-- Keyboard Shortcuts Modal -->
+<div class="mo-overlay" id="modal-shortcuts">
+  <div class="mo mo-sm">
+    <div class="mo-hdr"><span class="mo-title">⌨️ 键盘快捷键</span><button class="mo-close" onclick="closeModal('modal-shortcuts')">✕</button></div>
+    <div class="mo-body">
+      <div class="shortcut-grid">
+        <kbd>/</kbd><span>聚焦搜索框</span>
+        <kbd>n</kbd><span>打开新建任务窗口</span>
+        <kbd>?</kbd><span>显示 / 关闭此帮助</span>
+        <kbd>Esc</kbd><span>关闭当前弹窗</span>
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:var(--text3)">在输入框内输入时快捷键不触发。</div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast / Confirm -->
+<div class="toast-wrap" id="toast-wrap"></div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title"></div>
+    <div class="confirm-desc" id="confirm-desc"></div>
+    <div class="confirm-actions"><button class="btn btn-ghost" onclick="closeConfirm()">取消</button><button class="btn btn-danger" id="confirm-ok-btn">确认</button></div>
+  </div>
+</div>
+
+<script>
+// ══ Constants ═══════════════════════════════════════════════════════════════
+const VOICE_CATALOG = {
+  '中文（普通话）':[{label:'晓晓（女）',id:'zh-CN-XiaoxiaoNeural'},{label:'云希（男）',id:'zh-CN-YunxiNeural'},{label:'云扬（男）',id:'zh-CN-YunyangNeural'},{label:'晓伊（女）',id:'zh-CN-XiaoyiNeural'}],
+  '粤语':[{label:'晓佳（女）',id:'zh-HK-HiuGaaiNeural'},{label:'万龙（男）',id:'zh-HK-WanLungNeural'},{label:'晓曼（女）',id:'zh-HK-HiuMaanNeural'}],
+  '英语':[{label:'Guy (M)',id:'en-US-GuyNeural'},{label:'Jenny (F)',id:'en-US-JennyNeural'},{label:'Davis (M)',id:'en-US-DavisNeural'},{label:'Aria (F)',id:'en-US-AriaNeural'}],
+  '日语':[{label:'Nanami (F)',id:'ja-JP-NanamiNeural'},{label:'Keita (M)',id:'ja-JP-KeitaNeural'}],
+  '韩语':[{label:'SunHi (F)',id:'ko-KR-SunHiNeural'},{label:'InJoon (M)',id:'ko-KR-InJoonNeural'}],
+  '法语':[{label:'Denise (F)',id:'fr-FR-DeniseNeural'},{label:'Henri (M)',id:'fr-FR-HenriNeural'}],
+  '德语':[{label:'Katja (F)',id:'de-DE-KatjaNeural'},{label:'Conrad (M)',id:'de-DE-ConradNeural'}],
+  '西班牙语':[{label:'Elvira (F)',id:'es-ES-ElviraNeural'},{label:'Alvaro (M)',id:'es-ES-AlvaroNeural'}],
+  '葡萄牙语':[{label:'Francisca (F)',id:'pt-BR-FranciscaNeural'},{label:'Antonio (M)',id:'pt-BR-AntonioNeural'}],
+  '意大利语':[{label:'Elsa (F)',id:'it-IT-ElsaNeural'},{label:'Diego (M)',id:'it-IT-DiegoNeural'}],
+  '俄语':[{label:'Dariya (F)',id:'ru-RU-DariyaNeural'},{label:'Dmitry (M)',id:'ru-RU-DmitryNeural'}],
+  '阿拉伯语':[{label:'Zariyah (F)',id:'ar-SA-ZariyahNeural'},{label:'Hamed (M)',id:'ar-SA-HamedNeural'}],
+  '印度尼西亚语':[{label:'Gadis (F)',id:'id-ID-GadisNeural'},{label:'Ardi (M)',id:'id-ID-ArdiNeural'}],
+};
+const SP_COLORS=['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#84CC16','#F97316','#EC4899','#6B7280'];
+
+// ══ State ═══════════════════════════════════════════════════════════════════
+let _page='home', _folderId=undefined, _folderName='', _allFolders=[];
+let _moveCtx=null, _moveFolderId=undefined;
+let _renameFolderId=null, _deleteFolderId=null;
+let _detailFileId=null, _detailBack='home';
+let _taskPollTimer=null, _debounceTimers={};
+let _voiceLang='中文（普通话）', _genTextResult=null;
+let _miniAudio=null;
+let _homeFiles=[], _myFiles=[], _prevRunningIds=new Set();
+
+// ══ API ══════════════════════════════════════════════════════════════════════
+const API={
+  async get(url){const r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();},
+  async post(url,data){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const j=await r.json();if(!j.ok)throw new Error(j.error||'请求失败');return j;},
+  async put(url,data){const r=await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const j=await r.json();if(!j.ok)throw new Error(j.error||'请求失败');return j;},
+  async del(url){const r=await fetch(url,{method:'DELETE'});const j=await r.json();if(!j.ok)throw new Error(j.error||'请求失败');return j;},
+};
+
+// ══ Helpers ══════════════════════════════════════════════════════════════════
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDur(s){if(!s&&s!==0)return '—';const m=Math.floor(s/60),sec=Math.floor(s%60);return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}
+function fmtDate(iso){return iso?(iso.replace('T',' ').slice(0,16)):'—';}
+function fmtSize(b){if(!b)return '—';if(b<1024*1024)return(b/1024).toFixed(1)+' KB';return(b/1024/1024).toFixed(1)+' MB';}
+function timeAgo(iso){if(!iso)return '—';const s=Math.floor((Date.now()-new Date(iso))/1000);if(s<60)return '刚刚';const m=Math.floor(s/60);if(m<60)return m+'分钟前';const h=Math.floor(m/60);if(h<24)return h+'小时前';return Math.floor(h/24)+'天前';}
+function sceneName(s){return {meeting:'会议',interview:'访谈',medical:'问诊',other:'其他'}[s]||s||'—';}
+function debounceLoad(key){clearTimeout(_debounceTimers[key]);_debounceTimers[key]=setTimeout(()=>{if(key==='home')loadHome();else if(key==='my')loadMy();},400);}
+function getFolderName(id){if(!id)return '根目录';const f=_allFolders.find(x=>x.folder_id===id);return f?f.name:id;}
+
+// ══ Navigation ═══════════════════════════════════════════════════════════════
+function goTo(p,opts){
+  ['home','myaudio','tasks','trash','detail'].forEach(x=>{
+    document.getElementById('page-'+x).classList.toggle('hidden',x!==p);
+  });
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('nav-'+p);if(nb)nb.classList.add('active');
+  document.getElementById('sidebar').classList.toggle('visible',p==='myaudio');
+  stopTaskPoll();
+  _page=p;
+  if(p==='home')loadHome();
+  else if(p==='myaudio'){loadFolders();loadMy();}
+  else if(p==='tasks'){loadTasks();startTaskPoll();}
+  else if(p==='trash')loadTrash();
+  else if(p==='detail'&&opts)openDetail(opts.fileId,opts.back);
+}
+
+// ══ File table render ═════════════════════════════════════════════════════════
+function renderFileTable(key,files){
+  const tbody=document.getElementById('tbody-'+key);
+  const isMy=key==='my';
+  if(!files.length){
+    tbody.innerHTML=`<tr><td colspan="${isMy?8:8}" style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:32px;margin-bottom:8px">📭</div>暂无文件</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=files.map(f=>{
+    const ext=(f.file_name||'').split('.').pop().toUpperCase();
+    const folderTd=isMy?`<td style="font-size:12px;color:var(--text3)">${getFolderName(f.folder_id)}</td>`:'';
+    return`<tr data-id="${f.file_id}">
+      <td class="cb-col"><input type="checkbox" onchange="updateBulk('${key}')"/></td>
+      <td><div class="file-name"><span class="ext-badge">${ext}</span><a href="#" onclick="openDetail('${f.file_id}','${key}');return false" style="color:var(--text)">${esc(f.file_name)}</a></div>${f.topic?`<div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(f.topic)}</div>`:''}</td>
+      <td>${fmtDur(f.duration)}</td>
+      ${folderTd}
+      <td style="font-size:12px">${esc(f.language||'—')}</td>
+      <td style="font-size:12px">${sceneName(f.scene)}</td>
+      <td style="font-size:12px">${fmtDate(f.created_at)}</td>
+      <td><div class="row-actions">
+        <button class="row-btn" onclick="showMiniPlayer(this,'${f.file_id}','${esc(f.file_name)}')">▶</button>
+        <a class="row-btn" href="/api/platform/files/${f.file_id}/download">⬇</a>
+        <button class="row-btn" onclick="openDetail('${f.file_id}','${key}')">详情</button>
+        <button class="row-btn danger" onclick="softDeleteFile('${f.file_id}','${key}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══ Home ═════════════════════════════════════════════════════════════════════
+async function loadHome(){
+  const p=new URLSearchParams({limit:500,offset:0});
+  const s=document.getElementById('home-search').value;
+  const l=document.getElementById('home-lang').value;
+  const sc=document.getElementById('home-scene').value;
+  const so=document.getElementById('home-source').value;
+  if(s)p.set('search',s);if(l)p.set('language',l);if(sc)p.set('scene',sc);if(so)p.set('source',so);
+  try{
+    const res=await API.get('/api/platform/files?'+p);
+    let files=applyAdvFilters(res.data||[],'home');
+    const sortVal=document.getElementById('home-sort')?.value||'created_at_desc';
+    files=sortFiles(files,sortVal);
+    _homeFiles=files;
+    renderFileTable('home',files);
+    document.getElementById('home-sub').textContent=`共 ${files.length} 个文件`;
+  }catch(e){document.getElementById('tbody-home').innerHTML=`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--danger)">加载失败: ${esc(e.message)}</td></tr>`;}
+}
+
+// ══ Stats ════════════════════════════════════════════════════════════════════
+async function loadStats(){
+  try{
+    const res=await API.get('/api/platform/stats');
+    const s=res.data;
+    const totEl=document.getElementById('stat-total');
+    const durEl=document.getElementById('stat-dur');
+    const sizeEl=document.getElementById('stat-size');
+    const tskEl=document.getElementById('stat-tasks');
+    if(totEl)totEl.textContent=s.total_files??'—';
+    if(durEl){const h=Math.floor((s.total_duration||0)/3600),m=Math.floor((s.total_duration||0)%3600/60);durEl.textContent=h>0?h+'h '+m+'m':m+'m';}
+    if(sizeEl)sizeEl.textContent=fmtSize(s.total_size||0);
+    if(tskEl){tskEl.textContent=s.active_tasks??0;tskEl.style.color=(s.active_tasks>0)?'var(--warning)':'var(--text)';}
+    // Language distribution mini chart
+    const langBars=document.getElementById('stat-lang-bars');
+    if(langBars){
+      const langs=s.by_language||[];
+      if(!langs.length){langBars.innerHTML='<div style="font-size:11px;color:var(--text3);margin-top:6px">暂无数据</div>';}
+      else{
+        const maxCnt=langs[0].cnt||1;
+        langBars.innerHTML=langs.slice(0,5).map(l=>{
+          const short=(l.language||'未知').replace('（普通话）','').replace('（粤语）','').slice(0,4);
+          return`<div class="lang-bar-row"><div class="lang-bar-lbl">${esc(short)}</div><div class="lang-bar-trk"><div class="lang-bar-fill" style="width:${Math.round(l.cnt/maxCnt*100)}%"></div></div><div class="lang-bar-cnt">${l.cnt}</div></div>`;
+        }).join('');
+      }
+    }
+    // Scene distribution mini chart
+    const SCENE_NAME={meeting:'会议',interview:'访谈',medical:'问诊',other:'其他'};
+    const sceneBars=document.getElementById('stat-scene-bars');
+    if(sceneBars){
+      const scenes=s.by_scene||[];
+      if(!scenes.length){sceneBars.innerHTML='<div style="font-size:11px;color:var(--text3)">暂无数据</div>';}
+      else{
+        const maxS=scenes[0].cnt||1;
+        sceneBars.innerHTML=scenes.map(sc=>`<div class="lang-bar-row"><div class="lang-bar-lbl">${esc(SCENE_NAME[sc.scene]||sc.scene||'未知')}</div><div class="lang-bar-trk"><div class="lang-bar-fill" style="width:${Math.round(sc.cnt/maxS*100)}%;background:var(--success)"></div></div><div class="lang-bar-cnt">${sc.cnt}</div></div>`).join('');
+      }
+    }
+  }catch(e){}
+}
+
+// ══ Advanced search ══════════════════════════════════════════════════════════
+function toggleAdvPanel(panelId,btnId){
+  const panel=document.getElementById(panelId);
+  const btn=document.getElementById(btnId);
+  const isOpen=panel.classList.contains('open');
+  panel.classList.toggle('open',!isOpen);
+  if(btn)btn.classList.toggle('open',!isOpen);
+}
+function resetAdv(key){
+  ['dur-min','dur-max','spk','date-from','date-to'].forEach(f=>{
+    const el=document.getElementById(key+'-'+f);if(el)el.value='';
+  });
+  if(key==='home')loadHome();else loadMy();
+}
+
+// ══ Client-side sort helper ══════════════════════════════════════════════════
+function sortFiles(files,sortVal){
+  const f=[...files];
+  if(sortVal==='created_at_asc')f.sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
+  else if(sortVal==='duration_desc')f.sort((a,b)=>(b.duration||0)-(a.duration||0));
+  else if(sortVal==='duration_asc')f.sort((a,b)=>(a.duration||0)-(b.duration||0));
+  else if(sortVal==='file_name_asc')f.sort((a,b)=>(a.file_name||'').localeCompare(b.file_name||''));
+  else if(sortVal==='file_name_desc')f.sort((a,b)=>(b.file_name||'').localeCompare(a.file_name||''));
+  else f.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
+  return f;
+}
+
+// Apply advanced filters client-side
+function applyAdvFilters(files,prefix){
+  let res=files;
+  const durMin=parseFloat(document.getElementById(prefix+'-dur-min')?.value)||0;
+  const durMax=parseFloat(document.getElementById(prefix+'-dur-max')?.value)||Infinity;
+  const spk=parseInt(document.getElementById(prefix+'-spk')?.value)||0;
+  const dateFrom=document.getElementById(prefix+'-date-from')?.value||'';
+  const dateTo=document.getElementById(prefix+'-date-to')?.value||'';
+  if(durMin>0)res=res.filter(f=>(f.duration||0)>=durMin);
+  if(durMax<Infinity)res=res.filter(f=>(f.duration||0)<=durMax);
+  if(spk>0)res=res.filter(f=>(f.speaker_count||0)===spk);
+  if(dateFrom)res=res.filter(f=>(f.created_at||'')>=dateFrom);
+  if(dateTo)res=res.filter(f=>(f.created_at||'')<=dateTo+'T23:59:59');
+  return res;
+}
+
+// ══ My Files ═════════════════════════════════════════════════════════════════
+async function loadFolders(){
+  try{
+    const res=await API.get('/api/platform/folders');
+    // API returns tree; flatten it for sidebar/selects
+    function flatTree(nodes,acc=[]){nodes.forEach(n=>{acc.push(n);if(n.children&&n.children.length)flatTree(n.children,acc);});return acc;}
+    _allFolders=flatTree(res.data||[]);
+    renderSidebarFolders(_allFolders);
+    renderFolderSelects();
+  }catch(e){}
+}
+
+function renderSidebarFolders(folders){
+  const root=folders.filter(f=>!f.parent_id);
+  document.getElementById('folder-list').innerHTML=root.map(f=>`
+    <div class="sb-item" id="sb-${f.folder_id}" onclick="filterFolder('${f.folder_id}','${esc(f.name)}')">
+      <span class="ic">📁</span><span style="flex:1">${esc(f.name)}</span>
+      <span class="sb-actions">
+        <button class="sb-act-btn" onclick="event.stopPropagation();openRenameFolderModal('${f.folder_id}','${esc(f.name)}')">✎</button>
+        <button class="sb-act-btn" onclick="event.stopPropagation();openDeleteFolderModal('${f.folder_id}','${esc(f.name)}')">🗑</button>
+      </span>
+    </div>`).join('');
+}
+
+function renderFolderSelects(){
+  const opt=_allFolders.map(f=>`<option value="${f.folder_id}">${esc(f.name)}</option>`).join('');
+  const uFolder=document.getElementById('uFolder');
+  if(uFolder){const v=uFolder.value;uFolder.innerHTML='<option value="">根目录</option>'+opt;uFolder.value=v;}
+  // Move modal
+  const mt=document.getElementById('moveTarget');
+  if(mt)mt.innerHTML='<div class="move-folder-item" data-val="" onclick="selectMoveTarget(this)">📂 根目录（无文件夹）</div>'+
+    _allFolders.map(f=>`<div class="move-folder-item" data-val="${f.folder_id}" onclick="selectMoveTarget(this)">📁 ${esc(f.name)}</div>`).join('');
+}
+
+function filterFolder(fid,fname){
+  _folderId=fid; _folderName=fname==='all'?'':fname;
+  document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
+  const t=document.getElementById(fid===undefined?'sb-all':'sb-'+fid);if(t)t.classList.add('active');
+  const sep=document.getElementById('my-bc-sep'),cur=document.getElementById('my-bc-cur');
+  if(!_folderName){sep.classList.add('hidden');cur.textContent='';document.getElementById('my-title').textContent='我的文件';}
+  else{sep.classList.remove('hidden');cur.textContent=_folderName;document.getElementById('my-title').textContent=_folderName;}
+  loadMy();
+}
+
+async function loadMy(){
+  const p=new URLSearchParams({limit:500,offset:0});
+  const s=document.getElementById('my-search').value;
+  const l=document.getElementById('my-lang').value;
+  const sc=document.getElementById('my-scene').value;
+  if(s)p.set('search',s);if(l)p.set('language',l);if(sc)p.set('scene',sc);
+  // folder_id: undefined=all, null=root (no folder), string=specific folder
+  if(_folderId!==undefined)p.set('folder_id',_folderId===null?'null':(_folderId||''));
+  try{
+    const res=await API.get('/api/platform/files?'+p);
+    let files=applyAdvFilters(res.data||[],'my');
+    const sortVal=document.getElementById('my-sort')?.value||'created_at_desc';
+    files=sortFiles(files,sortVal);
+    _myFiles=files;
+    renderFileTable('my',files);
+    document.getElementById('my-sub').textContent=`共 ${files.length} 个文件`;
+  }catch(e){document.getElementById('tbody-my').innerHTML=`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--danger)">加载失败</td></tr>`;}
+}
+
+// ══ Tasks ════════════════════════════════════════════════════════════════════
+async function loadTasks(){
+  try{
+    const res=await API.get('/api/platform/tasks?limit=50');
+    const tasks=res.data||[];
+    document.getElementById('tasks-sub').textContent=`共 ${tasks.length} 个任务`;
+    renderTaskGrid(tasks);
+  }catch(e){document.getElementById('task-grid').innerHTML=`<div style="color:var(--danger);padding:40px">加载失败</div>`;}
+}
+
+function renderTaskGrid(tasks){
+  const grid=document.getElementById('task-grid');
+  if(!tasks.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="ic">⚙️</div><p>暂无生成任务</p><br><button class="btn btn-primary" onclick="openModal(\'modal-gen\')">✨ 立即生成</button></div>';return;}
+  const STEPS=['排队中','生成文本','合成音频','完成'];
+  const STATUS_IDX={queued:0,generating_text:1,synthesizing:2,completed:3};
+  const lbl={queued:'排队中',generating_text:'生成文本中',synthesizing:'合成音频中',completed:'已完成',failed:'失败'};
+  grid.innerHTML=tasks.map(t=>{
+    const run=['queued','generating_text','synthesizing'].includes(t.status);
+    const curIdx=STATUS_IDX[t.status]??-1;
+    let pipHtml='';
+    if(t.status!=='failed'){
+      pipHtml='<div class="pipeline">';
+      STEPS.forEach((label,idx)=>{
+        const cls=curIdx>idx?'done':(curIdx===idx?'active':'');
+        const icon=curIdx>idx?'✓':(String(idx+1));
+        pipHtml+=`<div class="pip-step ${cls}"><div class="pip-dot">${curIdx===idx&&run?'<span class="pulse" style="width:8px;height:8px;border-radius:50%;background:#fff;display:inline-block"></span>':icon}</div><div class="pip-label">${label}</div></div>`;
+      });
+      pipHtml+='</div>';
+    }
+    return`<div class="task-card">
+      <div class="task-card-hdr"><div class="task-topic">${esc(t.topic||'（无主题）')}</div><span class="status status-${t.status}">${run?'<span class="pulse"></span>':''}${lbl[t.status]||t.status}</span></div>
+      <div class="task-meta"><span>🌐 ${esc(t.language||'中文')}</span><span>👥 ${t.people_count||2}人</span><span>📝 ${t.word_count||1000}字</span><span title="${fmtDate(t.created_at)}">${timeAgo(t.created_at)}</span></div>
+      ${pipHtml}
+      ${t.error_msg?`<div class="task-err">❌ ${esc(t.error_msg)}</div>`:''}
+      ${t.status==='completed'&&t.file_id?`<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="openDetail('${t.file_id}','tasks')">查看音频 →</button></div>`:''}
+      <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+        ${t.status==='failed'?`<button class="btn btn-ghost btn-sm" onclick="retryTask('${t.task_id}')" style="font-size:11px;color:var(--warning)">↺ 重试</button>`:'<span></span>'}
+        <button class="btn btn-ghost btn-sm" onclick="deleteTask('${t.task_id}')" style="font-size:11px;color:var(--text3)">删除记录</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteTask(id){try{await API.del('/api/platform/tasks/'+id);loadTasks();showToast('ok','任务已删除');}catch(e){showToast('err','删除失败');}}
+
+function startTaskPoll(){stopTaskPoll();_taskPollTimer=setInterval(async()=>{try{const r=await API.get('/api/platform/tasks?limit=50');renderTaskGrid(r.data||[]);if(!(r.data||[]).some(t=>['queued','generating_text','synthesizing'].includes(t.status)))stopTaskPoll();}catch(e){}},3000);}
+function stopTaskPoll(){if(_taskPollTimer){clearInterval(_taskPollTimer);_taskPollTimer=null;}}
+
+// ══ Trash ════════════════════════════════════════════════════════════════════
+async function loadTrash(){
+  try{
+    const res=await API.get('/api/platform/trash?limit=200');
+    const files=res.data||[];
+    const tbody=document.getElementById('tbody-trash');
+    if(!files.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:32px;margin-bottom:8px">🗑</div>回收站为空</td></tr>';return;}
+    tbody.innerHTML=files.map(f=>`<tr data-id="${f.file_id}">
+      <td class="cb-col"><input type="checkbox" onchange="updateBulk('trash')"/></td>
+      <td><div class="file-name"><span class="ext-badge">${(f.file_name||'').split('.').pop().toUpperCase()}</span>${esc(f.file_name)}</div></td>
+      <td>${fmtDur(f.duration)}</td><td style="font-size:12px">${esc(f.language||'—')}</td><td style="font-size:12px">${fmtDate(f.deleted_at)}</td>
+      <td><div class="row-actions" style="opacity:1">
+        <button class="row-btn" onclick="restoreFile('${f.file_id}','${esc(f.file_name)}')">↩ 还原</button>
+        <button class="row-btn danger" onclick="permDeleteFile('${f.file_id}','${esc(f.file_name)}')">🗑</button>
+      </div></td>
+    </tr>`).join('');
+  }catch(e){document.getElementById('tbody-trash').innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--danger)">加载失败</td></tr>';}
+}
+
+async function restoreFile(id,name){try{await API.post('/api/platform/trash/'+id+'/restore',{});showToast('ok','「'+name+'」已还原');loadTrash();}catch(e){showToast('err','还原失败');}}
+async function permDeleteFile(id,name){showConfirm('永久删除？','「'+name+'」将被彻底删除，无法恢复。',async()=>{try{await API.del('/api/platform/trash/'+id);showToast('ok','已永久删除');loadTrash();}catch(e){showToast('err','删除失败');}});}
+async function bulkRestore(){const ids=getSelIds('trash');if(!ids.length){showToast('err','请先选择文件');return;}try{await Promise.all(ids.map(id=>API.post('/api/platform/trash/'+id+'/restore',{})));showToast('ok',ids.length+' 个文件已还原');clearSel('trash');loadTrash();}catch(e){showToast('err','还原失败');}}
+async function bulkPermDelete(){const ids=getSelIds('trash');if(!ids.length){showToast('err','请先选择文件');return;}showConfirm('永久删除 '+ids.length+' 个文件？','该操作不可恢复。',async()=>{try{await Promise.all(ids.map(id=>API.del('/api/platform/trash/'+id)));showToast('ok',ids.length+' 个文件已永久删除');clearSel('trash');loadTrash();}catch(e){showToast('err','删除失败');}});}
+
+// ══ Detail ═══════════════════════════════════════════════════════════════════
+async function openDetail(fileId,back){
+  _detailFileId=fileId; _detailBack=back||'home';
+  goTo('detail');
+  document.getElementById('detail-back-btn').onclick=()=>goTo(_detailBack);
+  document.getElementById('detail-title').textContent='加载中…';
+  document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span>加载中…</div>';
+  try{const res=await API.get('/api/platform/files/'+fileId);renderDetail(res.data);}
+  catch(e){document.getElementById('detail-body').innerHTML='<div style="color:var(--danger);padding:40px">加载失败: '+esc(e.message)+'</div>';}
+}
+
+function renderDetail(f){
+  document.getElementById('detail-title').textContent=f.file_name||'文件详情';
+  document.getElementById('detail-dl-btn').onclick=()=>{window.location.href='/api/platform/files/'+f.file_id+'/download';};
+  const dlj=document.getElementById('detail-dl-json');
+  dlj.classList.toggle('hidden',!f.transcript_json);
+  dlj.onclick=()=>{window.location.href='/api/platform/files/'+f.file_id+'/transcript?type=json';};
+  const dls=document.getElementById('detail-dl-srt');
+  dls.classList.toggle('hidden',!f.transcript_srt);
+  dls.onclick=()=>{window.location.href='/api/platform/files/'+f.file_id+'/transcript?type=srt';};
+  document.getElementById('detail-del-btn').onclick=()=>showConfirm('删除此文件？','文件将移入回收站。',async()=>{try{await API.del('/api/platform/files/'+f.file_id);showToast('ok','已移入回收站');goTo(_detailBack);}catch(e){showToast('err','删除失败');}});
+
+  let txHtml='<div style="padding:8px;color:var(--text3);font-size:12px">暂无字幕数据</div>';
+  if(f.transcript_json){try{const segs=JSON.parse(f.transcript_json);if(Array.isArray(segs)&&segs.length)txHtml=segs.map(s=>`<div class="transcript-seg"><span class="seg-speaker">${esc(s.speaker||'')}</span><span class="seg-text">${esc(s.text||s.content||'')}</span><span style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0">${fmtDur(s.start_time)}-${fmtDur(s.end_time)}</span></div>`).join('');}catch(e){}}
+  else if(f.transcript_srt)txHtml='<pre style="font-size:11px;white-space:pre-wrap;word-break:break-word">'+esc(f.transcript_srt.slice(0,3000))+'</pre>';
+
+  const audioUrl='/api/platform/files/'+f.file_id+'/download';
+  // Parse tags
+  let tags=[];try{tags=JSON.parse(f.tags||'[]');}catch(e){}
+  const tagHtml=tags.map(t=>`<span class="tag-pill">${esc(t)}<span class="trm" onclick="detRemoveTag('${f.file_id}','${esc(t)}',this)">×</span></span>`).join(' ')
+    +'&nbsp;<span style="font-size:11px;color:var(--text3);cursor:pointer" onclick="detAddTag(\'${f.file_id}\')">＋标签</span>';
+
+  document.getElementById('detail-body').innerHTML=`
+    <div class="detail-wrap">
+      <div class="detail-player"><div class="audio-card">
+        <div style="font-size:12px;color:var(--text2)">${esc(f.file_name)}</div>
+        <div class="audio-waveform"><div class="waveform-anim" id="det-wave"><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div></div></div>
+        <audio id="det-audio" src="${audioUrl}" preload="metadata" style="display:none"></audio>
+        <div class="audio-ctrl">
+          <button class="play-btn" id="det-play" onclick="toggleDetPlay()">▶</button>
+          <div class="prog-bar" onclick="seekDet(event,this)"><div class="prog-fill" id="det-fill"></div></div>
+          <span class="time-txt" id="det-time">00:00 / ${fmtDur(f.duration)}</span>
+        </div>
+        <div style="margin-top:12px"><a href="${audioUrl}" class="btn btn-ghost btn-sm" download="${esc(f.file_name)}">⬇ 下载</a></div>
+      </div></div>
+      <div class="detail-meta">
+        <div class="meta-section">
+          <h4>基本信息 <span style="font-weight:400;font-size:11px;color:var(--text3)">（点击值可编辑）</span></h4>
+          <div class="meta-grid">
+            <span class="meta-key">文件名</span>
+            <span class="meta-val"><span id="dv-fname">${esc(f.file_name)}</span><button class="edit-trigger" onclick="detStartEdit('fname','${f.file_id}','${esc(f.file_name)}','text')">✎</button></span>
+            <span class="meta-key">主题</span>
+            <span class="meta-val"><span id="dv-topic">${esc(f.topic||'—')}</span><button class="edit-trigger" onclick="detStartEdit('topic','${f.file_id}','${esc(f.topic||'')}','text')">✎</button></span>
+            <span class="meta-key">时长</span><span class="meta-val">${fmtDur(f.duration)}</span>
+            <span class="meta-key">大小</span><span class="meta-val">${fmtSize(f.file_size)}</span>
+            <span class="meta-key">格式</span><span class="meta-val">${(f.format||'—').toUpperCase()}</span>
+            <span class="meta-key">来源</span><span class="meta-val">${f.source==='generated'?'AI生成':'手动上传'}</span>
+            <span class="meta-key">创建时间</span><span class="meta-val">${fmtDate(f.created_at)}</span>
+          </div>
+        </div>
+        <div class="meta-section">
+          <h4>内容属性</h4>
+          <div class="meta-grid">
+            <span class="meta-key">语言</span>
+            <span class="meta-val"><span id="dv-language">${esc(f.language||'—')}</span><button class="edit-trigger" onclick="detStartEdit('language','${f.file_id}','${esc(f.language||'')}','select-lang')">✎</button></span>
+            <span class="meta-key">说话人数</span>
+            <span class="meta-val"><span id="dv-speaker_count">${f.speaker_count||'—'}</span><button class="edit-trigger" onclick="detStartEdit('speaker_count','${f.file_id}','${f.speaker_count||''}','number')">✎</button></span>
+            <span class="meta-key">场景</span>
+            <span class="meta-val"><span id="dv-scene">${sceneName(f.scene)}</span><button class="edit-trigger" onclick="detStartEdit('scene','${f.file_id}','${esc(f.scene||'')}','select-scene')">✎</button></span>
+            <span class="meta-key">文件夹</span>
+            <span class="meta-val"><span id="dv-folder">${esc(getFolderName(f.folder_id))}</span><button class="edit-trigger" onclick="detStartEdit('folder_id','${f.file_id}','${f.folder_id||''}','select-folder')">✎</button></span>
+            <span class="meta-key">标签</span>
+            <span class="meta-val" id="dv-tags-wrap" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">${tagHtml}</span>
+          </div>
+        </div>
+        <div class="meta-section"><h4 style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">字幕 / 台本<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="copyTranscript()">📋 复制文本</button></h4><div class="transcript-box" id="det-transcript-box">${txHtml}</div></div>
+      </div>
+    </div>`;
+  // Store current file data for editing
+  window._detailFile = f;
+
+  const audio=document.getElementById('det-audio');
+  if(audio){
+    audio.ontimeupdate=()=>{const pct=audio.duration?audio.currentTime/audio.duration*100:0;const fill=document.getElementById('det-fill');if(fill)fill.style.width=pct+'%';const t=document.getElementById('det-time');if(t)t.textContent=fmtDur(audio.currentTime)+' / '+fmtDur(audio.duration||f.duration);};
+    audio.onended=()=>{const b=document.getElementById('det-play');if(b)b.textContent='▶';const w=document.getElementById('det-wave');if(w)w.classList.remove('playing');};
+  }
+}
+
+function toggleDetPlay(){
+  const a=document.getElementById('det-audio'),b=document.getElementById('det-play'),w=document.getElementById('det-wave');
+  if(!a)return;
+  if(a.paused){a.play();b.textContent='⏸';if(w)w.classList.add('playing');}
+  else{a.pause();b.textContent='▶';if(w)w.classList.remove('playing');}
+}
+function seekDet(e,bar){const a=document.getElementById('det-audio');if(!a||!a.duration)return;const r=bar.getBoundingClientRect();a.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*a.duration;}
+
+// ══ File ops ═════════════════════════════════════════════════════════════════
+async function softDeleteFile(id,key){try{await API.del('/api/platform/files/'+id);showToast('ok','已移入回收站');if(key==='home')loadHome();else if(key==='my')loadMy();}catch(e){showToast('err','删除失败');}}
+
+// ══ Bulk ═════════════════════════════════════════════════════════════════════
+function toggleAll(key,cb){document.getElementById('tbl-'+key).querySelectorAll('tbody input[type=checkbox]').forEach(c=>c.checked=cb.checked);updateBulk(key);}
+function updateBulk(key){const ids=getSelIds(key);const bar=document.getElementById('bulk-'+key);const cnt=document.getElementById('bulk-'+key+'-cnt');bar.classList.toggle('visible',ids.length>0);if(cnt)cnt.textContent='已选 '+ids.length+' 项';}
+function clearSel(key){const tbl=document.getElementById('tbl-'+key);if(tbl)tbl.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false);const bar=document.getElementById('bulk-'+key);if(bar)bar.classList.remove('visible');}
+function getSelIds(key){const tbl=document.getElementById('tbl-'+key);if(!tbl)return[];return[...tbl.querySelectorAll('tbody tr[data-id] input[type=checkbox]:checked')].map(cb=>cb.closest('tr').dataset.id);}
+async function deleteSelected(key){const ids=getSelIds(key);if(!ids.length){showToast('err','请先选择文件');return;}showConfirm('删除 '+ids.length+' 个文件？','文件将移入回收站。',async()=>{try{await API.post('/api/platform/batch/delete',{file_ids:ids});showToast('ok',ids.length+' 个文件已移入回收站');clearSel(key);if(key==='home')loadHome();else loadMy();}catch(e){showToast('err','删除失败');}});}
+async function exportSelected(key){const ids=getSelIds(key);if(!ids.length){showToast('err','请先选择文件');return;}window.location.href='/api/platform/batch/download?ids='+ids.join(',');}
+
+// ══ Move ═════════════════════════════════════════════════════════════════════
+function openMoveModal(key){
+  const ids=getSelIds(key);if(!ids.length){showToast('err','请先选择文件');return;}
+  _moveCtx={key,ids}; _moveFolderId=undefined;
+  document.getElementById('movModalTitle').textContent='移动 '+ids.length+' 个文件';
+  document.getElementById('moveErr').style.display='none';
+  renderFolderSelects();
+  openModal('modal-move');
+}
+function selectMoveTarget(el){document.querySelectorAll('#moveTarget .move-folder-item').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');_moveFolderId=el.dataset.val||null;document.getElementById('moveErr').style.display='none';}
+async function confirmMove(){
+  if(_moveFolderId===undefined){document.getElementById('moveErr').style.display='block';return;}
+  if(!_moveCtx)return;
+  closeModal('modal-move');
+  try{await API.post('/api/platform/batch/move',{file_ids:_moveCtx.ids,folder_id:_moveFolderId||null});showToast('ok',_moveCtx.ids.length+' 个文件已移动');clearSel(_moveCtx.key);if(_moveCtx.key==='home')loadHome();else loadMy();}
+  catch(e){showToast('err','移动失败: '+e.message);}
+  _moveCtx=null;
+}
+
+// ══ Folders ═══════════════════════════════════════════════════════════════════
+function openCreateFolderModal(){document.getElementById('folderName').value='';document.getElementById('folderErr').style.display='none';openModal('modal-folder');}
+async function doCreateFolder(){const name=document.getElementById('folderName').value.trim(),err=document.getElementById('folderErr');if(!name){err.textContent='⚠ 请输入名称';err.style.display='block';return;}try{await API.post('/api/platform/folders',{name});closeModal('modal-folder');showToast('ok','文件夹「'+name+'」创建成功');await loadFolders();}catch(e){err.textContent='创建失败';err.style.display='block';}}
+function openRenameFolderModal(id,name){_renameFolderId=id;document.getElementById('renameFolderInput').value=name;document.getElementById('renameFolderErr').style.display='none';openModal('modal-rename-folder');}
+async function doRenameFolder(){const name=document.getElementById('renameFolderInput').value.trim(),err=document.getElementById('renameFolderErr');if(!name){err.textContent='⚠ 请输入名称';err.style.display='block';return;}try{await API.put('/api/platform/folders/'+_renameFolderId,{name});closeModal('modal-rename-folder');showToast('ok','已重命名为「'+name+'」');await loadFolders();}catch(e){err.textContent='重命名失败';err.style.display='block';}}
+function openDeleteFolderModal(id,name){_deleteFolderId=id;document.getElementById('deleteFolderName').textContent='「'+name+'」';openModal('modal-delete-folder');}
+async function doDeleteFolder(){try{await API.del('/api/platform/folders/'+_deleteFolderId);closeModal('modal-delete-folder');showToast('ok','文件夹已删除');if(_folderId===_deleteFolderId)filterFolder(undefined,'all');await loadFolders();loadMy();}catch(e){showToast('err','删除失败');}}
+
+// ══ Generate modal ═══════════════════════════════════════════════════════════
+function selectMode(mode){
+  document.getElementById('rLLM').classList.toggle('sel',mode==='llm');
+  document.getElementById('rManual').classList.toggle('sel',mode==='manual');
+  document.getElementById('secLLM').classList.toggle('hidden',mode!=='llm');
+  document.getElementById('secManual').classList.toggle('hidden',mode!=='manual');
+  updateSpRows();
+}
+function onTplChange(sel){document.getElementById('customPG').classList.toggle('hidden',sel.value!=='custom');}
+async function genText(){
+  const topic=document.getElementById('topicInput').value.trim();
+  if(!topic){showToast('err','请先填写文本主题');return;}
+  const btn=document.getElementById('btnGenText');
+  btn.textContent='⏳ 生成中…';btn.disabled=true;
+  document.getElementById('secPreview').classList.remove('hidden');
+  document.getElementById('previewText').textContent='正在生成，请稍候…';
+  try{
+    const lang=document.getElementById('genLang').value;
+    const people=parseInt(document.getElementById('spCount').value)||2;
+    const words=parseInt(document.getElementById('wordCount').value)||1000;
+    const tpl=document.getElementById('tplSelect').value;
+    const cp=document.getElementById('customPrompt').value;
+    const kw=[...document.querySelectorAll('#kwWrap .ti-tag')].map(el=>el.textContent.replace('×','').trim());
+    const r=await fetch('/api/generate_text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:topic,scenario:topic,core_content:cp||topic,people_count:people,word_count:words,language:lang,audio_language:lang,template_label:tpl,keyword_terms:kw})});
+    const data=await r.json();
+    if(data.dialogue_text){document.getElementById('previewText').textContent=data.dialogue_text;_genTextResult=data;btn.innerHTML='↺ 重新生成';btn.disabled=false;}
+    else throw new Error(data.error||'生成失败');
+  }catch(e){document.getElementById('previewText').textContent='生成失败: '+e.message;btn.textContent='✨ 预览生成文本';btn.disabled=false;}
+}
+function regenText(){_genTextResult=null;genText();}
+function syncVoiceLang(lang){_voiceLang=lang||'中文（普通话）';document.getElementById('voiceLangLabel').textContent='（'+_voiceLang+'）';updateSpRows();}
+function updateSpRows(){
+  const isManual=!document.getElementById('rLLM').classList.contains('sel');
+  const n=Math.min(10,Math.max(1,parseInt(document.getElementById(isManual?'spCountManual':'spCount').value)||2));
+  const c=document.getElementById('spRows');c.innerHTML='';
+  const voices=VOICE_CATALOG[_voiceLang]||VOICE_CATALOG['中文（普通话）'];
+  for(let i=1;i<=n;i++){
+    const r=document.createElement('div');r.className='sp-row';
+    const opts=voices.map(v=>`<option value="${v.id}">${v.label}</option>`).join('');
+    r.innerHTML=`<div class="sp-badge" style="background:${SP_COLORS[i-1]}">${i}</div><select class="select-field" style="flex:1" data-sp="${i}"><option value="">— 请选择音色 —</option>${opts}</select>`;
+    if(voices[i-1])r.querySelector('select').value=voices[i-1].id;
+    c.appendChild(r);
+  }
+}
+async function submitGen(){
+  const isManual=!document.getElementById('rLLM').classList.contains('sel');
+  const lang=document.getElementById(isManual?'genLangManual':'genLang').value;
+  const spRows=document.querySelectorAll('#spRows select');
+  let voiceOk=true;const voiceMap={};
+  spRows.forEach((s,i)=>{if(!s.value)voiceOk=false;voiceMap['Speaker '+(i+1)]=s.value;});
+  if(!voiceOk){document.getElementById('spWarn').style.display='flex';return;}
+  document.getElementById('spWarn').style.display='none';
+  const btn=document.getElementById('btnSubmit');btn.textContent='提交中…';btn.disabled=true;
+  try{
+    const payload={generation_mode:isManual?'direct':'llm',language:lang,voice_map:voiceMap,output_format:document.getElementById(isManual?'outputFmtManual':'outputFmt').value,include_scripts:document.getElementById('includeScripts').checked};
+    if(isManual){payload.input_text=document.getElementById('manualText').value;payload.people_count=parseInt(document.getElementById('spCountManual').value)||2;}
+    else{payload.topic=document.getElementById('topicInput').value.trim();payload.people_count=parseInt(document.getElementById('spCount').value)||2;payload.word_count=parseInt(document.getElementById('wordCount').value)||1000;payload.template=document.getElementById('tplSelect').value;payload.custom_prompt=document.getElementById('customPrompt').value;payload.keywords=[...document.querySelectorAll('#kwWrap .ti-tag')].map(el=>el.textContent.replace('×','').trim());}
+    await API.post('/api/platform/tasks',payload);
+    closeModal('modal-gen');
+    showToast('ok','任务已提交，请在「生成任务」页查看进度');
+    loadStats();
+    if(_page==='tasks'){loadTasks();startTaskPoll();}
+  }catch(e){showToast('err','提交失败: '+e.message);}
+  btn.textContent='🎵 生成音频';btn.disabled=false;
+}
+
+// ══ Upload ════════════════════════════════════════════════════════════════════
+function handleFSel(input){if(input.files[0])showFInfo(input.files[0]);}
+function handleDrop(e){e.preventDefault();document.getElementById('uZone').classList.remove('drag');const f=e.dataTransfer.files[0];if(!f)return;const ext=f.name.split('.').pop().toLowerCase();if(!['wav','mp3','m4a','mp4'].includes(ext)){showToast('err','不支持该格式');return;}if(f.size>500*1024*1024){showToast('err','文件超出 500MB 限制');return;}showFInfo(f);}
+function showFInfo(f){document.getElementById('uFileName').textContent=f.name;document.getElementById('uFileSize').textContent=(f.size/1024/1024).toFixed(1)+' MB';document.getElementById('uInfo').classList.remove('hidden');document.getElementById('uZone').style.display='none';}
+function clearFile(){document.getElementById('fInput').value='';document.getElementById('uInfo').classList.add('hidden');document.getElementById('uZone').style.display='block';}
+async function doUpload(){
+  const hasFile=!document.getElementById('uInfo').classList.contains('hidden');
+  if(!hasFile){showToast('err','请先选择文件');return;}
+  const lang=document.getElementById('uLang').value,scene=document.getElementById('uScene').value,sp=document.getElementById('uSp').value;
+  if(!lang){showToast('err','请选择语言');return;}if(!scene){showToast('err','请选择场景');return;}if(!sp){showToast('err','请填写说话人数');return;}
+  const btn=document.getElementById('btnUpload');btn.textContent='上传中…';btn.disabled=true;
+  // Show progress bar
+  const pw=document.getElementById('uploadProgWrap');
+  const pf=document.getElementById('uploadProgFill');
+  const pl=document.getElementById('uploadProgLabel');
+  if(pw)pw.style.display='block';
+  if(pf)pf.style.width='0%';
+  if(pl)pl.textContent='上传中…';
+  // Simulate progress (real XHR progress needs XMLHttpRequest)
+  let prog=0;
+  const progTimer=setInterval(()=>{prog=Math.min(prog+Math.random()*15,85);if(pf)pf.style.width=prog+'%';},300);
+  const fd=new FormData();
+  fd.append('file',document.getElementById('fInput').files[0]);
+  fd.append('language',lang);fd.append('scene',scene);fd.append('speaker_count',sp);
+  const fi=document.getElementById('uFolder').value;if(fi)fd.append('folder_id',fi);
+  const topic=document.getElementById('uTopic').value.trim();if(topic)fd.append('topic',topic);
+  try{
+    const r=await fetch('/api/platform/upload',{method:'POST',body:fd});
+    const j=await r.json();
+    clearInterval(progTimer);
+    if(pf)pf.style.width='100%';
+    if(pl)pl.textContent='上传完成！';
+    if(!j.ok)throw new Error(j.error||'上传失败');
+    setTimeout(()=>{closeModal('modal-upload');clearFile();if(pw)pw.style.display='none';},500);
+    showToast('ok','上传成功');
+    if(_page==='home'){loadHome();loadStats();}else if(_page==='myaudio')loadMy();
+  }catch(e){
+    clearInterval(progTimer);
+    if(pw)pw.style.display='none';
+    showToast('err','上传失败: '+e.message);
+  }
+  btn.textContent='上传';btn.disabled=false;
+}
+
+// ══ Mini player ══════════════════════════════════════════════════════════════
+function showMiniPlayer(btn,fileId,fileName){
+  const row=btn.closest('tr');
+  const nxt=row.nextSibling;
+  if(nxt&&nxt.classList&&nxt.classList.contains('mini-player-row')){if(_miniAudio){_miniAudio.pause();_miniAudio=null;}nxt.remove();return;}
+  document.querySelectorAll('.mini-player-row').forEach(el=>el.remove());
+  if(_miniAudio){_miniAudio.pause();_miniAudio=null;}
+  const cols=row.querySelectorAll('td,th').length;
+  const pr=document.createElement('tr');pr.className='mini-player-row';
+  const td=pr.insertCell(0);td.colSpan=cols||8;
+  td.innerHTML=`<div class="mini-player">
+    <button class="mini-play" id="mp-play">▶</button>
+    <div class="mini-prog" onclick="seekMini(event,this)"><div class="mini-prog-fill" id="mp-fill"></div></div>
+    <span id="mp-time" style="font-size:12px;color:rgba(255,255,255,.8);white-space:nowrap">00:00</span>
+    <span style="font-size:12px;color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis;max-width:160px;white-space:nowrap">${esc(fileName)}</span>
+    <button style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);font-size:12px" onclick="closeMiniPlayer(this)">✕</button>
+  </div>`;
+  row.parentNode.insertBefore(pr,row.nextSibling);
+  _miniAudio=new Audio('/api/platform/files/'+fileId+'/download');
+  _miniAudio.ontimeupdate=()=>{const pct=_miniAudio.duration?_miniAudio.currentTime/_miniAudio.duration*100:0;const f=document.getElementById('mp-fill');if(f)f.style.width=pct+'%';const t=document.getElementById('mp-time');if(t)t.textContent=fmtDur(_miniAudio.currentTime)+'/'+fmtDur(_miniAudio.duration);};
+  _miniAudio.onended=()=>{const b=document.getElementById('mp-play');if(b)b.textContent='▶';};
+  const pb=document.getElementById('mp-play');
+  if(pb)pb.onclick=()=>{if(_miniAudio.paused){_miniAudio.play();pb.textContent='⏸';}else{_miniAudio.pause();pb.textContent='▶';}};
+  _miniAudio.play().then(()=>{if(pb)pb.textContent='⏸';}).catch(()=>{});
+}
+function seekMini(e,bar){if(!_miniAudio||!_miniAudio.duration)return;const r=bar.getBoundingClientRect();_miniAudio.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*_miniAudio.duration;}
+function closeMiniPlayer(btn){if(_miniAudio){_miniAudio.pause();_miniAudio=null;}const r=btn.closest('.mini-player-row');if(r)r.remove();}
+
+// ══ Modals ════════════════════════════════════════════════════════════════════
+function openModal(id){const el=document.getElementById(id);if(el)el.classList.add('open');if(id==='modal-gen'){updateSpRows();_genTextResult=null;document.getElementById('secPreview').classList.add('hidden');}if(id==='modal-upload')loadFolders();}
+function closeModal(id){const el=document.getElementById(id);if(el)el.classList.remove('open');}
+
+// ══ Toast ════════════════════════════════════════════════════════════════════
+function showToast(type,msg){const wrap=document.getElementById('toast-wrap');const t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML=(type==='ok'?'✅':type==='err'?'❌':'ℹ️')+' '+esc(msg);wrap.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);}
+
+// ══ Confirm ══════════════════════════════════════════════════════════════════
+let _confirmCb=null;
+function showConfirm(title,desc,onOk){_confirmCb=onOk||null;document.getElementById('confirm-title').textContent=title;document.getElementById('confirm-desc').textContent=desc;document.getElementById('confirm-overlay').classList.add('open');document.getElementById('confirm-ok-btn').onclick=()=>{closeConfirm();if(_confirmCb)_confirmCb();};}
+function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('open');_confirmCb=null;}
+
+// ══ Tag input ════════════════════════════════════════════════════════════════
+function addKw(e,input){if(e.key==='Enter'||e.key===','){e.preventDefault();const v=input.value.replace(/,/g,'').trim();if(v)addTagChip(document.getElementById('kwWrap'),v,input);input.value='';}}
+function checkKwComma(input){if(input.value.includes(',')){const pts=input.value.split(',');pts.slice(0,-1).forEach(p=>{const v=p.trim();if(v)addTagChip(document.getElementById('kwWrap'),v,input);});input.value=pts[pts.length-1];}}
+function addTagChip(wrap,text,inputEl){const chip=document.createElement('span');chip.className='ti-tag';chip.innerHTML=esc(text)+'<span class="rm" onclick="this.closest(\'.ti-tag\').remove()">×</span>';wrap.insertBefore(chip,inputEl);}
+
+// ══ Detail inline editing ════════════════════════════════════════════════════
+const DET_LANG_OPTIONS=['中文（普通话）','粤语','英语','日语','韩语','法语','德语','西班牙语','葡萄牙语','意大利语','俄语','阿拉伯语','印度尼西亚语'];
+const DET_SCENE_OPTIONS=[['meeting','会议'],['interview','访谈'],['medical','问诊'],['other','其他']];
+
+function detStartEdit(field,fileId,current,inputType){
+  // Remove any existing edit row
+  const prev=document.getElementById('det-edit-row');if(prev)prev.remove();
+  const valEl=document.getElementById('dv-'+field);if(!valEl)return;
+
+  let inputHtml='';
+  if(inputType==='text'){
+    inputHtml=`<input class="edit-field" id="det-ef" value="${esc(current)}" style="min-width:160px"/>`;
+  }else if(inputType==='number'){
+    inputHtml=`<input class="edit-field" id="det-ef" type="number" value="${esc(current)}" min="1" max="20" style="width:80px"/>`;
+  }else if(inputType==='select-lang'){
+    const opts=DET_LANG_OPTIONS.map(l=>`<option value="${l}"${l===current?' selected':''}>${l}</option>`).join('');
+    inputHtml=`<select class="edit-field" id="det-ef">${opts}</select>`;
+  }else if(inputType==='select-scene'){
+    const opts=DET_SCENE_OPTIONS.map(([v,l])=>`<option value="${v}"${v===current?' selected':''}>${l}</option>`).join('');
+    inputHtml=`<select class="edit-field" id="det-ef">${opts}</select>`;
+  }else if(inputType==='select-folder'){
+    const opts='<option value="">根目录</option>'+_allFolders.map(f=>`<option value="${f.folder_id}"${f.folder_id===current?' selected':''}>${esc(f.name)}</option>`).join('');
+    inputHtml=`<select class="edit-field" id="det-ef">${opts}</select>`;
+  }
+
+  // Insert inline below the field's parent row (simulate by temporarily replacing the span)
+  valEl.dataset.orig=valEl.innerHTML;
+  valEl.innerHTML=inputHtml+
+    `<span class="edit-actions">
+       <button class="edit-save" onclick="detSaveEdit('${field}','${fileId}','${inputType}')">✓</button>
+       <button class="edit-cancel" onclick="detCancelEdit('${field}')">✕</button>
+     </span>`;
+  const ef=document.getElementById('det-ef');
+  if(ef){ef.focus();if(ef.tagName==='INPUT')ef.select();}
+  if(ef&&ef.tagName==='INPUT')ef.addEventListener('keydown',e=>{if(e.key==='Enter')detSaveEdit(field,fileId,inputType);if(e.key==='Escape')detCancelEdit(field);});
+}
+
+async function detSaveEdit(field,fileId,inputType){
+  const ef=document.getElementById('det-ef');if(!ef)return;
+  const raw=ef.value;
+  let payload={};
+  if(field==='fname')payload.file_name=raw.trim();
+  else if(field==='topic')payload.topic=raw.trim();
+  else if(field==='language')payload.language=raw;
+  else if(field==='speaker_count')payload.speaker_count=parseInt(raw)||null;
+  else if(field==='scene')payload.scene=raw;
+  else if(field==='folder_id')payload.folder_id=raw||null;
+  try{
+    const res=await API.put('/api/platform/files/'+fileId,payload);
+    const f=res.data;
+    window._detailFile=f;
+    const valEl=document.getElementById('dv-'+field);
+    if(valEl){
+      let displayVal='';
+      if(field==='fname')displayVal=esc(f.file_name);
+      else if(field==='topic')displayVal=esc(f.topic||'—');
+      else if(field==='language')displayVal=esc(f.language||'—');
+      else if(field==='speaker_count')displayVal=String(f.speaker_count||'—');
+      else if(field==='scene')displayVal=sceneName(f.scene);
+      else if(field==='folder_id')displayVal=esc(getFolderName(f.folder_id));
+      const origBtn=valEl.querySelector('.edit-trigger');
+      valEl.dataset.orig=undefined;
+      valEl.innerHTML=`<span id="dv-${field}">${displayVal}</span><button class="edit-trigger" onclick="detStartEdit('${field}','${fileId}','${esc(raw)}','${inputType}')">✎</button>`;
+    }
+    if(field==='fname')document.getElementById('detail-title').textContent=f.file_name||'文件详情';
+    showToast('ok','保存成功');
+  }catch(e){showToast('err','保存失败: '+e.message);detCancelEdit(field);}
+}
+
+function detCancelEdit(field){
+  const valEl=document.getElementById('dv-'+field);
+  if(valEl&&valEl.dataset.orig)valEl.innerHTML=valEl.dataset.orig;
+}
+
+// Tags
+async function detRemoveTag(fileId,tag,el){
+  const f=window._detailFile;if(!f)return;
+  let tags=[];try{tags=JSON.parse(f.tags||'[]');}catch(e){}
+  tags=tags.filter(t=>t!==tag);
+  try{
+    await API.put('/api/platform/files/'+fileId,{tags});
+    window._detailFile={...f,tags:JSON.stringify(tags)};
+    el.closest('.tag-pill').remove();
+    showToast('ok','标签已删除');
+  }catch(e){showToast('err','删除失败');}
+}
+
+async function detAddTag(fileId){
+  const tag=prompt('输入新标签：');
+  if(!tag||!tag.trim())return;
+  const f=window._detailFile;if(!f)return;
+  let tags=[];try{tags=JSON.parse(f.tags||'[]');}catch(e){}
+  if(tags.includes(tag.trim()))return;
+  tags.push(tag.trim());
+  try{
+    const res=await API.put('/api/platform/files/'+fileId,{tags});
+    window._detailFile=res.data;
+    // Refresh tags display
+    const wrap=document.getElementById('dv-tags-wrap');
+    if(wrap){
+      const tagHtml=tags.map(t=>`<span class="tag-pill">${esc(t)}<span class="trm" onclick="detRemoveTag('${fileId}','${esc(t)}',this)">×</span></span>`).join(' ')
+        +`&nbsp;<span style="font-size:11px;color:var(--text3);cursor:pointer" onclick="detAddTag('${fileId}')">＋标签</span>`;
+      wrap.innerHTML=tagHtml;
+    }
+    showToast('ok','标签已添加');
+  }catch(e){showToast('err','添加失败');}
+}
+
+// ══ Sortable column headers ═══════════════════════════════════════════════════
+// Map: sortField → [ascending value, descending value]
+const SORT_COLS={
+  fname:['file_name_asc','file_name_desc'],
+  dur:['duration_asc','duration_desc'],
+  date:['created_at_asc','created_at_desc'],
+};
+const DEFAULT_DIR={fname:'file_name_asc',dur:'duration_desc',date:'created_at_desc'};
+
+function setTableSort(key,asc,desc){
+  const sel=document.getElementById(key+'-sort');if(!sel)return;
+  const cur=sel.value;
+  sel.value=cur===asc?desc:cur===desc?asc:asc;
+  updateSortIndicators(key);
+  if(key==='home')loadHome();else loadMy();
+}
+
+function updateSortIndicators(key){
+  const sel=document.getElementById(key+'-sort');
+  const val=sel?sel.value:'';
+  Object.entries(SORT_COLS).forEach(([col,[asc,desc]])=>{
+    const ic=document.getElementById('si-'+key+'-'+col);
+    const th=document.getElementById('sh-'+key+'-'+col);
+    if(!ic)return;
+    if(val===asc){ic.textContent=' ↑';if(th)th.classList.add('sorted');}
+    else if(val===desc){ic.textContent=' ↓';if(th)th.classList.add('sorted');}
+    else{ic.textContent='';if(th)th.classList.remove('sorted');}
+  });
+}
+
+// ══ Task actions ══════════════════════════════════════════════════════════════
+async function retryTask(id){
+  try{
+    await API.post('/api/platform/tasks/'+id,{action:'retry'});
+    showToast('ok','任务已重新加入队列');
+    loadTasks();startTaskPoll();
+  }catch(e){showToast('err','重试失败: '+e.message);}
+}
+
+async function clearCompletedTasks(){
+  showConfirm('清空已完成任务？','将删除所有已完成的任务记录（音频文件不受影响）。',async()=>{
+    try{
+      const r=await fetch('/api/platform/tasks?status=completed',{method:'DELETE'});
+      const j=await r.json();
+      showToast('ok','已清除 '+(j.data?.deleted??0)+' 条已完成记录');
+      loadTasks();
+    }catch(e){showToast('err','操作失败');}
+  });
+}
+
+// ══ Shortcuts modal ═══════════════════════════════════════════════════════════
+function toggleShortcutsModal(){
+  const m=document.getElementById('modal-shortcuts');
+  if(m.classList.contains('open'))closeModal('modal-shortcuts');
+  else openModal('modal-shortcuts');
+}
+
+// ══ Mobile nav ════════════════════════════════════════════════════════════════
+function toggleMobileNav(){
+  const mn=document.getElementById('mobile-nav');
+  const ov=document.getElementById('mobile-nav-overlay');
+  const open=mn.classList.toggle('open');
+  if(ov)ov.style.display=open?'block':'none';
+}
+function closeMobileNav(){
+  const mn=document.getElementById('mobile-nav');
+  const ov=document.getElementById('mobile-nav-overlay');
+  if(mn)mn.classList.remove('open');
+  if(ov)ov.style.display='none';
+}
+
+// ══ Keyboard shortcuts ════════════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  const tag=e.target.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+  if(document.querySelector('.mo-overlay.open,.confirm-overlay.open'))return;
+  if(e.key==='/'&&!e.ctrlKey&&!e.metaKey){
+    e.preventDefault();
+    const sid=_page==='home'?'home-search':_page==='myaudio'?'my-search':null;
+    if(sid)document.getElementById(sid)?.focus();
+  }else if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey){
+    e.preventDefault();openModal('modal-gen');
+  }else if(e.key==='?'){
+    toggleShortcutsModal();
+  }
+});
+
+// ══ CSV export ═══════════════════════════════════════════════════════════════
+function exportCSV(key){
+  const files=key==='home'?_homeFiles:_myFiles;
+  if(!files.length){showToast('err','暂无数据可导出');return;}
+  const cols=['file_name','language','scene','duration','file_size','source','speaker_count','topic','created_at'];
+  const headers=['文件名','语言','场景','时长(秒)','文件大小(字节)','来源','说话人数','主题','创建时间'];
+  const rows=[headers.join(',')];
+  files.forEach(f=>{rows.push(cols.map(c=>{const v=f[c]??'';return'"'+String(v).replace(/"/g,'""')+'"';}).join(','));});
+  const blob=new Blob(['﻿'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='audio_files_'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(a.href);
+  showToast('ok','CSV 已导出（'+files.length+' 条记录）');
+}
+
+// ══ Completion banner ════════════════════════════════════════════════════════
+function showCompletionBanner(topic){
+  const prev=document.getElementById('comp-banner-el');if(prev)prev.remove();
+  const el=document.createElement('div');el.id='comp-banner-el';el.className='comp-banner';
+  el.innerHTML='✅ 任务完成：<strong>'+(topic?esc(topic):'（无主题）')+'</strong>'
+    +'&nbsp;&nbsp;<button class="btn btn-ghost btn-sm" style="border-color:rgba(167,243,208,.4);color:#A7F3D0;font-size:11px" onclick="goTo(\'tasks\')">查看任务 →</button>'
+    +'<button style="background:none;border:none;cursor:pointer;color:rgba(167,243,208,.6);margin-left:8px;font-size:16px;line-height:1" onclick="document.getElementById(\'comp-banner-el\').remove()">✕</button>';
+  document.body.appendChild(el);
+  setTimeout(()=>{const e=document.getElementById('comp-banner-el');if(e){e.style.animation='bannerOut .3s ease forwards';setTimeout(()=>e.remove(),300);}},6000);
+}
+
+// ══ Copy transcript ══════════════════════════════════════════════════════════
+function copyTranscript(){
+  const box=document.getElementById('det-transcript-box');
+  if(!box){showToast('err','暂无字幕内容');return;}
+  const text=box.innerText||box.textContent||'';
+  navigator.clipboard.writeText(text).then(()=>{showToast('ok','台本已复制到剪贴板');}).catch(()=>{showToast('err','复制失败，请手动选取');});
+}
+
+// ══ ESC key ══════════════════════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.mo-overlay.open').forEach(m=>m.classList.remove('open'));closeConfirm();}});
+
+// ══ Init ═════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  updateSpRows();
+  updateSortIndicators('home');
+  updateSortIndicators('my');
+  loadHome();
+  loadStats();
+  // Background task indicator + completion notification + stats refresh
+  setInterval(async()=>{
+    if(_page!=='tasks'){
+      try{
+        const r=await API.get('/api/platform/tasks?limit=20');
+        const tasks=r.data||[];
+        const nowRunning=new Set(tasks.filter(t=>['queued','generating_text','synthesizing'].includes(t.status)).map(t=>t.task_id));
+        const hasRunning=nowRunning.size>0;
+        // Nav badge colour
+        const nb=document.getElementById('nav-tasks');if(nb)nb.style.color=hasRunning?'var(--warning)':'';
+        // Detect newly-completed tasks
+        if(_prevRunningIds.size>0){
+          const justDone=tasks.filter(t=>t.status==='completed'&&_prevRunningIds.has(t.task_id));
+          if(justDone.length){
+            showCompletionBanner(justDone[0].topic);
+            loadStats();
+            if(_page==='home')loadHome();
+          }
+        }
+        _prevRunningIds=nowRunning;
+      }catch(e){}
+    }
+  },8000);
+});
+</script>
+</body>
 </html>

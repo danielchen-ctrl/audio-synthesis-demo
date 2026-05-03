@@ -229,7 +229,7 @@ def _meta_payload() -> dict[str, Any]:
 def _cache_is_fresh() -> bool:
     if not META_FILE.exists():
         return False
-    if not SERVER_ARCHIVE.exists() or not ASSET_ARCHIVE.exists():
+    if not SERVER_ARCHIVE.exists():
         return False
     try:
         saved = json.loads(META_FILE.read_text(encoding="utf-8"))
@@ -240,10 +240,14 @@ def _cache_is_fresh() -> bool:
         return False
     if not (MODULE_CACHE / "server.pyc").exists():
         return False
-    if not (ASSET_CACHE / "static" / "index.html").exists():
-        return False
-    if not (ASSET_CACHE / "static" / "app.js").exists():
-        return False
+    # Static-asset checks are only relevant when ASSET_ARCHIVE is present.
+    # When the .pkg is absent (e.g. fork without full build artefacts), skip them
+    # so that module-only usage (training, batch generation) still works.
+    if ASSET_ARCHIVE.exists():
+        if not (ASSET_CACHE / "static" / "index.html").exists():
+            return False
+        if not (ASSET_CACHE / "static" / "app.js").exists():
+            return False
     return True
 
 
@@ -1921,11 +1925,12 @@ def ensure_embedded_runtime() -> None:
         return
     if not SERVER_ARCHIVE.exists():
         raise FileNotFoundError(f"Missing server archive: {SERVER_ARCHIVE}")
-    if not ASSET_ARCHIVE.exists():
-        raise FileNotFoundError(f"Missing asset archive: {ASSET_ARCHIVE}")
     _reset_cache()
     _extract_bundle_modules()
-    _extract_static_assets()
+    # Static assets (UI files) are only extracted when the asset archive is
+    # present.  Omitting them is fine for headless training / batch generation.
+    if ASSET_ARCHIVE.exists():
+        _extract_static_assets()
     META_FILE.write_text(
         json.dumps(_meta_payload(), ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -1943,6 +1948,59 @@ def load_bundle_server():
     if str(MODULE_CACHE) not in sys.path:
         sys.path.insert(0, str(MODULE_CACHE))
 
+    # ── Bundle bug fix #1: industry_template_loader.pyc missing `import sys` ──
+    # Pre-load the module ourselves and inject `sys` before server.pyc imports it.
+    _itl_path = MODULE_CACHE / "industry_template_loader.pyc"
+    if _itl_path.exists() and "industry_template_loader" not in sys.modules:
+        try:
+            _itl_spec = importlib.util.spec_from_file_location(
+                "industry_template_loader", _itl_path
+            )
+            if _itl_spec and _itl_spec.loader:
+                _itl_mod = importlib.util.module_from_spec(_itl_spec)
+                _itl_mod.sys = sys  # inject sys before exec so line-19 NameError is avoided
+                sys.modules["industry_template_loader"] = _itl_mod
+                _itl_spec.loader.exec_module(_itl_mod)
+        except Exception as _itl_err:
+            import logging as _log
+            _log.warning("[load_bundle_server] industry_template_loader pre-load error: %s", _itl_err)
+
+    # ── Bundle bug fix #2 (pre-load): dialogue_intelligence_engine.pyc defines the
+    #    Role class.  Pre-load and patch Role.__init__ so that any object created
+    #    without a `responsibility` kwarg still has the attribute (defaulting to "").
+    #    Must be done BEFORE server.pyc is exec'd so server.pyc picks up the patch. ──
+    _die_path = MODULE_CACHE / "dialogue_intelligence_engine.pyc"
+    if _die_path.exists() and "dialogue_intelligence_engine" not in sys.modules:
+        try:
+            _die_spec = importlib.util.spec_from_file_location(
+                "dialogue_intelligence_engine", _die_path
+            )
+            if _die_spec and _die_spec.loader:
+                _die_mod = importlib.util.module_from_spec(_die_spec)
+                _die_mod.sys = sys  # defensive: inject sys in case this module also needs it
+                sys.modules["dialogue_intelligence_engine"] = _die_mod
+                _die_spec.loader.exec_module(_die_mod)
+                # Patch Role class if found
+                _Role_cls = getattr(_die_mod, "Role", None)
+                if _Role_cls is not None and isinstance(_Role_cls, type):
+                    if not getattr(_Role_cls, "_patched_responsibility", False):
+                        _orig_role_init = _Role_cls.__init__
+                        def _make_patched_role_init(orig):
+                            def _patched_role_init(self, *args, **kwargs):
+                                orig(self, *args, **kwargs)
+                                if not hasattr(self, "responsibility"):
+                                    self.responsibility = (
+                                        getattr(self, "role_desc", None)
+                                        or getattr(self, "description", None)
+                                        or ""
+                                    )
+                            return _patched_role_init
+                        _Role_cls.__init__ = _make_patched_role_init(_orig_role_init)
+                        _Role_cls._patched_responsibility = True
+        except Exception as _die_err:
+            import logging as _log
+            _log.warning("[load_bundle_server] dialogue_intelligence_engine pre-load error: %s", _die_err)
+
     spec = importlib.util.spec_from_file_location(
         "_demo_embedded_bundle_server",
         module_path,
@@ -1952,6 +2010,40 @@ def load_bundle_server():
 
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+
+    # ── Bundle bug fix #2: Role objects created by _ensure_speaker_count lack
+    #    the `responsibility` attribute.  Find the Role class across all bundle
+    #    modules loaded so far and patch its __init__ to guarantee the attribute. ──
+    def _patch_role_class_responsibility():
+        _checked = set()
+        _candidates = [module] + [
+            _m for _n, _m in sys.modules.items()
+            if _m is not None
+            and _n not in _checked
+            and hasattr(_m, "__file__")
+            and str(MODULE_CACHE) in str(getattr(_m, "__file__", ""))
+        ]
+        for _bmod in _candidates:
+            _Role_cls = getattr(_bmod, "Role", None)
+            if _Role_cls is not None and isinstance(_Role_cls, type):
+                if not getattr(_Role_cls, "_patched_responsibility", False):
+                    _orig_role_init = _Role_cls.__init__
+                    def _make_patched_init(orig):
+                        def _patched_init(self, *args, **kwargs):
+                            orig(self, *args, **kwargs)
+                            if not hasattr(self, "responsibility"):
+                                self.responsibility = (
+                                    getattr(self, "role_desc", None)
+                                    or getattr(self, "description", None)
+                                    or ""
+                                )
+                        return _patched_init
+                    _Role_cls.__init__ = _make_patched_init(_orig_role_init)
+                    _Role_cls._patched_responsibility = True
+                return True  # patched
+        return False
+
+    _patch_role_class_responsibility()  # first attempt right after exec_module
 
     module.PROJECT_ROOT = ROOT
     module.STATIC_DIR = active_static_dir()
@@ -2024,6 +2116,9 @@ def load_bundle_server():
 
         module.GenerateTextHandler.post = _patched_generate_text_post
         module._embedded_generate_text_handler_patched = True
+
+    # Second pass: re-scan after all lazy imports triggered during the patches above
+    _patch_role_class_responsibility()
 
     _BUNDLE_SERVER = module
     return module
