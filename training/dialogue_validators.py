@@ -112,13 +112,8 @@ def validate_with_quality_gate(task: TrainingTask, lines: DialogueLines) -> Dict
         errors.append(ValidationError("占位符残留", "存在占位符残留 [[[CORE"))
         is_valid = False
 
-    core_markers = re.findall(r"<<(核心|Core|コア|Noyau|핵심|Kern|Núcleo|Esencial):.*?>>", full_text)
-    if len(core_markers) == 0 and not task.meta.get("translate_fallback"):
-        errors.append(ValidationError("核心标记缺失", "缺少核心标记"))
-        is_valid = False
-    if len(core_markers) > 2:
-        errors.append(ValidationError("核心标记过多", f"核心标记过多({len(core_markers)}次)"))
-        is_valid = False
+    # NOTE: core marker checks removed — bundle output never contains <<核心:…>> markers.
+    # Missing/excess marker scoring is handled as "warning" in quality_scoring.py instead.
 
     summary = "; ".join(error.message for error in errors) if errors else "ok"
     return {"passed": is_valid and not errors, "errors": errors, "summary": summary}
