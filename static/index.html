@@ -297,6 +297,12 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:22px
 /* ══ Legacy modal (from styles.css) ══════════════════════════════════════════ */
 .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.42);align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
+.modal-overlay.open.minimized{display:none!important}
+#gen-minimized-bar{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--primary,#3b82f6);color:#fff;border-radius:32px;padding:10px 20px 10px 16px;align-items:center;gap:10px;cursor:pointer;z-index:250;box-shadow:0 4px 24px rgba(0,0,0,.28);font-size:14px;font-weight:500;white-space:nowrap;user-select:none;transition:filter .15s}
+#gen-minimized-bar.visible{display:flex}
+#gen-minimized-bar:hover{filter:brightness(1.1)}
+#gen-minimized-bar .mini-restore-hint{opacity:.65;font-size:12px;margin-left:4px}
+.gen-mini-spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 .modal-panel{position:relative;width:min(960px,calc(100vw - 40px));height:min(820px,calc(100vh - 40px));min-width:760px;min-height:560px;max-width:calc(100vw - 20px);max-height:calc(100vh - 20px);display:flex;flex-direction:column;background:#fff;border-radius:var(--r-lg);box-shadow:var(--sh-lg);overflow:hidden}
 .modal-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:22px 24px 16px;border-bottom:1px solid var(--gray-200);cursor:move;user-select:none}
 .modal-title{font-size:20px;font-weight:700;color:var(--gray-900)}
@@ -597,6 +603,13 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
   </main>
 </div>
 
+<!-- ══ Minimized generation floating bar ══ -->
+<div id="gen-minimized-bar" role="button" tabindex="0" onclick="restoreGenModal()" onkeydown="if(event.key==='Enter'||event.key===' ')restoreGenModal()">
+  <span class="gen-mini-spinner" id="gen-mini-spinner"></span>
+  <span id="gen-minimized-text">正在生成...</span>
+  <span class="mini-restore-hint">点击恢复</span>
+</div>
+
 <!-- ══ Generate Modal ══ -->
 <!-- ══ Legacy Generate Modal (from app.js / legacy demo) ══ -->
 <div id="toastContainer" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
@@ -607,6 +620,7 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
       <div class="modal-title">在线生成音频</div>
       <div class="modal-header-actions">
         <button id="resetModalLayoutBtn" class="modal-header-btn" type="button">重置布局</button>
+        <button id="minimizeModalBtn" class="modal-header-btn" type="button" title="最小化，生成期间可继续操作平台" onclick="minimizeGenModal()">—</button>
         <button id="closeModalBtn" class="modal-close" type="button" aria-label="关闭">×</button>
       </div>
     </div>
@@ -1773,6 +1787,58 @@ showConfirm = function(title,desc,onOk){
   }
 };
 closeConfirm = function(){document.getElementById('confirm-overlay').classList.remove('open');_confirmCb=null;};
+
+// ── Generate modal minimize / restore ────────────────────────────────────────
+let _miniPollTimer = null;
+
+function minimizeGenModal() {
+  document.getElementById('modalOverlay').classList.add('minimized');
+  document.getElementById('gen-minimized-bar').classList.add('visible');
+  _startMiniPoll();
+}
+
+function restoreGenModal() {
+  document.getElementById('modalOverlay').classList.remove('minimized');
+  document.getElementById('gen-minimized-bar').classList.remove('visible');
+  clearTimeout(_miniPollTimer);
+  _miniPollTimer = null;
+}
+
+function _startMiniPoll() {
+  clearTimeout(_miniPollTimer);
+  _tickMiniBar();
+}
+
+function _tickMiniBar() {
+  const bar = document.getElementById('gen-minimized-bar');
+  if (!bar.classList.contains('visible')) return;
+
+  const textEl = document.getElementById('gen-minimized-text');
+  const spinner = document.getElementById('gen-mini-spinner');
+  let busy = false;
+  try {
+    const s = window.state && window.state.form;
+    if (s && s.isGeneratingText)  { textEl.textContent = '正在生成文本...'; busy = true; }
+    else if (s && s.isSubmittingAudio) { textEl.textContent = '正在合成音频...'; busy = true; }
+    else { textEl.textContent = '已就绪 — 点击查看结果'; }
+  } catch(e) { textEl.textContent = '生成中...'; busy = true; }
+
+  spinner.style.display = busy ? '' : 'none';
+  _miniPollTimer = setTimeout(_tickMiniBar, 600);
+}
+
+// Auto-hide bar when modal is closed normally (e.g. via × button)
+(function() {
+  const overlay = document.getElementById('modalOverlay');
+  if (!overlay) return;
+  new MutationObserver(() => {
+    if (!overlay.classList.contains('open')) {
+      document.getElementById('gen-minimized-bar').classList.remove('visible');
+      clearTimeout(_miniPollTimer);
+      _miniPollTimer = null;
+    }
+  }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
+})();
 </script>
 </body>
 </html>

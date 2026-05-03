@@ -2,7 +2,7 @@
 webapp/db.py
 ============
 SQLite 数据库初始化与 CRUD 辅助函数。
-数据库文件位于项目根目录 platform.db，Python 内置 sqlite3，零配置。
+数据库文件位于 runtime/platform.db，Python 内置 sqlite3，零配置，首次启动自动创建。
 """
 from __future__ import annotations
 
