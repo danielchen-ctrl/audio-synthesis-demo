@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import concurrent.futures
 from typing import Callable, Dict, Iterable, Optional
 
 from training.dialogue_validators import validate_with_quality_gate
@@ -10,6 +11,17 @@ from training.training_types import ExecutionResult, TrainingTask
 
 
 Generator = Callable[[TrainingTask, int], tuple]
+
+# Maximum seconds a single generator() call may run before being abandoned.
+# 10-speaker tasks can spin inside the bundle for 30+ min; cap at 5 min.
+_GENERATOR_TIMEOUT_SECONDS = 300
+
+
+def _call_with_timeout(fn, *args, timeout: int = _GENERATOR_TIMEOUT_SECONDS):
+    """Run fn(*args) in a thread; raise TimeoutError if it exceeds `timeout` s."""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(fn, *args)
+        return future.result(timeout=timeout)
 
 
 def execute_tasks(
@@ -29,7 +41,7 @@ def execute_tasks(
         last_error = ""
         for retry in range(max_retries + 1):
             try:
-                lines, debug_info = generator(task, retry)
+                lines, debug_info = _call_with_timeout(generator, task, retry)
                 validation = validate_with_quality_gate(task, lines)
                 score_report = score_dialogue(task, lines, validator_errors=validation["errors"])
                 result = ExecutionResult(

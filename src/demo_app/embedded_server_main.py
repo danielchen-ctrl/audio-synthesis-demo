@@ -931,7 +931,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     dialogue_id = _new_dialogue_id()
     basename = _basename_from_title(title, timestamp, bundle_server.generate_basename(profile, language, timestamp))
-    save_dir = ROOT / "demo" / timestamp
+    save_dir = ROOT / "demo-data" / timestamp
     save_dir.mkdir(parents=True, exist_ok=True)
     text_path = save_dir / f"{basename}.txt"
     text_path.write_text(dialogue_text, encoding="utf-8")
@@ -1016,10 +1016,10 @@ def _ensure_manifest_cache() -> None:
     with _manifest_cache_lock:
         if _manifest_cache_loaded:
             return
-        demo_root = ROOT / "demo"
+        demo_root = ROOT / "demo-data"
         if demo_root.exists():
             # Sort by mtime desc and cap at _MANIFEST_CACHE_MAX so that
-            # large historical demo/ trees don't fill memory on startup.
+            # large historical demo-data/ trees don't fill memory on startup.
             all_manifests = sorted(
                 demo_root.glob("*/manifest.json"),
                 key=lambda p: p.stat().st_mtime,
@@ -1161,7 +1161,7 @@ def _create_manual_dialogue_payload(bundle_server: Any, payload: dict[str, Any])
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     dialogue_id = _new_dialogue_id()
     basename = _basename_from_title(title, timestamp, "manual_dialogue")
-    save_dir = ROOT / "demo" / timestamp
+    save_dir = ROOT / "demo-data" / timestamp
     save_dir.mkdir(parents=True, exist_ok=True)
     text_path = save_dir / f"{basename}.txt"
     text_path.write_text(dialogue_text, encoding="utf-8")
@@ -1254,7 +1254,7 @@ def _cleanup_extra_audio_formats(audio_paths: dict[str, Path], keep_format: str)
 
 
 def _resolve_audio_target(manifest: dict[str, Any], dialogue_id: str) -> Path | None:
-    save_dir = Path(manifest.get("save_dir") or ROOT / "demo")
+    save_dir = Path(manifest.get("save_dir") or ROOT / "demo-data")
     basename = str(manifest.get("basename") or dialogue_id)
     audio_path = str(manifest.get("audio_path") or "").strip()
     if audio_path:
@@ -1278,11 +1278,11 @@ def _task_storage_dir(manifest_path: Path, manifest: dict[str, Any]) -> Path:
     except OSError:
         resolved = candidate.absolute()
 
-    demo_root = (ROOT / "demo").resolve()
+    demo_root = (ROOT / "demo-data").resolve()
     try:
         resolved.relative_to(demo_root)
     except ValueError as exc:
-        raise HTTPError(400, reason="task save_dir is outside demo directory") from exc
+        raise HTTPError(400, reason="task save_dir is outside demo-data directory") from exc
 
     if resolved == demo_root:
         raise HTTPError(400, reason="refuse to delete demo root")
@@ -1742,7 +1742,7 @@ class DownloadHandler(RequestHandler):
             _, manifest = _find_manifest(dialogue_id)
         except FileNotFoundError as exc:
             raise HTTPError(404, reason=str(exc)) from exc
-        save_dir = Path(manifest.get("save_dir") or ROOT / "demo")
+        save_dir = Path(manifest.get("save_dir") or ROOT / "demo-data")
 
         if kind == "text":
             target = Path(manifest["text_path"])
@@ -1979,7 +1979,7 @@ def load_bundle_server():
 
     module.PROJECT_ROOT = ROOT
     module.STATIC_DIR = active_static_dir()
-    module.DEMO_DIR = ROOT / "demo"
+    module.DEMO_DIR = ROOT / "demo-data"
     module.DEMO_DIR.mkdir(parents=True, exist_ok=True)
 
     if not getattr(module, "_embedded_naturalness_patched", False):
@@ -2060,7 +2060,7 @@ def make_app():
     module = load_bundle_server()
     module.PROJECT_ROOT = ROOT
     module.STATIC_DIR = active_static_dir()
-    module.DEMO_DIR = ROOT / "demo"
+    module.DEMO_DIR = ROOT / "demo-data"
     module.DEMO_DIR.mkdir(parents=True, exist_ok=True)
     app = module.make_app()
     app.add_handlers(

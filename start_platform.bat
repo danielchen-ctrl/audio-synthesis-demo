@@ -32,7 +32,7 @@ timeout /t 2 /nobreak >nul
 
 :: -- Start server in new window --
 echo [INFO] Starting server...
-start "platform_server" /D "%ROOT%" cmd /k %PY% server_platform.py
+start "platform_server" /D "%ROOT%" cmd /c %PY% server_platform.py
 
 :: -- Wait up to 30s for server ready --
 echo [INFO] Waiting for server (up to 30s)...
@@ -58,4 +58,3 @@ echo.
 echo  Open in browser: %PLATFORM_URL%
 echo  To stop: close the "platform_server" window
 echo.
-pause

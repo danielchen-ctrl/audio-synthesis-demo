@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 _ROOT = Path(__file__).resolve().parents[2]
 _TRAINING_OUT_DIR = _ROOT / "output" / "training_v2"
-_OLD_CORPUS_DIR   = _ROOT / "demo" / "training_long_dialogue"
+_OLD_CORPUS_DIR   = _ROOT / "demo-data" / "training_long_dialogue"
 
 # 旧语料库 domain_id → 对应的 template_id 列表
 # 旧语料比新训练数据粒度粗（行业级 vs 主题级），用作兜底

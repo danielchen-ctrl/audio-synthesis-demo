@@ -39,9 +39,9 @@ from demo_app.embedded_server_main import (
     make_app,
 )
 
-from webapp.db import init_db
-from webapp.routes import register_platform_routes
-from webapp.task_runner import start_worker
+from src.webapp.db import init_db
+from src.webapp.routes import register_platform_routes
+from src.webapp.task_runner import start_worker
 
 import os
 import tornado.ioloop

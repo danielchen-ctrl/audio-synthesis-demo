@@ -43,8 +43,8 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-import webapp.db as db
-from webapp.task_runner import enqueue
+import src.webapp.db as db
+from src.webapp.task_runner import enqueue, _guess_scene
 
 
 # ── 基类 ──────────────────────────────────────────────────────────────────────
@@ -116,6 +116,7 @@ class TasksHandler(PlatformHandler):
             db.update_task_status(
                 task["task_id"], "completed",
                 file_id=data.get("file_id") or None,
+                dialogue_id=data.get("dialogue_id") or "",
             )
             self.set_status(201)
             self.ok(db.get_task(task["task_id"]))
@@ -125,8 +126,8 @@ class TasksHandler(PlatformHandler):
         if not data.get("topic") and not data.get("input_text"):
             raise HTTPError(400, reason="topic 或 input_text 为必填")
         mode = data.get("generation_mode", "llm")
-        if mode not in ("llm", "direct"):
-            raise HTTPError(400, reason="generation_mode 须为 llm 或 direct")
+        if mode not in ("llm", "direct", "text_only"):
+            raise HTTPError(400, reason="generation_mode 须为 llm、direct 或 text_only")
         if mode == "direct" and not data.get("input_text"):
             raise HTTPError(400, reason="直接输入模式需提供 input_text")
 
@@ -249,6 +250,10 @@ class FilesHandler(PlatformHandler):
                 pass
         ext = fpath.suffix.lstrip(".").lower() or "mp3"
         folder_id = data.get("folder_id") or None
+        topic_val = data.get("topic") or ""
+        _raw_scene = (data.get("scene") or "").strip()
+        # Re-infer scene when caller sends "other" or leaves blank
+        scene_val = _raw_scene if (_raw_scene and _raw_scene != "other") else (_guess_scene("", topic_val) or "other")
         record = db.create_audio_file({
             "file_name": data.get("file_name") or fpath.name,
             "file_path": str(fpath.resolve()),
@@ -258,12 +263,46 @@ class FilesHandler(PlatformHandler):
             "file_size": file_size,
             "language": data.get("language") or "",
             "speaker_count": int(data.get("speaker_count") or 0) or None,
-            "scene": data.get("scene") or "other",
-            "topic": data.get("topic") or "",
+            "scene": scene_val,
+            "topic": topic_val,
             "folder_id": folder_id,
+            "transcript_json": data.get("transcript_json") or None,
         })
         self.set_status(201)
         self.ok(record)
+
+
+def _try_recover_transcript(task_id: str) -> "str | None":
+    """从磁盘 manifest 恢复旧文件的对话台本（懒加载回填）。
+    适用于 include_scripts=False 且在台本自动保存修复前生成的文件。"""
+    try:
+        task = db.get_task(task_id)
+        if not task:
+            return None
+        dialogue_id = task.get("dialogue_id")
+        if not dialogue_id:
+            return None
+        from demo_app.embedded_server_main import _find_manifest
+        _, manifest = _find_manifest(dialogue_id)
+        text_path_str = manifest.get("text_path")
+        if not text_path_str:
+            return None
+        text_path = Path(text_path_str)
+        if not text_path.exists():
+            return None
+        raw_text = text_path.read_text(encoding="utf-8")
+        lines = []
+        for raw in raw_text.strip().splitlines():
+            raw = raw.strip()
+            if not raw:
+                continue
+            if ": " in raw:
+                spk, txt = raw.split(": ", 1)
+                lines.append({"speaker": spk.strip(), "text": txt.strip(),
+                               "start_time": None, "end_time": None})
+        return json.dumps(lines, ensure_ascii=False) if lines else None
+    except Exception:
+        return None
 
 
 class FileHandler(PlatformHandler):
@@ -273,6 +312,13 @@ class FileHandler(PlatformHandler):
         f = db.get_audio_file(file_id)
         if not f:
             raise HTTPError(404, reason="文件不存在")
+        # 懒加载回填：旧文件无 transcript_json 时尝试从磁盘恢复对话台本
+        if not f.get("transcript_json") and f.get("task_id"):
+            recovered = _try_recover_transcript(f["task_id"])
+            if recovered:
+                db.update_audio_file(file_id, transcript_json=recovered)
+                f = dict(f)
+                f["transcript_json"] = recovered
         self.ok(f)
 
     def put(self, file_id: str) -> None:
@@ -320,26 +366,86 @@ class FileDownloadHandler(PlatformHandler):
             self.finish(fp.read())
 
 
+def _build_dialogue_text(f: dict) -> str:
+    """从 audio_file 记录生成纯文本对话内容（优先磁盘原始 txt，次选 transcript_json）。"""
+    # 1. 通过 task dialogue_id 查找 manifest → text_path
+    if f.get("task_id"):
+        try:
+            task = db.get_task(f["task_id"])
+            if task and task.get("dialogue_id"):
+                from demo_app.embedded_server_main import _find_manifest
+                _, manifest = _find_manifest(task["dialogue_id"])
+                txt_path = Path(manifest.get("text_path") or "")
+                if txt_path.exists():
+                    return txt_path.read_text(encoding="utf-8")
+        except Exception:
+            pass
+    # 2. 在音频文件同级目录查找 manifest.json（旧 demo 生成文件，dialogue_id 未存储时的回退）
+    fpath = Path(f.get("file_path") or "")
+    if fpath.exists():
+        for candidate_dir in [fpath.parent, fpath.parent.parent]:
+            try:
+                manifest_path = candidate_dir / "manifest.json"
+                if manifest_path.exists():
+                    import json as _json2
+                    manifest = _json2.loads(manifest_path.read_text(encoding="utf-8"))
+                    txt_path = Path(manifest.get("text_path") or "")
+                    if txt_path.exists():
+                        return txt_path.read_text(encoding="utf-8")
+            except Exception:
+                pass
+    # 3. 从 transcript_json 构建
+    raw_json = f.get("transcript_json")
+    if raw_json:
+        try:
+            import json as _json
+            segs = _json.loads(raw_json)
+            if isinstance(segs, list) and segs:
+                return "\n".join(
+                    f"{s.get('speaker','Speaker')}: {s.get('text', s.get('content',''))}"
+                    for s in segs
+                )
+        except Exception:
+            pass
+    return ""
+
+
 class FileTranscriptHandler(PlatformHandler):
-    """GET /api/platform/files/<file_id>/transcript?type=json|srt"""
+    """GET /api/platform/files/<file_id>/transcript?type=json|srt|text"""
 
     def get(self, file_id: str) -> None:
         f = db.get_audio_file(file_id)
         if not f:
             raise HTTPError(404, reason="文件不存在")
-        t = self.get_query_argument("type", "json")
+        t = self.get_query_argument("type", "text")
         if t == "srt":
             content = f.get("transcript_srt") or ""
             fname = f["file_name"].rsplit(".", 1)[0] + "_transcript.srt"
             self.set_header("Content-Type", "text/plain; charset=utf-8")
             self.set_header("Content-Disposition", f"attachment; filename*=UTF-8''{urllib.parse.quote(fname)}")
             self.finish(content)
-        else:
+        elif t == "json":
             content = f.get("transcript_json") or "[]"
             fname = f["file_name"].rsplit(".", 1)[0] + "_transcript.json"
             self.set_header("Content-Type", "application/json; charset=utf-8")
             self.set_header("Content-Disposition", f"attachment; filename*=UTF-8''{urllib.parse.quote(fname)}")
             self.finish(content)
+        else:  # type=text — 纯文本对话下载
+            # 对于纯文本文件（format=txt），直接读取文件内容
+            if (f.get("format") or "").lower() == "txt":
+                fpath = Path(f["file_path"])
+                if fpath.exists():
+                    content = fpath.read_text(encoding="utf-8")
+                else:
+                    content = _build_dialogue_text(f)
+            else:
+                content = _build_dialogue_text(f)
+            if not content:
+                raise HTTPError(404, reason="对话文本暂不可用")
+            fname = f["file_name"].rsplit(".", 1)[0] + ".txt"
+            self.set_header("Content-Type", "text/plain; charset=utf-8")
+            self.set_header("Content-Disposition", f"attachment; filename*=UTF-8''{urllib.parse.quote(fname)}")
+            self.finish(content.encode("utf-8"))
 
 
 # ── Upload ────────────────────────────────────────────────────────────────────

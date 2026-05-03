@@ -19,7 +19,7 @@ from pathlib import Path
 
 # ─── 路径 ─────────────────────────────────────────────────────────────────
 _ROOT         = Path(__file__).resolve().parents[2]
-_TRAINING_DIR = _ROOT / "demo" / "training_long_dialogue"
+_TRAINING_DIR = _ROOT / "demo-data" / "training_long_dialogue"
 
 # ─── 训练文件内容缓存 ──────────────────────────────────────────────────────
 # Bounded cache so repeated calls with the same domain/language don't hit disk.

@@ -6,13 +6,10 @@
   - 训练任务生成、回归、模板提取等可执行脚本
 - `data/`
   - 训练任务清单与固定场景数据
-- `docs/`
-  - 训练链路说明与历史实施记录
-
 ## 入口
 
-- 使用说明：`training/docs/pipeline-guide.md`
-- 历史记录：`training/docs/implementation-report.md`
+- 使用说明：`docs/pipeline-guide.md`
+- 历史记录：`docs/implementation-report.md`
 - 数据样例：
   - `training/data/training_jobs_mvp.jsonl`
   - `training/data/training_jobs_full.jsonl`

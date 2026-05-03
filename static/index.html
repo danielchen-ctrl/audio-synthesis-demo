@@ -22,11 +22,11 @@ button{cursor:pointer;font-family:inherit}
 .nav-btn:hover{background:var(--bg3);color:var(--text)}
 .nav-btn.active{background:rgba(59,130,246,.15);color:var(--primary)}
 .topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
-.btn{padding:7px 14px;border-radius:6px;border:none;font-size:13px;font-weight:500;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn{padding:8px 16px;border-radius:6px;border:none;font-size:14px;font-weight:500;transition:.15s;display:inline-flex;align-items:center;gap:6px}
 .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
 .btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{opacity:.85}
-.btn-sm{padding:5px 10px;font-size:12px}
+.btn-sm{padding:6px 12px;font-size:13px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .legacy-link{font-size:12px;color:var(--text3);padding:6px 10px;border-radius:6px;border:1px solid var(--border);transition:.15s}.legacy-link:hover{color:var(--text2);border-color:var(--text3)}
 
@@ -59,14 +59,14 @@ button{cursor:pointer;font-family:inherit}
 .search-wrap input{width:100%;padding:7px 10px 7px 32px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none}
 .search-wrap input:focus{border-color:var(--primary)}
 .search-wrap .ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px}
-.select-field{padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none;cursor:pointer;min-width:110px}
+.select-field{padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;outline:none;cursor:pointer;min-width:110px}
 .select-field:focus{border-color:var(--primary)}
 
 /* Table */
 .table-wrap{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
 table{width:100%;border-collapse:collapse}
-thead th{padding:10px 12px;text-align:left;font-size:12px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap}
-tbody td{padding:10px 12px;font-size:13px;border-bottom:1px solid rgba(51,65,85,.5);vertical-align:middle}
+thead th{padding:11px 14px;text-align:left;font-size:13px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody td{padding:12px 14px;font-size:14px;border-bottom:1px solid rgba(51,65,85,.5);vertical-align:middle}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:rgba(255,255,255,.02)}
 .cb-col{width:36px}
@@ -93,6 +93,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 /* Task cards */
 .task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .task-card{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:16px}
+.task-card-failed{border-left:3px solid var(--danger)}
 .task-card-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
 .task-topic{font-weight:600;font-size:14px;flex:1;margin-right:8px;word-break:break-all}
 .task-meta{font-size:12px;color:var(--text3);margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap}
@@ -101,26 +102,36 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .task-err{font-size:11px;color:var(--danger);margin-top:6px;word-break:break-all}
 
 /* Detail */
-.detail-wrap{display:flex;gap:24px;flex-wrap:wrap}
-.detail-player{flex:0 0 280px}
-.detail-meta{flex:1;min-width:260px}
-.audio-card{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:20px;text-align:center}
-.audio-waveform{height:80px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:28px;margin:12px 0}
-.audio-ctrl{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:12px}
-.play-btn{width:40px;height:40px;border-radius:50%;background:var(--primary);border:none;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center}
-.prog-bar{flex:1;height:4px;background:var(--bg3);border-radius:99px;cursor:pointer;position:relative}
+.detail-wrap{display:flex;flex-direction:column;gap:16px}
+.detail-player{width:100%}
+.detail-meta{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.detail-meta-full{grid-column:1/-1}
+/* Big audio player card */
+.audio-card{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px}
+.audio-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.audio-card-title{font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+.audio-waveform{height:64px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:28px;margin-bottom:14px}
+.audio-ctrl{display:flex;gap:12px;align-items:center}
+/* Text preview card (for text-only generated files) */
+.text-preview-card{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px}
+.text-preview-hdr{font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.text-preview-body{font-size:13px;color:var(--text2);white-space:pre-wrap;line-height:1.7;max-height:360px;overflow-y:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--bg3);border-radius:6px;padding:12px 14px}
+.play-btn{width:44px;height:44px;flex-shrink:0;border-radius:50%;background:var(--primary);border:none;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(59,130,246,.35);transition:all .15s}
+.play-btn:hover{background:var(--primary-hover);transform:scale(1.05)}
+.prog-bar{flex:1;height:6px;background:var(--bg3);border-radius:99px;cursor:pointer;position:relative}
 .prog-fill{height:100%;background:var(--primary);border-radius:99px;width:0;pointer-events:none}
-.time-txt{font-size:12px;color:var(--text3);white-space:nowrap}
-.meta-section{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px}
+.time-txt{font-size:12px;color:var(--text3);white-space:nowrap;min-width:90px;text-align:right}
+.meta-section{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:16px;height:100%;box-sizing:border-box}
 .meta-section h4{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text2)}
-.meta-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}
-.meta-key{color:var(--text3)}
+.meta-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:13px}
+.meta-key{color:var(--text3);white-space:nowrap}
 .meta-val{color:var(--text)}
-.transcript-box{background:var(--bg3);border-radius:6px;padding:12px;font-size:12px;line-height:1.7;max-height:260px;overflow-y:auto;color:var(--text2)}
+.transcript-box{background:var(--bg3);border-radius:6px;padding:12px;font-size:12px;line-height:1.7;max-height:300px;overflow-y:auto;color:var(--text2)}
 .transcript-seg{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
 .transcript-seg:last-child{border:none}
 .seg-speaker{font-weight:600;color:var(--primary);flex-shrink:0;min-width:70px}
 .seg-text{flex:1}
+@media(max-width:680px){.detail-meta{grid-template-columns:1fr}}
 
 /* Modals */
 .mo-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:16px}
@@ -205,10 +216,13 @@ textarea.form-input{resize:vertical;min-height:100px;font-family:inherit}
 .preset-back-btn{font-size:12px;color:var(--text2);cursor:pointer;padding:4px 0;display:inline-block;margin-top:4px}.preset-back-btn:hover{color:var(--text)}
 
 /* Stats bar */
-.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
-.stat-num{font-size:22px;font-weight:700;color:var(--text)}
-.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+.stats-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;align-items:stretch}
+.stat-combined{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center}
+.stat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:0 12px;min-width:60px}
+.stat-divider{width:1px;height:44px;background:var(--border);flex-shrink:0}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:4px;min-height:0}
+.stat-num{font-size:26px;font-weight:700;color:var(--text)}
+.stat-label{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
 .stat-bar{height:3px;background:var(--bg3);border-radius:99px;margin-top:6px;overflow:hidden}
 .stat-bar-fill{height:100%;background:var(--primary);border-radius:99px}
 
@@ -261,14 +275,19 @@ textarea.form-input{resize:vertical;min-height:100px;font-family:inherit}
 @keyframes bannerIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes bannerOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(16px)}}
 /* Language mini chart */
-.lang-bars{display:flex;flex-direction:column;gap:5px;margin-top:8px}
-.lang-bar-row{display:flex;align-items:center;gap:6px}
-.lang-bar-lbl{font-size:10px;color:var(--text3);width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;flex-shrink:0}
-.lang-bar-trk{flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.lang-bars{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.lang-bar-row{display:flex;align-items:center;gap:8px}
+.lang-bar-lbl{font-size:12px;color:var(--text2);width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;flex-shrink:0}
+.lang-bar-trk{flex:1;height:8px;background:var(--bg3);border-radius:99px;overflow:hidden}
 .lang-bar-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .6s}
-.lang-bar-cnt{font-size:10px;color:var(--text3);width:20px;text-align:right;flex-shrink:0}
+.lang-bar-cnt{font-size:12px;font-weight:600;color:var(--text);width:26px;text-align:right;flex-shrink:0}
 
 /* ── Phase 5 ── */
+/* Pagination */
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:10px 4px 2px;font-size:13px;color:var(--text3)}
+.pager-btn{padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;font-size:12px;transition:.12s}.pager-btn:hover:not(:disabled){background:var(--bg3);color:var(--text)}.pager-btn:disabled{opacity:.38;cursor:not-allowed}
+.pager-info{padding:0 6px}
+
 /* Sortable column headers */
 .th-sort{cursor:pointer;user-select:none}
 .th-sort:hover{color:var(--text)}
@@ -340,10 +359,16 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:22px
 .wc-preset:hover,.wc-preset.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 .long-dialogue-hint{color:var(--warning);font-size:12px;margin-top:4px}
 .compact-group{max-width:160px}
-.compact-input{width:120px}
-.btn-generate{width:100%;padding:12px 20px;border-radius:var(--r-md);background:var(--primary);color:#fff;font-size:15px;font-weight:600;border:none;box-shadow:0 2px 8px rgba(59,130,246,.35);transition:all .15s ease}
-.btn-generate:hover:not(:disabled){background:var(--primary-hover);box-shadow:0 4px 12px rgba(59,130,246,.45)}
-.btn-generate:disabled{background:var(--gray-300);box-shadow:none;cursor:not-allowed}
+.compact-input{width:80px;text-align:center}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+/* Speaker section header row */
+.spk-section-header{display:flex;align-items:center;gap:14px;margin-bottom:0;flex-wrap:wrap}
+.spk-count-row{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.spk-count-row .compact-input{width:70px}
+/* Footer generate-text button */
+.footer-gen-btn{padding:8px 18px;font-size:13px;font-weight:500;background:var(--gray-700);border:none;border-radius:var(--r-sm);color:#fff;cursor:pointer;transition:background .15s}
+.footer-gen-btn:hover:not(:disabled){background:var(--gray-800)}
+.footer-gen-btn:disabled{background:var(--gray-300);cursor:not-allowed}
 .preview-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .readonly-field{background:var(--gray-50);color:var(--gray-700)}
 .keyword-preview-group{margin-top:12px}
@@ -435,9 +460,9 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
     <button class="nav-btn" onclick="goTo('trash')" id="nav-trash">🗑 回收站</button>
   </nav>
   <div class="topbar-right">
+    <button class="btn btn-primary" onclick="openLegacyModal()">✨ 生成语料</button>
     <button class="btn btn-ghost btn-sm theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换亮/暗主题">🌙</button>
     <button class="btn btn-ghost btn-sm" onclick="openModal('modal-upload')">⬆ 上传</button>
-    <button class="btn btn-primary btn-sm" onclick="openLegacyModal()">✨ 生成语料</button>
   </div>
   <button class="hamburger" onclick="toggleMobileNav()" title="菜单">≡</button>
 </header>
@@ -477,11 +502,17 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
 
       <!-- Stats cards -->
       <div class="stats-bar" id="home-stats">
-        <div class="stat-card"><span class="stat-num" id="stat-total">—</span><span class="stat-label">全部文件</span></div>
-        <div class="stat-card"><span class="stat-num" id="stat-dur">—</span><span class="stat-label">总时长</span></div>
-        <div class="stat-card"><span class="stat-num" id="stat-size">—</span><span class="stat-label">总大小</span></div>
-        <div class="stat-card"><span class="stat-num" id="stat-tasks">—</span><span class="stat-label">进行中任务</span></div>
-        <div class="stat-card" id="stat-lang-card"><span class="stat-label">语言分布</span><div class="lang-bars" id="stat-lang-bars"><div style="font-size:11px;color:var(--text3);margin-top:6px">—</div></div><div class="dist-divider"></div><div class="dist-label">场景分布</div><div class="lang-bars" id="stat-scene-bars"><div style="font-size:11px;color:var(--text3)">—</div></div></div>
+        <div class="stat-combined">
+          <div class="stat-item"><span class="stat-num" id="stat-total">—</span><span class="stat-label">全部文件</span></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><span class="stat-num" id="stat-dur">—</span><span class="stat-label">总时长</span></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><span class="stat-num" id="stat-size">—</span><span class="stat-label">总大小</span></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><span class="stat-num" id="stat-tasks">—</span><span class="stat-label">进行中</span></div>
+        </div>
+        <div class="stat-card" id="stat-lang-card"><span class="stat-label">语言分布</span><div class="lang-bars" id="stat-lang-bars"><div style="font-size:11px;color:var(--text3);margin-top:6px">—</div></div></div>
+        <div class="stat-card" id="stat-scene-card"><span class="stat-label">场景分布</span><div class="lang-bars" id="stat-scene-bars"><div style="font-size:11px;color:var(--text3);margin-top:6px">—</div></div></div>
       </div>
 
       <div class="filter-bar">
@@ -516,6 +547,7 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
         <thead><tr><th class="cb-col"><input type="checkbox" onchange="toggleAll('home',this)"/></th><th class="th-sort" id="sh-home-fname" onclick="setTableSort('home','file_name_asc','file_name_desc')">文件名<span class="sort-ic" id="si-home-fname"></span></th><th class="th-sort" id="sh-home-dur" onclick="setTableSort('home','duration_desc','duration_asc')">时长<span class="sort-ic" id="si-home-dur"></span></th><th>语言</th><th>场景</th><th>来源</th><th class="th-sort" id="sh-home-date" onclick="setTableSort('home','created_at_desc','created_at_asc')">创建时间<span class="sort-ic" id="si-home-date"></span></th><th>操作</th></tr></thead>
         <tbody id="tbody-home"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)"><span class="spinner"></span>加载中…</td></tr></tbody>
       </table></div>
+      <div id="pager-home" class="pager"></div>
     </div>
 
     <!-- My Files Page -->
@@ -551,6 +583,7 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
         <thead><tr><th class="cb-col"><input type="checkbox" onchange="toggleAll('my',this)"/></th><th class="th-sort" id="sh-my-fname" onclick="setTableSort('my','file_name_asc','file_name_desc')">文件名<span class="sort-ic" id="si-my-fname"></span></th><th class="th-sort" id="sh-my-dur" onclick="setTableSort('my','duration_desc','duration_asc')">时长<span class="sort-ic" id="si-my-dur"></span></th><th>文件夹</th><th>语言</th><th>场景</th><th class="th-sort" id="sh-my-date" onclick="setTableSort('my','created_at_desc','created_at_asc')">创建时间<span class="sort-ic" id="si-my-date"></span></th><th>操作</th></tr></thead>
         <tbody id="tbody-my"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)"><span class="spinner"></span>加载中…</td></tr></tbody>
       </table></div>
+      <div id="pager-my" class="pager"></div>
     </div>
 
     <!-- Tasks Page -->
@@ -591,8 +624,7 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
         </div>
         <div class="hdr-actions">
           <button class="btn btn-ghost btn-sm" id="detail-dl-btn">⬇ 下载音频</button>
-          <button class="btn btn-ghost btn-sm hidden" id="detail-dl-json">⬇ 字幕JSON</button>
-          <button class="btn btn-ghost btn-sm hidden" id="detail-dl-srt">⬇ 字幕SRT</button>
+          <button class="btn btn-ghost btn-sm hidden" id="detail-dl-txt">📄 下载对话文本</button>
           <button class="btn btn-ghost btn-sm" id="detail-del-btn" style="color:var(--danger)">🗑 删除</button>
         </div>
       </div>
@@ -618,7 +650,7 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
     <div id="modalHeader" class="modal-header">
       <div class="modal-title">在线生成音频</div>
       <div class="modal-header-actions">
-        <button id="resetModalLayoutBtn" class="modal-header-btn" type="button">重置布局</button>
+        <button id="resetModalLayoutBtn" class="modal-header-btn" type="button">重置</button>
         <button id="minimizeModalBtn" class="modal-header-btn" type="button" title="最小化，生成期间可继续操作平台" onclick="minimizeGenModal()">—</button>
         <button id="closeModalBtn" class="modal-close" type="button" aria-label="关闭">×</button>
       </div>
@@ -650,7 +682,7 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
         <div id="topicManualGroup" class="form-group">
           <label class="form-label" for="llmTopic">输入主题<span class="req">*</span></label>
           <div class="topic-input-container">
-            <input id="llmTopic" class="input-field topic-with-action" type="text" maxlength="255" placeholder="如：季度复盘会议讨论" />
+            <input id="llmTopic" class="input-field topic-with-action" type="text" maxlength="255" placeholder="如：季度复盘会议讨论" autocomplete="off" />
             <button id="presetPickerBtn" class="topic-preset-inline-btn" type="button">预置主题</button>
           </div>
         </div>
@@ -747,36 +779,24 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
       </section>
 
       <section class="modal-section">
-        <div class="section-title">说话人数</div>
-        <div class="form-group compact-group">
-          <label class="form-label" for="speakerCount">说话人数<span class="req">*</span></label>
-          <input id="speakerCount" class="input-field compact-input" type="number" min="1" max="10" value="2" />
-          <div class="form-hint">范围 1–10，须与文本中 Speaker 数量一致</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">音色配置<span class="req">*</span></label>
-          <div class="voice-language-hint">
-            当前语言：<span id="voiceLanguageLabel">中文（普通话）</span> — 音色列表已按语言筛选
+        <div class="spk-section-header">
+          <div class="section-title" style="margin-bottom:0">说话人 &amp; 音色<span class="req">*</span></div>
+          <div class="spk-count-row">
+            <label class="form-label" for="speakerCount" style="margin-bottom:0;font-weight:400;color:var(--gray-500)">人数</label>
+            <input id="speakerCount" class="input-field compact-input" type="number" min="1" max="10" value="2" />
           </div>
-          <div id="speakerVoiceRows" class="speaker-rows"></div>
-          <div id="voiceWarning" class="inline-warning hidden">请为所有说话人选择音色</div>
         </div>
-        <div id="generateTextRow">
-          <button id="generateTextBtn" class="btn-generate" type="button">✨ 根据以上配置生成文本</button>
+        <div class="form-hint" style="margin-top:4px;margin-bottom:10px">范围 1–10，须与对话文本中的 Speaker 数量一致</div>
+        <div class="voice-language-hint">
+          当前语言：<span id="voiceLanguageLabel">中文（普通话）</span> — 音色列表已按语言筛选
         </div>
-      </section>
-
-      <section id="previewSection" class="modal-section hidden">
-        <div class="preview-head">
-          <div class="section-title no-margin">文本预览与编辑</div>
-          <button id="regenTextBtn" class="btn btn-secondary btn-sm" type="button">重新生成</button>
-        </div>
-        <textarea id="previewText" class="textarea-field mono-field" rows="7"></textarea>
+        <div id="speakerVoiceRows" class="speaker-rows"></div>
+        <div id="voiceWarning" class="inline-warning hidden">请为所有说话人选择音色</div>
       </section>
 
       <section class="modal-section">
         <div class="section-title">音频配置</div>
-        <div class="form-grid">
+        <div class="form-grid-3">
           <div class="form-group">
             <label class="form-label" for="outputFormat">音频输出格式<span class="req">*</span></label>
             <select id="outputFormat" class="select-field">
@@ -785,9 +805,6 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
               <option>M4A</option>
             </select>
           </div>
-        </div>
-        <input id="preciseDuration" type="hidden" value="" />
-        <div class="form-grid">
           <div class="form-group">
             <label class="form-label" for="folderSelect">保存到文件夹</label>
             <select id="folderSelect" class="select-field">
@@ -799,13 +816,22 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
             <div id="tagWrap" class="tag-input-wrap">
               <input id="tagInput" type="text" placeholder="输入标签，回车添加" />
             </div>
-            <div class="form-hint">可选，回车添加多个标签</div>
+            <div class="form-hint">可选，回车添加</div>
           </div>
         </div>
-        <label class="checkbox-row" for="includeScripts">
+        <input id="preciseDuration" type="hidden" value="" />
+        <label class="checkbox-row" for="includeScripts" style="margin-top:10px">
           <input id="includeScripts" type="checkbox" />
           <span>同时生成 JSON 和 SRT 脚本文件</span>
         </label>
+      </section>
+
+      <section id="previewSection" class="modal-section hidden">
+        <div class="preview-head">
+          <div class="section-title no-margin">文本预览与编辑</div>
+          <button id="regenTextBtn" class="btn btn-secondary btn-sm" type="button">重新生成</button>
+        </div>
+        <textarea id="previewText" class="textarea-field mono-field" rows="7"></textarea>
       </section>
 
       <div id="modalMessage" class="modal-message"></div>
@@ -813,7 +839,11 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
 
     <div class="modal-footer">
       <button id="cancelModalBtn" class="btn btn-secondary" type="button">取消</button>
-      <button id="submitAudioBtn" class="btn btn-primary" type="button">生成音频</button>
+      <button id="textOnlyBtn" class="btn btn-secondary btn-sm" type="button" title="仅生成对话文本文件，不合成音频">📄 仅生成文本</button>
+      <div id="generateTextRow" style="display:contents">
+        <button id="generateTextBtn" class="btn btn-primary footer-gen-btn" type="button">✨ 生成对话文本</button>
+      </div>
+      <button id="submitAudioBtn" class="btn btn-primary" type="button">🎵 生成音频</button>
     </div>
     <div id="modalResizeHandle" class="modal-resize-handle" aria-hidden="true" title="拖动调整弹窗大小"></div>
   </div>
@@ -864,7 +894,7 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
       </div>
       <div class="form-row" style="margin-top:14px">
         <div class="form-group"><label class="form-label">语言 *</label><select class="form-input" id="uLang"><option value="">— 请选择 —</option><option>中文（普通话）</option><option>英语</option><option>日语</option><option>韩语</option><option>法语</option><option>德语</option><option>西班牙语</option><option>葡萄牙语</option><option>意大利语</option><option>俄语</option><option>阿拉伯语</option><option>印度尼西亚语</option><option>粤语</option></select></div>
-        <div class="form-group"><label class="form-label">场景 *</label><select class="form-input" id="uScene"><option value="">— 请选择 —</option><option value="meeting">会议</option><option value="interview">访谈</option><option value="medical">问诊</option><option value="other">其他</option></select></div>
+        <div class="form-group"><label class="form-label">场景 *</label><select class="form-input" id="uScene"><option value="">— 请选择 —</option><option value="meeting">会议</option><option value="interview">访谈</option><option value="medical">医疗问诊</option><option value="legal">法律合规</option><option value="finance">金融保险</option><option value="tech">科技测试</option><option value="sales">零售销售</option><option value="construction">建筑工程</option><option value="consulting">咨询服务</option><option value="media">媒体娱乐</option><option value="manufacturing">制造业</option><option value="auto">汽车行业</option><option value="other">其他</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">说话人数 *</label><input class="form-input" type="number" id="uSp" value="2" min="1" max="20"/></div>
@@ -954,6 +984,8 @@ let _detailFileId=null, _detailBack='home';
 let _taskPollTimer=null, _debounceTimers={};
 let _miniAudio=null;
 let _homeFiles=[], _myFiles=[], _prevRunningIds=new Set();
+let _homePage=1, _myPage=1;
+const PAGE_SIZE=15;
 
 // ══ API ══════════════════════════════════════════════════════════════════════
 const API={
@@ -969,7 +1001,8 @@ function fmtDur(s){if(!s&&s!==0)return '—';const m=Math.floor(s/60),sec=Math.f
 function fmtDate(iso){return iso?(iso.replace('T',' ').slice(0,16)):'—';}
 function fmtSize(b){if(!b)return '—';if(b<1024*1024)return(b/1024).toFixed(1)+' KB';return(b/1024/1024).toFixed(1)+' MB';}
 function timeAgo(iso){if(!iso)return '—';const s=Math.floor((Date.now()-new Date(iso))/1000);if(s<60)return '刚刚';const m=Math.floor(s/60);if(m<60)return m+'分钟前';const h=Math.floor(m/60);if(h<24)return h+'小时前';return Math.floor(h/24)+'天前';}
-function sceneName(s){return {meeting:'会议',interview:'访谈',medical:'问诊',other:'其他'}[s]||s||'—';}
+const SCENE_LABEL_MAP={meeting:'会议',interview:'访谈',medical:'医疗问诊',legal:'法律合规',finance:'金融保险',tech:'科技测试',sales:'零售销售',construction:'建筑工程',consulting:'咨询服务',media:'媒体娱乐',manufacturing:'制造业',auto:'汽车行业',other:'其他'};
+function sceneName(s){return SCENE_LABEL_MAP[s]||s||'—';}
 function debounceLoad(key){clearTimeout(_debounceTimers[key]);_debounceTimers[key]=setTimeout(()=>{if(key==='home')loadHome();else if(key==='my')loadMy();},400);}
 function getFolderName(id){if(!id)return '根目录';const f=_allFolders.find(x=>x.folder_id===id);return f?f.name:id;}
 
@@ -993,24 +1026,47 @@ function goTo(p,opts){
 // ══ File table render ═════════════════════════════════════════════════════════
 function renderFileTable(key,files){
   const tbody=document.getElementById('tbody-'+key);
+  const pager=document.getElementById('pager-'+key);
   const isMy=key==='my';
   if(!files.length){
-    tbody.innerHTML=`<tr><td colspan="${isMy?8:8}" style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:32px;margin-bottom:8px">📭</div>暂无文件</td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:32px;margin-bottom:8px">📭</div>暂无文件</td></tr>`;
+    if(pager)pager.innerHTML='';
     return;
   }
-  tbody.innerHTML=files.map(f=>{
+  // 分页
+  const totalPages=Math.max(1,Math.ceil(files.length/PAGE_SIZE));
+  if(key==='home'){if(_homePage>totalPages)_homePage=1;}
+  else{if(_myPage>totalPages)_myPage=1;}
+  const page=key==='home'?_homePage:_myPage;
+  const pageFiles=files.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+  // 渲染分页控件
+  if(pager){
+    if(totalPages<=1){pager.innerHTML='';}
+    else{
+      const start=(page-1)*PAGE_SIZE+1, end=Math.min(page*PAGE_SIZE,files.length);
+      pager.innerHTML=`<span class="pager-info">${start}–${end} / 共 ${files.length} 条</span>`
+        +`<button class="pager-btn" onclick="changePage('${key}',1)" ${page===1?'disabled':''}>«</button>`
+        +`<button class="pager-btn" onclick="changePage('${key}',${page-1})" ${page===1?'disabled':''}>‹</button>`
+        +`<span class="pager-info">第 ${page} / ${totalPages} 页</span>`
+        +`<button class="pager-btn" onclick="changePage('${key}',${page+1})" ${page===totalPages?'disabled':''}>›</button>`
+        +`<button class="pager-btn" onclick="changePage('${key}',${totalPages})" ${page===totalPages?'disabled':''}>»</button>`;
+    }
+  }
+  tbody.innerHTML=pageFiles.map(f=>{
     const ext=(f.file_name||'').split('.').pop().toUpperCase();
+    const isTextFile=(f.format||'').toLowerCase()==='txt';
     const folderTd=isMy?`<td style="font-size:12px;color:var(--text3)">${getFolderName(f.folder_id)}</td>`:'';
+    const extBadgeStyle=isTextFile?'background:rgba(16,185,129,.2);color:var(--success)':'';
     return`<tr data-id="${f.file_id}">
       <td class="cb-col"><input type="checkbox" onchange="updateBulk('${key}')"/></td>
-      <td><div class="file-name"><span class="ext-badge">${ext}</span><a href="#" onclick="openDetail('${f.file_id}','${key}');return false" style="color:var(--text)">${esc(f.file_name)}</a></div>${f.topic?`<div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(f.topic)}</div>`:''}</td>
-      <td>${fmtDur(f.duration)}</td>
+      <td><div class="file-name"><span class="ext-badge" style="${extBadgeStyle}">${isTextFile?'📄 TXT':ext}</span><a href="#" onclick="openDetail('${f.file_id}','${key}');return false" style="color:var(--text)">${esc(f.file_name)}</a></div>${f.topic?`<div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(f.topic)}</div>`:''}</td>
+      <td>${isTextFile?`<span style="color:var(--text3);font-size:12px">文本</span>`:fmtDur(f.duration)}</td>
       ${folderTd}
       <td style="font-size:12px">${esc(f.language||'—')}</td>
       <td style="font-size:12px">${sceneName(f.scene)}</td>
       <td style="font-size:12px">${fmtDate(f.created_at)}</td>
       <td><div class="row-actions">
-        <button class="row-btn" onclick="showMiniPlayer(this,'${f.file_id}','${esc(f.file_name)}')">▶</button>
+        ${isTextFile?'':`<button class="row-btn" onclick="showMiniPlayer(this,'${f.file_id}','${esc(f.file_name)}')">▶</button>`}
         <a class="row-btn" href="/api/platform/files/${f.file_id}/download">⬇</a>
         <button class="row-btn" onclick="openDetail('${f.file_id}','${key}')">详情</button>
         <button class="row-btn danger" onclick="softDeleteFile('${f.file_id}','${key}')">🗑</button>
@@ -1019,8 +1075,15 @@ function renderFileTable(key,files){
   }).join('');
 }
 
+// ══ Pagination ═══════════════════════════════════════════════════════════════
+function changePage(key,page){
+  if(key==='home'){_homePage=page;renderFileTable('home',_homeFiles);}
+  else{_myPage=page;renderFileTable('my',_myFiles);}
+}
+
 // ══ Home ═════════════════════════════════════════════════════════════════════
 async function loadHome(){
+  _homePage=1;
   const p=new URLSearchParams({limit:500,offset:0});
   const s=document.getElementById('home-search').value;
   const l=document.getElementById('home-lang').value;
@@ -1064,17 +1127,23 @@ async function loadStats(){
         }).join('');
       }
     }
-    // Scene distribution mini chart
-    const SCENE_NAME={meeting:'会议',interview:'访谈',medical:'问诊',other:'其他'};
+    // Scene distribution mini chart + dynamic scene filter
     const sceneBars=document.getElementById('stat-scene-bars');
+    const scenes=s.by_scene||[];
     if(sceneBars){
-      const scenes=s.by_scene||[];
       if(!scenes.length){sceneBars.innerHTML='<div style="font-size:11px;color:var(--text3)">暂无数据</div>';}
       else{
         const maxS=scenes[0].cnt||1;
-        sceneBars.innerHTML=scenes.map(sc=>`<div class="lang-bar-row"><div class="lang-bar-lbl">${esc(SCENE_NAME[sc.scene]||sc.scene||'未知')}</div><div class="lang-bar-trk"><div class="lang-bar-fill" style="width:${Math.round(sc.cnt/maxS*100)}%;background:var(--success)"></div></div><div class="lang-bar-cnt">${sc.cnt}</div></div>`).join('');
+        sceneBars.innerHTML=scenes.map(sc=>`<div class="lang-bar-row"><div class="lang-bar-lbl">${esc(sceneName(sc.scene))}</div><div class="lang-bar-trk"><div class="lang-bar-fill" style="width:${Math.round(sc.cnt/maxS*100)}%;background:var(--success)"></div></div><div class="lang-bar-cnt">${sc.cnt}</div></div>`).join('');
       }
     }
+    // 动态填充场景过滤下拉（只显示有文件的场景）
+    ['home-scene','my-scene'].forEach(id=>{
+      const sel=document.getElementById(id);
+      if(!sel)return;
+      const cur=sel.value;
+      sel.innerHTML='<option value="">全部场景</option>'+scenes.map(sc=>`<option value="${esc(sc.scene)}"${sc.scene===cur?' selected':''}>${esc(sceneName(sc.scene))} (${sc.cnt})</option>`).join('');
+    });
   }catch(e){}
 }
 
@@ -1166,6 +1235,7 @@ function filterFolder(fid,fname){
 }
 
 async function loadMy(){
+  _myPage=1;
   const p=new URLSearchParams({limit:500,offset:0});
   const s=document.getElementById('my-search').value;
   const l=document.getElementById('my-lang').value;
@@ -1213,12 +1283,15 @@ function renderTaskGrid(tasks){
       });
       pipHtml+='</div>';
     }
-    return`<div class="task-card">
+    const failedPip=t.status==='failed'?`<div class="pipeline" style="opacity:.45;filter:grayscale(1)">${STEPS.map((label,idx)=>`<div class="step done"><div class="step-dot"></div><div class="step-lbl">${label}</div></div>`).slice(0,3).join('')}<div class="step"><div class="step-dot" style="background:var(--danger)">✕</div><div class="step-lbl" style="color:var(--danger)">失败</div></div></div>`:'';
+    const isTextOnly=t.generation_mode==='text_only';
+    return`<div class="task-card${t.status==='failed'?' task-card-failed':''}">
       <div class="task-card-hdr"><div class="task-topic">${esc(t.topic||'（无主题）')}</div><span class="status status-${t.status}">${run?'<span class="pulse"></span>':''}${lbl[t.status]||t.status}</span></div>
-      <div class="task-meta"><span>🌐 ${esc(t.language||'中文')}</span><span>👥 ${t.people_count||2}人</span><span>📝 ${t.word_count||1000}字</span><span title="${fmtDate(t.created_at)}">${timeAgo(t.created_at)}</span></div>
-      ${pipHtml}
+      <div class="task-meta"><span>🌐 ${esc(t.language||'中文')}</span>${isTextOnly?`<span>📄 仅生成文本</span>`:`<span>👥 ${t.people_count||2}人</span>`}<span>📝 ${t.word_count||1000}字</span></div>
+      <div class="task-meta" style="margin-top:2px"><span>📅 ${fmtDate(t.created_at)}</span><span style="color:var(--text3)">${timeAgo(t.created_at)}</span></div>
+      ${t.status!=='failed'?pipHtml:failedPip}
       ${t.error_msg?`<div class="task-err">❌ ${esc(t.error_msg)}</div>`:''}
-      ${t.status==='completed'&&t.file_id?`<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="openDetail('${t.file_id}','tasks')">查看音频 →</button></div>`:''}
+      ${t.status==='completed'&&t.file_id?`<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="openDetail('${t.file_id}','tasks')">查看详情 →</button></div>`:''}
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
         ${t.status==='failed'?`<button class="btn btn-ghost btn-sm" onclick="retryTask('${t.task_id}')" style="font-size:11px;color:var(--warning)">↺ 重试</button>`:'<span></span>'}
         <button class="btn btn-ghost btn-sm" onclick="deleteTask('${t.task_id}')" style="font-size:11px;color:var(--text3)">删除记录</button>
@@ -1268,39 +1341,57 @@ async function openDetail(fileId,back){
 }
 
 function renderDetail(f){
+  const isText=(f.format||'').toLowerCase()==='txt';
   document.getElementById('detail-title').textContent=f.file_name||'文件详情';
-  document.getElementById('detail-dl-btn').onclick=()=>{window.location.href='/api/platform/files/'+f.file_id+'/download';};
-  const dlj=document.getElementById('detail-dl-json');
-  dlj.classList.toggle('hidden',!f.transcript_json);
-  dlj.onclick=()=>{window.location.href='/api/platform/files/'+f.file_id+'/transcript?type=json';};
-  const dls=document.getElementById('detail-dl-srt');
-  dls.classList.toggle('hidden',!f.transcript_srt);
-  dls.onclick=()=>{window.location.href='/api/platform/files/'+f.file_id+'/transcript?type=srt';};
+  const dlBtn=document.getElementById('detail-dl-btn');
+  dlBtn.textContent=isText?'📄 下载文本':'⬇ 下载音频';
+  dlBtn.onclick=()=>{window.location.href='/api/platform/files/'+f.file_id+'/download';};
+  const dlt=document.getElementById('detail-dl-txt');
+  // Show text download for generated audio files; hide for text-only files and uploads
+  dlt.classList.toggle('hidden', isText || f.source==='uploaded');
+  dlt.onclick=async()=>{
+    try{
+      const r=await fetch('/api/platform/files/'+f.file_id+'/transcript?type=text');
+      if(!r.ok){showToast('err','对话文本暂不可用（生成时未保存文本）');return;}
+      const blob=await r.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download=f.file_name.replace(/\.[^.]+$/,'.txt');
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }catch(e){showToast('err','下载失败');}
+  };
   document.getElementById('detail-del-btn').onclick=()=>showConfirm('删除此文件？','文件将移入回收站。',async()=>{try{await API.del('/api/platform/files/'+f.file_id);showToast('ok','已移入回收站');goTo(_detailBack);}catch(e){showToast('err','删除失败');}});
 
-  let txHtml='<div style="padding:8px;color:var(--text3);font-size:12px">暂无字幕数据</div>';
-  if(f.transcript_json){try{const segs=JSON.parse(f.transcript_json);if(Array.isArray(segs)&&segs.length)txHtml=segs.map(s=>`<div class="transcript-seg"><span class="seg-speaker">${esc(s.speaker||'')}</span><span class="seg-text">${esc(s.text||s.content||'')}</span><span style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0">${fmtDur(s.start_time)}-${fmtDur(s.end_time)}</span></div>`).join('');}catch(e){}}
-  else if(f.transcript_srt)txHtml='<pre style="font-size:11px;white-space:pre-wrap;word-break:break-word">'+esc(f.transcript_srt.slice(0,3000))+'</pre>';
-
-  const audioUrl='/api/platform/files/'+f.file_id+'/download';
-  // Parse tags
+  const fileUrl='/api/platform/files/'+f.file_id+'/download';
+  // Parse tags — fixed: use template literal for tag button so f.file_id is interpolated
   let tags=[];try{tags=JSON.parse(f.tags||'[]');}catch(e){}
   const tagHtml=tags.map(t=>`<span class="tag-pill">${esc(t)}<span class="trm" onclick="detRemoveTag('${f.file_id}','${esc(t)}',this)">×</span></span>`).join(' ')
-    +'&nbsp;<span style="font-size:11px;color:var(--text3);cursor:pointer" onclick="detAddTag(\'${f.file_id}\')">＋标签</span>';
+    +`&nbsp;<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;height:auto" onclick="detAddTag('${f.file_id}')">＋ 标签</button>`;
+
+  // Build the player/preview section depending on file type
+  const playerHtml = isText ? `
+        <div class="text-preview-card">
+          <div class="text-preview-hdr">📄 ${esc(f.file_name)}</div>
+          <div class="text-preview-body" id="det-text-preview">加载中…</div>
+        </div>` : `
+        <div class="audio-card">
+          <div class="audio-card-top">
+            <span class="audio-card-title">🎵 ${esc(f.file_name)}</span>
+          </div>
+          <div class="audio-waveform"><div class="waveform-anim" id="det-wave"><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div></div></div>
+          <audio id="det-audio" src="${fileUrl}" preload="metadata" style="display:none"></audio>
+          <div class="audio-ctrl">
+            <button class="play-btn" id="det-play" onclick="toggleDetPlay()">▶</button>
+            <div class="prog-bar" onclick="seekDet(event,this)"><div class="prog-fill" id="det-fill"></div></div>
+            <span class="time-txt" id="det-time">00:00 / ${fmtDur(f.duration)}</span>
+          </div>
+        </div>`;
 
   document.getElementById('detail-body').innerHTML=`
     <div class="detail-wrap">
-      <div class="detail-player"><div class="audio-card">
-        <div style="font-size:12px;color:var(--text2)">${esc(f.file_name)}</div>
-        <div class="audio-waveform"><div class="waveform-anim" id="det-wave"><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div></div></div>
-        <audio id="det-audio" src="${audioUrl}" preload="metadata" style="display:none"></audio>
-        <div class="audio-ctrl">
-          <button class="play-btn" id="det-play" onclick="toggleDetPlay()">▶</button>
-          <div class="prog-bar" onclick="seekDet(event,this)"><div class="prog-fill" id="det-fill"></div></div>
-          <span class="time-txt" id="det-time">00:00 / ${fmtDur(f.duration)}</span>
-        </div>
-        <div style="margin-top:12px"><a href="${audioUrl}" class="btn btn-ghost btn-sm" download="${esc(f.file_name)}">⬇ 下载</a></div>
-      </div></div>
+      <div class="detail-player">${playerHtml}
+      </div>
       <div class="detail-meta">
         <div class="meta-section">
           <h4>基本信息 <span style="font-weight:400;font-size:11px;color:var(--text3)">（点击值可编辑）</span></h4>
@@ -1309,10 +1400,9 @@ function renderDetail(f){
             <span class="meta-val"><span id="dv-fname">${esc(f.file_name)}</span><button class="edit-trigger" onclick="detStartEdit('fname','${f.file_id}','${esc(f.file_name)}','text')">✎</button></span>
             <span class="meta-key">主题</span>
             <span class="meta-val"><span id="dv-topic">${esc(f.topic||'—')}</span><button class="edit-trigger" onclick="detStartEdit('topic','${f.file_id}','${esc(f.topic||'')}','text')">✎</button></span>
-            <span class="meta-key">时长</span><span class="meta-val">${fmtDur(f.duration)}</span>
             <span class="meta-key">大小</span><span class="meta-val">${fmtSize(f.file_size)}</span>
             <span class="meta-key">格式</span><span class="meta-val">${(f.format||'—').toUpperCase()}</span>
-            <span class="meta-key">来源</span><span class="meta-val">${f.source==='generated'?'AI生成':'手动上传'}</span>
+            <span class="meta-key">来源</span><span class="meta-val">${isText?'AI生成文本':f.source==='generated'?'AI生成':'手动上传'}</span>
             <span class="meta-key">创建时间</span><span class="meta-val">${fmtDate(f.created_at)}</span>
           </div>
         </div>
@@ -1331,16 +1421,23 @@ function renderDetail(f){
             <span class="meta-val" id="dv-tags-wrap" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">${tagHtml}</span>
           </div>
         </div>
-        <div class="meta-section"><h4 style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">字幕 / 台本<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="copyTranscript()">📋 复制文本</button></h4><div class="transcript-box" id="det-transcript-box">${txHtml}</div></div>
       </div>
     </div>`;
   // Store current file data for editing
   window._detailFile = f;
 
-  const audio=document.getElementById('det-audio');
-  if(audio){
-    audio.ontimeupdate=()=>{const pct=audio.duration?audio.currentTime/audio.duration*100:0;const fill=document.getElementById('det-fill');if(fill)fill.style.width=pct+'%';const t=document.getElementById('det-time');if(t)t.textContent=fmtDur(audio.currentTime)+' / '+fmtDur(audio.duration||f.duration);};
-    audio.onended=()=>{const b=document.getElementById('det-play');if(b)b.textContent='▶';const w=document.getElementById('det-wave');if(w)w.classList.remove('playing');};
+  if(isText){
+    // Load text preview
+    fetch('/api/platform/files/'+f.file_id+'/transcript?type=text')
+      .then(r=>r.ok?r.text():Promise.reject(r))
+      .then(txt=>{const el=document.getElementById('det-text-preview');if(el)el.textContent=txt;})
+      .catch(()=>{const el=document.getElementById('det-text-preview');if(el)el.textContent='（文本内容不可用）';});
+  } else {
+    const audio=document.getElementById('det-audio');
+    if(audio){
+      audio.ontimeupdate=()=>{const pct=audio.duration?audio.currentTime/audio.duration*100:0;const fill=document.getElementById('det-fill');if(fill)fill.style.width=pct+'%';const t=document.getElementById('det-time');if(t)t.textContent=fmtDur(audio.currentTime)+' / '+fmtDur(audio.duration||f.duration);};
+      audio.onended=()=>{const b=document.getElementById('det-play');if(b)b.textContent='▶';const w=document.getElementById('det-wave');if(w)w.classList.remove('playing');};
+    }
   }
 }
 
@@ -1391,6 +1488,77 @@ function openDeleteFolderModal(id,name){_deleteFolderId=id;document.getElementBy
 async function doDeleteFolder(){try{await API.del('/api/platform/folders/'+_deleteFolderId);closeModal('modal-delete-folder');showToast('ok','文件夹已删除');if(_folderId===_deleteFolderId)filterFolder(undefined,'all');await loadFolders();loadMy();}catch(e){showToast('err','删除失败');}}
 
 // ══ Generate modal — handled by app.js (legacy modal) ════════════════════════
+
+// Text-only generation: submit platform task without audio synthesis
+async function submitTextOnly(){
+  // Only valid in LLM mode (llmSection visible)
+  const llmSection=document.getElementById('llmSection');
+  if(!llmSection||llmSection.classList.contains('hidden')){
+    showToast('err','仅文本生成只在 LLM 模式下可用');return;
+  }
+  // Use manual topic, or preset option short title (not the full resolved text)
+  const manualTopic=(document.getElementById('llmTopic')?.value||'').trim();
+  let presetTitle='';
+  const presetSel=document.getElementById('presetTopicSelect');
+  if(presetSel&&presetSel.selectedIndex>=0){
+    const optText=(presetSel.options[presetSel.selectedIndex]?.text||'').trim();
+    if(optText&&optText!=='选择预置主题')presetTitle=optText;
+  }
+  // Full preset text for the LLM scenario prompt
+  const presetResolved=(document.getElementById('presetTopicResolved')?.value||'').trim();
+  const topic=manualTopic||presetTitle||presetResolved||'';
+  if(!topic){showToast('err','请先填写主题或选择预置场景');return;}
+
+  const template=(document.getElementById('templateSelect')?.value||'');
+  const language=(document.getElementById('llmLanguage')?.value||'中文（普通话）');
+  const wordCount=parseInt(document.getElementById('wordCountLimit')?.value||'1000',10);
+  const peopleCount=parseInt(document.getElementById('speakerCount')?.value||'2',10);
+  const customPrompt=(document.getElementById('customPrompt')?.value||presetResolved||'').trim();
+  // Collect keywords from chip elements
+  const kwWrap=document.getElementById('keywordWrap');
+  const keywords=kwWrap?[...kwWrap.querySelectorAll('.ti-tag')].map(c=>c.textContent.replace('×','').trim()).filter(Boolean):[];
+
+  // Disable all generate buttons while submitting
+  const btns=['textOnlyBtn','generateTextBtn','submitAudioBtn'].map(id=>document.getElementById(id));
+  btns.forEach(b=>{if(b){b.disabled=true;}});
+  const selfBtn=document.getElementById('textOnlyBtn');
+  if(selfBtn)selfBtn.textContent='⏳ 提交中…';
+
+  try{
+    const res=await API.post('/api/platform/tasks',{
+      generation_mode:'text_only',
+      topic,
+      template,
+      language,
+      word_count:wordCount,
+      people_count:peopleCount,
+      custom_prompt:customPrompt,
+      keywords,
+    });
+    if(res.ok){
+      // Reset buttons before closing so they're ready next time modal opens
+      btns.forEach(b=>{if(b)b.disabled=false;});
+      if(selfBtn)selfBtn.textContent='📄 仅生成文本';
+      closeModal('modal-generate');
+      showToast('ok','文本生成任务已提交');
+      goTo('tasks');
+    }
+  }catch(e){
+    showToast('err','提交失败: '+(e.message||e));
+    btns.forEach(b=>{if(b)b.disabled=false;});
+    if(selfBtn)selfBtn.textContent='📄 仅生成文本';
+  }
+}
+
+// Wire up text-only button after app.js loads
+(function(){
+  function wireTextOnly(){
+    const btn=document.getElementById('textOnlyBtn');
+    if(btn&&!btn._wired){btn.onclick=submitTextOnly;btn._wired=true;}
+  }
+  document.addEventListener('DOMContentLoaded',wireTextOnly);
+  setTimeout(wireTextOnly,500); // fallback after app.js init
+})();
 
 // ══ Upload ════════════════════════════════════════════════════════════════════
 function handleFSel(input){if(input.files[0])showFInfo(input.files[0]);}
@@ -1483,7 +1651,7 @@ function addTagChip(wrap,text,inputEl){const chip=document.createElement('span')
 
 // ══ Detail inline editing ════════════════════════════════════════════════════
 const DET_LANG_OPTIONS=['中文（普通话）','粤语','英语','日语','韩语','法语','德语','西班牙语','葡萄牙语','意大利语','俄语','阿拉伯语','印度尼西亚语'];
-const DET_SCENE_OPTIONS=[['meeting','会议'],['interview','访谈'],['medical','问诊'],['other','其他']];
+const DET_SCENE_OPTIONS=Object.entries(SCENE_LABEL_MAP);
 
 function detStartEdit(field,fileId,current,inputType){
   // Remove any existing edit row
@@ -1582,7 +1750,7 @@ async function detAddTag(fileId){
     const wrap=document.getElementById('dv-tags-wrap');
     if(wrap){
       const tagHtml=tags.map(t=>`<span class="tag-pill">${esc(t)}<span class="trm" onclick="detRemoveTag('${fileId}','${esc(t)}',this)">×</span></span>`).join(' ')
-        +`&nbsp;<span style="font-size:11px;color:var(--text3);cursor:pointer" onclick="detAddTag('${fileId}')">＋标签</span>`;
+        +`&nbsp;<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;height:auto" onclick="detAddTag('${fileId}')">＋ 标签</button>`;
       wrap.innerHTML=tagHtml;
     }
     showToast('ok','标签已添加');
@@ -1700,13 +1868,6 @@ function showCompletionBanner(topic){
   setTimeout(()=>{const e=document.getElementById('comp-banner-el');if(e){e.style.animation='bannerOut .3s ease forwards';setTimeout(()=>e.remove(),300);}},6000);
 }
 
-// ══ Copy transcript ══════════════════════════════════════════════════════════
-function copyTranscript(){
-  const box=document.getElementById('det-transcript-box');
-  if(!box){showToast('err','暂无字幕内容');return;}
-  const text=box.innerText||box.textContent||'';
-  navigator.clipboard.writeText(text).then(()=>{showToast('ok','台本已复制到剪贴板');}).catch(()=>{showToast('err','复制失败，请手动选取');});
-}
 
 // ══ ESC key ══════════════════════════════════════════════════════════════════
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.mo-overlay.open').forEach(m=>m.classList.remove('open'));closeConfirm();}});
@@ -1737,27 +1898,30 @@ document.addEventListener('DOMContentLoaded',()=>{
   loadStats();
   // Background task indicator + completion notification + stats refresh
   setInterval(async()=>{
-    if(_page!=='tasks'){
-      try{
-        const r=await API.get('/api/platform/tasks?limit=20');
-        const tasks=r.data||[];
-        const nowRunning=new Set(tasks.filter(t=>['queued','generating_text','synthesizing'].includes(t.status)).map(t=>t.task_id));
-        const hasRunning=nowRunning.size>0;
-        // Nav badge colour
-        const nb=document.getElementById('nav-tasks');if(nb)nb.style.color=hasRunning?'var(--warning)':'';
-        // Detect newly-completed tasks
-        if(_prevRunningIds.size>0){
-          const justDone=tasks.filter(t=>t.status==='completed'&&_prevRunningIds.has(t.task_id));
-          if(justDone.length){
-            showCompletionBanner(justDone[0].topic);
-            loadStats();
-            if(_page==='home')loadHome();
-          }
+    try{
+      const r=await API.get('/api/platform/tasks?limit=50');
+      const tasks=r.data||[];
+      const nowRunning=new Set(tasks.filter(t=>['queued','generating_text','synthesizing'].includes(t.status)).map(t=>t.task_id));
+      const hasRunning=nowRunning.size>0;
+      // Nav badge colour
+      const nb=document.getElementById('nav-tasks');if(nb)nb.style.color=hasRunning?'var(--warning)':'';
+      // When on tasks page, always refresh the grid
+      if(_page==='tasks'){
+        renderTaskGrid(tasks);
+        document.getElementById('tasks-sub').textContent=`共 ${tasks.length} 个任务`;
+      }
+      // Detect newly-completed tasks (when not on tasks page)
+      if(_page!=='tasks'&&_prevRunningIds.size>0){
+        const justDone=tasks.filter(t=>t.status==='completed'&&_prevRunningIds.has(t.task_id));
+        if(justDone.length){
+          showCompletionBanner(justDone[0].topic);
+          loadStats();
+          if(_page==='home')loadHome();
         }
-        _prevRunningIds=nowRunning;
-      }catch(e){}
-    }
-  },8000);
+      }
+      _prevRunningIds=nowRunning;
+    }catch(e){}
+  },5000);
 });
 </script>
 <script src="/static/app.js"></script>

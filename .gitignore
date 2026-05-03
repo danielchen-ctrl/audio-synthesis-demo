@@ -25,7 +25,7 @@ reports/
 runtime/
 tmp/
 temp/
-demo/
+demo-data/
 archive/deprecated/debug_images/
 
 # Logs
@@ -68,4 +68,7 @@ training/data/training_jobs_b4_*.jsonl
 runtime/platform.db
 runtime/platform.db-shm
 runtime/platform.db-wal
+platform.db
+platform.db-shm
+platform.db-wal
 storage/

@@ -2,7 +2,7 @@
   "defaults": {
     "wordCount": "1000",
     "wordCountMin": 100,
-    "wordCountMax": 3000,
+    "wordCountMax": 50000,
     "folder": "默认目录"
   },
   "folderOptions": [

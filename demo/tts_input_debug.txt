@@ -1,0 +1,110 @@
+================================================================================
+PROMPT DEBUG - 最终 prompt（约束逻辑）
+================================================================================
+
+[最终 prompt 前 80 行]
+  1: Background Setting (scenario): シナル：日本語でビジネス会話をします。仕事の意味は、その時の明確な会話によって決まります。
+  2: 
+  3: Participants: Total 10 people, Owner=Speaker 1, others Speaker 2..N are reasonable roles (if scenario mentions "family/colleague/nurse/client", automatically match roles)
+  4: 
+  5: Dialogue Requirements:
+  6: - Each speaker must speak at least 2 times
+  7: - Natural dialogue flow: opening → information gathering/questions → explanation/discussion → decision/next steps → summary
+  8: - DO NOT directly quote scenario text as dialogue (NO copying)
+  9: - core_content must be naturally expressed by Speaker 1 in dialogue and emphasized
+ 10: - Output must strictly follow format: Speaker X: ...
+ 11: - Output language must be 日语 only, Chinese character ratio must be < 10%
+ 12: - 【指令 3-A】Dialogue text total character count (excluding Speaker labels) must ≤ 3000; exceeding this limit is considered a failure and must be rewritten
+ 13: - 【指令 3-A】For people_count=10, each speaker must speak at least 2 rounds, but total character count must still meet the upper limit
+ 14: - 【指令1-4】DO NOT output meaningless repetitive sentences to fill word count
+ 15: 
+ 16: [角色信息 CAST]
+ 17: Owner: {'name': 'Professional', 'gender': 'Male', 'age': 35, 'role': '专业人士', 'goal': 'Communicate professionally based on 宮殿産業を守り、金産業を守る', 'style': 'Professional, practical, insightful', 'habits': ['From my perspective', 'Based on experience', 'I suggest'], 'taboos': ["I don't know", 'Whatever', "Doesn't matter"]}
+ 18: Others: [{'name': 'Counterpart', 'gender': 'Male', 'age': 40, 'role': '对话方', 'goal': 'Understand professional opinion and make decisions', 'style': 'Practical, detail-oriented, questioning', 'habits': ['Specifically', 'So', 'This'], 'taboos': []}, {'name': 'Coordinator', 'gender': 'Female', 'age': 38, 'role': 'Third Party/Consultant', 'goal': 'Provide supplementary information and suggestions', 'style': 'Objective, professional, neutral', 'habits': ['Please note', 'Consider', 'From another angle'], 'taboos': []}]
+ 19: 
+ 20: [人物画像 Profile]
+ 21: Job: 宝鎮
+ 22: Work: 宮殿産業を守り、金産業を守る
+ 23: Seniority: 経営者や起業家
+ 24: Use Case: 
+ 25: 
+ 26: [核心内容 Core]
+ 27: 必要な要件: 具体的な詳細、責任、未解決の問題、依存関係、および明確な日本語。
+ 28: 
+ 29: [开始生成对话...]
+ 30: 
+
+[INSTRUCTION 段 - scenario 作为生成约束]
+Background Setting (scenario): シナル：日本語でビジネス会話をします。仕事の意味は、その時の明確な会話によって決まります。
+
+Participants: Total 10 people, Owner=Speaker 1, others Speaker 2..N are reasonable roles (if scenario mentions "family/colleague/nurse/client", automatically match roles)
+
+Dialogue Requirements:
+- Each speaker must speak at least 2 times
+- Natural dialogue flow: opening → information gathering/questions → explanation/discussion → decision/next steps → summary
+- DO NOT directly quote scenario text as dialogue (NO copying)
+- core_content must be naturally expressed by Speaker 1 in dialogue and emphasized
+- Output must strictly follow format: Speaker X: ...
+- Output language must be 日语 only, Chinese character ratio must be < 10%
+- 【指令 3-A】Dialogue text total character count (excluding Speaker labels) must ≤ 3000; exceeding this limit is considered a failure and must be rewritten
+- 【指令 3-A】For people_count=10, each speaker must speak at least 2 rounds, but total character count must still meet the upper limit
+- 【指令1-4】DO NOT output meaningless repetitive sentences to fill word count
+
+[greeting_owner 模板 - 确认不含 scenario]
+  您好，我是专业人士。我们开始吧。
+
+[说明]
+  instruction 已放在最终 prompt 最前面，作为约束逻辑影响生成
+  scenario 不再出现在 greeting_owner 中，只作为 instruction 约束
+================================================================================
+
+================================================================================
+[生成结果检测]
+  speaker_count: 10
+  每个 speaker 行数: {1: 47, 2: 23, 3: 6, 4: 3, 5: 3, 7: 3, 6: 3, 10: 3, 9: 3, 8: 3}
+  scenario_leak: False
+  重复率: 2.22%
+  中文占比: 63.25%
+
+[字数限制检测]
+  目标 target_chars: 3000
+  实际 actual_chars: 2710
+  填充率 fill_ratio: 90.3%
+  扩写轮数 fill_turns: 11
+  随机种子 seed: 1942907158
+  实际字符数（不含标签）: 2710
+  是否触发 rewrite: False
+  rewrite 次数: 0
+
+[最终生成文本前 30 行预览]
+  Speaker Speaker 1: 您好，我叫Professional，是专业人士。今天一起探讨。
+  Speaker Speaker 2: 您好Professional，我是Counterpart。很高兴见到您。
+  Speaker Speaker 3: 您好，我是Coordinator，是Third Party/Consultant。期待今天的讨论。
+  Speaker Speaker 1: 您目前遇到的具体问题是什么？
+  Speaker Speaker 2: 我理解了，能否给我一些时间整理一下思路？
+  Speaker Speaker 1: 这个问题是从什么时候开始的？
+  Speaker Speaker 3: 您提的这个问题很关键，让我仔细考虑后再正式回复您。
+  Speaker Speaker 1: 您希望达到什么样的结果？
+  Speaker Speaker 1: 从实际情况来看，这个方案需要分几个步骤。第一步是准备材料，第二步是提交申请，第三步是等待审核。
+  Speaker Speaker 4: 補足ですが、予算について確認が必要。
+  Speaker Speaker 5: 補足ですが、予算について調整します。
+  Speaker Speaker 7: 補足ですが、スケジュールについて調整します。
+  Speaker Speaker 6: 補足ですが、スケジュールについて確認が必要。
+  Speaker Speaker 1: 根据以往的经验，类似的情况处理周期大概是两周左右。我给您详细说说每个环节。
+  Speaker Speaker 1: 基于刚才的讨论，我建议我们有几个选择：
+  Speaker Speaker 1: 方案1: 方案一是快速推进，两周内完成，但可能需要您这边配合加班。
+  Speaker Speaker 10: 参与者の観点から、慎重に対応します。
+  Speaker Speaker 9: 参与者の観点から、優先的に対応します。
+  Speaker Speaker 4: 运营负责人の観点から、慎重に対応します。
+  Speaker Speaker 1: 方案2: 方案二是稳步推进，一个月完成，时间更充裕，质量更有保障。
+  Speaker Speaker 1: 在做出决定之前，我需要提醒您几个重要的注意事项：
+  Speaker Speaker 1: 需要提醒您的是，这个方案可能需要一些额外的时间和资源，建议您提前做好准备。
+  Speaker Speaker 2: 我明白了，这个确实需要注意。
+  Speaker Speaker 1: 实施过程中可能会遇到一些意外情况，建议我们保持密切沟通，及时调整。
+  Speaker Speaker 3: 从技术实现看，我明白了，这个确实需要注意。...需要考虑接口性能和降级策略。
+  Speaker Speaker 1: 好的，让我们总结一下：
+  Speaker Speaker 1: 最重要的是： <<コア:必要な要件: 具体的な詳細、責任、未解決の問題、依存関係、および明確な日本語。>>. 这是我们需要特别关注的。
+  Speaker Speaker 1: 我建议我们先制定一个详细的时间表，明确每个阶段的任务和负责人。
+  Speaker Speaker 1: 下周我们可以再开一次会，讨论具体的执行细节。您看什么时间方便？
+  Speaker Speaker 2: 好的，我理解了。那我们什么时候开始？
+================================================================================

@@ -11,8 +11,8 @@ import re
 import shutil
 from pathlib import Path
 
-CORPUS = Path("demo/training_long_dialogue")
-BACKUP = Path("demo/training_long_dialogue_backup")
+CORPUS = Path("demo-data/training_long_dialogue")
+BACKUP = Path("demo-data/training_long_dialogue_backup")
 
 # ── 字符集检测 ────────────────────────────────────────────────────────────────
 CJK_RE    = re.compile("[一-鿿]")

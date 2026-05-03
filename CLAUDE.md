@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## ⚡ Training Pipeline — Current Status (2026-05-03)
 
-**Phase: Ready to run on main project. No batches have completed yet.**
+**Phase: B0 Smoke 进行中 — 214/594（36%），通过率 100%，B1–B5 待启动。**
 
-All pipeline bugs are fixed (commits `9fcaefa4` `1f9867bc` `054d8af8` on branch `codex/fix/legacy-generation-adapter`). Merge/pull to main, then run:
+All pipeline bugs are fixed (commits `9fcaefa4` `1f9867bc` `054d8af8`). 训练以 `--resume` 方式在后台运行，日志见 `output/training_v2/run_all_batches.log`。
 
 ```bash
 # Full B0→B5 run (65,628 tasks total)
@@ -21,7 +21,7 @@ python tools/training/run_all_batches.py --resume
 python tools/training/run_all_batches.py --only-batches b0_smoke b1_foundation
 ```
 
-Output lands in `output/training_v2/{batch}/passed/` (gitignored). See full execution guide: [`training/docs/training-plan-v2-execution.md`](training/docs/training-plan-v2-execution.md)
+Output lands in `output/training_v2/{batch}/passed/` (gitignored). See full execution guide: [`docs/training-plan-v2-execution.md`](docs/training-plan-v2-execution.md)
 
 **Quick progress check:**
 ```bash
@@ -209,7 +209,6 @@ demo/
 runtime/
   platform.db                      ← SQLite DB (gitignored; auto-created on first start)
 training/                          ← training pipeline v2
-  docs/training-plan-v2-execution.md
   quality_scoring.py / dialogue_validators.py / training_executor.py / training_storage.py
   plan_v2_data.py / data/training_jobs_b*.jsonl
 tools/training/
