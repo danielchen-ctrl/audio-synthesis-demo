@@ -92,8 +92,9 @@ class PlatformHandler(RequestHandler):
 # ── Tasks ─────────────────────────────────────────────────────────────────────
 
 class TasksHandler(PlatformHandler):
-    """GET /api/platform/tasks  — 任务列表
-       POST /api/platform/tasks — 创建任务"""
+    """GET /api/platform/tasks           — 任务列表
+       POST /api/platform/tasks          — 创建任务
+       DELETE /api/platform/tasks?status=completed — 清空已完成任务"""
 
     def get(self) -> None:
         limit = int(self.get_query_argument("limit", "50"))
@@ -122,15 +123,39 @@ class TasksHandler(PlatformHandler):
         self.set_status(201)
         self.ok(task)
 
+    def delete(self) -> None:
+        status = self.get_query_argument("status", "")
+        if status != "completed":
+            raise HTTPError(400, reason="仅支持 status=completed")
+        count = db.delete_completed_tasks()
+        self.ok({"deleted": count})
+
 
 class TaskHandler(PlatformHandler):
-    """GET/DELETE /api/platform/tasks/<task_id>"""
+    """GET/POST/DELETE /api/platform/tasks/<task_id>"""
 
     def get(self, task_id: str) -> None:
         task = db.get_task(task_id)
         if not task:
             raise HTTPError(404, reason="任务不存在")
         self.ok(task)
+
+    def post(self, task_id: str) -> None:
+        """重试失败任务：POST /api/platform/tasks/<id>  body: {"action":"retry"}"""
+        data = self.body()
+        if data.get("action") != "retry":
+            raise HTTPError(400, reason="未知操作，仅支持 action=retry")
+        task = db.get_task(task_id)
+        if not task:
+            raise HTTPError(404, reason="任务不存在")
+        if task["status"] != "failed":
+            raise HTTPError(400, reason="只有失败的任务才能重试")
+        if db.count_active_tasks() >= 3:
+            raise HTTPError(429, reason="当前进行中任务已达上限（3个）")
+        updated = db.retry_task(task_id)
+        if updated:
+            enqueue(task_id)
+        self.ok(updated)
 
     def delete(self, task_id: str) -> None:
         task = db.get_task(task_id)
@@ -504,3 +529,59 @@ class BatchDownloadHandler(PlatformHandler):
         self.set_header("Content-Disposition", "attachment; filename=corpus_export.zip")
         self.set_header("Content-Length", str(len(buf.getvalue())))
         self.finish(buf.getvalue())
+
+
+# ── Stats ─────────────────────────────────────────────────────────────────────
+
+class StatsHandler(PlatformHandler):
+    """GET /api/platform/stats — 平台统计摘要"""
+
+    def get(self) -> None:
+        with db._conn() as c:
+            total = c.execute(
+                "SELECT COUNT(*) FROM audio_files WHERE deleted=0"
+            ).fetchone()[0]
+            total_dur = c.execute(
+                "SELECT COALESCE(SUM(duration),0) FROM audio_files WHERE deleted=0"
+            ).fetchone()[0]
+            active_tasks = c.execute(
+                "SELECT COUNT(*) FROM tasks WHERE status IN ('queued','generating_text','synthesizing')"
+            ).fetchone()[0]
+            trash_count = c.execute(
+                "SELECT COUNT(*) FROM audio_files WHERE deleted=1"
+            ).fetchone()[0]
+            by_lang = c.execute(
+                "SELECT language, COUNT(*) AS cnt FROM audio_files WHERE deleted=0 "
+                "GROUP BY language ORDER BY cnt DESC LIMIT 5"
+            ).fetchall()
+            by_scene = c.execute(
+                "SELECT scene, COUNT(*) AS cnt FROM audio_files WHERE deleted=0 "
+                "GROUP BY scene ORDER BY cnt DESC"
+            ).fetchall()
+            total_size = c.execute(
+                "SELECT COALESCE(SUM(file_size),0) FROM audio_files WHERE deleted=0"
+            ).fetchone()[0]
+        self.ok({
+            "total_files": int(total),
+            "total_duration": float(total_dur),
+            "total_size": int(total_size),
+            "active_tasks": int(active_tasks),
+            "trash_count": int(trash_count),
+            "by_language": [dict(r) for r in by_lang],
+            "by_scene": [dict(r) for r in by_scene],
+        })
+
+
+# ── Legacy Demo Page ──────────────────────────────────────────────────────────
+
+class LegacyPageHandler(RequestHandler):
+    """GET /legacy — 原 Demo 页面"""
+
+    def get(self) -> None:
+        legacy_html = ROOT / "static" / "legacy.html"
+        if not legacy_html.exists():
+            self.set_status(404)
+            self.finish("Legacy demo not found")
+            return
+        self.set_header("Content-Type", "text/html; charset=utf-8")
+        self.finish(legacy_html.read_bytes())
