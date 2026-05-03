@@ -348,6 +348,7 @@ class UploadHandler(PlatformHandler):
         scene = self.get_body_argument("scene", "other")
         speaker_count = int(self.get_body_argument("speaker_count", "1"))
         topic = self.get_body_argument("topic", Path(original_name).stem)
+        folder_id = self.get_body_argument("folder_id", None) or None
 
         # 尝试读取音频时长
         duration = 0.0
@@ -369,6 +370,7 @@ class UploadHandler(PlatformHandler):
             "speaker_count": speaker_count,
             "scene": scene,
             "topic": topic,
+            "folder_id": folder_id,
         })
         self.set_status(201)
         self.ok(file_record)

@@ -759,10 +759,6 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
           <button id="regenTextBtn" class="btn btn-secondary btn-sm" type="button">重新生成</button>
         </div>
         <textarea id="previewText" class="textarea-field mono-field" rows="7"></textarea>
-        <div id="previewKeywordGroup" class="keyword-preview-group hidden">
-          <label class="form-label" for="previewKeywordHighlight">关键词高亮预览</label>
-          <div id="previewKeywordHighlight" class="keyword-highlight-preview"></div>
-        </div>
       </section>
 
       <section class="modal-section">
@@ -932,7 +928,7 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
   <div class="confirm-box">
     <div class="confirm-title" id="confirm-title"></div>
     <div class="confirm-desc" id="confirm-desc"></div>
-    <div class="confirm-actions"><button class="btn btn-ghost" onclick="closeConfirm()">取消</button><button class="btn btn-danger" id="confirm-ok-btn">确认</button></div>
+    <div class="confirm-actions"><button class="btn btn-ghost" id="confirm-cancel-btn" onclick="closeConfirm()">取消</button><button class="btn btn-danger" id="confirm-ok-btn">确认</button></div>
   </div>
 </div>
 
@@ -1708,7 +1704,7 @@ function toggleTheme(){
   const next=(html.dataset.theme==='light')?'dark':'light';
   html.dataset.theme=next;
   const btn=document.getElementById('themeToggle');
-  if(btn)btn.textContent=next==='light'?'🌙':'☀️';
+  if(btn)btn.textContent=next==='light'?'☀️':'🌙';
   localStorage.setItem('platform-theme',next);
 }
 (function(){
@@ -1716,7 +1712,7 @@ function toggleTheme(){
   document.documentElement.dataset.theme=saved;
   document.addEventListener('DOMContentLoaded',()=>{
     const btn=document.getElementById('themeToggle');
-    if(btn)btn.textContent=saved==='light'?'🌙':'☀️';
+    if(btn)btn.textContent=saved==='light'?'☀️':'🌙';
   });
 })();
 
@@ -1754,8 +1750,28 @@ document.addEventListener('DOMContentLoaded',()=>{
 <script src="/static/app.js"></script>
 <script>
 // Restore platform versions of showToast/showConfirm (app.js defines them with incompatible APIs)
-showToast = function(type,msg){const wrap=document.getElementById('toast-wrap');const t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML=(type==='ok'?'✅':type==='err'?'❌':'ℹ️')+' '+esc(msg);wrap.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);};
-showConfirm = function(title,desc,onOk){_confirmCb=onOk||null;document.getElementById('confirm-title').textContent=title;document.getElementById('confirm-desc').textContent=desc;document.getElementById('confirm-overlay').classList.add('open');document.getElementById('confirm-ok-btn').onclick=()=>{closeConfirm();if(_confirmCb)_confirmCb();};};
+showToast = function(type,msg){const aliased=(type==='success'||type==='ok')?'ok':(type==='error'||type==='err')?'err':'info';const wrap=document.getElementById('toast-wrap');const t=document.createElement('div');t.className='toast toast-'+aliased;t.innerHTML=(aliased==='ok'?'✅':aliased==='err'?'❌':'ℹ️')+' '+esc(msg);wrap.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);};
+showConfirm = function(title,desc,onOk){
+  // Support both calling conventions:
+  // app.js style:      const ok = await showConfirm("message")  → Promise<bool>
+  // platform style:   showConfirm("title", "desc", callbackFn) → void
+  const isCallbackStyle = typeof onOk === 'function' || (typeof desc === 'function');
+  if(typeof desc === 'function'){onOk=desc;desc='';}
+  _confirmCb=isCallbackStyle?(onOk||null):null;
+  document.getElementById('confirm-title').textContent=title;
+  document.getElementById('confirm-desc').textContent=desc||'';
+  document.getElementById('confirm-overlay').classList.add('open');
+  if(isCallbackStyle){
+    document.getElementById('confirm-ok-btn').onclick=()=>{closeConfirm();if(_confirmCb)_confirmCb();};
+    document.getElementById('confirm-cancel-btn').onclick=()=>{closeConfirm();};
+    return undefined;
+  }else{
+    return new Promise(resolve=>{
+      document.getElementById('confirm-ok-btn').onclick=()=>{closeConfirm();resolve(true);};
+      document.getElementById('confirm-cancel-btn').onclick=()=>{closeConfirm();resolve(false);};
+    });
+  }
+};
 closeConfirm = function(){document.getElementById('confirm-overlay').classList.remove('open');_confirmCb=null;};
 </script>
 </body>

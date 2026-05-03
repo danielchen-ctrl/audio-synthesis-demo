@@ -1083,10 +1083,7 @@ function highlightKeywordsHtml(text, keywords) {
 }
 
 function renderKeywordHighlightPreview() {
-  const previewText = normalizeText(el.previewText.value);
-  const shouldShow = currentMode() === "llm" && Boolean(previewText) && state.form.keywords.length > 0;
-  el.previewKeywordGroup.classList.toggle("hidden", !shouldShow);
-  el.previewKeywordHighlight.innerHTML = shouldShow ? highlightKeywordsHtml(previewText, state.form.keywords) : "";
+  // keyword highlight preview section removed from UI
 }
 
 function renderSubmitState() {
@@ -2140,6 +2137,10 @@ async function submitAudioGeneration() {
         })
       });
     } catch (_e) { /* silent */ }
+
+    // 刷新平台文件列表（if platform page is active）
+    if (typeof loadHome === "function") void loadHome();
+    if (typeof loadStats === "function") void loadStats();
 
     state.modalOpen = false;
     showToast("success", "音频生成成功，已保存到文件管理");

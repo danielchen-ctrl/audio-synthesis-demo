@@ -53,6 +53,72 @@ for batch in ['b0_smoke','b1_foundation','b2_positive_pairs','b3_cross_combo_bas
 
 ---
 
+## 🖥 Platform — Current Status (2026-05-03)
+
+**Phase: Live and debugged. All known runtime bugs fixed.**
+
+The corpus generation platform is a unified Tornado server combining the legacy dialogue/audio generation demo with a full file management platform.
+
+### Bug fixes applied (2026-05-03)
+
+| # | Issue | Fix location |
+|---|-------|-------------|
+| 1 | 预置主题按钮被条件隐藏 | `static/app.js` `renderModeUi()` |
+| 2 | 上传文件未归入所选文件夹 | `webapp/handlers.py` `UploadHandler.post()` |
+| 3 | 重新生成确认框无响应 | `static/index.html` `showConfirm` restoration script |
+| 4 | 确认框取消按钮缺少 id | `static/index.html` confirm overlay HTML |
+| 5 | 预置主题文件不存在 | 新建 `demo/预置对话情景参数.txt` (22 entries) |
+
+### Start the platform
+
+```bash
+python server.py
+# or double-click
+start_platform.bat
+```
+
+Server: `http://127.0.0.1:8899/`  
+Platform DB: `runtime/platform.db` (SQLite WAL, auto-created)
+
+### Platform API routes
+
+```
+Tasks    GET/POST  /api/platform/tasks
+         PUT/DELETE /api/platform/tasks/<id>
+Files    GET       /api/platform/files
+         GET/PUT/DELETE /api/platform/files/<id>
+         GET       /api/platform/files/<id>/download
+         GET/POST  /api/platform/files/<id>/transcript
+Upload   POST      /api/platform/upload
+Folders  GET/POST  /api/platform/folders
+         PUT/DELETE /api/platform/folders/<id>
+Search   GET       /api/platform/search
+Trash    GET       /api/platform/trash
+         POST      /api/platform/trash/<id>/restore
+         DELETE    /api/platform/trash/<id>
+Batch    POST      /api/platform/batch/move
+         POST      /api/platform/batch/delete
+         GET       /api/platform/batch/download
+Stats    GET       /api/platform/stats
+Legacy   GET       /legacy
+```
+
+### Preset topics
+
+22 preset dialogue scenarios in `demo/预置对话情景参数.txt`. Parsed at startup by `_load_preset_topics()` in `embedded_server_main.py`. Changing the file requires a server restart.
+
+Format:
+```
+N） Industry｜Scene
+场景对话设置：Role1、Role2、Role3
+对话核心内容：keyword1、keyword2、keyword3
+people_count = 3
+language = Chinese
+target_words = 1500
+```
+
+---
+
 ## Commands
 
 ### Run the server
@@ -112,37 +178,43 @@ Branch naming convention: `codex/feature/*`, `codex/fix/*`, `codex/chore/*`, `co
 ### Entry point and source layout
 
 ```
-server.py                          ← thin wrapper, re-exports embedded_server_main.main()
+server.py                          ← thin re-export wrapper → server_platform.py
+server_platform.py                 ← unified Tornado app: merges legacy demo + platform routes
 src/demo_app/
-  embedded_server_main.py          ← 2000+ line monolith: Tornado app, HTTP handlers, TTS pipeline,
-  │                                   bundle extraction, manifest cache, text generation orchestration
-  few_shot_selector.py             ← retrieves training corpus examples by domain+language
-  multilingual_naturalness.py      ← three-pass LLM output post-processing (repair → keywords → stabilize)
+  embedded_server_main.py          ← 2000+ line core: Tornado handlers, TTS pipeline,
+  │                                   bundle extraction, manifest cache, text generation
+  few_shot_selector.py             ← retrieves few-shot corpus examples by domain+language
+  multilingual_naturalness.py      ← three-pass LLM post-processing (repair → keywords → stabilize)
   rule_loader.py                   ← lru_cache loader for the three YAML rule files in config/
 static/
-  index.html / app.js / styles.css ← single-page UI served by Tornado
+  index.html                       ← single-page platform UI (nav + modals + platform pages)
+  app.js                           ← ~100KB: generation modal logic, state machine
+  styles.css                       ← CSS variables, light/dark theme, component styles
+webapp/
+  db.py                            ← SQLite helpers (audio_files, tasks, folders tables)
+  handlers.py                      ← all /api/platform/* Tornado handlers
+  routes.py                        ← PLATFORM_ROUTES list + register_platform_routes()
+  task_runner.py                   ← background task worker (enqueue / poll loop)
 config/
   app.yaml                         ← host/port/GUI title
   runtime.yaml                     ← backend routing flags (source_first vs bundle_fallback)
-  online_audio_ui.json             ← preset theme catalog (18 industry scenarios) and UI defaults
+  online_audio_ui.json             ← preset theme catalog (18 industry templates) and UI defaults
   text_quality_rules.yaml          ← persona/conflict rules consumed by multilingual_naturalness.py
   text_naturalness_rules.yaml      ← per-language natural speech rules
   text_postprocess_rules.yaml      ← term-rewrite rules per language
 demo/
-  training_long_dialogue/          ← few-shot corpus: 630 files, 14 domains × 9 languages × 5 speaker variants
+  training_long_dialogue/          ← few-shot corpus: 630 files, 14 domains × 9 languages × 5 variants
+  预置对话情景参数.txt               ← 22 preset dialogue scenarios (loaded by _load_preset_topics)
   README.md
+runtime/
+  platform.db                      ← SQLite DB (gitignored; auto-created on first start)
 training/                          ← training pipeline v2
-  docs/training-plan-v2-execution.md  ← execution guide (start here)
-  quality_scoring.py               ← 100-point scorer; missing_core_marker is WARNING (not error)
-  dialogue_validators.py           ← structural validator; core-marker check removed (bundle never emits them)
-  training_executor.py             ← retry loop + score gate (passed = no error-severity findings AND score ≥ 60)
-  training_storage.py              ← writes passed/ and failed_samples/ trees, _index.jsonl, _failed.jsonl
-  plan_v2_data.py                  ← POSITIVE_PAIRS, PRESET_TEMPLATES, MANUAL_TOPICS, B4/B5 combos
-  data/training_jobs_b*.jsonl      ← pre-built task files (B0/B1/B5 committed; B2-B4 auto-generated)
+  docs/training-plan-v2-execution.md
+  quality_scoring.py / dialogue_validators.py / training_executor.py / training_storage.py
+  plan_v2_data.py / data/training_jobs_b*.jsonl
 tools/training/
-  run_all_batches.py               ← B0→B5 sequential runner with gate + auto-cleanup (main entry point)
-  run_training_plan.py             ← single-batch runner (--batch / --stage interfaces)
-  build_training_plan_jobs.py      ← generates jobs JSONL for a given batch
+  run_all_batches.py               ← B0→B5 sequential runner (main entry point)
+  run_training_plan.py / build_training_plan_jobs.py
 ```
 
 ### The "bundle" concept
@@ -153,17 +225,41 @@ The LLM engine is packaged as a PyInstaller `.exe` (`build/demo_app/SceneDialogu
 
 `config/runtime.yaml` controls fallback behaviour (`text_bundle_fallback: enabled` etc.).
 
+### Platform database (SQLite)
+
+Three tables in `runtime/platform.db`:
+
+| Table | Key columns | Notes |
+|-------|-------------|-------|
+| `audio_files` | file_id, file_name, file_path, source, duration, language, speaker_count, scene, topic, folder_id, deleted, deleted_at | soft-delete via `deleted=1` |
+| `tasks` | task_id, status, params_json, result_json, error_msg | statuses: queued → generating_text → synthesizing → completed / failed |
+| `folders` | folder_id, name | used to group files in 我的文件 view |
+
+`webapp/db.py` provides all helpers; `webapp/task_runner.py` polls for queued tasks and drives them through the status machine.
+
 ### Static file serving
 
 `active_static_dir()` in `embedded_server_main.py` returns `static/` if both `static/index.html` and `static/app.js` exist there; otherwise falls back to `runtime/cache/embedded_bundle/assets/static/`. In development, edits to `static/` take effect immediately without touching the bundle.
 
-### UI generation modes
+### UI pages
 
-The single-page UI (`static/index.html` + `static/app.js`) offers two modes:
+The single-page app has five navigable pages rendered inside `#page-{name}` divs:
+
+| Page | nav key | Description |
+|------|---------|-------------|
+| 全部文件 | `home` | All non-deleted files, sortable/filterable |
+| 我的文件 | `myaudio` | Files grouped by folder |
+| 生成任务 | `tasks` | Task queue (auto-polls every 3 s when tasks are running) |
+| 回收站 | `trash` | Soft-deleted files; restore or permanently delete |
+| 文件详情 | `detail` | Per-file metadata, transcript, delete |
+
+Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Opened via "✨ 生成语料" button.
+
+### UI generation modes
 
 **LLM mode** (`source_mode: "llm"`) — AI generates dialogue text then synthesises audio:
 - User picks a preset theme from `templateSelect` (18 industry scenarios from `config/online_audio_ui.json`)
-- Optionally inputs a free-text topic (`llmTopic`) or selects from saved preset topics
+- Optionally inputs a free-text topic (`llmTopic`) or selects from 22 saved preset topics
 - Configures language, word count, keywords, speaker count
 - Backend calls the bundle LLM, runs three post-processing passes, then synthesises audio
 
@@ -191,6 +287,13 @@ The single-page UI (`static/index.html` + `static/app.js`) offers two modes:
 4. `pydub` probes segment durations (read-then-discard, no accumulation)
 5. `subprocess.run(ffmpeg -f concat …)` stitches segments; temporary `.mp3` segment files cleaned up in `finally`
 
+**Platform task generation (`POST /api/platform/tasks` → task worker)**
+1. Payload stored as `params_json` in DB, status set to `queued`
+2. `task_runner.py` polling loop picks up queued tasks
+3. Calls same internal generate + synthesise pipeline
+4. On success: writes audio to `storage/generated/`, updates DB with result path
+5. On failure: stores error_msg, sets status `failed`
+
 ### Key global state in `embedded_server_main.py`
 
 | Variable | Purpose |
@@ -198,7 +301,22 @@ The single-page UI (`static/index.html` + `static/app.js`) offers two modes:
 | `_BUNDLE_SERVER` | Shared `BundleServer` instance loaded from the `.exe` bundle; initialised once |
 | `_manifest_cache` | `OrderedDict` LRU (500 entries) mapping `dialogue_id → (manifest_path, manifest_dict)`; protected by `_manifest_cache_lock` |
 | `_ONLINE_AUDIO_CONFIG_CACHE` | UI config loaded once per process from `config/online_audio_ui.json` |
-| `_PRESET_TOPICS_CACHE` | Preset scenario list, loaded once per process |
+| `_PRESET_TOPICS_CACHE` | 22-entry preset scenario list, loaded once per process from `demo/预置对话情景参数.txt` |
+
+### showConfirm dual API
+
+`showConfirm` in `static/index.html` supports two calling conventions:
+
+```javascript
+// Platform style — callback (void return)
+showConfirm("title", "description", () => { /* on OK */ });
+
+// app.js style — Promise (await-able)
+const confirmed = await showConfirm("Are you sure?");
+if (!confirmed) return;
+```
+
+The restoration script (after `<script src="/static/app.js">`) overrides `showConfirm` to detect which style is being used and branch accordingly.
 
 ### Training corpus and few-shot
 
