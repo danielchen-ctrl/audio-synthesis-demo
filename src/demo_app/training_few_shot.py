@@ -23,6 +23,31 @@ logger = logging.getLogger(__name__)
 
 _ROOT = Path(__file__).resolve().parents[2]
 _TRAINING_OUT_DIR = _ROOT / "output" / "training_v2"
+_OLD_CORPUS_DIR   = _ROOT / "demo" / "training_long_dialogue"
+
+# 旧语料库 domain_id → 对应的 template_id 列表
+# 旧语料比新训练数据粒度粗（行业级 vs 主题级），用作兜底
+_OLD_DOMAIN_TO_TEMPLATES: dict[str, list[str]] = {
+    "medical":          ["t01_medical_chronic"],
+    "hr_recruit":       ["t02_hr_recruitment"],
+    "media_strategy":   ["t03_entertainment_celebrity", "t14_media_weekly"],
+    "construction":     ["t04_engineering_delivery"],
+    "ai_tech":          ["t05_auto_launch", "t12_ai_paid_conversion"],
+    "consulting":       ["t06_consulting_expansion"],
+    "legal":            ["t07_legal_retainer", "t15_legal_ad_compliance"],
+    "finance":          ["t08_wealth_allocation"],
+    "retail":           ["t09_retail_repurchase"],
+    "insurance":        ["t10_insurance_qc", "t16_insurance_sales_insight"],
+    "realestate":       ["t11_realestate_destock"],
+    "manufacturing":    ["t13_manufacturing_efficiency"],
+    "commercialization":["t12_ai_paid_conversion", "t14_media_weekly"],
+    "test_dev":         ["t17_payment_integration", "t18_payment_refund_security",
+                         "t19_payment_reconciliation", "t20_moments_publish",
+                         "t21_moments_interaction", "t22_moments_privacy"],
+}
+
+# 旧语料库文件的基础分（低于新训练数据最低分 80，确保新数据优先）
+_OLD_CORPUS_BASE_SCORE = 65.0
 
 # ── Template label → ID（22 个预置模板，对应训练计划 t01-t22）────────────────
 _LABEL_TO_TEMPLATE_ID: dict[str, str] = {
@@ -168,45 +193,91 @@ def _parse_template_id(stem: str) -> str | None:
     return m.group(1) if m else None
 
 
+def _parse_old_corpus_stem(stem: str) -> tuple[str, str] | None:
+    """从旧语料库文件名 stem 解析 (domain_id, lang_code)。
+    格式: {domain_id}_{lang_short}_spk{N}_wc5000
+    示例: medical_zh_spk3_wc5000 / hr_recruit_zh_spk3_wc5000
+    """
+    for lang_code in ("zh", "en", "ja", "ko", "fr", "de", "es", "pt", "yue"):
+        marker = f"_{lang_code}_spk"
+        if marker in stem:
+            domain_id = stem.split(marker)[0]
+            return domain_id, lang_code
+    return None
+
+
+def _index_old_corpus(index: dict[tuple[str, str], list[tuple[float, Path]]]) -> int:
+    """将 demo/training_long_dialogue/ 的文件按 domain→template 映射纳入索引。
+    旧语料打 _OLD_CORPUS_BASE_SCORE 分，确保新训练数据优先命中。
+    返回新增条目数。
+    """
+    if not _OLD_CORPUS_DIR.exists():
+        return 0
+    added = 0
+    for txt_file in _OLD_CORPUS_DIR.glob("*.txt"):
+        parsed = _parse_old_corpus_stem(txt_file.stem)
+        if not parsed:
+            continue
+        domain_id, lang_code = parsed
+        template_ids = _OLD_DOMAIN_TO_TEMPLATES.get(domain_id, [])
+        for t_id in template_ids:
+            key = (t_id, lang_code)
+            index.setdefault(key, []).append((_OLD_CORPUS_BASE_SCORE, txt_file))
+            added += 1
+    return added
+
+
 def _build_index() -> dict[tuple[str, str], list[tuple[float, Path]]]:
-    """扫描 output/training_v2/*/passed/ 构建 (template_id, lang) → samples 索引。"""
+    """扫描新训练产出 + 旧语料库，构建统一的 (template_id, lang) → samples 索引。
+
+    优先级：新训练产出（score 80+）> 旧语料库（score 65）
+    """
     index: dict[tuple[str, str], list[tuple[float, Path]]] = {}
-    if not _TRAINING_OUT_DIR.exists():
-        logger.debug("[training_few_shot] 训练输出目录不存在: %s", _TRAINING_OUT_DIR)
-        return index
 
-    for batch_dir in _TRAINING_OUT_DIR.iterdir():
-        if not batch_dir.is_dir():
-            continue
-        passed_root = batch_dir / "passed"
-        if not passed_root.exists():
-            continue
-        # 目录层级: passed/{batch_name}/{Category}/{language}/{files}
-        for batch_sub in passed_root.iterdir():
-            if not batch_sub.is_dir():
+    # ── 新训练产出：output/training_v2/*/passed/ ──────────────────────────
+    new_count = 0
+    if _TRAINING_OUT_DIR.exists():
+        for batch_dir in _TRAINING_OUT_DIR.iterdir():
+            if not batch_dir.is_dir():
                 continue
-            for cat_dir in batch_sub.iterdir():
-                if not cat_dir.is_dir():
+            passed_root = batch_dir / "passed"
+            if not passed_root.exists():
+                continue
+            # 目录层级: passed/{batch_name}/{Category}/{language}/{files}
+            for batch_sub in passed_root.iterdir():
+                if not batch_sub.is_dir():
                     continue
-                for lang_dir in cat_dir.iterdir():
-                    if not lang_dir.is_dir():
+                for cat_dir in batch_sub.iterdir():
+                    if not cat_dir.is_dir():
                         continue
-                    lang_code = _DIR_LANG_TO_SHORT.get(lang_dir.name)
-                    if not lang_code:
-                        continue
-                    for txt_file in lang_dir.glob("*.txt"):
-                        t_id = _parse_template_id(txt_file.stem)
-                        if not t_id:
+                    for lang_dir in cat_dir.iterdir():
+                        if not lang_dir.is_dir():
                             continue
-                        score = _read_score(txt_file)
-                        key = (t_id, lang_code)
-                        index.setdefault(key, []).append((score, txt_file))
+                        lang_code = _DIR_LANG_TO_SHORT.get(lang_dir.name)
+                        if not lang_code:
+                            continue
+                        for txt_file in lang_dir.glob("*.txt"):
+                            t_id = _parse_template_id(txt_file.stem)
+                            if not t_id:
+                                continue
+                            score = _read_score(txt_file)
+                            key = (t_id, lang_code)
+                            index.setdefault(key, []).append((score, txt_file))
+                            new_count += 1
 
+    # ── 旧语料库：demo/training_long_dialogue/ ────────────────────────────
+    old_count = _index_old_corpus(index)
+
+    # 每个 key 按分数降序排列（新数据分高，自然排在前面）
     for key in index:
         index[key].sort(key=lambda x: x[0], reverse=True)
 
     total = sum(len(v) for v in index.values())
-    logger.info("[training_few_shot] 索引构建完成: %d 个(模板,语言)组合, %d 个样本", len(index), total)
+    logger.info(
+        "[training_few_shot] 索引构建完成: %d 个(模板,语言)组合, %d 条目 "
+        "（新训练 %d + 旧语料 %d）",
+        len(index), total, new_count, old_count,
+    )
     return index
 
 
