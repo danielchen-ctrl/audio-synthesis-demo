@@ -105,6 +105,19 @@ class TasksHandler(PlatformHandler):
     def post(self) -> None:
         data = self.body()
 
+        # Legacy modal import: create a pre-completed task record without queuing
+        if data.get("_import"):
+            if not data.get("topic"):
+                raise HTTPError(400, reason="topic 为必填")
+            task = db.create_task(data)
+            db.update_task_status(
+                task["task_id"], "completed",
+                file_id=data.get("file_id") or None,
+            )
+            self.set_status(201)
+            self.ok(db.get_task(task["task_id"]))
+            return
+
         # 基础校验
         if not data.get("topic") and not data.get("input_text"):
             raise HTTPError(400, reason="topic 或 input_text 为必填")

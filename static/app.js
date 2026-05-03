@@ -2120,8 +2120,9 @@ async function submitAudioGeneration() {
     });
 
     // Register in platform file browser (best-effort)
+    let _platformFileId = null;
     try {
-      await fetch("/api/platform/files", {
+      const _pfRes = await fetch("/api/platform/files", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -2134,6 +2135,28 @@ async function submitAudioGeneration() {
           scene: "other",
           format: (el.outputFormat ? el.outputFormat.value : "mp3").toLowerCase(),
           folder_id: el.folderSelect && el.folderSelect.value ? el.folderSelect.value : undefined,
+        })
+      });
+      if (_pfRes.ok) {
+        const _pfJson = await _pfRes.json();
+        _platformFileId = _pfJson.data && _pfJson.data.file_id;
+      }
+    } catch (_e) { /* silent */ }
+
+    // Log as a completed platform task so it appears in the task list
+    try {
+      await fetch("/api/platform/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          _import: true,
+          topic: currentTitle() || "在线生成",
+          language: currentLanguageBackend(),
+          people_count: speakerCountValue(),
+          word_count: state.form.wordCount || 1000,
+          generation_mode: currentMode() === "llm" ? "llm" : "direct",
+          template: state.form.template || undefined,
+          file_id: _platformFileId || undefined,
         })
       });
     } catch (_e) { /* silent */ }

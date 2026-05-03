@@ -72,8 +72,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .cb-col{width:36px}
 .file-name{font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px}
 .ext-badge{font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(59,130,246,.2);color:var(--primary);font-weight:600;flex-shrink:0}
-.row-actions{display:flex;gap:4px;opacity:0;transition:.1s}
-tbody tr:hover .row-actions{opacity:1}
+.row-actions{display:flex;gap:4px;opacity:1;transition:.1s}
 .row-btn{background:none;border:none;color:var(--text3);padding:4px 6px;border-radius:4px;font-size:12px;white-space:nowrap}.row-btn:hover{background:var(--bg3);color:var(--text)}
 .row-btn.danger:hover{color:var(--danger)}
 .empty-row td{text-align:center;padding:40px;color:var(--text3)}
@@ -1474,7 +1473,7 @@ function showToast(type,msg){const wrap=document.getElementById('toast-wrap');co
 
 // ══ Confirm ══════════════════════════════════════════════════════════════════
 var _confirmCb=null;
-function showConfirm(title,desc,onOk){_confirmCb=onOk||null;document.getElementById('confirm-title').textContent=title;document.getElementById('confirm-desc').textContent=desc;document.getElementById('confirm-overlay').classList.add('open');document.getElementById('confirm-ok-btn').onclick=()=>{closeConfirm();if(_confirmCb)_confirmCb();};}
+function showConfirm(title,desc,onOk){_confirmCb=onOk||null;document.getElementById('confirm-title').textContent=title;document.getElementById('confirm-desc').textContent=desc;document.getElementById('confirm-overlay').classList.add('open');document.getElementById('confirm-ok-btn').onclick=()=>{const cb=_confirmCb;closeConfirm();if(cb)cb();};}
 function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('open');_confirmCb=null;}
 
 // ══ Tag input ════════════════════════════════════════════════════════════════
@@ -1776,7 +1775,7 @@ showConfirm = function(title,desc,onOk){
   document.getElementById('confirm-desc').textContent=desc||'';
   document.getElementById('confirm-overlay').classList.add('open');
   if(isCallbackStyle){
-    document.getElementById('confirm-ok-btn').onclick=()=>{closeConfirm();if(_confirmCb)_confirmCb();};
+    document.getElementById('confirm-ok-btn').onclick=()=>{const cb=_confirmCb;closeConfirm();if(cb)cb();};
     document.getElementById('confirm-cancel-btn').onclick=()=>{closeConfirm();};
     return undefined;
   }else{
