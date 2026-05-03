@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DB_PATH = ROOT / "platform.db"
+DB_PATH = ROOT / "runtime" / "platform.db"
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS tasks (

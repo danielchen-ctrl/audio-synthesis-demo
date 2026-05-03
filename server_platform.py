@@ -53,7 +53,7 @@ def main() -> None:
 
     # 1. 初始化数据库
     init_db()
-    logging.getLogger(__name__).info("[platform] Database initialized → %s", ROOT / "platform.db")
+    logging.getLogger(__name__).info("[platform] Database initialized → %s", ROOT / "runtime" / "platform.db")
 
     # 2. 构建 Tornado app（含所有原有路由）
     app = make_app()
@@ -76,7 +76,7 @@ def main() -> None:
     print(f"{'='*55}")
     for url in local_urls(port):
         print(f"  访问地址: {url}")
-    print(f"  数据库:   {ROOT / 'platform.db'}")
+    print(f"  数据库:   {ROOT / 'runtime' / 'platform.db'}")
     print(f"  存储目录: {ROOT / 'storage'}")
     print(f"{'='*55}\n")
 

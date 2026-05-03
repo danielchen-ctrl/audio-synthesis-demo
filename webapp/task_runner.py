@@ -157,7 +157,7 @@ async def _process_task(task_id: str) -> None:
     audio_path = Path(audio_result["audio_file_path"])
     file_size = audio_path.stat().st_size if audio_path.exists() else 0
 
-    # 从 segments JSON 读取时长
+    # 从 segments JSON 读取时长（仅当 include_scripts=True 时有值）
     duration = 0.0
     segs_path = audio_result.get("segments_json_path") or ""
     if segs_path and Path(segs_path).exists():
@@ -165,6 +165,16 @@ async def _process_task(task_id: str) -> None:
             segs = json.loads(Path(segs_path).read_text(encoding="utf-8"))
             if segs and isinstance(segs, list):
                 duration = float(segs[-1].get("end_time", 0))
+        except Exception:
+            pass
+
+    # 若 segments 不可用，直接读取音频文件时长（pydub 探针）
+    if duration == 0.0 and audio_path.exists():
+        try:
+            from pydub import AudioSegment as _AS
+            _seg = _AS.from_file(str(audio_path))
+            duration = len(_seg) / 1000.0
+            del _seg
         except Exception:
             pass
 
@@ -219,11 +229,15 @@ async def _worker() -> None:
 
 
 def enqueue(task_id: str) -> None:
-    """将 task_id 加入处理队列（线程安全）。"""
-    loop = asyncio.get_event_loop()
+    """将 task_id 加入处理队列（从 Tornado handler 同步调用安全）。"""
+    loop = asyncio.get_running_loop()
     loop.call_soon_threadsafe(_task_queue.put_nowait, task_id)
 
 
+_MAX_WORKERS = 3  # 与 handlers.py 中的并发限制（count_active_tasks >= 3）保持一致
+
+
 def start_worker() -> None:
-    """在 Tornado IOLoop 启动后调用一次，启动后台 worker 协程。"""
-    asyncio.ensure_future(_worker())
+    """在 Tornado IOLoop 启动后调用一次，启动后台 worker 协程（并发数 = _MAX_WORKERS）。"""
+    for _ in range(_MAX_WORKERS):
+        asyncio.ensure_future(_worker())

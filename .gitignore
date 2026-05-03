@@ -65,7 +65,7 @@ training/data/training_jobs_b3_*.jsonl
 training/data/training_jobs_b4_*.jsonl
 
 # Platform
-platform.db
-platform.db-shm
-platform.db-wal
+runtime/platform.db
+runtime/platform.db-shm
+runtime/platform.db-wal
 storage/
