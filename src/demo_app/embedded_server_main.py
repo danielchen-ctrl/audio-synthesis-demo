@@ -474,42 +474,6 @@ def _compact_multiline_text(value: str) -> str:
     return " ".join(cleaned).strip()
 
 
-def _extract_section(block: str, start_tokens: list[str], stop_tokens: list[str]) -> str:
-    start_index = -1
-    matched_token = ""
-    for token in start_tokens:
-        idx = block.find(token)
-        if idx != -1 and (start_index == -1 or idx < start_index):
-            start_index = idx
-            matched_token = token
-    if start_index == -1:
-        return ""
-
-    section = block[start_index + len(matched_token):]
-    if section.startswith(("：", ":")):
-        section = section[1:]
-
-    stop_index = len(section)
-    for token in stop_tokens:
-        idx = section.find(token)
-        if idx != -1:
-            stop_index = min(stop_index, idx)
-
-    return _compact_multiline_text(section[:stop_index])
-
-
-def _extract_word_count(block: str) -> int:
-    range_match = re.search(r"target_words\s*=\s*(\d+)\s*[~～\-]\s*(\d+)", block, flags=re.IGNORECASE)
-    if range_match:
-        low = int(range_match.group(1))
-        high = int(range_match.group(2))
-        return max(100, int(round((low + high) / 2)))
-    single_match = re.search(r"target_words\s*=\s*(\d+)", block, flags=re.IGNORECASE)
-    if single_match:
-        return max(100, int(single_match.group(1)))
-    return 1000
-
-
 def _guess_template_label(title: str, scenario: str) -> str:
     match = re.search(r"[（(]([^()（）]{1,20})[)）]", title)
     if match:
