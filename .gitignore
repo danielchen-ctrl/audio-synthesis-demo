@@ -63,3 +63,9 @@ Thumbs.db
 training/data/training_jobs_b2_*.jsonl
 training/data/training_jobs_b3_*.jsonl
 training/data/training_jobs_b4_*.jsonl
+
+# Platform
+platform.db
+platform.db-shm
+platform.db-wal
+storage/
