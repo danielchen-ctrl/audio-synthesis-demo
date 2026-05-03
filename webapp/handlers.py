@@ -172,7 +172,8 @@ class TaskHandler(PlatformHandler):
 # ── Files ─────────────────────────────────────────────────────────────────────
 
 class FilesHandler(PlatformHandler):
-    """GET /api/platform/files — 文件列表（含搜索/筛选）"""
+    """GET  /api/platform/files — 文件列表（含搜索/筛选）
+       POST /api/platform/files — 注册已有音频文件（旧 demo 生成后调用）"""
 
     def get(self) -> None:
         folder_id = self.get_query_argument("folder_id", "_unset_")
@@ -198,6 +199,41 @@ class FilesHandler(PlatformHandler):
         )
         total = db.count_audio_files()
         self.ok(files, total=total)
+
+    def post(self) -> None:
+        """注册旧 demo 生成的音频文件到平台 DB（file_path 必须已存在于磁盘）。"""
+        data = self.body()
+        file_path_str = data.get("file_path", "")
+        if not file_path_str:
+            raise HTTPError(400, reason="file_path 不能为空")
+        fpath = Path(file_path_str)
+        if not fpath.exists():
+            raise HTTPError(400, reason=f"文件不存在: {file_path_str}")
+        file_size = fpath.stat().st_size
+        duration = float(data.get("duration") or 0)
+        if duration == 0:
+            try:
+                from pydub import AudioSegment as _AS
+                _seg = _AS.from_file(str(fpath))
+                duration = len(_seg) / 1000.0
+                del _seg
+            except Exception:
+                pass
+        ext = fpath.suffix.lstrip(".").lower() or "mp3"
+        record = db.create_audio_file({
+            "file_name": data.get("file_name") or fpath.name,
+            "file_path": str(fpath.resolve()),
+            "source": "generated",
+            "duration": duration,
+            "format": data.get("format") or ext,
+            "file_size": file_size,
+            "language": data.get("language") or "",
+            "speaker_count": int(data.get("speaker_count") or 0) or None,
+            "scene": data.get("scene") or "other",
+            "topic": data.get("topic") or "",
+        })
+        self.set_status(201)
+        self.ok(record)
 
 
 class FileHandler(PlatformHandler):

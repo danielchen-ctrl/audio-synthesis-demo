@@ -207,7 +207,7 @@ const el = {
   staleOnlyFilter: document.getElementById("staleOnlyFilter"),
   clearTaskFiltersBtn: document.getElementById("clearTaskFiltersBtn"),
   taskSummary: document.getElementById("taskSummary"),
-  taskTableBody: document.getElementById("taskTableBody"),
+  legacyTaskTableBody: document.getElementById("legacyTaskTableBody"),
   taskEmpty: document.getElementById("taskEmpty"),
   toastContainer: document.getElementById("toastContainer"),
   modalOverlay: document.getElementById("modalOverlay"),
@@ -739,7 +739,7 @@ function showConfirm(message) {
   });
 }
 
-function openModal() {
+function openLegacyModal() {
   state.modalOpen = true;
   el.modalOverlay.classList.add("open");
   applyModalSize();
@@ -751,7 +751,7 @@ function openModal() {
   }
 }
 
-function closeModal() {
+function closeLegacyModal() {
   if (state.form.isGeneratingText || state.form.isSubmittingAudio) return;
   state.modalOpen = false;
   el.modalOverlay.classList.remove("open");
@@ -1129,7 +1129,7 @@ function renderTaskSearchUi(shownCount) {
 
 function renderTasks(tasks) {
   if (!tasks) tasks = filteredTasks();
-  el.taskTableBody.innerHTML = tasks
+  el.legacyTaskTableBody.innerHTML = tasks
     .map(
       (task) => `
     <tr>
@@ -1663,7 +1663,7 @@ async function openTaskInModal(task) {
   state.form = nextForm;
   state.modalOpen = true;
   renderAll();
-  openModal();
+    openLegacyModal();
 }
 
 function triggerBrowserDownload(blob, fileName) {
@@ -2096,8 +2096,26 @@ async function submitAudioGeneration() {
       snapshot: buildTaskSnapshot(dialogueId, workingText, textFileName || basenameFromPath(state.form.generatedTextFileName))
     });
 
+    // Register in platform file browser (best-effort)
+    try {
+      await fetch("/api/platform/files", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          file_path: audioPayload.audio_file_path,
+          file_name: audioPayload.file_name || basenameFromPath(audioPayload.audio_file_path),
+          language: currentLanguageBackend(),
+          speaker_count: speakerCountValue(),
+          topic: currentTitle(),
+          source: "generated",
+          scene: "other",
+          format: (el.outputFormat ? el.outputFormat.value : "mp3").toLowerCase(),
+        })
+      });
+    } catch (_e) { /* silent */ }
+
     state.modalOpen = false;
-    showToast("success", "任务已提交，请在生成任务列表查看进度");
+    showToast("success", "音频生成成功，已保存到文件管理");
     resetForm();
   } catch (requestError) {
     const audioErrMsg = requestError.name === "AbortError"
@@ -2163,12 +2181,12 @@ function bindEvents() {
   window.addEventListener("resize", applyModalSize);
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && state.modalOpen) {
-      closeModal();
+    closeLegacyModal();
     }
   });
   el.modalOverlay.addEventListener("click", (event) => {
     if (event.target === el.modalOverlay) {
-      closeModal();
+    closeLegacyModal();
     }
   });
   el.resetModalLayoutBtn.addEventListener("click", resetModalLayout);
@@ -2218,9 +2236,9 @@ function bindEvents() {
     void cleanupOldTasks();
   });
   // uploadBtn 已设为 disabled，无需事件绑定
-  el.openOnlineAudioBtn.addEventListener("click", openModal);
-  el.closeModalBtn.addEventListener("click", closeModal);
-  el.cancelModalBtn.addEventListener("click", closeModal);
+  el.openOnlineAudioBtn.addEventListener("click", openLegacyModal);
+  el.closeModalBtn.addEventListener("click", closeLegacyModal);
+  el.cancelModalBtn.addEventListener("click", closeLegacyModal);
 
   el.modeCardLlm.addEventListener("click", (event) => {
     event.preventDefault();
@@ -2345,7 +2363,7 @@ function bindEvents() {
   el.generateTextBtn.addEventListener("click", handleGenerateText);
   el.regenTextBtn.addEventListener("click", handleGenerateText);
   el.submitAudioBtn.addEventListener("click", submitAudioGeneration);
-  el.taskTableBody.addEventListener("click", handleTaskTableClick);
+  el.legacyTaskTableBody.addEventListener("click", handleTaskTableClick);
 }
 
 async function init() {
@@ -2359,7 +2377,7 @@ async function init() {
   renderAll();
   loadServerInfo(); // 不阻塞 init，share box 异步更新
   if (state.modalOpen) {
-    openModal();
+    openLegacyModal();
   }
 }
 
