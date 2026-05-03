@@ -98,9 +98,8 @@ VOICE_CATALOG = {
 }
 
 MAX_AUDIO_TEXT_CHARS = 12000
-PRESET_TOPIC_FILE_NAME = "预置对话情景参数.txt"
+PRESET_TOPICS_CONFIG_FILE = "preset_topics.json"
 ONLINE_AUDIO_CONFIG_FILE_NAME = "online_audio_ui.json"
-PRESET_BLOCK_RE = re.compile(r"(?ms)^\s*(\d+)[）\)]\s*(.+?)(?=^\s*\d+[）\)]\s*|\Z)")
 DEFAULT_PRESET_DISPLAY_TITLE_OVERRIDES = {
     "1": "医疗健康｜慢病随访",
     "2": "人力资源与招聘｜招聘补岗",
@@ -626,76 +625,43 @@ def _load_online_audio_config() -> dict[str, Any]:
     return merged
 
 
-def _resolve_preset_topic_file() -> Path | None:
-    candidates: list[Path] = []
-    for base in [ROOT, ROOT.parent, ROOT.parent.parent]:
-        candidates.extend(
-            [
-                base / "demo" / "对话情景参数" / PRESET_TOPIC_FILE_NAME,
-                base / "demo" / PRESET_TOPIC_FILE_NAME,
-                base / "demo_app" / "demo" / "对话情景参数" / PRESET_TOPIC_FILE_NAME,
-                base / "demo_app" / "demo" / PRESET_TOPIC_FILE_NAME,
-            ]
-        )
-
-    seen: set[Path] = set()
-    for candidate in candidates:
-        if candidate in seen:
-            continue
-        seen.add(candidate)
-        if candidate.exists():
-            return candidate
-    return None
-
-
 def _load_preset_topics() -> list[dict[str, Any]]:
-    preset_topic_file = _resolve_preset_topic_file()
-    if not preset_topic_file:
-        return []
+    config_path = ROOT / "config" / PRESET_TOPICS_CONFIG_FILE
+    try:
+        presets_data: list[dict[str, Any]] = json.loads(config_path.read_text(encoding="utf-8"))
+    except Exception:
+        presets_data = []
 
     online_audio_config = _load_online_audio_config()
     preset_display_titles = online_audio_config.get("presetDisplayTitles") or {}
-    raw_text = preset_topic_file.read_text(encoding="utf-8")
     presets: list[dict[str, Any]] = []
 
-    for match in PRESET_BLOCK_RE.finditer(raw_text):
-        preset_id = match.group(1)
-        block = match.group(2).strip()
-        title = next((line.strip() for line in block.splitlines() if line.strip()), "")
-        if not title:
+    for item in presets_data:
+        preset_id = str(item.get("id", ""))
+        label = item.get("label", "")
+        if not preset_id or not label:
             continue
-
-        scenario = _extract_section(
-            block,
-            ["场景对话设置（升级版）", "场景对话设置"],
-            ["对话生成参数", "**参数", "参数：", "参数:", "对话核心内容", "核心内容", "全新情景对话", "全新对话", "对话节选"],
-        )
-        core_content = _extract_section(
-            block,
-            ["对话核心内容（红色标注）", "对话核心内容", "核心内容"],
-            ["全新情景对话", "全新对话", "对话节选", "Action Items"],
-        )
-        topic_text = _preset_topic_text(title)
-        template_label = _guess_template_label(title, scenario)
-        people_match = re.search(r"people_count\s*=\s*(\d+)", block, flags=re.IGNORECASE)
-        language_match = re.search(r"language\s*=\s*([^\s｜|]+)", block, flags=re.IGNORECASE)
-        topic_desc_match = re.search(r"topic_description\s*=\s*(.+)", block)
-        topic_description = topic_desc_match.group(1).strip() if topic_desc_match else ""
+        roles = item.get("roles", [])
+        scenario = "、".join(roles) if roles else label
+        core_content = "、".join(item.get("core_keywords", []))
+        topic_description = item.get("topic_description", "")
+        topic_text = _preset_topic_text(label)
+        template_label = _guess_template_label(label, scenario)
 
         presets.append(
             {
                 "id": preset_id,
-                "source_title": title,
+                "source_title": label,
                 "topic_text": topic_text,
                 "topic_description": topic_description,
                 "display_title": str(preset_display_titles.get(preset_id) or _preset_display_title(topic_text)),
-                "scenario": scenario or topic_text,
+                "scenario": scenario,
                 "core_content": core_content,
                 "template_label": template_label,
-                "people_count": max(2, min(10, _safe_int(people_match.group(1) if people_match else None, 3))),
-                "word_count": min(5000, max(300, _extract_word_count(block))),
-                "language": _canonical_language(language_match.group(1) if language_match else "Chinese"),
-                "profile": _preset_profile(title, topic_text, template_label),
+                "people_count": max(2, min(10, int(item.get("people_count", 3)))),
+                "word_count": min(5000, max(300, int(item.get("target_words", 1500)))),
+                "language": _canonical_language(str(item.get("language", "Chinese"))),
+                "profile": _preset_profile(label, topic_text, template_label),
             }
         )
 
