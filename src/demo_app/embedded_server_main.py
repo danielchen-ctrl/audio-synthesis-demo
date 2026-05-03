@@ -43,7 +43,7 @@ if str(SRC_DIR) not in sys.path:
 
 from demo_app.multilingual_naturalness import enforce_keywords_in_lines as merge_keywords_into_lines
 from demo_app.multilingual_naturalness import polish_generated_lines, repair_dialogue_quality, stabilize_dialogue_constraints
-from demo_app.few_shot_selector import get_few_shot_example
+from demo_app.few_shot_selector import get_few_shot_example, get_topic_few_shot_example
 
 RUNTIME_CACHE = ROOT / "runtime" / "cache" / "embedded_bundle"
 MODULE_CACHE = RUNTIME_CACHE / "modules"
@@ -118,18 +118,12 @@ DEFAULT_PRESET_DISPLAY_TITLE_OVERRIDES = {
     "14": "娱乐/媒体｜战略周会",
     "15": "法律服务｜广告合规",
     "16": "保险行业｜销售洞察",
-    "17": "测试开发｜支付接入",
-    "18": "测试开发｜下单回调",
-    "19": "测试开发｜退款安全",
-    "20": "测试开发｜对账差错",
-    "21": "测试开发｜稳定性准入",
-    "22": "测试开发｜朋友圈项目",
-    "23": "测试开发｜内容发布",
-    "24": "测试开发｜多端分发",
-    "25": "测试开发｜互动一致性",
-    "26": "测试开发｜隐私可见性",
-    "27": "测试开发｜内容审核",
-    "28": "测试开发｜容量与准入",
+    "17": "测试开发｜支付接入与交易链路",
+    "18": "测试开发｜退款与资金安全",
+    "19": "测试开发｜对账与稳定性准入",
+    "20": "测试开发｜朋友圈内容发布与多端分发",
+    "21": "测试开发｜社交互动与状态一致性",
+    "22": "测试开发｜隐私权限与内容审核",
 }
 
 
@@ -685,12 +679,15 @@ def _load_preset_topics() -> list[dict[str, Any]]:
         template_label = _guess_template_label(title, scenario)
         people_match = re.search(r"people_count\s*=\s*(\d+)", block, flags=re.IGNORECASE)
         language_match = re.search(r"language\s*=\s*([^\s｜|]+)", block, flags=re.IGNORECASE)
+        topic_desc_match = re.search(r"topic_description\s*=\s*(.+)", block)
+        topic_description = topic_desc_match.group(1).strip() if topic_desc_match else ""
 
         presets.append(
             {
                 "id": preset_id,
                 "source_title": title,
                 "topic_text": topic_text,
+                "topic_description": topic_description,
                 "display_title": str(preset_display_titles.get(preset_id) or _preset_display_title(topic_text)),
                 "scenario": scenario or topic_text,
                 "core_content": core_content,
@@ -919,13 +916,18 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
             sep=lbl["sep"],
         )
 
-    # Few-shot 注入：从训练语料取同行业示例，引导 LLM 对齐行业对话风格
+    # Few-shot 注入：优先用主题专属训练样本，无则回退到通用语料库
     _fs_domain = generation_context.get("domain", "")
-    if _fs_domain:
+    _fs_example = ""
+    if template_label:
+        # 有模板标签时（预置主题或手动输入+选模板），走主题感知选择器
+        _fs_example = get_topic_few_shot_example(template_label, language)
+    if not _fs_example and _fs_domain:
+        # 无模板标签或未命中训练数据，回退到通用语料库
         _fs_example = get_few_shot_example(_fs_domain, language)
-        if _fs_example:
-            _fs_label = "Reference dialogue style (match the tone and rhythm, do not copy content):" if language in ("English", "Japanese", "Korean") else "参考对话风格示例（仅参考语气和节奏，请勿照抄内容）："
-            core_content = core_content + f"\n\n{_fs_label}\n---\n{_fs_example}\n---"
+    if _fs_example:
+        _fs_label = "Reference dialogue style (match the tone and rhythm, do not copy content):" if language in ("English", "Japanese", "Korean") else "参考对话风格示例（仅参考语气和节奏，请勿照抄内容）："
+        core_content = core_content + f"\n\n{_fs_label}\n---\n{_fs_example}\n---"
 
     lines, rewrite_info = _generate_long_dialogue_lines(
         bundle_server,

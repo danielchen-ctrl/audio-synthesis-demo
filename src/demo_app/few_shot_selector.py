@@ -247,3 +247,29 @@ def get_few_shot_example(domain: str, language: str) -> str:
             continue
 
     return ""
+
+
+def get_topic_few_shot_example(template_label: str, language: str) -> str:
+    """主题感知 few-shot 选择器。
+
+    优先从训练产出数据（output/training_v2/*/passed/）中查找该模板对应的高质量
+    样本；未找到时回退到 get_few_shot_example() 的通用语料库。
+
+    Args:
+        template_label: UI 模板下拉值（如 "医疗健康｜慢病随访"）或手动输入主题文本
+        language:       规范化语言名，如 "Chinese" / "English"
+    """
+    # 优先：主题专属训练样本
+    try:
+        from demo_app.training_few_shot import resolve_template_id, get_training_few_shot
+        template_id = resolve_template_id(template_label)
+        if template_id:
+            excerpt = get_training_few_shot(template_id, language)
+            if excerpt:
+                return excerpt
+    except Exception:
+        pass
+
+    # 回退：通用语料库（以模板标签的行业部分作为 domain）
+    domain = template_label.split("｜")[0].strip() if "｜" in template_label else template_label
+    return get_few_shot_example(domain, language)

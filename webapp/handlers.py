@@ -71,6 +71,9 @@ class PlatformHandler(RequestHandler):
     def body(self) -> dict:
         try:
             raw = self.request.body.decode("utf-8") or "{}"
+        except UnicodeDecodeError:
+            raise HTTPError(400, reason="请求体编码错误，必须使用 UTF-8 编码")
+        try:
             return json.loads(raw)
         except Exception:
             raise HTTPError(400, reason="Invalid JSON body")
@@ -154,10 +157,22 @@ class TaskHandler(PlatformHandler):
         self.ok(task)
 
     def post(self, task_id: str) -> None:
-        """重试失败任务：POST /api/platform/tasks/<id>  body: {"action":"retry"}"""
+        """操作任务：POST /api/platform/tasks/<id>  body: {"action":"retry"|"cancel"}"""
         data = self.body()
-        if data.get("action") != "retry":
-            raise HTTPError(400, reason="未知操作，仅支持 action=retry")
+        action = data.get("action")
+
+        if action == "cancel":
+            task = db.get_task(task_id)
+            if not task:
+                raise HTTPError(404, reason="任务不存在")
+            if task["status"] not in ("queued", "generating_text", "synthesizing"):
+                raise HTTPError(400, reason="只有进行中的任务可以取消")
+            db.update_task_status(task_id, "failed", error_msg="用户取消")
+            self.ok(db.get_task(task_id))
+            return
+
+        if action != "retry":
+            raise HTTPError(400, reason="未知操作，支持 action=retry 或 action=cancel")
         task = db.get_task(task_id)
         if not task:
             raise HTTPError(404, reason="任务不存在")
