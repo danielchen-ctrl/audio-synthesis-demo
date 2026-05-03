@@ -170,6 +170,25 @@ def delete_task(task_id: str) -> None:
         c.execute("DELETE FROM tasks WHERE task_id=?", (task_id,))
 
 
+def retry_task(task_id: str) -> dict | None:
+    """将失败任务重置为 queued，清空错误信息。"""
+    now = now_iso()
+    with _conn() as c:
+        c.execute(
+            "UPDATE tasks SET status='queued', error_msg=NULL, file_id=NULL, "
+            "dialogue_id=NULL, updated_at=? WHERE task_id=? AND status='failed'",
+            (now, task_id),
+        )
+    return get_task(task_id)
+
+
+def delete_completed_tasks() -> int:
+    """删除所有已完成任务，返回删除数量。"""
+    with _conn() as c:
+        cur = c.execute("DELETE FROM tasks WHERE status='completed'")
+        return cur.rowcount
+
+
 # ── audio_files CRUD ──────────────────────────────────────────────────────────
 
 def create_audio_file(data: dict) -> dict:

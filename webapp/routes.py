@@ -16,7 +16,9 @@ from webapp.handlers import (
     FileTranscriptHandler,
     FolderHandler,
     FoldersHandler,
+    LegacyPageHandler,
     SearchHandler,
+    StatsHandler,
     TaskHandler,
     TasksHandler,
     TrashDeleteHandler,
@@ -49,6 +51,10 @@ PLATFORM_ROUTES = [
     (r"/api/platform/batch/move", BatchMoveHandler),
     (r"/api/platform/batch/delete", BatchDeleteHandler),
     (r"/api/platform/batch/download", BatchDownloadHandler),
+    # Stats
+    (r"/api/platform/stats", StatsHandler),
+    # Legacy demo
+    (r"/legacy", LegacyPageHandler),
 ]
 
 

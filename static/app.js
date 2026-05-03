@@ -240,7 +240,6 @@ const el = {
   wordCountLimit: document.getElementById("wordCountLimit"),
   keywordWrap: document.getElementById("keywordWrap"),
   keywordInput: document.getElementById("keywordInput"),
-  manualTopic: document.getElementById("manualTopic"),
   manualLanguage: document.getElementById("manualLanguage"),
   manualText: document.getElementById("manualText"),
   speakerCount: document.getElementById("speakerCount"),
@@ -603,7 +602,7 @@ function resolvedLlmTopic() {
 }
 
 function currentTitle() {
-  return currentMode() === "llm" ? resolvedLlmTopic() : el.manualTopic.value.trim();
+  return currentMode() === "llm" ? resolvedLlmTopic() : (state.form.manualTopic || "");
 }
 
 function currentWorkingText() {
@@ -773,7 +772,6 @@ function readFormFromDom() {
   state.form.customPrompt = el.customPrompt.value;
   state.form.llmLanguage = el.llmLanguage.value;
   state.form.wordCountLimit = el.wordCountLimit.value;
-  state.form.manualTopic = el.manualTopic.value;
   state.form.manualLanguage = el.manualLanguage.value;
   state.form.manualText = el.manualText.value;
   state.form.speakerCount = speakerCountValue();
@@ -796,7 +794,6 @@ function syncFormToDom() {
   el.wordCountLimit.min = String(wordCountRange().min);
   el.wordCountLimit.max = String(wordCountRange().max);
   el.wordCountLimit.value = state.form.wordCountLimit || defaultWordCountLimit();
-  el.manualTopic.value = state.form.manualTopic || "";
   el.manualLanguage.value = state.form.manualLanguage || LANGUAGE_OPTIONS[0].backend;
   el.manualText.value = state.form.manualText || "";
   el.speakerCount.value = String(state.form.speakerCount || 2);
@@ -1336,7 +1333,6 @@ function validateBeforeSubmit() {
     return "";
   }
 
-  if (!el.manualTopic.value.trim()) return "请先填写文本主题";
   if (!el.manualLanguage.value) return "请选择文本语言";
   if (!normalizeText(el.manualText.value)) return "请先输入文本内容";
   return validateSpeakerConsistency(el.manualText.value);
@@ -1459,12 +1455,12 @@ function buildGenerateTextPayload() {
 
 function buildManualCreatePayload() {
   return {
-    title: el.manualTopic.value.trim(),
+    title: state.form.manualTopic || "直接输入",
     dialogue_text: normalizeText(el.manualText.value),
     language: el.manualLanguage.value,
     audio_language: el.manualLanguage.value,
     people_count: speakerCountValue(),
-    scenario: el.manualTopic.value.trim(),
+    scenario: state.form.manualTopic || "直接输入",
     template_label: "直接输入",
     keyword_terms: [...state.form.keywords],
     tags: state.form.tags,
@@ -2321,10 +2317,6 @@ function bindEvents() {
     applyPresetSelection(presetTopicById(el.presetTopicSelect.value));
   });
 
-  el.manualTopic.addEventListener("input", () => {
-    state.form.manualTopic = el.manualTopic.value;
-    debouncedPersistState();
-  });
   el.manualText.addEventListener("input", () => {
     state.form.manualText = el.manualText.value;
     debouncedPersistState();
