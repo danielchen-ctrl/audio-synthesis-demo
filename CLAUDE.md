@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## ⚡ Training Pipeline — Current Status (2026-05-03)
+## ⚡ Training Pipeline — Current Status (2026-05-04)
 
-**Phase: B0 Smoke 进行中 — 214/594（36%），通过率 100%，B1–B5 待启动。**
+**Phase: B0 Smoke 进行中，B1–B5 待启动。**
 
-All pipeline bugs are fixed (commits `9fcaefa4` `1f9867bc` `054d8af8`). 训练以 `--resume` 方式在后台运行，日志见 `output/training_v2/run_all_batches.log`。
+训练以 `--resume` 方式在后台运行，日志见 `output/training_v2/run_all_batches.log`。
 
 ```bash
 # Full B0→B5 run (65,628 tasks total)
@@ -25,7 +25,7 @@ Output lands in `output/training_v2/{batch}/passed/` (gitignored). See full exec
 
 **Quick progress check:**
 ```bash
-python3 -c "
+python -c "
 import json, os
 for batch in ['b0_smoke','b1_foundation','b2_positive_pairs','b3_cross_combo_base','b4_high_risk_boost','b5_extreme_50k']:
     p = f'output/training_v2/{batch}/_index.jsonl'
@@ -53,21 +53,11 @@ for batch in ['b0_smoke','b1_foundation','b2_positive_pairs','b3_cross_combo_bas
 
 ---
 
-## 🖥 Platform — Current Status (2026-05-03)
+## 🖥 Platform — Current Status (2026-05-04)
 
 **Phase: Live and debugged. All known runtime bugs fixed.**
 
 The corpus generation platform is a unified Tornado server combining the legacy dialogue/audio generation demo with a full file management platform.
-
-### Bug fixes applied (2026-05-03)
-
-| # | Issue | Fix location |
-|---|-------|-------------|
-| 1 | 预置主题按钮被条件隐藏 | `static/app.js` `renderModeUi()` |
-| 2 | 上传文件未归入所选文件夹 | `webapp/handlers.py` `UploadHandler.post()` |
-| 3 | 重新生成确认框无响应 | `static/index.html` `showConfirm` restoration script |
-| 4 | 确认框取消按钮缺少 id | `static/index.html` confirm overlay HTML |
-| 5 | 预置主题文件不存在 | 新建 `demo/预置对话情景参数.txt` (22 entries) |
 
 ### Start the platform
 
@@ -77,7 +67,7 @@ python server.py
 start_platform.bat
 ```
 
-Server: `http://127.0.0.1:8899/`  
+Server: `http://127.0.0.1:8899/`
 Platform DB: `runtime/platform.db` (SQLite WAL, auto-created)
 
 ### Platform API routes
@@ -105,16 +95,21 @@ Legacy   GET       /legacy
 
 ### Preset topics
 
-22 preset dialogue scenarios in `demo/预置对话情景参数.txt`. Parsed at startup by `_load_preset_topics()` in `embedded_server_main.py`. Changing the file requires a server restart.
+22 preset dialogue scenarios stored in `config/preset_topics.json`. Loaded at startup by `_load_preset_topics()` in `embedded_server_main.py`. Changing the file requires a server restart.
 
-Format:
-```
-N） Industry｜Scene
-场景对话设置：Role1、Role2、Role3
-对话核心内容：keyword1、keyword2、keyword3
-people_count = 3
-language = Chinese
-target_words = 1500
+Schema per entry:
+```json
+{
+  "id": "1",
+  "label": "医疗健康｜慢病随访",
+  "roles": ["全科医生", "慢病管理护士", "患者本人"],
+  "core_keywords": ["症状变化", "用药执行", "复查节点"],
+  "topic_description": "围绕一名高血压或糖尿病患者复诊后的随访沟通...",
+  "example_topic": "高血压患者复诊后的用药和生活习惯随访沟通",
+  "people_count": 3,
+  "language": "Chinese",
+  "target_words": 1500
+}
 ```
 
 ---
@@ -124,8 +119,6 @@ target_words = 1500
 ### Run the server
 ```bash
 python server.py
-# or
-python scripts/start_server.py
 ```
 Server binds to `http://127.0.0.1:8899/` (configured in `config/app.yaml`).
 
@@ -157,7 +150,7 @@ python scripts/validate_rule_configs.py
 ```bash
 python scripts/run_pre_release_ci_gate.py
 ```
-This runs: required-path check → YAML parse → Python compile → repo daily check → multilingual quality check → embedded smoke test. Writes reports to `reports/pre_release_gate/latest.json`.
+This runs: required-path check → YAML parse → Python compile → repo daily check → multilingual quality check → embedded smoke test.
 
 ### Run multilingual quality checks
 ```bash
@@ -180,40 +173,47 @@ Branch naming convention: `codex/feature/*`, `codex/fix/*`, `codex/chore/*`, `co
 ```
 server.py                          ← thin re-export wrapper → server_platform.py
 server_platform.py                 ← unified Tornado app: merges legacy demo + platform routes
-src/demo_app/
-  embedded_server_main.py          ← 2000+ line core: Tornado handlers, TTS pipeline,
-  │                                   bundle extraction, manifest cache, text generation
-  few_shot_selector.py             ← retrieves few-shot corpus examples by domain+language
-  multilingual_naturalness.py      ← three-pass LLM post-processing (repair → keywords → stabilize)
-  rule_loader.py                   ← lru_cache loader for the three YAML rule files in config/
+src/
+  demo_app/
+    embedded_server_main.py        ← 2000+ line core: Tornado handlers, TTS pipeline,
+    │                                 bundle extraction, manifest cache, text generation
+    few_shot_selector.py           ← retrieves few-shot corpus examples by domain+language
+    training_few_shot.py           ← retrieves topic-matched samples from training output
+    multilingual_naturalness.py    ← three-pass LLM post-processing (repair → keywords → stabilize)
+    rule_loader.py                 ← lru_cache loader for the three YAML rule files in config/
+  webapp/
+    db.py                          ← SQLite helpers (audio_files, tasks, folders tables)
+    handlers.py                    ← all /api/platform/* Tornado handlers
+    routes.py                      ← PLATFORM_ROUTES list + register_platform_routes()
+    task_runner.py                 ← background task worker (enqueue / poll loop)
 static/
   index.html                       ← single-page platform UI (nav + modals + platform pages)
   app.js                           ← ~100KB: generation modal logic, state machine
   styles.css                       ← CSS variables, light/dark theme, component styles
-webapp/
-  db.py                            ← SQLite helpers (audio_files, tasks, folders tables)
-  handlers.py                      ← all /api/platform/* Tornado handlers
-  routes.py                        ← PLATFORM_ROUTES list + register_platform_routes()
-  task_runner.py                   ← background task worker (enqueue / poll loop)
 config/
   app.yaml                         ← host/port/GUI title
   runtime.yaml                     ← backend routing flags (source_first vs bundle_fallback)
+  preset_topics.json               ← 22 preset dialogue scenarios (loaded by _load_preset_topics)
   online_audio_ui.json             ← preset theme catalog (18 industry templates) and UI defaults
   text_quality_rules.yaml          ← persona/conflict rules consumed by multilingual_naturalness.py
   text_naturalness_rules.yaml      ← per-language natural speech rules
   text_postprocess_rules.yaml      ← term-rewrite rules per language
-demo/
+demo-data/
   training_long_dialogue/          ← few-shot corpus: 630 files, 14 domains × 9 languages × 5 variants
-  预置对话情景参数.txt               ← 22 preset dialogue scenarios (loaded by _load_preset_topics)
   README.md
 runtime/
   platform.db                      ← SQLite DB (gitignored; auto-created on first start)
+  cache/                           ← bundle extraction cache (gitignored; regenerated at startup)
 training/                          ← training pipeline v2
-  quality_scoring.py / dialogue_validators.py / training_executor.py / training_storage.py
+  training_executor.py             ← task runner with 300s per-task timeout
+  quality_scoring.py / dialogue_validators.py / training_storage.py
   plan_v2_data.py / data/training_jobs_b*.jsonl
 tools/training/
   run_all_batches.py               ← B0→B5 sequential runner (main entry point)
   run_training_plan.py / build_training_plan_jobs.py
+docs/
+  training-plan-v2-execution.md   ← full training execution guide
+  pipeline-guide.md               ← training pipeline architecture
 ```
 
 ### The "bundle" concept
@@ -231,10 +231,10 @@ Three tables in `runtime/platform.db`:
 | Table | Key columns | Notes |
 |-------|-------------|-------|
 | `audio_files` | file_id, file_name, file_path, source, duration, language, speaker_count, scene, topic, folder_id, deleted, deleted_at | soft-delete via `deleted=1` |
-| `tasks` | task_id, status, params_json, result_json, error_msg | statuses: queued → generating_text → synthesizing → completed / failed |
-| `folders` | folder_id, name | used to group files in 我的文件 view |
+| `tasks` | task_id, status, generation_mode, topic, language, people_count, word_count, error_msg, file_id | statuses: queued → generating_text → synthesizing → completed / failed |
+| `folders` | folder_id, name, parent_id | used to group files in 我的文件 view |
 
-`webapp/db.py` provides all helpers; `webapp/task_runner.py` polls for queued tasks and drives them through the status machine.
+`src/webapp/db.py` provides all helpers; `src/webapp/task_runner.py` polls for queued tasks and drives them through the status machine.
 
 ### Static file serving
 
@@ -258,7 +258,7 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 
 **LLM mode** (`source_mode: "llm"`) — AI generates dialogue text then synthesises audio:
 - User picks a preset theme from `templateSelect` (18 industry scenarios from `config/online_audio_ui.json`)
-- Optionally inputs a free-text topic (`llmTopic`) or selects from 22 saved preset topics
+- Optionally inputs a free-text topic (`llmTopic`) or selects from 22 saved preset topics (`config/preset_topics.json`)
 - Configures language, word count, keywords, speaker count
 - Backend calls the bundle LLM, runs three post-processing passes, then synthesises audio
 
@@ -274,10 +274,10 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 1. Parameters sanitised (`_safe_profile`, `_safe_generation_context`)
 2. Language normalised to canonical form (`_canonical_language`)
 3. Non-CJK profile fields translated to the target language (`_sanitize_profile_for_language`)
-4. Few-shot example injected from `demo/training_long_dialogue/` (`few_shot_selector.get_few_shot_example`)
+4. Few-shot example injected from `demo-data/training_long_dialogue/` (`few_shot_selector.get_few_shot_example`)
 5. `_generate_long_dialogue_lines()` → calls bundle LLM, loops with dedup until word-count target is met
 6. Three post-processing passes: `repair_dialogue_quality` → `merge_keywords_into_lines` → `stabilize_dialogue_constraints`
-7. Written to `demo/{timestamp}/{basename}.txt` + `manifest.json`; registered in in-memory LRU cache (`_manifest_cache`, 500-entry cap)
+7. Written to `demo-data/{timestamp}/{basename}.txt` + `manifest.json`; registered in in-memory LRU cache (`_manifest_cache`, 500-entry cap)
 
 **Audio synthesis (`POST /api/synthesize_audio`)**
 1. Manifest looked up from cache/disk (`_find_manifest`)
@@ -288,7 +288,7 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 
 **Platform task generation (`POST /api/platform/tasks` → task worker)**
 1. Payload stored as `params_json` in DB, status set to `queued`
-2. `task_runner.py` polling loop picks up queued tasks
+2. `src/webapp/task_runner.py` polling loop picks up queued tasks
 3. Calls same internal generate + synthesise pipeline
 4. On success: writes audio to `storage/generated/`, updates DB with result path
 5. On failure: stores error_msg, sets status `failed`
@@ -300,7 +300,7 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 | `_BUNDLE_SERVER` | Shared `BundleServer` instance loaded from the `.exe` bundle; initialised once |
 | `_manifest_cache` | `OrderedDict` LRU (500 entries) mapping `dialogue_id → (manifest_path, manifest_dict)`; protected by `_manifest_cache_lock` |
 | `_ONLINE_AUDIO_CONFIG_CACHE` | UI config loaded once per process from `config/online_audio_ui.json` |
-| `_PRESET_TOPICS_CACHE` | 22-entry preset scenario list, loaded once per process from `demo/预置对话情景参数.txt` |
+| `_PRESET_TOPICS_CACHE` | 22-entry preset scenario list, loaded once per process from `config/preset_topics.json` |
 
 ### showConfirm dual API
 
@@ -319,7 +319,7 @@ The restoration script (after `<script src="/static/app.js">`) overrides `showCo
 
 ### Training corpus and few-shot
 
-`demo/training_long_dialogue/` is **committed to the repo** (force-tracked despite `demo/` being in `.gitignore`). Files follow the naming pattern `{domain_id}_{lang_short}_spk{N}_wc5000.txt`.
+`demo-data/training_long_dialogue/` is **committed to the repo** (force-tracked despite `demo-data/` being in `.gitignore`). Files follow the naming pattern `{domain_id}_{lang_short}_spk{N}_wc5000.txt`.
 
 - **14 domains**: `ai_tech`, `commercialization`, `construction`, `consulting`, `finance`, `hr_recruit`, `insurance`, `legal`, `manufacturing`, `media_strategy`, `medical`, `realestate`, `retail`, `test_dev`
 - **9 languages**: `zh`, `en`, `ja`, `ko`, `fr`, `de`, `es`, `pt`, `yue`
