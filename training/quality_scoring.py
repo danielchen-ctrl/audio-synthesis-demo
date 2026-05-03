@@ -18,6 +18,10 @@ def _count_japanese_kana(text: str) -> int:
     return len(re.findall(r"[\u3040-\u309f\u30a0-\u30ff]", text))
 
 
+def _count_korean_chars(text: str) -> int:
+    return len(re.findall(r"[\uac00-\ud7af\u1100-\u11ff]", text))
+
+
 def score_dialogue(
     task: TrainingTask,
     lines: DialogueLines,
@@ -60,35 +64,70 @@ def score_dialogue(
             )
         )
 
-    if task.language == "中文":
-        chinese_ratio = 1.0
-    elif task.language == "粤语":
-        chinese_ratio = 0.0
-    else:
-        chinese_ratio = _count_chinese_chars(full_text) / max(len(full_text), 1)
-        allowed_ratio = 0.70 if task.meta.get("translate_fallback") else 0.15
-        should_flag_high_ratio = chinese_ratio > allowed_ratio
-        details = {"ratio": round(chinese_ratio, 4), "allowed_ratio": allowed_ratio}
+    chinese_ratio = _count_chinese_chars(full_text) / max(len(full_text), 1)
+    kana_ratio = _count_japanese_kana(full_text) / max(len(full_text), 1)
+    korean_ratio = _count_korean_chars(full_text) / max(len(full_text), 1)
 
-        if task.language == "日语":
-            kana_ratio = _count_japanese_kana(full_text) / max(len(full_text), 1)
-            details["kana_ratio"] = round(kana_ratio, 4)
-            should_flag_high_ratio = chinese_ratio > 0.35 and kana_ratio < 0.05
-
-        if should_flag_high_ratio:
+    if task.language == "日语":
+        # 真实日语文本假名占比通常 15-40%；低于 8% 说明主体不是日语
+        if kana_ratio < 0.08:
+            score -= 30
+            findings.append(
+                ValidationFinding(
+                    code="language_mismatch",
+                    severity="error",
+                    message=f"日语任务但假名比例过低 {kana_ratio:.1%}（判定为非日语内容）",
+                    details={"kana_ratio": round(kana_ratio, 4), "chinese_ratio": round(chinese_ratio, 4)},
+                )
+            )
+        elif chinese_ratio > 0.30:
+            # 有足够假名但中文仍然过多
             score -= 20
             findings.append(
                 ValidationFinding(
                     code="high_chinese_ratio",
                     severity="error",
-                    message=f"中文占比过高: {chinese_ratio:.1%}",
-                    details=details,
+                    message=f"日语任务中文占比过高: {chinese_ratio:.1%}",
+                    details={"chinese_ratio": round(chinese_ratio, 4), "kana_ratio": round(kana_ratio, 4)},
+                )
+            )
+    elif task.language == "韩语":
+        if korean_ratio < 0.05:
+            score -= 30
+            findings.append(
+                ValidationFinding(
+                    code="language_mismatch",
+                    severity="error",
+                    message=f"韩语任务但韩文比例过低 {korean_ratio:.1%}",
+                    details={"korean_ratio": round(korean_ratio, 4), "chinese_ratio": round(chinese_ratio, 4)},
+                )
+            )
+    elif task.language not in ("中文", "粤语"):
+        # 非 CJK 语言（英语、法语、德语、西班牙语等）不应出现大量中文
+        allowed_ratio = 0.70 if task.meta.get("translate_fallback") else 0.15
+        if chinese_ratio > allowed_ratio:
+            score -= 20
+            findings.append(
+                ValidationFinding(
+                    code="high_chinese_ratio",
+                    severity="error",
+                    message=f"中文占比过高: {chinese_ratio:.1%}（允许上限 {allowed_ratio:.0%}）",
+                    details={"ratio": round(chinese_ratio, 4), "allowed_ratio": allowed_ratio},
                 )
             )
 
-    target_min = task.word_count * 0.7
-    target_max = task.word_count * 1.3
-    if total_chars < target_min or total_chars > target_max:
+    # 字数严重不足（< 30% 目标）→ error；一般偏离（< 70% 或 > 130%）→ warning
+    if total_chars < task.word_count * 0.30:
+        score -= 30
+        findings.append(
+            ValidationFinding(
+                code="word_count_critical_short",
+                severity="error",
+                message=f"字数严重不足: target={task.word_count}, actual={total_chars} ({total_chars/max(task.word_count,1):.0%})",
+                details={"target": task.word_count, "actual": total_chars},
+            )
+        )
+    elif total_chars < task.word_count * 0.7 or total_chars > task.word_count * 1.3:
         score -= 12
         findings.append(
             ValidationFinding(
@@ -164,6 +203,8 @@ def score_dialogue(
         "total_chars": total_chars,
         "marker_count": marker_count,
         "chinese_ratio": round(chinese_ratio, 4),
+        "kana_ratio": round(kana_ratio, 4),
+        "korean_ratio": round(korean_ratio, 4),
         "speaker_distribution": speaker_distribution,
         "target_word_count": task.word_count,
     }
