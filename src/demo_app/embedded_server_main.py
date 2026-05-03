@@ -229,7 +229,7 @@ def _meta_payload() -> dict[str, Any]:
 def _cache_is_fresh() -> bool:
     if not META_FILE.exists():
         return False
-    if not SERVER_ARCHIVE.exists() or not ASSET_ARCHIVE.exists():
+    if not SERVER_ARCHIVE.exists():
         return False
     try:
         saved = json.loads(META_FILE.read_text(encoding="utf-8"))
@@ -240,10 +240,14 @@ def _cache_is_fresh() -> bool:
         return False
     if not (MODULE_CACHE / "server.pyc").exists():
         return False
-    if not (ASSET_CACHE / "static" / "index.html").exists():
-        return False
-    if not (ASSET_CACHE / "static" / "app.js").exists():
-        return False
+    # Static-asset checks are only relevant when ASSET_ARCHIVE is present.
+    # When the .pkg is absent (e.g. fork without full build artefacts), skip them
+    # so that module-only usage (training, batch generation) still works.
+    if ASSET_ARCHIVE.exists():
+        if not (ASSET_CACHE / "static" / "index.html").exists():
+            return False
+        if not (ASSET_CACHE / "static" / "app.js").exists():
+            return False
     return True
 
 
@@ -1921,11 +1925,12 @@ def ensure_embedded_runtime() -> None:
         return
     if not SERVER_ARCHIVE.exists():
         raise FileNotFoundError(f"Missing server archive: {SERVER_ARCHIVE}")
-    if not ASSET_ARCHIVE.exists():
-        raise FileNotFoundError(f"Missing asset archive: {ASSET_ARCHIVE}")
     _reset_cache()
     _extract_bundle_modules()
-    _extract_static_assets()
+    # Static assets (UI files) are only extracted when the asset archive is
+    # present.  Omitting them is fine for headless training / batch generation.
+    if ASSET_ARCHIVE.exists():
+        _extract_static_assets()
     META_FILE.write_text(
         json.dumps(_meta_payload(), ensure_ascii=False, indent=2),
         encoding="utf-8",
