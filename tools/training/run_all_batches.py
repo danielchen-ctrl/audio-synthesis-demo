@@ -90,25 +90,30 @@ def _read_index(batch: str, out_dir: str) -> list[dict]:
     return records
 
 
-def _pass_rate(records: list[dict]) -> float:
-    if not records:
-        return 0.0
-    # 每个 task_id 只取最后一条记录（同一任务可能重试多次）
+def _best_by_tid(records: list[dict]) -> dict[str, dict]:
+    """每个 task_id 保留最优记录：passed=True 一旦出现就不被后续失败覆盖。
+    多次非 --resume 重跑时，某次通过的任务不应因后续重跑失败而在统计中消失。"""
     by_tid: dict[str, dict] = {}
     for r in records:
         tid = r.get("task_id", "")
-        by_tid[tid] = r   # 后面的覆盖前面的（最后一次才是最终状态）
-    final = list(by_tid.values())
+        if not tid:
+            continue
+        existing = by_tid.get(tid)
+        if existing is None or (not existing.get("passed") and r.get("passed")):
+            by_tid[tid] = r
+    return by_tid
+
+
+def _pass_rate(records: list[dict]) -> float:
+    if not records:
+        return 0.0
+    final = list(_best_by_tid(records).values())
     passed = sum(1 for r in final if r.get("passed"))
     return passed / len(final)
 
 
 def _count_passed(records: list[dict]) -> tuple[int, int]:
-    by_tid: dict[str, dict] = {}
-    for r in records:
-        tid = r.get("task_id", "")
-        by_tid[tid] = r
-    final = list(by_tid.values())
+    final = list(_best_by_tid(records).values())
     passed = sum(1 for r in final if r.get("passed"))
     return passed, len(final)
 

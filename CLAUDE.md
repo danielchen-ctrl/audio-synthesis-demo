@@ -32,7 +32,9 @@ for batch in ['b0_smoke','b1_foundation','b2_positive_pairs','b3_cross_combo_bas
     if not os.path.exists(p): print(f'{batch:<25} not started'); continue
     records = [json.loads(l) for l in open(p,encoding='utf-8') if l.strip()]
     by_tid = {}
-    for r in records: by_tid[r['task_id']] = r
+    for r in records:
+        tid = r['task_id']
+        if tid not in by_tid or (not by_tid[tid]['passed'] and r['passed']): by_tid[tid] = r
     done = len(by_tid); passed = sum(1 for r in by_tid.values() if r['passed'])
     print(f'{batch:<25} {passed:>5}/{done:<6} passed ({passed/done:.0%} rate)' if done else f'{batch:<25} 0 tasks')
 "
