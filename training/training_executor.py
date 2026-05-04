@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import concurrent.futures
-import dataclasses
 from typing import Callable, Dict, Iterable, Optional
 
 from training.dialogue_validators import validate_with_quality_gate
@@ -36,13 +35,8 @@ def execute_tasks(
     generator = generator or generate_dialogue_for_task
     stats = {"total": 0, "success": 0, "failed": 0}
 
-    _JA_WORD_CAP = 3000
-
     for task in tasks:
         stats["total"] += 1
-        # Bundle LLM degrades to Chinese for Japanese tasks with large word counts
-        if task.language == "日语" and task.word_count > _JA_WORD_CAP:
-            task = dataclasses.replace(task, word_count=_JA_WORD_CAP)
         success = False
         last_error = ""
         for retry in range(max_retries + 1):
