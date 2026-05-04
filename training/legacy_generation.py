@@ -18,10 +18,50 @@ from training.training_types import DialogueLines, TrainingTask
 # Languages whose bundle generation degrades to Chinese on large targets.
 # Each individual call is capped at _CHUNK_SIZE; results are concatenated.
 _CHUNK_LANGUAGES: frozenset[str] = frozenset({"日语", "韩语"})
-_CHUNK_SIZE = 2500          # chars per independent call for chunk languages
+# Bundle generates ~300 chars of Japanese per call regardless of target size.
+# Smaller chunk size means more calls and more accumulated content.
+_CHUNK_SIZE = 500           # chars per independent call for chunk languages
+_MAX_CHUNKS = 40            # safety cap: avoids excessive calls on 30k+ targets
 _CHUNK_MAX_RETRIES = 2      # retries if a chunk fails language check
 # Bundle RoleKPI enforcement fails for these languages beyond this speaker count
 _PEOPLE_COUNT_CAP: dict[str, int] = {"日语": 8, "韩语": 8}
+
+# Matches the "Scenario: <description>" artifact that the bundle embeds into
+# English/non-Chinese dialogue lines (e.g. "around Scenario: A professional
+# business discussion conducted in En."). Greedy match to end of sentence.
+_SCENARIO_ARTIFACT_RE = re.compile(r"\s*Scenario:\s+[A-Za-z][^.!?\n<]*[.!?]?")
+# Matches <<核心:…>> / <<Core:…>> / <<コア:…>> etc. template markers
+_MARKER_RE = re.compile(r"<<[^>]+>>")
+# Trailing dangling prepositions left after stripping the Scenario phrase
+_TRAILING_PREP_RE = re.compile(
+    r"\s+(around|about|on|for|in|of|with|to|and|or|the|a|an)\s*$",
+    re.IGNORECASE,
+)
+
+
+def _clean_lines(lines: DialogueLines, language: str) -> DialogueLines:
+    """Strip known bundle render artifacts from generated lines.
+
+    - Removes <<marker>> templates from all non-Chinese languages.
+    - Removes "Scenario: <description>" substrings from non-CJK languages
+      (English, French, German, Spanish, etc.) where the bundle leaks the
+      scenario prompt text directly into the dialogue content.
+    """
+    if language in ("中文", "粤语"):
+        return lines
+
+    cleaned: DialogueLines = []
+    for speaker, text in lines:
+        # Strip <<…>> markers
+        text = _MARKER_RE.sub("", text).strip()
+        # Strip "Scenario: description" artifact (non-CJK only; Japanese/Korean
+        # do not exhibit this pattern and stripping could corrupt valid text)
+        if language not in ("日语", "韩语"):
+            text = _SCENARIO_ARTIFACT_RE.sub("", text).strip()
+            text = _TRAILING_PREP_RE.sub("", text).strip()
+        if text:
+            cleaned.append((speaker, text))
+    return cleaned
 
 
 def _kana_ratio(text: str) -> float:
@@ -61,20 +101,24 @@ def _generate_chunked(
     bundle_server: Any,
     generate_fn: Any,
 ) -> Tuple[DialogueLines, Dict[str, Any]]:
-    """
-    Generate a large dialogue by making N independent small calls, each capped
-    at _CHUNK_SIZE characters. Invalid chunks (wrong language) are retried up to
-    _CHUNK_MAX_RETRIES times and then skipped.
+    """Generate a large dialogue by making N independent small calls.
 
-    This avoids the cross-segment language drift that occurs when a single
-    multi-segment loop accumulates Chinese-contaminated segments.
+    Each call is capped at _CHUNK_SIZE characters (_MAX_CHUNKS total cap).
+    Invalid chunks (wrong language) are retried up to _CHUNK_MAX_RETRIES times
+    and then skipped. Duplicate lines across chunks are deduplicated.
+
+    Background: the bundle generates ~300 chars of Japanese per call regardless
+    of the target. Using _CHUNK_SIZE=500 instead of 2500 produces ~5× more calls
+    for the same target, accumulating enough content to pass the 40% word-count
+    gate.
     """
     total_target = task.word_count
-    n_chunks = max(1, -(-total_target // _CHUNK_SIZE))  # ceil division
-    chunk_size = total_target // n_chunks
+    n_chunks = min(_MAX_CHUNKS, max(1, -(-total_target // _CHUNK_SIZE)))  # ceil, capped
+    chunk_size = max(_CHUNK_SIZE, total_target // n_chunks)
 
     profile = _build_profile(task)
     all_lines: DialogueLines = []
+    seen_texts: set[str] = set()
     total_chars = 0
     n_valid = 0
     last_rewrite_info: dict = {}
@@ -83,7 +127,7 @@ def _generate_chunked(
         remaining = total_target - total_chars
         if remaining <= 0:
             break
-        this_chunk_size = min(chunk_size, remaining)
+        this_chunk_size = min(chunk_size, max(_CHUNK_SIZE, remaining))
 
         chunk_lines: DialogueLines = []
         for attempt in range(_CHUNK_MAX_RETRIES + 1):
@@ -99,18 +143,20 @@ def _generate_chunked(
                 )
             except (RuntimeError, Exception):
                 # Bundle internal errors (e.g. RoleKPIHardFail) — treat as invalid chunk
-                this_chunk_size = max(500, this_chunk_size - 100 * (attempt + 1))
+                this_chunk_size = max(300, this_chunk_size - 100 * (attempt + 1))
                 continue
             last_rewrite_info = rewrite_info
             if _chunk_is_valid(seg_lines, task.language):
                 chunk_lines = seg_lines
                 break
-            # Invalid chunk — retry with slightly varied target to shake the bundle
-            this_chunk_size = max(500, this_chunk_size - 100 * (attempt + 1))
+            this_chunk_size = max(300, this_chunk_size - 100 * (attempt + 1))
 
         if chunk_lines:
-            all_lines.extend(chunk_lines)
-            total_chars += sum(len(t) for _, t in chunk_lines)
+            for spk, txt in chunk_lines:
+                if txt not in seen_texts:
+                    seen_texts.add(txt)
+                    all_lines.append((spk, txt))
+                    total_chars += len(txt)
             n_valid += 1
 
     debug_info = {
@@ -118,7 +164,7 @@ def _generate_chunked(
         "line_count": len(all_lines),
         "total_chars": total_chars,
         "seed": task.seed + seed_offset,
-        "generator": "embedded_bundle_chunked_v1",
+        "generator": "embedded_bundle_chunked_v2",
         "n_chunks": n_chunks,
         "n_valid_chunks": n_valid,
         "chunk_size": chunk_size,
@@ -127,14 +173,15 @@ def _generate_chunked(
 
 
 def generate_dialogue_for_task(task: TrainingTask, seed_offset: int = 0) -> Tuple[DialogueLines, Dict[str, Any]]:
-    """
-    Generate dialogue lines for a training task using the current embedded bundle server.
+    """Generate dialogue lines for a training task using the embedded bundle server.
 
     For languages in _CHUNK_LANGUAGES (Japanese, Korean): splits the target into
-    independent _CHUNK_SIZE calls to prevent cross-segment language drift, and caps
-    people_count at _PEOPLE_COUNT_CAP to avoid bundle RoleKPI enforcement failures.
-    For all other languages: delegates to _generate_long_dialogue_lines directly,
-    which already handles large targets via its own internal multi-segment loop.
+    independent _CHUNK_SIZE calls to accumulate enough content, and caps
+    people_count at _PEOPLE_COUNT_CAP to avoid bundle RoleKPI failures.
+    For all other languages: delegates to _generate_long_dialogue_lines directly.
+
+    Post-generation: applies _clean_lines() to strip bundle render artifacts
+    (Scenario: placeholder, <<marker>> templates) before returning.
     """
     from demo_app.embedded_server_main import (
         _generate_long_dialogue_lines,
@@ -150,24 +197,25 @@ def generate_dialogue_for_task(task: TrainingTask, seed_offset: int = 0) -> Tupl
     bundle_server = load_bundle_server()
 
     if task.language in _CHUNK_LANGUAGES and task.word_count > _CHUNK_SIZE:
-        return _generate_chunked(task, seed_offset, bundle_server, _generate_long_dialogue_lines)
+        lines, debug_info = _generate_chunked(task, seed_offset, bundle_server, _generate_long_dialogue_lines)
+    else:
+        profile = _build_profile(task)
+        lines, rewrite_info = _generate_long_dialogue_lines(
+            bundle_server=bundle_server,
+            profile=profile,
+            scenario=task.scenario,
+            core_content=task.core_content,
+            people_count=task.people_count,
+            total_target=task.word_count,
+            language=task.language,
+        )
+        debug_info = {
+            "rewrite_info": rewrite_info,
+            "line_count": len(lines),
+            "total_chars": sum(len(text) for _, text in lines),
+            "seed": task.seed + seed_offset,
+            "generator": "embedded_bundle_v1",
+        }
 
-    profile = _build_profile(task)
-    lines, rewrite_info = _generate_long_dialogue_lines(
-        bundle_server=bundle_server,
-        profile=profile,
-        scenario=task.scenario,
-        core_content=task.core_content,
-        people_count=task.people_count,
-        total_target=task.word_count,
-        language=task.language,
-    )
-
-    debug_info = {
-        "rewrite_info": rewrite_info,
-        "line_count": len(lines),
-        "total_chars": sum(len(text) for _, text in lines),
-        "seed": task.seed + seed_offset,
-        "generator": "embedded_bundle_v1",
-    }
+    lines = _clean_lines(lines, task.language)
     return lines, debug_info
