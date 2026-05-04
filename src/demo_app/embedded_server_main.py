@@ -1469,9 +1469,9 @@ async def _synthesize_audio_from_lines(
         # ── Phase 0b: retry failed segments sequentially (handles rate-limits) ─
         _failed_idx = [i for i, r in enumerate(results) if r is not None]
         if _failed_idx:
-            _log.warning(
-                "_synthesize_audio_from_lines: %d/%d segments failed on first pass, retrying...",
-                len(_failed_idx), len(valid_segments),
+            print(
+                f"[TTS] {len(_failed_idx)}/{len(valid_segments)} segments failed on first pass, retrying sequentially...",
+                flush=True,
             )
             for _fi in _failed_idx:
                 _, _, _cleaned, _voice, _, _seg_path = valid_segments[_fi]
