@@ -94,9 +94,16 @@ for batch in ['b0_smoke','b1_foundation','b2_positive_pairs','b3_cross_combo_bas
 
 ---
 
-## 🖥 Platform — Current Status (2026-05-04)
+## 🖥 Platform — Current Status (2026-05-05)
 
-**Phase: Live and debugged. All known runtime bugs fixed.**
+**Phase: Live. UI 任务页已支持分页，legacy 生成计数已修复。**
+
+### 近期 UI 变更（2026-05-05）
+
+| 文件 | 改动 |
+|------|------|
+| `static/index.html` | 任务页改为每页 18 条 + 首/上/下/末分页控件；API 请求上限从 50 → 200 |
+| `static/app.js` | 生成开始/结束时调用 `window._incLegacyInProgress` / `_decLegacyInProgress`，使首页统计卡"进行中"数量正确反映 legacy 模态框的生成状态 |
 
 The corpus generation platform is a unified Tornado server combining the legacy dialogue/audio generation demo with a full file management platform.
 
@@ -152,6 +159,25 @@ Schema per entry:
   "target_words": 1500
 }
 ```
+
+---
+
+## 🗂 仓库维护记录
+
+### Git 历史瘦身（2026-05-05）
+
+用 `git filter-repo` 从所有历史提交中永久删除了以下大文件，并 force push 覆盖了 GitHub：
+
+| 路径 | 原大小 | 说明 |
+|------|--------|------|
+| `build/DialogDemo/DialogDemo.pkg` | 108 MB | 老 Mac 二进制（通过 Git LFS 存储） |
+| `build/demo_app/PYZ-00.pyz` | 11.7 MB | PyInstaller 中间产物，不应提交 |
+| `demo/20260308_183515/*.wav` | 9.9 MB | 早期测试音频 |
+| `output/payment_5step/*.mp3` | 5.6 MB | 早期输出音频 |
+
+清理结果：`.git/` 从 **329 MB → 62 MB**（节省 267 MB）。
+
+> `.gitattributes` 中保留了 `build/DialogDemo/DialogDemo.pkg filter=lfs` 规则（历史遗留），该文件路径已不再存在，不影响任何功能。
 
 ---
 
