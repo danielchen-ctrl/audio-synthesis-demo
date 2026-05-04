@@ -248,13 +248,11 @@ async def _process_task(task_id: str) -> None:
         except Exception:
             pass
 
-    # 若 segments 不可用，直接读取音频文件时长（pydub 探针）
+    # 若 segments 不可用，直接读取音频文件时长（ffprobe 探针，零内存）
     if duration == 0.0 and audio_path.exists():
         try:
-            from pydub import AudioSegment as _AS
-            _seg = _AS.from_file(str(audio_path))
-            duration = len(_seg) / 1000.0
-            del _seg
+            from demo_app.embedded_server_main import _probe_duration_secs
+            duration = _probe_duration_secs(audio_path)
         except Exception:
             pass
 
@@ -326,6 +324,32 @@ def enqueue(task_id: str) -> None:
 _MAX_WORKERS = 3  # 与 handlers.py 中的并发限制（count_active_tasks >= 3）保持一致
 
 
+def _recover_stuck_tasks() -> int:
+    """将上次服务崩溃时卡在中间状态（generating_text / synthesizing）的任务重置为 queued。
+    updated_at 超过 10 分钟的才重置，避免误重置当前正在处理的任务。"""
+    try:
+        import sqlite3
+        from pathlib import Path as _P
+        _db_path = _P(__file__).resolve().parents[2] / "runtime" / "platform.db"
+        if not _db_path.exists():
+            return 0
+        conn = sqlite3.connect(str(_db_path), check_same_thread=False)
+        result = conn.execute(
+            """UPDATE tasks SET status='queued', error_msg=NULL
+               WHERE status IN ('generating_text','synthesizing')
+               AND updated_at < datetime('now','-10 minutes')"""
+        )
+        count = result.rowcount
+        conn.commit()
+        conn.close()
+        if count:
+            logger.info("[task-recovery] Reset %d stuck task(s) → queued", count)
+        return count
+    except Exception as exc:
+        logger.warning("[task-recovery] Failed: %s", exc)
+        return 0
+
+
 def backfill_scenes() -> int:
     """回填存量 audio_files 中 scene='other' 的记录，使用 topic 重新推断分类。
     在 start_worker() 时调用一次，幂等。返回更新条数。"""
@@ -371,6 +395,7 @@ def backfill_scenes() -> int:
 
 def start_worker() -> None:
     """在 Tornado IOLoop 启动后调用一次，启动后台 worker 协程（并发数 = _MAX_WORKERS）。"""
+    _recover_stuck_tasks()     # 恢复上次崩溃遗留的中间态任务
     backfill_scenes()          # 一次性回填存量 scene='other' 的文件
     for _ in range(_MAX_WORKERS):
         asyncio.ensure_future(_worker())

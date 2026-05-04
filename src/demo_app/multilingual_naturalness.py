@@ -4,36 +4,8 @@ import random
 import re
 from typing import Any
 
+from demo_app.lang_utils import LANGUAGE_ALIASES
 from demo_app.rule_loader import load_text_naturalness_rules
-
-
-LANGUAGE_ALIASES = {
-    "中文": "Chinese",
-    "中文（普通话）": "Chinese",
-    "Chinese": "Chinese",
-    "英语": "English",
-    "英文": "English",
-    "English": "English",
-    "日语": "Japanese",
-    "日本語": "Japanese",
-    "Japanese": "Japanese",
-    "韩语": "Korean",
-    "한국어": "Korean",
-    "Korean": "Korean",
-    "法语": "French",
-    "French": "French",
-    "德语": "German",
-    "Deutsch": "German",
-    "German": "German",
-    "西班牙语": "Spanish",
-    "Español": "Spanish",
-    "Spanish": "Spanish",
-    "葡萄牙语": "Portuguese",
-    "Português": "Portuguese",
-    "Portuguese": "Portuguese",
-    "粤语": "Cantonese",
-    "Cantonese": "Cantonese",
-}
 
 _PLACEHOLDER_ROLE_RE = re.compile(
     r"(Professional|Counterpart|Coordinator|Participant|Consultant|Third\s*Party)",
@@ -51,6 +23,16 @@ _DESCRIPTOR_PREFIX_RE = re.compile(
     r"^(核心对话内容|核心内容|补充要求|文本主题|主题模板|行业场景|场景类型|角色分工|讨论重点|重点讨论|目标输出|写作要求|参与角色|最终目标|主题|角色目标|推进阶段|风险检查点|成功标准|重点关注)\s*[:：]?\s*"
 )
 _INLINE_DESCRIPTOR_RE = re.compile(r"(核心对话内容|核心内容|文本主题|主题模板|行业场景|场景类型|角色分工|讨论重点|重点讨论|目标输出|写作要求|参与角色|最终目标|主题|角色目标|推进阶段|风险检查点|成功标准|重点关注)\s*[:：]\s*")
+
+# Pre-compiled patterns for _normalize_topic_candidate (avoids repeated compile in hot path)
+_TOPIC_STRIP_PATTERNS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"^(围绕|关于)"), ""),
+    (re.compile(r"^(先对齐|比较|收敛|拆开|明确|形成|负责把|推动|补充|说明|判断)"), ""),
+    (re.compile(r"(进行真实自然的多轮.*|展开真实自然的多轮.*|多轮.*对话|场景对话|评审会对话|进行讨论|展开讨论)$"), ""),
+    (re.compile(r"(中的现状目标和关键背景|对应的取舍与优先级|的下一步方案责任分工和验证口径|有明确负责人验证方式和时间点)$"), ""),
+    (re.compile(r"\s+"), ""),
+]
+
 _GENERIC_FOCUS_TERMS = {
     "相关协作方",
     "相关协作方2",
@@ -212,12 +194,8 @@ def _normalize_topic_candidate(text: str, limit: int = 20) -> str:
     updated = _strip_descriptor_prefix(text)
     if not updated:
         return ""
-    updated = re.sub(r"^(围绕|关于)", "", updated)
-    updated = re.sub(r"^(先对齐|比较|收敛|拆开|明确|形成|负责把|推动|补充|说明|判断)", "", updated)
-    updated = re.sub(r"(进行真实自然的多轮.*|展开真实自然的多轮.*|多轮.*对话|场景对话|评审会对话|进行讨论|展开讨论)$", "", updated)
-    updated = re.sub(r"(中的现状目标和关键背景|对应的取舍与优先级|的下一步方案责任分工和验证口径|有明确负责人验证方式和时间点)$", "", updated)
-    updated = re.sub(r"(进行真实自然的多轮.*|展开真实自然的多轮.*|多轮.*对话|场景对话|评审会对话|进行讨论|展开讨论)$", "", updated)
-    updated = re.sub(r"\s+", "", updated)
+    for _pat, _repl in _TOPIC_STRIP_PATTERNS:
+        updated = _pat.sub(_repl, updated)
     updated = updated.strip("“”\"'《》[]【】")
     updated = updated.strip("，。；;：:、")
     if not updated:

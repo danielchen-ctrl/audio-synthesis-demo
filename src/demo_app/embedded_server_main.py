@@ -41,6 +41,7 @@ SRC_DIR = ROOT / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+from demo_app.lang_utils import canonical_language as _canonical_language_fn
 from demo_app.multilingual_naturalness import enforce_keywords_in_lines as merge_keywords_into_lines
 from demo_app.multilingual_naturalness import polish_generated_lines, repair_dialogue_quality, stabilize_dialogue_constraints
 from demo_app.few_shot_selector import get_few_shot_example, get_topic_few_shot_example
@@ -67,6 +68,38 @@ SELECTED_MODULES = [
 ]
 
 _BUNDLE_SERVER: Any | None = None
+
+
+def _load_app_config() -> dict:
+    try:
+        import yaml
+        return yaml.safe_load((ROOT / "config" / "app.yaml").read_text(encoding="utf-8")) or {}
+    except Exception:
+        return {}
+
+
+_APP_CFG = _load_app_config()
+_TTS_CONCURRENCY: int = int((_APP_CFG.get("app") or {}).get("tts_concurrency") or 12)
+
+# ── Silence clip cache ─────────────────────────────────────────────────────────
+# Generated once on first use, stored in runtime/cache/ and reused across requests.
+_SILENCE_CACHE: dict[int, Path] = {}
+_SILENCE_CACHE_LOCK = threading.Lock()
+
+
+def _get_silence_clip(duration_ms: int) -> Path:
+    """Return a cached silence .mp3 of the given duration, creating it if needed."""
+    with _SILENCE_CACHE_LOCK:
+        if duration_ms not in _SILENCE_CACHE:
+            from pydub import AudioSegment as _AS
+            cache_dir = ROOT / "runtime" / "cache"
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            clip_path = cache_dir / f"sil_{duration_ms}ms.mp3"
+            if not clip_path.exists():
+                _AS.silent(duration=duration_ms).export(str(clip_path), format="mp3", bitrate="48k")
+            _SILENCE_CACHE[duration_ms] = clip_path
+        return _SILENCE_CACHE[duration_ms]
+
 
 # ── Manifest index ─────────────────────────────────────────────────────────────
 # Lazily populated on first access; bounded LRU keeps O(1) lookup by dialogue_id.
@@ -132,51 +165,54 @@ def active_static_dir() -> Path:
     return ASSET_CACHE / "static"
 
 
+def _probe_duration_secs(file_path) -> float:
+    """Return audio duration in seconds without loading the file into memory.
+
+    Priority: ffprobe (zero RAM) → ffmpeg -i stderr parse → pydub fallback.
+    Returns 0.0 on any failure.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        return 0.0
+    ffmpeg = _ffmpeg_path()
+    if ffmpeg:
+        ffprobe = Path(ffmpeg).with_name(
+            "ffprobe.exe" if sys.platform == "win32" else "ffprobe"
+        )
+        if ffprobe.exists():
+            try:
+                r = subprocess.run(
+                    [str(ffprobe), "-v", "quiet", "-show_entries", "format=duration",
+                     "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
+                    capture_output=True, text=True, timeout=15,
+                )
+                return float(r.stdout.strip())
+            except Exception:
+                pass
+        # ffprobe not available — parse Duration from ffmpeg -i stderr
+        try:
+            r = subprocess.run(
+                [ffmpeg, "-i", str(path), "-f", "null", "-"],
+                capture_output=True, text=True, timeout=15,
+            )
+            m = re.search(r"Duration:\s*(\d+):(\d+):(\d+\.?\d*)", r.stderr)
+            if m:
+                return int(m.group(1)) * 3600 + int(m.group(2)) * 60 + float(m.group(3))
+        except Exception:
+            pass
+    # Last resort: pydub (loads file into memory)
+    try:
+        from pydub import AudioSegment as _AS
+        _seg = _AS.from_file(str(path))
+        dur = len(_seg) / 1000.0
+        del _seg
+        return dur
+    except Exception:
+        return 0.0
+
+
 def _canonical_language(value: str) -> str:
-    mapping = {
-        "中文": "Chinese",
-        "中文（普通话）": "Chinese",
-        "Chinese": "Chinese",
-        "zh": "Chinese",
-        "英文": "English",
-        "英语": "English",
-        "English": "English",
-        "en": "English",
-        "日语": "Japanese",
-        "Japanese": "Japanese",
-        "ja": "Japanese",
-        "韩语": "Korean",
-        "Korean": "Korean",
-        "ko": "Korean",
-        "法语": "French",
-        "French": "French",
-        "fr": "French",
-        "德语": "German",
-        "German": "German",
-        "de": "German",
-        "西班牙语": "Spanish",
-        "Spanish": "Spanish",
-        "es": "Spanish",
-        "葡萄牙语": "Portuguese",
-        "Portuguese": "Portuguese",
-        "pt": "Portuguese",
-        "意大利语": "Italian",
-        "Italian": "Italian",
-        "it": "Italian",
-        "俄语": "Russian",
-        "Russian": "Russian",
-        "ru": "Russian",
-        "阿拉伯语": "Arabic",
-        "Arabic": "Arabic",
-        "ar": "Arabic",
-        "印度尼西亚语": "Indonesian",
-        "印尼语": "Indonesian",
-        "Indonesian": "Indonesian",
-        "id": "Indonesian",
-        "粤语": "Cantonese",
-        "Cantonese": "Cantonese",
-    }
-    return mapping.get(str(value).strip(), "Chinese")
+    return _canonical_language_fn(value)
 
 
 def _speaker_numeric_id(speaker_label: str) -> int:
@@ -1382,8 +1418,8 @@ async def _synthesize_audio_from_lines(
 
     warning_message = None
     try:
-        # Synthesize all segments concurrently (rate-limited to 5 parallel requests)
-        sem = asyncio.Semaphore(5)
+        # Synthesize all segments concurrently (rate limit from config: tts_concurrency)
+        sem = asyncio.Semaphore(_TTS_CONCURRENCY)
 
         async def _tts_one(voice: str, text: str, path: Path) -> None:
             async with sem:
@@ -1404,9 +1440,7 @@ async def _synthesize_audio_from_lines(
 
         for idx, speaker, cleaned, voice, speaker_id, segment_file in valid_segments:
             voice_map[speaker_id] = voice
-            _probe = AudioSegment.from_file(segment_file)
-            duration_sec = len(_probe) / 1000.0
-            del _probe  # release immediately after reading duration
+            duration_sec = _probe_duration_secs(segment_file)
             end_sec = cursor_sec + duration_sec
             segments.append({
                 "speaker": speaker,
@@ -1426,11 +1460,9 @@ async def _synthesize_audio_from_lines(
 
         _ffmpeg = _ffmpeg_path()
         if _ffmpeg:
-            # Write tiny silence clips to disk (one-time cost, negligible RAM)
-            _sil_lead = tmp_dir / "_sil_lead.mp3"
-            _sil_gap  = tmp_dir / "_sil_gap.mp3"
-            AudioSegment.silent(duration=120).export(str(_sil_lead), format="mp3", bitrate="48k")
-            AudioSegment.silent(duration=220).export(str(_sil_gap),  format="mp3", bitrate="48k")
+            # Reuse cached silence clips (generated once, stored in runtime/cache/)
+            _sil_lead = _get_silence_clip(120)
+            _sil_gap  = _get_silence_clip(220)
 
             # Build ffmpeg concat list (lead silence + [segment + gap] * N)
             _concat_txt = tmp_dir / "_concat.txt"
@@ -1487,7 +1519,13 @@ async def _synthesize_audio_from_lines(
         audio_paths = _audio_output_paths(save_dir, basename)
         selected_audio_path = audio_paths[normalized_output_format]
         temp_wav_path = tmp_dir / f"{basename}.wav"
-        audio = bundle_server._generate_wave_for_lines(lines)
+        import concurrent.futures as _cf
+        with _cf.ThreadPoolExecutor(max_workers=1) as _fb_pool:
+            _fb_fut = _fb_pool.submit(bundle_server._generate_wave_for_lines, lines)
+            try:
+                audio = _fb_fut.result(timeout=300)
+            except _cf.TimeoutError:
+                raise RuntimeError("TTS fallback (wave generation) timed out after 300 s") from None
         bundle_server._write_wav(audio, temp_wav_path)
         del audio  # release the raw wave buffer immediately after writing to disk
         if normalized_output_format == "wav":

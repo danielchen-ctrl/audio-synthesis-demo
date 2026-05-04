@@ -35,6 +35,7 @@ logging.basicConfig(
 
 from demo_app.embedded_server_main import (
     _ensure_manifest_cache,
+    load_bundle_server,
     local_urls,
     make_app,
 )
@@ -57,6 +58,15 @@ def main() -> None:
 
     # 2. 构建 Tornado app（含所有原有路由）
     app = make_app()
+
+    # 2b. 主动加载 bundle server — 早失败早发现，避免首个请求时默默崩溃
+    _log = logging.getLogger(__name__)
+    try:
+        load_bundle_server()
+        _log.info("[platform] Bundle server loaded successfully")
+    except Exception as _exc:
+        _log.critical("[platform] Bundle server failed to load: %s", _exc, exc_info=True)
+        sys.exit(1)
 
     # 3. 注册平台路由
     register_platform_routes(app)

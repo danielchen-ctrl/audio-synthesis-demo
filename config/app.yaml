@@ -5,3 +5,4 @@
   gui_title: Scene Dialogue Demo
   gui_width: 1200
   gui_height: 860
+  tts_concurrency: 12

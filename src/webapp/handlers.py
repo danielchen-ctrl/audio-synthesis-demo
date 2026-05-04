@@ -242,10 +242,8 @@ class FilesHandler(PlatformHandler):
         duration = float(data.get("duration") or 0)
         if duration == 0:
             try:
-                from pydub import AudioSegment as _AS
-                _seg = _AS.from_file(str(fpath))
-                duration = len(_seg) / 1000.0
-                del _seg
+                from demo_app.embedded_server_main import _probe_duration_secs
+                duration = _probe_duration_secs(fpath)
             except Exception:
                 pass
         ext = fpath.suffix.lstrip(".").lower() or "mp3"
@@ -487,9 +485,8 @@ class UploadHandler(PlatformHandler):
         # 尝试读取音频时长
         duration = 0.0
         try:
-            from pydub import AudioSegment
-            seg = AudioSegment.from_file(str(dest))
-            duration = len(seg) / 1000.0
+            from demo_app.embedded_server_main import _probe_duration_secs
+            duration = _probe_duration_secs(dest)
         except Exception:
             pass
 
