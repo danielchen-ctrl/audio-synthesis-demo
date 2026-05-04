@@ -220,7 +220,7 @@ textarea.form-input{resize:vertical;min-height:100px;font-family:inherit}
 .stat-combined{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center}
 .stat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:0 12px;min-width:60px}
 .stat-divider{width:1px;height:44px;background:var(--border);flex-shrink:0}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:4px;min-height:0}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:4px;min-height:0;overflow:hidden}
 .stat-num{font-size:26px;font-weight:700;color:var(--text)}
 .stat-label{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
 .stat-bar{height:3px;background:var(--bg3);border-radius:99px;margin-top:6px;overflow:hidden}
@@ -275,7 +275,7 @@ textarea.form-input{resize:vertical;min-height:100px;font-family:inherit}
 @keyframes bannerIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes bannerOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(16px)}}
 /* Language mini chart */
-.lang-bars{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.lang-bars{display:flex;flex-direction:column;gap:7px;margin-top:10px;max-height:160px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .lang-bar-row{display:flex;align-items:center;gap:8px}
 .lang-bar-lbl{font-size:12px;color:var(--text2);width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;flex-shrink:0}
 .lang-bar-trk{flex:1;height:8px;background:var(--bg3);border-radius:99px;overflow:hidden}
