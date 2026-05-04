@@ -838,8 +838,8 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
     </div>
 
     <div class="modal-footer">
-      <button id="cancelModalBtn" class="btn btn-secondary" type="button">取消</button>
       <button id="textOnlyBtn" class="btn btn-secondary btn-sm" type="button" title="仅生成对话文本文件，不合成音频">📄 仅生成文本</button>
+      <button id="cancelModalBtn" class="btn btn-secondary" type="button">取消</button>
       <div id="generateTextRow" style="display:contents">
         <button id="generateTextBtn" class="btn btn-primary footer-gen-btn" type="button">✨ 生成对话文本</button>
       </div>
@@ -1552,9 +1552,23 @@ async function submitTextOnly(){
 
 // Wire up text-only button after app.js loads
 (function(){
+  function updateTextOnlyVisibility(){
+    const btn=document.getElementById('textOnlyBtn');
+    const llmSec=document.getElementById('llmSection');
+    if(!btn||!llmSec)return;
+    // Show only when LLM section is visible (not in manual/direct-input mode)
+    btn.style.display=llmSec.classList.contains('hidden')?'none':'';
+  }
   function wireTextOnly(){
     const btn=document.getElementById('textOnlyBtn');
     if(btn&&!btn._wired){btn.onclick=submitTextOnly;btn._wired=true;}
+    const llmSec=document.getElementById('llmSection');
+    if(llmSec&&!llmSec._textOnlyObserver){
+      const obs=new MutationObserver(updateTextOnlyVisibility);
+      obs.observe(llmSec,{attributes:true,attributeFilter:['class']});
+      llmSec._textOnlyObserver=obs;
+      updateTextOnlyVisibility(); // set initial state
+    }
   }
   document.addEventListener('DOMContentLoaded',wireTextOnly);
   setTimeout(wireTextOnly,500); // fallback after app.js init
@@ -1637,7 +1651,7 @@ function openModal(id){const el=document.getElementById(id);if(el)el.classList.a
 function closeModal(id){const el=document.getElementById(id);if(el)el.classList.remove('open');}
 
 // ══ Toast ════════════════════════════════════════════════════════════════════
-function showToast(type,msg){const wrap=document.getElementById('toast-wrap');const t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML=(type==='ok'?'✅':type==='err'?'❌':'ℹ️')+' '+esc(msg);wrap.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);}
+function showToast(type,msg,duration){const wrap=document.getElementById('toast-wrap');const t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML=(type==='ok'?'✅':type==='err'?'❌':'ℹ️')+' '+esc(msg);wrap.appendChild(t);const ms=duration||(msg.length>80?6000:3000);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},ms);}
 
 // ══ Confirm ══════════════════════════════════════════════════════════════════
 var _confirmCb=null;

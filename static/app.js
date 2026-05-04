@@ -2167,15 +2167,21 @@ async function submitAudioGeneration() {
       signal: audioAbortCtrl.signal
     });
 
+    // Detect TTS engine fallback (edge_tts failed, bundle synthetic TTS was used)
+    const ttsWarning = audioPayload.warning || "";
+    const ttsUsedFallback = ttsWarning.startsWith("edge_tts_fallback:");
+    const taskStatus = ttsUsedFallback ? "生成完成（备用引擎）" : "生成成功";
+
     updateTask(taskId, {
-      status: "生成成功",
+      status: taskStatus,
       createdAt: audioPayload.updated_at || nowIsoString(),
       dialogueId,
       fileName: audioPayload.file_name || basenameFromPath(audioPayload.audio_file_path),
       textFileName: textFileName || basenameFromPath(state.form.generatedTextFileName),
       textDownloadUrl: textDownloadUrl || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=text`,
       audioDownloadUrl: audioPayload.audio_download_url || `/api/download?dialogue_id=${encodeURIComponent(dialogueId)}&kind=audio`,
-      snapshot: buildTaskSnapshot(dialogueId, workingText, textFileName || basenameFromPath(state.form.generatedTextFileName))
+      snapshot: buildTaskSnapshot(dialogueId, workingText, textFileName || basenameFromPath(state.form.generatedTextFileName)),
+      ttsWarning: ttsUsedFallback ? ttsWarning : ""
     });
 
     // Register in platform file browser (best-effort)
@@ -2229,7 +2235,12 @@ async function submitAudioGeneration() {
     }
 
     state.modalOpen = false;
-    showToast("success", "音频生成成功，已保存到文件管理");
+    if (ttsUsedFallback) {
+      // edge_tts failed — synthetic bundle TTS was used instead. Warn prominently.
+      showToast("error", "⚠️ 在线TTS合成失败（网络或服务异常），已使用备用引擎生成音频，音质可能有所下降。如需正常音质，请检查网络后重试。");
+    } else {
+      showToast("success", "音频生成成功，已保存到文件管理");
+    }
     resetForm();
   } catch (requestError) {
     const audioErrMsg = requestError.name === "AbortError"
