@@ -597,6 +597,7 @@ html[data-theme="light"] .comp-banner{background:#1e3a5f}
         </div>
       </div>
       <div id="task-grid" class="task-grid"><div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span>加载中…</div></div>
+      <div id="pager-tasks" class="pager"></div>
     </div>
 
     <!-- Trash Page -->
@@ -983,9 +984,20 @@ let _renameFolderId=null, _deleteFolderId=null;
 let _detailFileId=null, _detailBack='home';
 let _taskPollTimer=null, _debounceTimers={};
 let _miniAudio=null;
-let _homeFiles=[], _myFiles=[], _prevRunningIds=new Set();
-let _homePage=1, _myPage=1;
+let _homeFiles=[], _myFiles=[], _allTasks=[], _prevRunningIds=new Set();
+let _homePage=1, _myPage=1, _taskPage=1;
 const PAGE_SIZE=15;
+// Track legacy modal (app.js) in-progress generations separately,
+// since they bypass the platform task queue and never appear as active_tasks in DB.
+let _legacyInProgress=0;
+function _refreshActiveTasksDisplay(dbCount){
+  const total=(dbCount??0)+_legacyInProgress;
+  const el=document.getElementById('stat-tasks');
+  if(el){el.textContent=total;el.style.color=total>0?'var(--warning)':'var(--text)';}
+}
+// Exposed to app.js via window so it can signal start/end of generation
+window._incLegacyInProgress=function(){_legacyInProgress++;_refreshActiveTasksDisplay(0);};
+window._decLegacyInProgress=function(){_legacyInProgress=Math.max(0,_legacyInProgress-1);_refreshActiveTasksDisplay(0);};
 
 // ══ API ══════════════════════════════════════════════════════════════════════
 const API={
@@ -1113,7 +1125,7 @@ async function loadStats(){
     if(totEl)totEl.textContent=s.total_files??'—';
     if(durEl){const h=Math.floor((s.total_duration||0)/3600),m=Math.floor((s.total_duration||0)%3600/60);durEl.textContent=h>0?h+'h '+m+'m':m+'m';}
     if(sizeEl)sizeEl.textContent=fmtSize(s.total_size||0);
-    if(tskEl){tskEl.textContent=s.active_tasks??0;tskEl.style.color=(s.active_tasks>0)?'var(--warning)':'var(--text)';}
+    if(tskEl){_refreshActiveTasksDisplay(s.active_tasks??0);}
     // Language distribution mini chart
     const langBars=document.getElementById('stat-lang-bars');
     if(langBars){
@@ -1257,20 +1269,45 @@ async function loadMy(){
 // ══ Tasks ════════════════════════════════════════════════════════════════════
 async function loadTasks(){
   try{
-    const res=await API.get('/api/platform/tasks?limit=50');
+    const res=await API.get('/api/platform/tasks?limit=200');
     const tasks=res.data||[];
     document.getElementById('tasks-sub').textContent=`共 ${tasks.length} 个任务`;
+    _taskPage=1;
     renderTaskGrid(tasks);
   }catch(e){document.getElementById('task-grid').innerHTML=`<div style="color:var(--danger);padding:40px">加载失败</div>`;}
 }
 
+const TASK_PAGE_SIZE=18;
 function renderTaskGrid(tasks){
+  _allTasks=tasks;
   const grid=document.getElementById('task-grid');
-  if(!tasks.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="ic">⚙️</div><p>暂无生成任务</p><br><button class="btn btn-primary" onclick="openLegacyModal()">✨ 立即生成</button></div>';return;}
+  const pager=document.getElementById('pager-tasks');
+  if(!tasks.length){
+    grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="ic">⚙️</div><p>暂无生成任务</p><br><button class="btn btn-primary" onclick="openLegacyModal()">✨ 立即生成</button></div>';
+    if(pager)pager.innerHTML='';
+    return;
+  }
+  // 分页切片
+  const totalPages=Math.max(1,Math.ceil(tasks.length/TASK_PAGE_SIZE));
+  if(_taskPage>totalPages)_taskPage=totalPages;
+  const pageTasks=tasks.slice((_taskPage-1)*TASK_PAGE_SIZE,_taskPage*TASK_PAGE_SIZE);
+  // 渲染分页控件
+  if(pager){
+    if(totalPages<=1){pager.innerHTML='';}
+    else{
+      const s=(_taskPage-1)*TASK_PAGE_SIZE+1,e=Math.min(_taskPage*TASK_PAGE_SIZE,tasks.length);
+      pager.innerHTML=`<span class="pager-info">${s}–${e} / 共 ${tasks.length} 条</span>`
+        +`<button class="pager-btn" onclick="changeTaskPage(1)" ${_taskPage===1?'disabled':''}>«</button>`
+        +`<button class="pager-btn" onclick="changeTaskPage(${_taskPage-1})" ${_taskPage===1?'disabled':''}>‹</button>`
+        +`<span class="pager-info">第 ${_taskPage} / ${totalPages} 页</span>`
+        +`<button class="pager-btn" onclick="changeTaskPage(${_taskPage+1})" ${_taskPage===totalPages?'disabled':''}>›</button>`
+        +`<button class="pager-btn" onclick="changeTaskPage(${totalPages})" ${_taskPage===totalPages?'disabled':''}>»</button>`;
+    }
+  }
   const STEPS=['排队中','生成文本','合成音频','完成'];
   const STATUS_IDX={queued:0,generating_text:1,synthesizing:2,completed:3};
-  const lbl={queued:'排队中',generating_text:'生成文本中',synthesizing:'合成音频中',completed:'已完成',failed:'失败'};
-  grid.innerHTML=tasks.map(t=>{
+  const lbl={queued:'排队中',generating_text:'生成文本中',synthesizing:'合成音频中',completed:'已完成',failed:'任务失败'};
+  grid.innerHTML=pageTasks.map(t=>{
     const run=['queued','generating_text','synthesizing'].includes(t.status);
     const curIdx=STATUS_IDX[t.status]??-1;
     let pipHtml='';
@@ -1302,7 +1339,9 @@ function renderTaskGrid(tasks){
 
 async function deleteTask(id){try{await API.del('/api/platform/tasks/'+id);loadTasks();showToast('ok','任务已删除');}catch(e){showToast('err','删除失败');}}
 
-function startTaskPoll(){stopTaskPoll();_taskPollTimer=setInterval(async()=>{try{const r=await API.get('/api/platform/tasks?limit=50');renderTaskGrid(r.data||[]);if(!(r.data||[]).some(t=>['queued','generating_text','synthesizing'].includes(t.status)))stopTaskPoll();}catch(e){}},3000);}
+function changeTaskPage(page){_taskPage=page;renderTaskGrid(_allTasks);}
+
+function startTaskPoll(){stopTaskPoll();_taskPollTimer=setInterval(async()=>{try{const r=await API.get('/api/platform/tasks?limit=200');renderTaskGrid(r.data||[]);if(!(r.data||[]).some(t=>['queued','generating_text','synthesizing'].includes(t.status)))stopTaskPoll();}catch(e){}},3000);}
 function stopTaskPoll(){if(_taskPollTimer){clearInterval(_taskPollTimer);_taskPollTimer=null;}}
 
 // ══ Trash ════════════════════════════════════════════════════════════════════
@@ -1913,13 +1952,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Background task indicator + completion notification + stats refresh
   setInterval(async()=>{
     try{
-      const r=await API.get('/api/platform/tasks?limit=50');
+      const r=await API.get('/api/platform/tasks?limit=200');
       const tasks=r.data||[];
       const nowRunning=new Set(tasks.filter(t=>['queued','generating_text','synthesizing'].includes(t.status)).map(t=>t.task_id));
       const hasRunning=nowRunning.size>0;
       // Nav badge colour
       const nb=document.getElementById('nav-tasks');if(nb)nb.style.color=hasRunning?'var(--warning)':'';
-      // When on tasks page, always refresh the grid
+      // When on tasks page, always refresh the grid (keep current page)
       if(_page==='tasks'){
         renderTaskGrid(tasks);
         document.getElementById('tasks-sub').textContent=`共 ${tasks.length} 个任务`;

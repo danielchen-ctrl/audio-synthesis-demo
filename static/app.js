@@ -2115,6 +2115,7 @@ async function submitAudioGeneration() {
   setModalMessage("任务已提交，正在生成音频...", "info");
   renderSubmitState();
   persistState();
+  if (typeof window._incLegacyInProgress === "function") window._incLegacyInProgress();
 
   const audioAbortCtrl = new AbortController();
   const audioAbortTimer = setTimeout(() => audioAbortCtrl.abort(), 20 * 60 * 1000);
@@ -2258,6 +2259,7 @@ async function submitAudioGeneration() {
   } finally {
     clearTimeout(audioAbortTimer);
     state.form.isSubmittingAudio = false;
+    if (typeof window._decLegacyInProgress === "function") window._decLegacyInProgress();
     renderAll();
   }
 }
