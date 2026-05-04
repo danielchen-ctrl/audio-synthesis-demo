@@ -6,9 +6,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## ⚡ Training Pipeline — Current Status (2026-05-04)
 
-**Phase: B0 Smoke 进行中，B1–B5 待启动。**
+**Phase: B1 Foundation 进行中（B0 已完成 91%，B1 运行中 78% 通过率）。**
 
 训练以 `--resume` 方式在后台运行，日志见 `output/training_v2/run_all_batches.log`。
+
+### 质量门禁（2026-05-04 修复）
+
+`training/quality_scoring.py` 新增两类强制拦截（`severity="error"`，直接 fail）：
+
+| 规则 | 触发条件 | 拦截原因 |
+|------|---------|---------|
+| `language_mismatch` | 日语任务假名比例 < 8% | Bundle LLM 生成日语时退化为中文 |
+| `language_mismatch` | 韩语任务韩文比例 < 5% | 同上 |
+| `high_chinese_ratio` | 日语任务中文 > 30%（即使有足够假名）| 中文混入过多 |
+| `word_count_critical_short` | 实际字数 < 目标 30% | 内容严重不足，不可用于训练 |
+
+B0 回测：108 条日语样本中 79 条被正确拦截，中英文样本无影响。
 
 ```bash
 # Full B0→B5 run (65,628 tasks total)
