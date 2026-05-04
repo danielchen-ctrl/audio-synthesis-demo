@@ -117,13 +117,13 @@ def score_dialogue(
             )
 
     # 字数严重不足（< 30% 目标）→ error；一般偏离（< 70% 或 > 130%）→ warning
-    if total_chars < task.word_count * 0.30:
+    if total_chars < task.word_count * 0.40:
         score -= 30
         findings.append(
             ValidationFinding(
                 code="word_count_critical_short",
                 severity="error",
-                message=f"字数严重不足: target={task.word_count}, actual={total_chars} ({total_chars/max(task.word_count,1):.0%})",
+                message=f"字数严重不足(< 40%): target={task.word_count}, actual={total_chars} ({total_chars/max(task.word_count,1):.0%})",
                 details={"target": task.word_count, "actual": total_chars},
             )
         )

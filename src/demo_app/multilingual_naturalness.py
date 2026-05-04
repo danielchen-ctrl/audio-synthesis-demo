@@ -698,6 +698,30 @@ def _filter_cjk_contamination(
             filtered.append((speaker, normalized or text))
     return filtered, removed
 
+_EN_OPENER_POOL: list[str] = [
+    "Let's dive straight in — the core question we need to resolve today is around {topic}.",
+    "Thanks for joining. I want us to leave this session with clear decisions on {topic}.",
+    "Before we get into details, let me frame why {topic} is critical right now.",
+    "I'll keep us moving. We've got a lot to cover on {topic}, so let's start with the biggest blocker.",
+    "Good to have everyone here. Let's focus — {topic} needs a concrete outcome from this conversation.",
+    "I want to set the right context first. The pressure around {topic} is real, and we need to address it today.",
+    "Let's get into it. Here's where we actually stand on {topic} right now.",
+    "I'll be direct — {topic} is stuck, and I want to understand why before we go any further.",
+    "Quick check before we start: is everyone aligned on the goal for {topic}? Let me confirm.",
+    "We're running tight on time, so let's go straight to the key issue with {topic}.",
+]
+
+_EN_SUPPORT_POOL: list[str] = [
+    "Happy to be here. I'll be watching for gaps in the {topic} plan as we go.",
+    "Thanks for the context. My focus will be the execution risk side of {topic}.",
+    "Understood. I'll flag anything that affects {topic} from my end as we work through this.",
+    "I've reviewed the brief. There are a few things on {topic} I want to push back on.",
+    "Good overview. From where I sit, the main uncertainty around {topic} is timing.",
+    "I've been tracking this. My concern about {topic} is whether the assumptions still hold.",
+    "Appreciate the framing. I want to make sure we're realistic about what's achievable on {topic}.",
+    "I'll stay focused on the downstream impact. A few of the {topic} dependencies worry me.",
+]
+
 _EN_TEMPLATE_REWRITES: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"^Based on (?:our previous discussion|the discussion so far),?\s*I (?:suggest|recommend) we have a few (?:options|choices)[.:]?", re.I), "Let me lay out the key options on the table."),
     (re.compile(r"^Let me summarize what we[''']ve discussed[.:]?$", re.I), "Let me quickly recap the key points before we move on."),
@@ -743,6 +767,7 @@ def _rewrite_english_line(
     primary_speaker: str,
     speaker_names: dict[str, str],
     topic: str,
+    rng: random.Random | None = None,
 ) -> str:
     original = _normalize_line_text(raw_text)
     if not original:
@@ -757,11 +782,12 @@ def _rewrite_english_line(
     if _RISK_ALERT_RE.search(original):
         return ""
 
-    # Lines containing placeholder role names → replace with proper English intro
+    # Lines containing placeholder role names → replace with varied opener from pool
     if _PLACEHOLDER_ROLE_RE.search(original):
+        _rng = rng or random.Random()
         if speaker == primary_speaker:
-            return f"Good morning everyone. Let's get started and align on {topic} today."
-        return f"Happy to be here. I'll be focused on key constraints and risk areas around {topic}."
+            return _rng.choice(_EN_OPENER_POOL).format(topic=topic)
+        return _rng.choice(_EN_SUPPORT_POOL).format(topic=topic)
 
     # Template rewrites for known verbose English boilerplate
     for pattern, replacement in _EN_TEMPLATE_REWRITES:
@@ -831,7 +857,7 @@ def _polish_english_generated_lines(
 
     for speaker, raw_text in lines:
         original = _normalize_line_text(raw_text)
-        updated = _rewrite_english_line(speaker, raw_text, primary_speaker, speaker_names, topic)
+        updated = _rewrite_english_line(speaker, raw_text, primary_speaker, speaker_names, topic, rng)
         if not updated:
             continue
         if updated == "\x00CJK_FALLBACK\x00":
