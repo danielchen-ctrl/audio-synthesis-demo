@@ -473,12 +473,19 @@ def enforce_keywords_in_lines(
         additions: list[tuple[str, str]] = []
         role_briefs = _context_role_briefs(generation_context, profile, len(order), _is_medical_context(scenario, core_content, profile))
         role_objectives = _context_role_objectives(generation_context, role_briefs, _split_focus_candidates(core_content, scenario, title), topic)
+        # Build reverse-indexed positions per speaker once — O(n) instead of O(n×k)
+        speaker_positions: dict[str, list[int]] = {}
+        for _pos in range(len(updated) - 1, -1, -1):
+            _sp = updated[_pos][0]
+            if _sp not in speaker_positions:
+                speaker_positions[_sp] = []
+            speaker_positions[_sp].append(_pos)
         for index, keyword in enumerate(missing_keywords):
             speaker = order[(index + 1) % len(order)] if len(order) > 1 else primary_speaker
             injected = False
-            for pos in range(len(updated) - 1, -1, -1):
+            for pos in speaker_positions.get(speaker, []):
                 line_speaker, line_text = updated[pos]
-                if line_speaker != speaker or _keyword_in_text(line_text, keyword):
+                if _keyword_in_text(line_text, keyword):
                     continue
                 speaker_index = order.index(speaker) if speaker in order else 0
                 role_hint = role_briefs[speaker_index] if speaker_index < len(role_briefs) else "相关角色"
@@ -1824,6 +1831,39 @@ def _trim_dialogue_to_target(
     return trimmed
 
 
+def _prepare_chinese_dialogue_context(
+    title: str,
+    scenario: str,
+    core_content: str,
+    profile: dict[str, Any] | None,
+    people_count: int,
+    keywords: list[str],
+    generation_context: dict[str, Any] | None,
+) -> dict[str, Any]:
+    order = [f"Speaker {i}" for i in range(1, max(2, people_count) + 1)]
+    topic = _context_topic_fragment(title, scenario, core_content, profile)
+    medical = _is_medical_context(scenario, core_content, profile)
+    context = _normalize_generation_context(generation_context)
+    role_briefs = _context_role_briefs(context, profile, len(order), medical)
+    focus_seed = _core_focus_fragment(title, core_content, scenario, profile) or topic
+    points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario, medical, context)
+    role_objectives = _context_role_objectives(context, role_briefs, points, topic)
+    stage_prompts = _context_stage_prompts(context, topic, points)
+    risk_checks = _context_risk_checks(context, points, topic)
+    success_signals = _context_success_signals(context, points, topic)
+    realism_pack = _domain_realism_pack(context, profile, medical)
+    speaker_names = _build_chinese_speaker_names([(sp, "") for sp in order], scenario, core_content, profile)
+    deliverable = context.get("deliverable") or f"围绕{topic}形成明确结论和下一步动作"
+    scene_goal = context.get("scene_goal") or topic
+    return dict(
+        order=order, topic=topic, medical=medical, context=context,
+        role_briefs=role_briefs, points=points, role_objectives=role_objectives,
+        stage_prompts=stage_prompts, risk_checks=risk_checks, success_signals=success_signals,
+        realism_pack=realism_pack, speaker_names=speaker_names,
+        deliverable=deliverable, scene_goal=scene_goal,
+    )
+
+
 def _stabilize_chinese_dialogue(
     lines: list[tuple[str, str]],
     title: str,
@@ -1835,7 +1875,14 @@ def _stabilize_chinese_dialogue(
     keywords: list[str],
     generation_context: dict[str, Any] | None = None,
 ) -> list[tuple[str, str]]:
-    order = [f"Speaker {index}" for index in range(1, max(2, people_count) + 1)]
+    ctx = _prepare_chinese_dialogue_context(title, scenario, core_content, profile, people_count, keywords, generation_context)
+    order = ctx["order"]
+    topic, medical, context = ctx["topic"], ctx["medical"], ctx["context"]
+    role_briefs, points, role_objectives = ctx["role_briefs"], ctx["points"], ctx["role_objectives"]
+    stage_prompts, risk_checks, success_signals = ctx["stage_prompts"], ctx["risk_checks"], ctx["success_signals"]
+    realism_pack, speaker_names = ctx["realism_pack"], ctx["speaker_names"]
+    deliverable, scene_goal = ctx["deliverable"], ctx["scene_goal"]
+
     current_order = _speaker_order(lines)
     speaker_map = {speaker: order[min(index, len(order) - 1)] for index, speaker in enumerate(current_order)}
     normalized: list[tuple[str, str]] = []
@@ -1844,20 +1891,6 @@ def _stabilize_chinese_dialogue(
         cleaned = _normalize_line_text(text)
         if mapped and cleaned:
             normalized.append((mapped, cleaned))
-
-    topic = _context_topic_fragment(title, scenario, core_content, profile)
-    medical = _is_medical_context(scenario, core_content, profile)
-    context = _normalize_generation_context(generation_context)
-    role_briefs = _context_role_briefs(context, profile, len(order), medical)
-    points = _structured_focus_points(topic, _core_focus_fragment(title, core_content, scenario, profile) or topic, keywords, core_content, scenario, medical, context)
-    role_objectives = _context_role_objectives(context, role_briefs, points, topic)
-    stage_prompts = _context_stage_prompts(context, topic, points)
-    risk_checks = _context_risk_checks(context, points, topic)
-    success_signals = _context_success_signals(context, points, topic)
-    realism_pack = _domain_realism_pack(context, profile, medical)
-    speaker_names = _build_chinese_speaker_names([(speaker, "") for speaker in order], scenario, core_content, profile)
-    deliverable = context.get("deliverable") or f"围绕{topic}形成明确结论和下一步动作"
-    scene_goal = context.get("scene_goal") or topic
 
     stabilized = list(normalized)
     counts = _speaker_turn_counts(stabilized)
@@ -1960,22 +1993,14 @@ def _build_structured_chinese_dialogue(
     keywords: list[str],
     generation_context: dict[str, Any] | None = None,
 ) -> list[tuple[str, str]]:
-    order = [f"Speaker {index}" for index in range(1, max(2, people_count) + 1)]
-    topic = _context_topic_fragment(title, scenario, core_content, profile)
-    medical = _is_medical_context(scenario, core_content, profile)
-    speaker_names = _build_chinese_speaker_names([(speaker, "") for speaker in order], scenario, core_content, profile)
-    focus_seed = _core_focus_fragment(title, core_content, scenario, profile) or topic
-    context = _normalize_generation_context(generation_context)
-    role_briefs = _context_role_briefs(context, profile, len(order), medical)
-    points = _structured_focus_points(topic, focus_seed, keywords, core_content, scenario, medical, context)
-    role_objectives = _context_role_objectives(context, role_briefs, points, topic)
-    stage_prompts = _context_stage_prompts(context, topic, points)
-    risk_checks = _context_risk_checks(context, points, topic)
-    success_signals = _context_success_signals(context, points, topic)
-    realism_pack = _domain_realism_pack(context, profile, medical)
+    ctx = _prepare_chinese_dialogue_context(title, scenario, core_content, profile, people_count, keywords, generation_context)
+    order = ctx["order"]
+    topic, medical, context = ctx["topic"], ctx["medical"], ctx["context"]
+    role_briefs, points, role_objectives = ctx["role_briefs"], ctx["points"], ctx["role_objectives"]
+    stage_prompts, risk_checks, success_signals = ctx["stage_prompts"], ctx["risk_checks"], ctx["success_signals"]
+    realism_pack, speaker_names = ctx["realism_pack"], ctx["speaker_names"]
+    deliverable, scene_goal = ctx["deliverable"], ctx["scene_goal"]
     focus = "、".join(points[:2]) if len(points) > 1 else (points[0] if points else topic)
-    deliverable = context.get("deliverable") or f"围绕{topic}形成明确结论和下一步动作"
-    scene_goal = context.get("scene_goal") or topic
 
     rebuilt: list[tuple[str, str]] = []
     primary = order[0]

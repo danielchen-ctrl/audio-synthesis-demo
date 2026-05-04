@@ -24,11 +24,15 @@ class MultilingualNaturalnessTests(unittest.TestCase):
         self.assertIn("Spanish", payload.get("languages", {}))
         self.assertIn("Cantonese", payload.get("languages", {}))
 
-    def test_polish_generated_lines_keeps_non_chinese_rule_path_available(self) -> None:
+    def test_polish_generated_lines_strips_english_marker_lines(self) -> None:
+        # <<Core:...>> echoes from the prompt template should be removed even for English.
+        # The function generates a fallback when all lines are filtered out.
         lines = [("Speaker 1", "The most important thing is: <<Core:membership growth>>")]
         polished, meta = polish_generated_lines(lines, "English")
-        self.assertEqual(polished, lines)
-        self.assertEqual(meta["rewrite_count"], 0)
+        rendered = " ".join(t for _, t in polished)
+        self.assertNotIn("<<Core:", rendered)
+        self.assertGreaterEqual(len(polished), 1)
+        self.assertGreaterEqual(meta["rewrite_count"], 1)
 
     def test_polish_generated_lines_rewrites_chinese_placeholders_and_noise(self) -> None:
         lines = [

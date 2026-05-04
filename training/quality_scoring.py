@@ -44,6 +44,20 @@ def score_dialogue(
             )
         )
 
+    # 非中文任务的对话行不应包含 "Scenario:" 模板描述（bundle 渲染残留，可出现在行中任意位置）
+    if task.language not in ("中文", "粤语"):
+        scenario_artifact_lines = [text for _, text in lines if re.search(r"Scenario:\s+[A-Z]", text)]
+        if scenario_artifact_lines:
+            score -= 30
+            findings.append(
+                ValidationFinding(
+                    code="scenario_placeholder_artifact",
+                    severity="error",
+                    message=f"对话行含有 'Scenario:' 模板占位符残留",
+                    details={"count": len(scenario_artifact_lines), "example": scenario_artifact_lines[0][:80]},
+                )
+            )
+
     if marker_count == 0:
         score -= 20
         findings.append(
@@ -60,6 +74,18 @@ def score_dialogue(
                 code="too_many_core_markers",
                 severity="warning",
                 message=f"核心标记数量偏多: {marker_count}",
+                details={"marker_count": marker_count},
+            )
+        )
+
+    # 对话输出中出现任何 <<...>> 标记均为 bundle 渲染残留，直接拦截
+    if marker_count > 0:
+        score -= 30
+        findings.append(
+            ValidationFinding(
+                code="core_marker_artifact",
+                severity="error",
+                message=f"对话输出含有核心标记残留 <<…>>: {marker_count} 处",
                 details={"marker_count": marker_count},
             )
         )
@@ -116,6 +142,23 @@ def score_dialogue(
                 )
             )
 
+    # 逐行检查：日语/韩语已有单独检测；其余非CJK语言不应有中文角色名渗漏
+    if task.language not in ("中文", "粤语", "日语", "韩语"):
+        leaked_line_count = sum(
+            1 for _, text in lines
+            if len(text) > 0 and _count_chinese_chars(text) / len(text) > 0.05
+        )
+        if lines and leaked_line_count / len(lines) > 0.15:
+            score -= 20
+            findings.append(
+                ValidationFinding(
+                    code="chinese_role_name_leak",
+                    severity="error",
+                    message=f"非中文任务行级中文渗漏: {leaked_line_count}/{len(lines)} 行含中文（>5% 字符比例）",
+                    details={"leaked_lines": leaked_line_count, "total_lines": len(lines)},
+                )
+            )
+
     # 字数严重不足（< 30% 目标）→ error；一般偏离（< 70% 或 > 130%）→ warning
     if total_chars < task.word_count * 0.40:
         score -= 30
@@ -151,6 +194,20 @@ def score_dialogue(
                 message=f"对话轮次过少: {len(lines)}",
             )
         )
+
+    if len(lines) > 5:
+        unique_texts = {text.strip() for _, text in lines}
+        repetition_rate = len(unique_texts) / len(lines)
+        if repetition_rate < 0.60:
+            score -= 30
+            findings.append(
+                ValidationFinding(
+                    code="high_repetition_rate",
+                    severity="error",
+                    message=f"重复行比例过高: unique={len(unique_texts)}, total={len(lines)}, 唯一率={repetition_rate:.1%}",
+                    details={"unique_lines": len(unique_texts), "total_lines": len(lines), "ratio": round(repetition_rate, 4)},
+                )
+            )
 
     if task.people_count >= 3 and "Speaker 3" in speaker_distribution:
         speaker3_lines = [text.strip() for speaker, text in lines if speaker == "Speaker 3"]
@@ -198,6 +255,7 @@ def score_dialogue(
 
     score = max(score, 0.0)
     passed = not any(item.severity == "error" for item in findings) and score >= 60
+    unique_count = len({text.strip() for _, text in lines})
     metrics = {
         "line_count": len(lines),
         "total_chars": total_chars,
@@ -207,6 +265,7 @@ def score_dialogue(
         "korean_ratio": round(korean_ratio, 4),
         "speaker_distribution": speaker_distribution,
         "target_word_count": task.word_count,
+        "unique_line_ratio": round(unique_count / max(len(lines), 1), 4),
     }
     return ScoreReport(
         passed=passed,

@@ -6,22 +6,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## ⚡ Training Pipeline — Current Status (2026-05-04)
 
-**Phase: B1 Foundation 进行中（B0 已完成 91%，B1 运行中 78% 通过率）。**
+**Phase: B0/B1 英语+日语数据已清理重跑（中文已完成），B2–B5 待启动。**
 
 训练以 `--resume` 方式在后台运行，日志见 `output/training_v2/run_all_batches.log`。
 
-### 质量门禁（2026-05-04 修复）
+已完成数据：
+- B0 中文：198/198 通过（已锁定，不重跑）
+- B1 中文：360/361 通过（已锁定，不重跑）
+- B0/B1 英语+日语：发现系统性质量问题（见下），全部清空重跑
 
-`training/quality_scoring.py` 新增两类强制拦截（`severity="error"`，直接 fail）：
+### 质量门禁（2026-05-04 两轮修复）
+
+`training/quality_scoring.py` 所有强制拦截规则（`severity="error"`，直接 fail）：
 
 | 规则 | 触发条件 | 拦截原因 |
 |------|---------|---------|
 | `language_mismatch` | 日语任务假名比例 < 8% | Bundle LLM 生成日语时退化为中文 |
 | `language_mismatch` | 韩语任务韩文比例 < 5% | 同上 |
 | `high_chinese_ratio` | 日语任务中文 > 30%（即使有足够假名）| 中文混入过多 |
-| `word_count_critical_short` | 实际字数 < 目标 30% | 内容严重不足，不可用于训练 |
+| `high_chinese_ratio` | 非CJK任务中文整体占比 > 15% | 大段中文内容渗入 |
+| `word_count_critical_short` | 实际字数 < 目标 40% | 内容严重不足，不可用于训练 |
+| `scenario_placeholder_artifact` | 非中文任务对话行中出现 `Scenario: [大写]` | Bundle 把 scenario 描述直接写入台词 |
+| `core_marker_artifact` | 对话输出中出现任意 `<<…>>` 标记 | Bundle 渲染残留，应在生成时消化 |
+| `chinese_role_name_leak` | 非CJK任务 >15% 的行含 >5% 中文字符 | 中文角色名渗漏到英/法/德等语言台词 |
+| `high_repetition_rate` | 唯一行率 < 60%（且总行数 > 5）| 内容高度重复，训练价值低 |
 
-B0 回测：108 条日语样本中 79 条被正确拦截，中英文样本无影响。
+**已知 bundle 限制**（无法从外部修复，只能靠门禁过滤）：
+- 英语输出：bundle 会把 `Scenario: A professional business discussion...` 嵌入台词 → `scenario_placeholder_artifact` 拦截
+- 英语输出：角色名退化为 "Professional" / "Counterpart" 而非真实人名
+- 日语输出：`<<コア:...>>` 标记未消化直接出现在台词里 → `core_marker_artifact` 拦截
+- 日语输出：中文角色名混入日语台词 → `chinese_role_name_leak` 拦截
 
 ```bash
 # Full B0→B5 run (65,628 tasks total)
@@ -63,6 +77,20 @@ for batch in ['b0_smoke','b1_foundation','b2_positive_pairs','b3_cross_combo_bas
 | B3 cross_combo_base | 24,948 | Full 21×22 topic-template cross, 3 sizes |
 | B4 high_risk_boost | 18,900 | 105 high-risk combos, large word counts |
 | B5 extreme_50k | 1,188 | 50k-word stress test, selected combos |
+
+---
+
+## 🔧 生成管线性能优化（2026-05-04 完成）
+
+以下优化已合并到 `src/demo_app/embedded_server_main.py` 和 `multilingual_naturalness.py`：
+
+| 编号 | 文件 | 改动 | 效果 |
+|------|------|------|------|
+| T3-1 | `embedded_server_main.py` | `_generate_long_dialogue_lines()` 并发生成：`ThreadPoolExecutor(max_workers=3)` 同时跑 N 段，顺序补充 | 长对话首段生成提速 ~3× |
+| T3-2 | `embedded_server_main.py` | `repair_dialogue_quality` 完整重建时跳过 `stabilize_dialogue_constraints` | 避免冗余的第三遍重建 |
+| T3-3 | `multilingual_naturalness.py` | `enforce_keywords_in_lines()` 预构建 `{speaker: [倒序位置]}` 字典，O(n×k) → O(n+k) | 关键词注入循环去掉内层扫描 |
+| T5-3 | `multilingual_naturalness.py` | 提取 `_prepare_chinese_dialogue_context()` helper，两个中文稳定化函数共用 | 消除 14 个上下文变量的重复计算 |
+| T5-4 | `embedded_server_main.py` | 提取 `_normalize_request_params(payload, language)` 封装三个 sanitize 调用 | 生成入口参数预处理统一化 |
 
 ---
 

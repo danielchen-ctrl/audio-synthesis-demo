@@ -6,8 +6,10 @@ from __future__ import annotations
 import asyncio
 import functools
 import importlib.util
+import math
 import subprocess
 from collections import OrderedDict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import mimetypes
 import os
@@ -435,6 +437,18 @@ def _sanitize_profile_for_language(profile: dict[str, Any], generation_context: 
         generation_context["scene_type"] = _translate_field(st, _SCENE_ZH_TO_EN)
 
 
+def _normalize_request_params(payload: dict[str, Any], language: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Extract and sanitize profile + generation_context from a request payload.
+
+    Returns (profile, generation_context) with Chinese field values translated to
+    English equivalents when language is not Chinese.
+    """
+    profile = _safe_profile(payload)
+    generation_context = _safe_generation_context(payload)
+    _sanitize_profile_for_language(profile, generation_context, language)
+    return profile, generation_context
+
+
 def _merge_text_parts(*parts: str, sep: str = "；") -> str:
     merged: list[str] = []
     for part in parts:
@@ -769,6 +783,7 @@ def _translate_dialogue_lines(
 
 _LONG_DIALOGUE_SEGMENT_TARGET = 3000   # chars requested per segment call
 _LONG_DIALOGUE_THRESHOLD      = 5000   # above this, switch to multi-segment
+_LONG_DIALOGUE_MAX_PARALLEL   = 3      # concurrent segment calls
 
 
 def _generate_long_dialogue_lines(
@@ -782,9 +797,9 @@ def _generate_long_dialogue_lines(
 ) -> tuple[list[tuple[str, str]], dict]:
     """
     Single call for total_target ≤ _LONG_DIALOGUE_THRESHOLD.
-    Multi-segment (loop) for larger targets: repeatedly calls
-    _generate_dialogue_lines with segment-sized targets and concatenates
-    unique lines until the accumulated character count meets total_target.
+    Multi-segment for larger targets: estimates needed segments upfront,
+    submits them in parallel (max 3 concurrent), deduplicates, then
+    tops up sequentially if still short.
     """
     if total_target <= _LONG_DIALOGUE_THRESHOLD:
         return bundle_server._generate_dialogue_lines(
@@ -794,30 +809,46 @@ def _generate_long_dialogue_lines(
     accumulated: list[tuple[str, str]] = []
     seen_texts: set[str] = set()
     last_rewrite_info: dict = {}
+
+    n_segs = min(16, math.ceil(total_target / _LONG_DIALOGUE_SEGMENT_TARGET))
+
+    def _one_seg(_: int) -> tuple[list, dict]:
+        return bundle_server._generate_dialogue_lines(
+            profile, scenario, core_content, people_count,
+            _LONG_DIALOGUE_SEGMENT_TARGET, language,
+        )
+
+    with ThreadPoolExecutor(max_workers=_LONG_DIALOGUE_MAX_PARALLEL) as ex:
+        futures = [ex.submit(_one_seg, i) for i in range(n_segs)]
+        for fut in as_completed(futures):
+            try:
+                seg_lines, rewrite_info = fut.result()
+                last_rewrite_info = rewrite_info
+                for spk, text in (seg_lines or []):
+                    if text and text not in seen_texts:
+                        seen_texts.add(text)
+                        accumulated.append((spk, text))
+            except Exception:
+                pass
+
+    # Sequential top-up if parallel segments fell short due to heavy deduplication
     consecutive_empty = 0
-
-    while True:
-        current_chars = sum(len(t) for _, t in accumulated)
-        if current_chars >= total_target:
-            break
-
+    while sum(len(t) for _, t in accumulated) < total_target:
         seg_lines, rewrite_info = bundle_server._generate_dialogue_lines(
             profile, scenario, core_content, people_count,
             _LONG_DIALOGUE_SEGMENT_TARGET, language,
         )
         last_rewrite_info = rewrite_info
-
         added = 0
         for spk, text in (seg_lines or []):
             if text and text not in seen_texts:
                 seen_texts.add(text)
                 accumulated.append((spk, text))
                 added += 1
-
         if added == 0:
             consecutive_empty += 1
             if consecutive_empty >= 3:
-                break   # LLM is looping; give up rather than spinning forever
+                break
         else:
             consecutive_empty = 0
 
@@ -825,17 +856,13 @@ def _generate_long_dialogue_lines(
 
 
 def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[str, Any]:
-    profile = _safe_profile(payload)
-    generation_context = _safe_generation_context(payload)
+    language = _canonical_language(str(payload.get("audio_language") or payload.get("language") or "Chinese"))
+    lbl = _prompt_labels(language)
+    profile, generation_context = _normalize_request_params(payload, language)
     scenario = str(payload.get("scenario") or "").strip()
     core_content = str(payload.get("core_content") or "").strip()
     people_count = max(2, min(10, _safe_int(payload.get("people_count"), 3)))
     word_count = min(50000, max(300, _safe_int(payload.get("word_count"), 1000)))
-    language = _canonical_language(str(payload.get("audio_language") or payload.get("language") or "Chinese"))
-    lbl = _prompt_labels(language)
-
-    # Sanitize Chinese strings in profile/generation_context for non-Chinese languages
-    _sanitize_profile_for_language(profile, generation_context, language)
 
     title = str(
         payload.get("title") or
@@ -937,6 +964,7 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         keywords=keyword_terms,
         generation_context=generation_context,
     )
+    already_rebuilt = bool(repair_meta.get("repaired"))
     if repair_meta.get("repaired"):
         lines = repaired_lines
     lines, injected_keywords = merge_keywords_into_lines(
@@ -949,18 +977,20 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
         profile=profile,
         generation_context=generation_context,
     )
-    lines, stabilize_meta = stabilize_dialogue_constraints(
-        lines,
-        language,
-        title=title,
-        scenario=scenario,
-        core_content=core_content,
-        profile=profile,
-        target_word_count=word_count,
-        people_count=people_count,
-        keywords=keyword_terms,
-        generation_context=generation_context,
-    )
+    stabilize_meta: dict[str, Any] = {}
+    if not already_rebuilt:
+        lines, stabilize_meta = stabilize_dialogue_constraints(
+            lines,
+            language,
+            title=title,
+            scenario=scenario,
+            core_content=core_content,
+            profile=profile,
+            target_word_count=word_count,
+            people_count=people_count,
+            keywords=keyword_terms,
+            generation_context=generation_context,
+        )
     dialogue_text = _render_dialogue_text(bundle_server, lines)
     normalized_lines = _normalize_lines(bundle_server, lines)
 
@@ -1421,14 +1451,45 @@ async def _synthesize_audio_from_lines(
         # Synthesize all segments concurrently (rate limit from config: tts_concurrency)
         sem = asyncio.Semaphore(_TTS_CONCURRENCY)
 
-        async def _tts_one(voice: str, text: str, path: Path) -> None:
+        async def _tts_one_safe(voice: str, text: str, path: Path) -> Exception | None:
+            """Returns None on success, or the exception on failure (never raises)."""
             async with sem:
-                await edge_tts.Communicate(text, voice).save(str(path))
+                try:
+                    await edge_tts.Communicate(text, voice).save(str(path))
+                    return None
+                except Exception as _e:
+                    return _e
 
-        await asyncio.gather(*[
-            _tts_one(voice, cleaned, segment_file)
+        # ── Phase 0: first-pass concurrent synthesis ──────────────────────────
+        results: list[Exception | None] = list(await asyncio.gather(*[
+            _tts_one_safe(voice, cleaned, segment_file)
             for (_, _, cleaned, voice, _, segment_file) in valid_segments
-        ])
+        ]))
+
+        # ── Phase 0b: retry failed segments sequentially (handles rate-limits) ─
+        _failed_idx = [i for i, r in enumerate(results) if r is not None]
+        if _failed_idx:
+            _log.warning(
+                "_synthesize_audio_from_lines: %d/%d segments failed on first pass, retrying...",
+                len(_failed_idx), len(valid_segments),
+            )
+            for _fi in _failed_idx:
+                _, _, _cleaned, _voice, _, _seg_path = valid_segments[_fi]
+                await asyncio.sleep(0.3)
+                try:
+                    await edge_tts.Communicate(_cleaned, _voice).save(str(_seg_path))
+                    results[_fi] = None
+                except Exception as _e2:
+                    results[_fi] = _e2
+
+        # ── Phase 0c: any still-failed → raise so outer except handles them ──
+        _still_failed = [i for i, r in enumerate(results) if r is not None]
+        if _still_failed:
+            _sample_err = results[_still_failed[0]]
+            raise RuntimeError(
+                f"{len(_still_failed)}/{len(valid_segments)} segments failed after retry "
+                f"(first error: {_sample_err})"
+            ) from _sample_err
 
         # ── Phase 1: measure durations one segment at a time ──────────────────
         # Load each AudioSegment solely to read its length, then release it
