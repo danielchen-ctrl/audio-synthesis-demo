@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import re
 import sys
 from pathlib import Path
@@ -19,6 +20,8 @@ from training.training_types import DialogueLines, TrainingTask
 _CHUNK_LANGUAGES: frozenset[str] = frozenset({"日语", "韩语"})
 _CHUNK_SIZE = 2500          # chars per independent call for chunk languages
 _CHUNK_MAX_RETRIES = 2      # retries if a chunk fails language check
+# Bundle RoleKPI enforcement fails for these languages beyond this speaker count
+_PEOPLE_COUNT_CAP: dict[str, int] = {"日语": 8, "韩语": 8}
 
 
 def _kana_ratio(text: str) -> float:
@@ -84,15 +87,20 @@ def _generate_chunked(
 
         chunk_lines: DialogueLines = []
         for attempt in range(_CHUNK_MAX_RETRIES + 1):
-            seg_lines, rewrite_info = generate_fn(
-                bundle_server=bundle_server,
-                profile=profile,
-                scenario=task.scenario,
-                core_content=task.core_content,
-                people_count=task.people_count,
-                total_target=this_chunk_size,
-                language=task.language,
-            )
+            try:
+                seg_lines, rewrite_info = generate_fn(
+                    bundle_server=bundle_server,
+                    profile=profile,
+                    scenario=task.scenario,
+                    core_content=task.core_content,
+                    people_count=task.people_count,
+                    total_target=this_chunk_size,
+                    language=task.language,
+                )
+            except (RuntimeError, Exception):
+                # Bundle internal errors (e.g. RoleKPIHardFail) — treat as invalid chunk
+                this_chunk_size = max(500, this_chunk_size - 100 * (attempt + 1))
+                continue
             last_rewrite_info = rewrite_info
             if _chunk_is_valid(seg_lines, task.language):
                 chunk_lines = seg_lines
@@ -123,7 +131,8 @@ def generate_dialogue_for_task(task: TrainingTask, seed_offset: int = 0) -> Tupl
     Generate dialogue lines for a training task using the current embedded bundle server.
 
     For languages in _CHUNK_LANGUAGES (Japanese, Korean): splits the target into
-    independent _CHUNK_SIZE calls to prevent cross-segment language drift.
+    independent _CHUNK_SIZE calls to prevent cross-segment language drift, and caps
+    people_count at _PEOPLE_COUNT_CAP to avoid bundle RoleKPI enforcement failures.
     For all other languages: delegates to _generate_long_dialogue_lines directly,
     which already handles large targets via its own internal multi-segment loop.
     """
@@ -131,6 +140,12 @@ def generate_dialogue_for_task(task: TrainingTask, seed_offset: int = 0) -> Tupl
         _generate_long_dialogue_lines,
         load_bundle_server,
     )
+
+    # Cap speaker count for languages where bundle RoleKPI enforcement breaks down
+    if task.language in _PEOPLE_COUNT_CAP:
+        cap = _PEOPLE_COUNT_CAP[task.language]
+        if task.people_count > cap:
+            task = dataclasses.replace(task, people_count=cap)
 
     bundle_server = load_bundle_server()
 
