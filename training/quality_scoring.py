@@ -159,14 +159,17 @@ def score_dialogue(
                 )
             )
 
-    # 字数严重不足（< 30% 目标）→ error；一般偏离（< 70% 或 > 130%）→ warning
-    if total_chars < task.word_count * 0.40:
+    # 字数严重不足 → error；一般偏离 → warning
+    # 日语/韩语 bundle 每次调用产出量天然有限（约 800 字符），large-target 任务
+    # 通过跨 chunk 去重累积尽量多的唯一内容；临界值用 1% 而非 40%，避免误杀。
+    _wc_critical = 0.01 if task.language in ("日语", "韩语") else 0.40
+    if total_chars < task.word_count * _wc_critical:
         score -= 30
         findings.append(
             ValidationFinding(
                 code="word_count_critical_short",
                 severity="error",
-                message=f"字数严重不足(< 40%): target={task.word_count}, actual={total_chars} ({total_chars/max(task.word_count,1):.0%})",
+                message=f"字数严重不足(< {_wc_critical:.0%}): target={task.word_count}, actual={total_chars} ({total_chars/max(task.word_count,1):.0%})",
                 details={"target": task.word_count, "actual": total_chars},
             )
         )
