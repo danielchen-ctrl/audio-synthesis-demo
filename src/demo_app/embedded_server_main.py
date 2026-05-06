@@ -117,19 +117,19 @@ _ONLINE_AUDIO_CONFIG_CACHE: dict[str, Any] | None = None
 _PRESET_TOPICS_CACHE: list[dict[str, Any]] | None = None
 
 VOICE_CATALOG = {
-    "Chinese": ["zh-CN-YunxiNeural", "zh-CN-XiaoxiaoNeural", "zh-CN-YunyangNeural", "zh-CN-XiaoyiNeural"],
-    "English": ["en-US-GuyNeural", "en-US-JennyNeural", "en-US-DavisNeural"],
-    "Japanese": ["ja-JP-NanamiNeural", "ja-JP-KeitaNeural"],
-    "Korean": ["ko-KR-SunHiNeural", "ko-KR-InJoonNeural"],
-    "French": ["fr-FR-DeniseNeural", "fr-FR-HenriNeural"],
-    "German": ["de-DE-KatjaNeural", "de-DE-ConradNeural"],
-    "Spanish": ["es-ES-ElviraNeural", "es-ES-AlvaroNeural"],
+    "Chinese":    ["zh-CN-YunxiNeural", "zh-CN-XiaoxiaoNeural", "zh-CN-YunyangNeural", "zh-CN-XiaoyiNeural"],
+    "English":    ["en-US-GuyNeural", "en-US-JennyNeural", "en-US-BrianNeural"],
+    "Japanese":   ["ja-JP-NanamiNeural", "ja-JP-KeitaNeural"],
+    "Korean":     ["ko-KR-SunHiNeural", "ko-KR-InJoonNeural"],
+    "French":     ["fr-FR-DeniseNeural", "fr-FR-HenriNeural"],
+    "German":     ["de-DE-KatjaNeural", "de-DE-ConradNeural"],
+    "Spanish":    ["es-ES-ElviraNeural", "es-ES-AlvaroNeural"],
     "Portuguese": ["pt-BR-FranciscaNeural", "pt-BR-AntonioNeural"],
-    "Italian": ["it-IT-ElsaNeural", "it-IT-DiegoNeural"],
-    "Russian": ["ru-RU-DariyaNeural", "ru-RU-DmitryNeural"],
-    "Arabic": ["ar-SA-ZariyahNeural", "ar-SA-HamedNeural"],
+    "Italian":    ["it-IT-ElsaNeural", "it-IT-DiegoNeural"],
+    "Russian":    ["ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural"],
+    "Arabic":     ["ar-SA-ZariyahNeural", "ar-SA-HamedNeural"],
     "Indonesian": ["id-ID-GadisNeural", "id-ID-ArdiNeural"],
-    "Cantonese": ["zh-HK-HiuGaaiNeural", "zh-HK-WanLungNeural", "zh-HK-HiuMaanNeural"],
+    "Cantonese":  ["zh-HK-HiuGaaiNeural", "zh-HK-WanLungNeural", "zh-HK-HiuMaanNeural"],
 }
 
 MAX_AUDIO_TEXT_CHARS = 12000

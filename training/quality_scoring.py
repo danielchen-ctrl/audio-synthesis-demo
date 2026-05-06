@@ -160,9 +160,9 @@ def score_dialogue(
             )
 
     # 字数严重不足 → error；一般偏离 → warning
-    # 日语/韩语 bundle 每次调用产出量天然有限（约 800 字符），large-target 任务
-    # 通过跨 chunk 去重累积尽量多的唯一内容；临界值用 1% 而非 40%，避免误杀。
-    _wc_critical = 0.01 if task.language in ("日语", "韩语") else 0.40
+    # 日语/韩语直接路径（target≤2500）应达到约20-40%；大目标chunked路径因dedup
+    # 受限，实测极少能达到15%，故15%门限自然过滤掉大目标无效样本。
+    _wc_critical = 0.15 if task.language in ("日语", "韩语") else 0.40
     if total_chars < task.word_count * _wc_critical:
         score -= 30
         findings.append(

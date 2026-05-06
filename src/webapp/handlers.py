@@ -113,10 +113,12 @@ class TasksHandler(PlatformHandler):
             if not data.get("topic"):
                 raise HTTPError(400, reason="topic 为必填")
             task = db.create_task(data)
+            tts_warn = (data.get("tts_warning") or "").strip()
             db.update_task_status(
                 task["task_id"], "completed",
                 file_id=data.get("file_id") or None,
                 dialogue_id=data.get("dialogue_id") or "",
+                error_msg=f"[TTS_WARN] {tts_warn}" if tts_warn else None,
             )
             self.set_status(201)
             self.ok(db.get_task(task["task_id"]))

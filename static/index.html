@@ -94,12 +94,15 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .task-card{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:16px}
 .task-card-failed{border-left:3px solid var(--danger)}
+.task-card-tts-warn{border-left:3px solid var(--warning)}
 .task-card-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
 .task-topic{font-weight:600;font-size:14px;flex:1;margin-right:8px;word-break:break-all}
 .task-meta{font-size:12px;color:var(--text3);margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap}
 .task-prog{height:3px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-top:8px}
 .task-prog-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .5s}
 .task-err{font-size:11px;color:var(--danger);margin-top:6px;word-break:break-all}
+.task-warn{font-size:11px;color:var(--warning);margin-top:6px}
+.status-tts-warn{background:rgba(245,158,11,.15);color:var(--warning)}
 
 /* Detail */
 .detail-wrap{display:flex;flex-direction:column;gap:16px}
@@ -217,11 +220,11 @@ textarea.form-input{resize:vertical;min-height:100px;font-family:inherit}
 
 /* Stats bar */
 .stats-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;align-items:stretch}
-.stat-combined{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center}
-.stat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:0 12px;min-width:60px}
-.stat-divider{width:1px;height:44px;background:var(--border);flex-shrink:0}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:4px;min-height:0;overflow:hidden}
-.stat-num{font-size:26px;font-weight:700;color:var(--text)}
+.stat-combined{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center}
+.stat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 8px;min-width:0}
+.stat-divider{width:1px;height:36px;background:var(--border);flex-shrink:0}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-height:0;overflow:hidden}
+.stat-num{font-size:19px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat-label{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
 .stat-bar{height:3px;background:var(--bg3);border-radius:99px;margin-top:6px;overflow:hidden}
 .stat-bar-fill{height:100%;background:var(--primary);border-radius:99px}
@@ -275,7 +278,7 @@ textarea.form-input{resize:vertical;min-height:100px;font-family:inherit}
 @keyframes bannerIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes bannerOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(16px)}}
 /* Language mini chart */
-.lang-bars{display:flex;flex-direction:column;gap:7px;margin-top:10px;max-height:160px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.lang-bars{display:flex;flex-direction:column;gap:5px;margin-top:8px;max-height:150px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .lang-bar-row{display:flex;align-items:center;gap:8px}
 .lang-bar-lbl{font-size:12px;color:var(--text2);width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;flex-shrink:0}
 .lang-bar-trk{flex:1;height:8px;background:var(--bg3);border-radius:99px;overflow:hidden}
@@ -444,6 +447,17 @@ html[data-theme="light"] .mini-player-row td{background:#1E293B;color:#E2E8F0}
 html[data-theme="light"] .comp-banner{background:#1e3a5f}
 /* theme toggle button */
 .theme-toggle{font-size:15px;padding:4px 8px;line-height:1}
+
+/* ── Share bar (LAN link footer) ── */
+.share-bar{position:fixed;bottom:0;left:0;right:0;height:36px;background:linear-gradient(90deg,#1e1b4b 0%,#312e81 50%,#1e1b4b 100%);border-top:1px solid rgba(99,102,241,.35);display:flex;align-items:center;padding:0 16px;gap:10px;z-index:90;font-size:12px;color:rgba(255,255,255,.75)}
+.share-bar-label{flex-shrink:0;color:rgba(255,255,255,.55);font-size:11px}
+.share-bar-url{color:rgba(200,210,255,.9);font-family:monospace;font-size:12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px;cursor:text;user-select:all}
+.share-bar-copy{flex-shrink:0;padding:3px 12px;border-radius:4px;border:1px solid rgba(165,180,252,.5);background:rgba(99,102,241,.2);color:rgba(220,225,255,.95);font-size:12px;cursor:pointer;transition:.15s;white-space:nowrap}
+.share-bar-copy:hover{background:rgba(99,102,241,.45);border-color:rgba(165,180,252,.8)}
+.share-bar-copy.copied{background:rgba(16,185,129,.25);border-color:rgba(52,211,153,.6);color:#6ee7b7}
+html[data-theme="light"] .share-bar{background:linear-gradient(90deg,#1e1b4b 0%,#4338ca 50%,#1e1b4b 100%)}
+/* Push page content up so share bar doesn't overlap */
+.page-wrap{padding-bottom:36px}
 </style>
 </head>
 <body>
@@ -1307,6 +1321,7 @@ function renderTaskGrid(tasks){
   const STEPS=['排队中','生成文本','合成音频','完成'];
   const STATUS_IDX={queued:0,generating_text:1,synthesizing:2,completed:3};
   const lbl={queued:'排队中',generating_text:'生成文本中',synthesizing:'合成音频中',completed:'已完成',failed:'任务失败'};
+  const LANG_ZH={Chinese:'中文',English:'英语',Japanese:'日语',Korean:'韩语',Spanish:'西班牙语',French:'法语',German:'德语',Portuguese:'葡萄牙语',Italian:'意大利语',Russian:'俄语',Arabic:'阿拉伯语',Indonesian:'印尼语',Cantonese:'粤语'};
   grid.innerHTML=pageTasks.map(t=>{
     const run=['queued','generating_text','synthesizing'].includes(t.status);
     const curIdx=STATUS_IDX[t.status]??-1;
@@ -1322,12 +1337,13 @@ function renderTaskGrid(tasks){
     }
     const failedPip=t.status==='failed'?`<div class="pipeline" style="opacity:.45;filter:grayscale(1)">${STEPS.map((label,idx)=>`<div class="step done"><div class="step-dot"></div><div class="step-lbl">${label}</div></div>`).slice(0,3).join('')}<div class="step"><div class="step-dot" style="background:var(--danger)">✕</div><div class="step-lbl" style="color:var(--danger)">失败</div></div></div>`:'';
     const isTextOnly=t.generation_mode==='text_only';
-    return`<div class="task-card${t.status==='failed'?' task-card-failed':''}">
-      <div class="task-card-hdr"><div class="task-topic">${esc(t.topic||'（无主题）')}</div><span class="status status-${t.status}">${run?'<span class="pulse"></span>':''}${lbl[t.status]||t.status}</span></div>
-      <div class="task-meta"><span>🌐 ${esc(t.language||'中文')}</span>${isTextOnly?`<span>📄 仅生成文本</span>`:`<span>👥 ${t.people_count||2}人</span>`}<span>📝 ${t.word_count||1000}字</span></div>
+    const isTtsWarn=t.status==='completed'&&(t.error_msg||'').startsWith('[TTS_WARN]');
+    return`<div class="task-card${t.status==='failed'?' task-card-failed':isTtsWarn?' task-card-tts-warn':''}">
+      <div class="task-card-hdr"><div class="task-topic">${esc(t.topic||'（无主题）')}</div><span class="status status-${isTtsWarn?'tts-warn':t.status}">${run?'<span class="pulse"></span>':''}${isTtsWarn?'⚠️ 备用引擎':lbl[t.status]||t.status}</span></div>
+      <div class="task-meta"><span>🌐 ${esc(LANG_ZH[t.language]||t.language||'中文')}</span>${isTextOnly?`<span>📄 仅生成文本</span>`:`<span>👥 ${t.people_count||2}人</span>`}<span>📝 ${t.word_count||1000}字</span></div>
       <div class="task-meta" style="margin-top:2px"><span>📅 ${fmtDate(t.created_at)}</span><span style="color:var(--text3)">${timeAgo(t.created_at)}</span></div>
       ${t.status!=='failed'?pipHtml:failedPip}
-      ${t.error_msg?`<div class="task-err">❌ ${esc(t.error_msg)}</div>`:''}
+      ${isTtsWarn?`<div class="task-warn">⚠️ 在线TTS失败，已用备用引擎生成（音质可能降低）</div>`:t.error_msg&&t.status==='failed'?`<div class="task-err">❌ ${esc(t.error_msg)}</div>`:''}
       ${t.status==='completed'&&t.file_id?`<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="openDetail('${t.file_id}','tasks')">查看详情 →</button></div>`:''}
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
         ${t.status==='failed'?`<button class="btn btn-ghost btn-sm" onclick="retryTask('${t.task_id}')" style="font-size:11px;color:var(--warning)">↺ 重试</button>`:'<span></span>'}
@@ -1935,7 +1951,7 @@ function toggleTheme(){
   localStorage.setItem('platform-theme',next);
 }
 (function(){
-  const saved=localStorage.getItem('platform-theme')||'dark';
+  const saved=localStorage.getItem('platform-theme')||'light';
   document.documentElement.dataset.theme=saved;
   document.addEventListener('DOMContentLoaded',()=>{
     const btn=document.getElementById('themeToggle');
@@ -2055,6 +2071,61 @@ function _tickMiniBar() {
     }
   }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
 })();
+</script>
+
+<!-- ══ Share bar ══ -->
+<div class="share-bar" id="share-bar" style="display:none">
+  <span class="share-bar-label">局域网访问：</span>
+  <span class="share-bar-url" id="share-bar-url">—</span>
+  <button class="share-bar-copy" id="share-bar-copy" onclick="copyShareLink()">复制</button>
+</div>
+<script>
+(function(){
+  async function initShareBar(){
+    try{
+      const r=await fetch('/api/server_info');
+      const d=await r.json();
+      const url=d.preferred_share_url||d.localhost_url||'';
+      if(!url)return;
+      const bar=document.getElementById('share-bar');
+      const urlEl=document.getElementById('share-bar-url');
+      if(bar&&urlEl){urlEl.textContent=url;urlEl.title=url;bar.style.display='flex';}
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded',initShareBar);
+})();
+// ── Universal clipboard helper (works on HTTP too) ──
+function _clipboardCopy(text,onOk,onFail){
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(onOk).catch(()=>_clipboardFallback(text,onOk,onFail));
+  }else{
+    _clipboardFallback(text,onOk,onFail);
+  }
+}
+function _clipboardFallback(text,onOk,onFail){
+  try{
+    const ta=document.createElement('textarea');
+    ta.value=text;ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    const ok=document.execCommand('copy');
+    document.body.removeChild(ta);
+    if(ok)onOk();else onFail();
+  }catch(e){onFail();}
+}
+function copyShareLink(){
+  const url=document.getElementById('share-bar-url')?.textContent||'';
+  if(!url||url==='—')return;
+  _clipboardCopy(url,()=>{
+    const btn=document.getElementById('share-bar-copy');
+    if(!btn)return;
+    btn.textContent='已复制 ✓';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='复制';btn.classList.remove('copied');},2000);
+  },()=>{
+    const el=document.getElementById('share-bar-url');
+    if(el){const r=document.createRange();r.selectNode(el);window.getSelection().removeAllRanges();window.getSelection().addRange(r);}
+    showToast('ok','已选中地址，请手动复制');
+  });
+}
 </script>
 </body>
 </html>

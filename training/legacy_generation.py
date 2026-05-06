@@ -20,7 +20,7 @@ from training.training_types import DialogueLines, TrainingTask
 _CHUNK_LANGUAGES: frozenset[str] = frozenset({"日语", "韩语"})
 # Bundle generates ~300 chars of Japanese per call regardless of target size.
 # Smaller chunk size means more calls and more accumulated content.
-_CHUNK_SIZE = 500           # chars per independent call for chunk languages
+_CHUNK_SIZE = 2500          # chars per independent call for chunk languages
 _MAX_CHUNKS = 40            # safety cap: avoids excessive calls on 30k+ targets
 _CHUNK_MAX_RETRIES = 2      # retries if a chunk fails language check
 # Bundle RoleKPI enforcement fails for these languages beyond this speaker count

@@ -292,13 +292,15 @@ async def _process_task(task_id: str) -> None:
         }
     )
 
+    tts_warn = (audio_result.get("warning") or "").strip()
     db.update_task_status(
         task_id,
         "completed",
         file_id=file_record["file_id"],
         dialogue_id=dialogue_id or "",
+        error_msg=f"[TTS_WARN] {tts_warn}" if tts_warn else None,
     )
-    logger.info("Task %s completed → file_id=%s", task_id, file_record["file_id"])
+    logger.info("Task %s completed → file_id=%s (tts_warn=%s)", task_id, file_record["file_id"], bool(tts_warn))
 
 
 # ── 后台 worker ───────────────────────────────────────────────────────────────

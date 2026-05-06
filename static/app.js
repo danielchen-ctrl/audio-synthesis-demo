@@ -71,25 +71,15 @@ const BASE_TEMPLATE_OPTIONS = FALLBACK_ONLINE_AUDIO_CONFIG.templateCatalog.map((
 
 const VOICE_LIBRARY = {
   Chinese: [
-    // 青年女声
+    // 女声（可用）
     { value: "zh-CN-XiaoxiaoNeural",  label: "晓晓（女·青年·亲切）" },
     { value: "zh-CN-XiaoyiNeural",    label: "晓伊（女·青年·温暖）" },
-    { value: "zh-CN-XiaohanNeural",   label: "晓涵（女·青年·清晰）" },
-    { value: "zh-CN-XiaomoNeural",    label: "晓墨（女·青年·情感）" },
-    { value: "zh-CN-XiaoyanNeural",   label: "晓颜（女·青年·客服）" },
-    // 中老年女声
     { value: "zh-CN-XiaoxuanNeural",  label: "晓萱（女·中年·沉稳）" },
-    { value: "zh-CN-XiaoqiuNeural",   label: "晓秋（女·中年·专业）" },
-    { value: "zh-CN-XiaoruiNeural",   label: "晓睿（女·老年·慈祥）" },
-    // 青年男声
+    // 男声（可用）
     { value: "zh-CN-YunxiNeural",     label: "云希（男·青年·活泼）" },
     { value: "zh-CN-YunxiaNeural",    label: "云夏（男·青年·明快）" },
-    { value: "zh-CN-YunfengNeural",   label: "云枫（男·青年·活力）" },
-    // 中老年男声
     { value: "zh-CN-YunyangNeural",   label: "云扬（男·中年·新闻）" },
     { value: "zh-CN-YunjianNeural",   label: "云健（男·中年·运动）" },
-    { value: "zh-CN-YunhaoNeural",    label: "云皓（男·成熟·旁白）" },
-    { value: "zh-CN-YunzeNeural",     label: "云泽（男·老年·稳重）" },
     // 台湾普通话
     { value: "zh-TW-HsiaoYuNeural",   label: "晓宇（女·台湾·温柔）" },
     { value: "zh-TW-YunJheNeural",    label: "云哲（男·台湾·自然）" }
@@ -97,14 +87,9 @@ const VOICE_LIBRARY = {
   English: [
     { value: "en-US-JennyNeural",       label: "Jenny（女·新闻·美式）" },
     { value: "en-US-AriaNeural",        label: "Aria（女·活力·美式）" },
-    { value: "en-US-MonicaNeural",      label: "Monica（女·友善·美式）" },
-    { value: "en-US-NancyNeural",       label: "Nancy（女·效率·美式）" },
-    { value: "en-US-SaraNeural",        label: "Sara（女·教育·美式）" },
     { value: "en-US-GuyNeural",         label: "Guy（男·随意·美式）" },
-    { value: "en-US-DavisNeural",       label: "Davis（男·休闲·美式）" },
     { value: "en-US-BrianNeural",       label: "Brian（男·叙述·美式）" },
     { value: "en-US-ChristopherNeural", label: "Christopher（男·专业·美式）" },
-    { value: "en-US-TonyNeural",        label: "Tony（男·活力·美式）" },
     { value: "en-US-RogerNeural",       label: "Roger（男·资深·美式）" },
     { value: "en-GB-SoniaNeural",       label: "Sonia（女·英式）" },
     { value: "en-GB-RyanNeural",        label: "Ryan（男·英式）" },
@@ -113,65 +98,45 @@ const VOICE_LIBRARY = {
   ],
   Japanese: [
     { value: "ja-JP-NanamiNeural", label: "Nanami（女·亲切）" },
-    { value: "ja-JP-AoiNeural",    label: "Aoi（女·温柔）" },
-    { value: "ja-JP-MayuNeural",   label: "Mayu（女·暖心）" },
-    { value: "ja-JP-ShioriNeural", label: "Shiori（女·年轻）" },
-    { value: "ja-JP-KeitaNeural",  label: "Keita（男·活力）" },
-    { value: "ja-JP-DaichiNeural", label: "Daichi（男·沉稳）" },
-    { value: "ja-JP-NaokiNeural",  label: "Naoki（男·稳重）" }
+    { value: "ja-JP-KeitaNeural",  label: "Keita（男·活力）" }
   ],
   Korean: [
-    { value: "ko-KR-SunHiNeural",    label: "SunHi（女·标准）" },
-    { value: "ko-KR-JiMinNeural",    label: "JiMin（女·活泼）" },
-    { value: "ko-KR-SeoHyeonNeural", label: "SeoHyeon（女·年轻）" },
-    { value: "ko-KR-YuJinNeural",    label: "YuJin（女·温柔）" },
-    { value: "ko-KR-InJoonNeural",   label: "InJoon（男·标准）" },
-    { value: "ko-KR-BongJinNeural",  label: "BongJin（男·成熟）" },
-    { value: "ko-KR-GookMinNeural",  label: "GookMin（男·中性）" }
+    { value: "ko-KR-SunHiNeural",  label: "SunHi（女·标准）" },
+    { value: "ko-KR-InJoonNeural", label: "InJoon（男·标准）" }
   ],
   Spanish: [
-    { value: "es-ES-ElviraNeural",  label: "Elvira（女·西班牙）" },
-    { value: "es-ES-AbrilNeural",   label: "Abril（女·西班牙）" },
-    { value: "es-ES-AlvaroNeural",  label: "Alvaro（男·西班牙）" },
-    { value: "es-ES-ArnauNeural",   label: "Arnau（男·西班牙）" },
-    { value: "es-MX-DaliaNeural",   label: "Dalia（女·墨西哥）" },
-    { value: "es-MX-JorgeNeural",   label: "Jorge（男·墨西哥）" }
+    { value: "es-ES-ElviraNeural", label: "Elvira（女·西班牙）" },
+    { value: "es-ES-AlvaroNeural", label: "Alvaro（男·西班牙）" },
+    { value: "es-MX-DaliaNeural",  label: "Dalia（女·墨西哥）" },
+    { value: "es-MX-JorgeNeural",  label: "Jorge（男·墨西哥）" }
   ],
   French: [
-    { value: "fr-FR-DeniseNeural",   label: "Denise（女·法国）" },
-    { value: "fr-FR-BrigitteNeural", label: "Brigitte（女·法国）" },
-    { value: "fr-FR-CelesteNeural",  label: "Celeste（女·法国）" },
-    { value: "fr-FR-HenriNeural",    label: "Henri（男·法国）" },
-    { value: "fr-BE-CharlineNeural", label: "Charline（女·比利时）" },
-    { value: "fr-CA-SylvieNeural",   label: "Sylvie（女·加拿大）" },
-    { value: "fr-CA-JeanNeural",     label: "Jean（男·加拿大）" }
+    { value: "fr-FR-DeniseNeural",  label: "Denise（女·法国）" },
+    { value: "fr-FR-HenriNeural",   label: "Henri（男·法国）" },
+    { value: "fr-BE-CharlineNeural",label: "Charline（女·比利时）" },
+    { value: "fr-CA-SylvieNeural",  label: "Sylvie（女·加拿大）" },
+    { value: "fr-CA-JeanNeural",    label: "Jean（男·加拿大）" }
   ],
   German: [
-    { value: "de-DE-KatjaNeural",      label: "Katja（女·德国）" },
-    { value: "de-DE-AmalaNeural",      label: "Amala（女·德国）" },
-    { value: "de-DE-MajaNeural",       label: "Maja（女·德国）" },
-    { value: "de-DE-ConradNeural",     label: "Conrad（男·德国）" },
-    { value: "de-DE-BerndNeural",      label: "Bernd（男·德国）" },
-    { value: "de-DE-ChristophNeural",  label: "Christoph（男·德国）" },
-    { value: "de-AT-IngridNeural",     label: "Ingrid（女·奥地利）" },
-    { value: "de-AT-JonasNeural",      label: "Jonas（男·奥地利）" }
+    { value: "de-DE-KatjaNeural",  label: "Katja（女·德国）" },
+    { value: "de-DE-AmalaNeural",  label: "Amala（女·德国）" },
+    { value: "de-DE-ConradNeural", label: "Conrad（男·德国）" },
+    { value: "de-AT-IngridNeural", label: "Ingrid（女·奥地利）" },
+    { value: "de-AT-JonasNeural",  label: "Jonas（男·奥地利）" }
   ],
   Portuguese: [
     { value: "pt-BR-FranciscaNeural", label: "Francisca（女·巴西）" },
     { value: "pt-BR-ThalitaNeural",   label: "Thalita（女·巴西）" },
     { value: "pt-BR-AntonioNeural",   label: "Antonio（男·巴西）" },
-    { value: "pt-BR-FabioNeural",     label: "Fabio（男·巴西）" },
-    { value: "pt-PT-FernandaNeural",  label: "Fernanda（女·葡萄牙）" },
     { value: "pt-PT-DuarteNeural",    label: "Duarte（男·葡萄牙）" }
   ],
   Italian: [
-    { value: "it-IT-ElsaNeural",      label: "Elsa（女·意大利）" },
-    { value: "it-IT-IsabellaNeural",  label: "Isabella（女·意大利）" },
-    { value: "it-IT-DiegoNeural",     label: "Diego（男·意大利）" },
-    { value: "it-IT-GiuseppeNeural",  label: "Giuseppe（男·意大利）" }
+    { value: "it-IT-ElsaNeural",     label: "Elsa（女·意大利）" },
+    { value: "it-IT-IsabellaNeural", label: "Isabella（女·意大利）" },
+    { value: "it-IT-DiegoNeural",    label: "Diego（男·意大利）" },
+    { value: "it-IT-GiuseppeNeural", label: "Giuseppe（男·意大利）" }
   ],
   Russian: [
-    { value: "ru-RU-DariyaNeural",   label: "Dariya（女·俄语）" },
     { value: "ru-RU-SvetlanaNeural", label: "Svetlana（女·俄语）" },
     { value: "ru-RU-DmitryNeural",   label: "Dmitry（男·俄语）" }
   ],
@@ -2030,6 +1995,11 @@ function applyPresetSelection(preset, options = {}) {
 async function copyShareLink() {
   const link = el.sharePrimaryLink.href && el.sharePrimaryLink.href !== "#" ? el.sharePrimaryLink.href : "";
   if (!link) return;
+  // Use universal clipboard helper from index.html if available (HTTP-compatible)
+  if (typeof _clipboardCopy === "function") {
+    _clipboardCopy(link, () => showToast("success", "访问地址已复制"), () => showToast("error", `复制失败，请手动复制：${link}`));
+    return;
+  }
   try {
     await navigator.clipboard.writeText(link);
     showToast("success", "访问地址已复制");
@@ -2224,6 +2194,7 @@ async function submitAudioGeneration() {
           template: state.form.template || undefined,
           file_id: _platformFileId || undefined,
           dialogue_id: dialogueId || undefined,
+          tts_warning: ttsUsedFallback ? ttsWarning : undefined,
         })
       });
     } catch (_e) { /* silent */ }
