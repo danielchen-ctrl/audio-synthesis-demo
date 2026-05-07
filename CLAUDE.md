@@ -4,18 +4,69 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## ⚡ Training Pipeline — Current Status (2026-05-04)
+## ⚡ Training Pipeline — Current Status (2026-05-07)
 
-**Phase: B0/B1 英语+日语数据已清理重跑（中文已完成），B2–B5 待启动。**
+**Phase: v3 并行训练方案进行中。Short tier 全部完成；Long tier 英语还在跑，其余已完成。**
 
-训练以 `--resume` 方式在后台运行，日志见 `output/training_v2/run_all_batches.log`。
+### v3 训练方案（当前主线）
 
-已完成数据：
-- B0 中文：198/198 通过（已锁定，不重跑）
-- B1 中文：360/361 通过（已锁定，不重跑）
-- B0/B1 英语+日语：发现系统性质量问题（见下），全部清空重跑
+v3 训练以每语言独立进程并行执行，替代了原 v2 的串行方案（v2 需 40 天，v3 约 5 小时完成 short tier）。
 
-### 质量门禁（2026-05-04 两轮修复）
+**Short tier 完成情况（2026-05-06）：**
+
+| 语言 | 完成/总数 | 通过数 | 通过率 |
+|------|---------|--------|--------|
+| 中文 | 330/330 | 330 | 100% |
+| 英语 | 330/330 | 330 | 100% |
+| 日语 | 198/198 | 175 | 88% |
+| 韩语 | 198/198 | 198 | 100% |
+
+**Long tier 完成情况（2026-05-06，英语仍在运行）：**
+
+| 语言 | 完成/总数 | 通过数 | 通过率 |
+|------|---------|--------|--------|
+| 中文 | 440/440 | 393 | 89% |
+| 英语 | 339/440 | 291 | 86% ← 运行中 |
+| 日语 | 132/132 | 59 | 45% |
+| 韩语 | 132/132 | 87 | 66% |
+
+> 日语 long tier 通过率低（45%）属于预期内：bundle 对 10k+ 字数日语生成能力有限，大量大字数目标被质量门禁过滤。
+
+**运行命令：**
+```bash
+# Short tier（4语言并行，~30分钟）
+python tools/training/run_v3_parallel.py
+
+# Long tier（4语言并行，~5小时）
+python tools/training/run_v3_parallel.py --long
+
+# 断点续跑
+python tools/training/run_v3_parallel.py --long --resume
+```
+
+输出目录：`output/training_v3/{batch}/`（gitignored）
+
+**Quick progress check:**
+```bash
+python -c "
+import json, os
+batches = {'chinese':'v3_long_chinese','english':'v3_long_english','japanese':'v3_long_japanese','korean':'v3_long_korean'}
+totals = {'chinese':440,'english':440,'japanese':132,'korean':132}
+for lang, batch in batches.items():
+    p = f'output/training_v3/{batch}/_index.jsonl'
+    if not os.path.exists(p): print(f'{lang}: not started'); continue
+    records = [json.loads(l) for l in open(p,encoding='utf-8') if l.strip()]
+    by_tid = {}
+    for r in records:
+        tid = r['task_id']
+        if tid not in by_tid or (not by_tid[tid]['passed'] and r['passed']): by_tid[tid] = r
+    done = len(by_tid); passed = sum(1 for r in by_tid.values() if r['passed'])
+    total = totals[lang]
+    print(f'{lang:10}: {done}/{total} ({done/total*100:.0f}%), {passed} passed ({passed/max(done,1)*100:.0f}%)')
+"
+```
+
+### 质量门禁规则
 
 `training/quality_scoring.py` 所有强制拦截规则（`severity="error"`，直接 fail）：
 
@@ -25,58 +76,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `language_mismatch` | 韩语任务韩文比例 < 5% | 同上 |
 | `high_chinese_ratio` | 日语任务中文 > 30%（即使有足够假名）| 中文混入过多 |
 | `high_chinese_ratio` | 非CJK任务中文整体占比 > 15% | 大段中文内容渗入 |
-| `word_count_critical_short` | 实际字数 < 目标 40% | 内容严重不足，不可用于训练 |
+| `word_count_critical_short` | 日韩实际字数 < 目标 15%；其余 < 40% | 内容严重不足 |
 | `scenario_placeholder_artifact` | 非中文任务对话行中出现 `Scenario: [大写]` | Bundle 把 scenario 描述直接写入台词 |
-| `core_marker_artifact` | 对话输出中出现任意 `<<…>>` 标记 | Bundle 渲染残留，应在生成时消化 |
+| `core_marker_artifact` | 对话输出中出现任意 `<<…>>` 标记 | Bundle 渲染残留 |
 | `chinese_role_name_leak` | 非CJK任务 >15% 的行含 >5% 中文字符 | 中文角色名渗漏到英/法/德等语言台词 |
 | `high_repetition_rate` | 唯一行率 < 60%（且总行数 > 5）| 内容高度重复，训练价值低 |
 
 **已知 bundle 限制**（无法从外部修复，只能靠门禁过滤）：
-- 英语输出：bundle 会把 `Scenario: A professional business discussion...` 嵌入台词 → `scenario_placeholder_artifact` 拦截
-- 英语输出：角色名退化为 "Professional" / "Counterpart" 而非真实人名
-- 日语输出：`<<コア:...>>` 标记未消化直接出现在台词里 → `core_marker_artifact` 拦截
-- 日语输出：中文角色名混入日语台词 → `chinese_role_name_leak` 拦截
+- 英语输出：bundle 会把 `Scenario: A professional business discussion...` 嵌入台词
+- 日语输出：`<<コア:...>>` 标记未消化直接出现在台词里
+- 日语输出：中文角色名混入日语台词
+- 日语/韩语：每次 bundle 调用仅生成约 300-800 个字符，大字数目标靠分块累积
 
-```bash
-# Full B0→B5 run (65,628 tasks total)
-python tools/training/run_all_batches.py
+### v2 训练数据（已锁定）
 
-# Resume after interruption
-python tools/training/run_all_batches.py --resume
-
-# Just B0 smoke + B1 foundation (recommended first run)
-python tools/training/run_all_batches.py --only-batches b0_smoke b1_foundation
-```
-
-Output lands in `output/training_v2/{batch}/passed/` (gitignored). See full execution guide: [`docs/training-plan-v2-execution.md`](docs/training-plan-v2-execution.md)
-
-**Quick progress check:**
-```bash
-python -c "
-import json, os
-for batch in ['b0_smoke','b1_foundation','b2_positive_pairs','b3_cross_combo_base','b4_high_risk_boost','b5_extreme_50k']:
-    p = f'output/training_v2/{batch}/_index.jsonl'
-    if not os.path.exists(p): print(f'{batch:<25} not started'); continue
-    records = [json.loads(l) for l in open(p,encoding='utf-8') if l.strip()]
-    by_tid = {}
-    for r in records:
-        tid = r['task_id']
-        if tid not in by_tid or (not by_tid[tid]['passed'] and r['passed']): by_tid[tid] = r
-    done = len(by_tid); passed = sum(1 for r in by_tid.values() if r['passed'])
-    print(f'{batch:<25} {passed:>5}/{done:<6} passed ({passed/done:.0%} rate)' if done else f'{batch:<25} 0 tasks')
-"
-```
-
-### Batch plan at a glance
-
-| Batch | Tasks | Key purpose |
-|-------|-------|-------------|
-| B0 smoke | 594 | Smoke validation — must pass ≥30% to continue |
-| B1 foundation | 3,960 | 22 templates × 3 langs × 5 sizes × 2 seeds |
-| B2 positive_pairs | 16,038 | 22 topic-template positive pairs, dense coverage |
-| B3 cross_combo_base | 24,948 | Full 21×22 topic-template cross, 3 sizes |
-| B4 high_risk_boost | 18,900 | 105 high-risk combos, large word counts |
-| B5 extreme_50k | 1,188 | 50k-word stress test, selected combos |
+v2 数据存于 `output/training_v2/`，已完成部分：
+- B0 中文：198/198 通过
+- B1 中文：360/361 通过
+- B0/B1 英语+日语：已清理（发现系统性质量问题）
+- B2–B5：未启动（已被 v3 方案取代）
 
 ---
 
@@ -94,11 +112,21 @@ for batch in ['b0_smoke','b1_foundation','b2_positive_pairs','b3_cross_combo_bas
 
 ---
 
-## 🖥 Platform — Current Status (2026-05-05)
+## 🖥 Platform — Current Status (2026-05-07)
 
-**Phase: Live. UI 任务页已支持分页，legacy 生成计数已修复。**
+**Phase: Live. 音色审计完成，TTS 警告追踪已上线，UI 多项优化。**
 
-### 近期 UI 变更（2026-05-05）
+### 近期变更（2026-05-07，commit 9efbba27）
+
+| 文件 | 改动 |
+|------|------|
+| `src/demo_app/embedded_server_main.py` | VOICE_CATALOG 替换废弃音色：`en-US-DavisNeural`→`BrianNeural`，`ru-RU-DariyaNeural`→`SvetlanaNeural` |
+| `src/webapp/task_runner.py` | 合成完成后读取 `audio_result["warning"]`，写入 `error_msg="[TTS_WARN] ..."`，任务卡片正确显示⚠️备用引擎状态 |
+| `src/webapp/handlers.py` | `_import` 路径支持 `tts_warning` 字段写入 DB |
+| `static/app.js` | 全量音色审计：移除 28 个废弃 Neural 音色（日/韩/英/俄等），保留 56 个有效音色 |
+| `static/index.html` | 默认主题改为浅色；底部 LAN 分享栏；任务卡片 TTS 回退橙色警告；语言名称显示中文；首页统计卡等高铺满 |
+
+### 近期变更（2026-05-05）
 
 | 文件 | 改动 |
 |------|------|
@@ -159,6 +187,40 @@ Schema per entry:
   "target_words": 1500
 }
 ```
+
+---
+
+## 🎙 真人 TTS API 接入 — 规划中（2026-05-07）
+
+**Phase: 方案已通过审核（v4.1 终版），等待 API 文档后进入 Phase 1 开发。**
+
+完整方案见：[`docs/real-human-tts-integration.md`](docs/real-human-tts-integration.md)
+
+### 方案概要
+
+当前 edge_tts Neural 合成存在拼接感明显、韵律不连贯等问题。方案核心设计：
+
+- **Provider 抽象层**：`EdgeTTSProvider` / `RealHumanProvider` / `BundleProvider` 统一接口，`TTSRouter` 路由
+- **段落合并**：同角色连续句合并为段落请求，消除句间机械停顿
+- **能力分级**：A 档（整段多 speaker）/ B 档（段落单 speaker）/ C 档（单句），按 `ProviderCapabilities` 字段驱动，不靠字符串硬判断
+- **tts_meta**：`audio_files` 表新增 JSON 字段，逐段记录 provider、耗时、降级原因、时间轴来源
+- **兼容策略**：`voice_map` 只读不写，新任务写 `voice_assignments`；公共 `voice_resolver.py` 兼容两种格式
+
+### 待新增文件（Phase 1 开工后）
+
+```
+src/demo_app/
+  tts_provider.py      ← TTSProvider 抽象 + TTSRouter + ProviderCapabilities + EdgeTTS/Bundle 迁入
+  real_human_tts.py    ← RealHumanProvider（依赖 API 文档）
+  voice_resolver.py    ← VoiceSpec.from_dict + resolve_voice_spec（新旧格式兼容）
+```
+
+### 开工前置条件
+
+1. API 文档（接口地址、鉴权、请求/响应格式）
+2. ProviderCapabilities 逐项确认（决定合成粒度）
+3. 音色 ID 列表（至少中/英）
+4. DB 路线：**路线 A（扩列）已确认**
 
 ---
 
@@ -276,11 +338,13 @@ training/                          ← training pipeline v2
   quality_scoring.py / dialogue_validators.py / training_storage.py
   plan_v2_data.py / data/training_jobs_b*.jsonl
 tools/training/
-  run_all_batches.py               ← B0→B5 sequential runner (main entry point)
-  run_training_plan.py / build_training_plan_jobs.py
+  run_all_batches.py               ← B0→B5 sequential runner (v2, superseded by v3)
+  run_v3_parallel.py               ← v3 parallel runner (current main entry point)
+  build_v3_jobs.py                 ← v3 job builder
 docs/
-  training-plan-v2-execution.md   ← full training execution guide
-  pipeline-guide.md               ← training pipeline architecture
+  real-human-tts-integration.md   ← 真人 TTS API 接入方案 v4.1（规划中）
+  training-plan-v2-execution.md   ← v2 training execution guide (reference only)
+  platform-changes.md             ← platform change log
 ```
 
 ### The "bundle" concept
@@ -298,8 +362,19 @@ Three tables in `runtime/platform.db`:
 | Table | Key columns | Notes |
 |-------|-------------|-------|
 | `audio_files` | file_id, file_name, file_path, source, duration, language, speaker_count, scene, topic, folder_id, deleted, deleted_at | soft-delete via `deleted=1` |
-| `tasks` | task_id, status, generation_mode, topic, language, people_count, word_count, error_msg, file_id | statuses: queued → generating_text → synthesizing → completed / failed |
+| `tasks` | task_id, status, generation_mode, topic, language, people_count, word_count, error_msg, file_id, voice_map, output_format, keywords, template, custom_prompt, input_text, include_scripts | statuses: queued → generating_text → synthesizing → completed / failed；参数拆列存储（无 params_json） |
 | `folders` | folder_id, name, parent_id | used to group files in 我的文件 view |
+
+**待新增列（真人 TTS Phase 1 开工时迁移）：**
+
+| 表 | 列 | 说明 |
+|----|----|------|
+| `tasks` | `tts_provider` TEXT DEFAULT 'edge_tts' | 期望 provider |
+| `tasks` | `tts_fallback_strategy` TEXT DEFAULT 'edge_then_bundle' | 降级策略 |
+| `tasks` | `voice_assignments` TEXT DEFAULT '{}' | 新格式音色参数 JSON |
+| `audio_files` | `tts_meta` TEXT DEFAULT NULL | 逐段降级详情 JSON |
+
+迁移由 `db._run_tts_migration()` 幂等执行（PRAGMA table_info 检查后再 ALTER TABLE）。
 
 `src/webapp/db.py` provides all helpers; `src/webapp/task_runner.py` polls for queued tasks and drives them through the status machine.
 
@@ -349,15 +424,21 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 **Audio synthesis (`POST /api/synthesize_audio`)**
 1. Manifest looked up from cache/disk (`_find_manifest`)
 2. Each dialogue line assigned an edge_tts voice (`_voice_for_speaker` → `VOICE_CATALOG`)
-3. `asyncio.gather` with `Semaphore(5)` fans out concurrent `edge_tts.Communicate.save()` calls
-4. `pydub` probes segment durations (read-then-discard, no accumulation)
-5. `subprocess.run(ffmpeg -f concat …)` stitches segments; temporary `.mp3` segment files cleaned up in `finally`
+3. Phase 0: `asyncio.gather` with `Semaphore(5)` fans out concurrent `edge_tts.Communicate.save()` calls
+4. Phase 0b: failed segments retried sequentially; Phase 0c: still-failed → raise → bundle fallback
+5. `pydub` probes segment durations (read-then-discard, no accumulation)
+6. `subprocess.run(ffmpeg -f concat …)` stitches segments; temp `.mp3` files cleaned up in `finally`
+7. Returns `warning: "edge_tts_fallback:..."` if bundle fallback was used
+
+**TTS voice catalog (`VOICE_CATALOG` in `embedded_server_main.py`)**
+
+56 working voices across 13 languages (28 deprecated voices removed 2026-05-07). Backend auto-assignment uses `VOICE_CATALOG`; frontend dropdown uses `VOICE_LIBRARY` in `app.js`. Both were updated in the same audit.
 
 **Platform task generation (`POST /api/platform/tasks` → task worker)**
-1. Payload stored as `params_json` in DB, status set to `queued`
+1. Payload params stored as individual columns in DB (no params_json), status set to `queued`
 2. `src/webapp/task_runner.py` polling loop picks up queued tasks
 3. Calls same internal generate + synthesise pipeline
-4. On success: writes audio to `storage/generated/`, updates DB with result path
+4. On success: writes audio to `storage/generated/`, updates DB with result path; if `audio_result["warning"]` is set, stores `error_msg="[TTS_WARN] ..."` to surface fallback in UI
 5. On failure: stores error_msg, sets status `failed`
 
 ### Key global state in `embedded_server_main.py`
