@@ -1,0 +1,102 @@
+{
+  "task_id": "e19d2ac34032",
+  "stage": "v3_long_chinese",
+  "job_function": "制造业",
+  "language": "中文",
+  "scenario": "【主题】生产线效率提升和瓶颈工序优化会议讨论\n围绕生产线效率提升和瓶颈工序优化展开讨论，重点关注设备稼动率、良品率、异常停机、工时浪费、排产计划、自动化改造机会、产能提升空间，以及降本增效的落地措施。",
+  "core_content": "核心关键词：瓶颈工序、设备效率、良率波动、排产协同、异常处理、改善动作。围绕生产线效率提升和瓶颈工序优化展开讨论，重点关注设备稼动率、良品率、异常停机、工时浪费、排产计划、自动化改造机会、产能提升空间，以及降本增效的落地措施。",
+  "people_count": 3,
+  "word_count": 10000,
+  "seed": 1869398623,
+  "effective_params": {
+    "scenario_head": "【主题】生产线效率提升和瓶颈工序优化会议讨论\n围绕生产线效率提升和瓶颈工序优化展开讨论，重点关注设备稼动率、良品率、异常",
+    "core_head": "核心关键词：瓶颈工序、设备效率、良率波动、排产协同、异常处理、改善动作。围绕生产线效率提升和瓶颈工序优化展开讨论，重点关",
+    "people_count": 3,
+    "word_count": 10000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 1353477525,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 71,
+          "2": 33,
+          "3": 9
+        },
+        "after": {
+          "1": 71,
+          "2": 33,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 10,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 7,
+              "commitment": 3
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 22
+    },
+    "line_count": 386,
+    "total_chars": 10040,
+    "seed": 1869398623,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 386,
+    "total_chars": 10040,
+    "speaker_distribution": {
+      "Speaker 1": 197,
+      "Speaker 2": 139,
+      "Speaker 3": 50
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 386,
+      "total_chars": 10040,
+      "marker_count": 0,
+      "chinese_ratio": 0.5698,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 197,
+        "Speaker 2": 139,
+        "Speaker 3": 50
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

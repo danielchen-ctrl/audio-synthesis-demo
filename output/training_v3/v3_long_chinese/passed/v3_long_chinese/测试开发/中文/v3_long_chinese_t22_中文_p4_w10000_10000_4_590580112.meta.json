@@ -1,0 +1,82 @@
+{
+  "task_id": "7d54b1d25f6d",
+  "stage": "v3_long_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】朋友圈隐私可见范围、内容审核和权限控制测试讨论\n围绕朋友圈内容的隐私可见范围、权限控制和内容审核展开讨论，重点覆盖好友可见、分组可见、仅自己可见、黑名单屏蔽、访问权限校验、隐私泄露风险、敏感词检测、图片视频审核、人工复审和违规内容拦截。",
+  "core_content": "核心关键词：好友可见、分组可见、黑名单屏蔽、权限校验、敏感词检测、图片审核、违规内容拦截。围绕朋友圈内容的隐私可见范围、权限控制和内容审核展开讨论，重点覆盖好友可见、分组可见、仅自己可见、黑名单屏蔽、访问权限校验、隐私泄露风险、敏感词检测、图片视频审核、人工复审和违规内容拦截。",
+  "people_count": 4,
+  "word_count": 10000,
+  "seed": 590580112,
+  "effective_params": {
+    "scenario_head": "【主题】朋友圈隐私可见范围、内容审核和权限控制测试讨论\n围绕朋友圈内容的隐私可见范围、权限控制和内容审核展开讨论，重点覆",
+    "core_head": "核心关键词：好友可见、分组可见、黑名单屏蔽、权限校验、敏感词检测、图片审核、违规内容拦截。围绕朋友圈内容的隐私可见范围、",
+    "people_count": 4,
+    "word_count": 10000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 3656794242,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比8.5%不足（需要>=15%）', 'Speaker 4 占比11.6%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比8.5%不足（需要>=15%）",
+          "Speaker 4 占比11.6%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 386,
+    "total_chars": 10057,
+    "seed": 590580112,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 386,
+    "total_chars": 10057,
+    "speaker_distribution": {
+      "Speaker 1": 186,
+      "Speaker 2": 130,
+      "Speaker 3": 34,
+      "Speaker 4": 36
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 386,
+      "total_chars": 10057,
+      "marker_count": 0,
+      "chinese_ratio": 0.5699,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 186,
+        "Speaker 2": 130,
+        "Speaker 3": 34,
+        "Speaker 4": 36
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

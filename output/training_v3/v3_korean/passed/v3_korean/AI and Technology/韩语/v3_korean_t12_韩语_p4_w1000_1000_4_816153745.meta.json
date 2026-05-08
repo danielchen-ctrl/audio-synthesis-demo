@@ -1,0 +1,119 @@
+{
+  "task_id": "493b4a67e68c",
+  "stage": "v3_korean",
+  "job_function": "AI and Technology",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: AI 产品免费用户向付费会员转化方案讨论]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 转化漏斗, 付费门槛, 试用策略, 价值感知, 数据回收, 实验计划]",
+  "people_count": 4,
+  "word_count": 1000,
+  "seed": 816153745,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 4,
+    "word_count": 1000,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 595826094,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 20,
+          "2": 10,
+          "3": 8,
+          "4": 3
+        },
+        "after": {
+          "1": 19,
+          "2": 10,
+          "3": 8,
+          "4": 8
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 5,
+          "speakers_fixed": [
+            "Speaker 4"
+          ],
+          "early_fixed": [
+            "Speaker 4"
+          ],
+          "ratio_fixed": [
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "speaker_contributions": {
+            "Speaker 4": {
+              "challenge": 3,
+              "commitment": 2
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 46,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 34
+    },
+    "line_count": 27,
+    "total_chars": 1508,
+    "seed": 816153745,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 27,
+    "total_chars": 1391,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 6,
+      "Speaker 3": 8,
+      "Speaker 4": 6
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 27,
+      "total_chars": 1391,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.2217,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 6,
+        "Speaker 3": 8,
+        "Speaker 4": 6
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.7407
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=1000, actual=1391",
+        "details": {
+          "target": 1000,
+          "actual": 1391
+        }
+      }
+    ]
+  }
+}

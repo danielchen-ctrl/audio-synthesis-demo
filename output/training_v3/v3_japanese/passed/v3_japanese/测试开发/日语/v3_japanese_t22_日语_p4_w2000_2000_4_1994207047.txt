@@ -1,0 +1,20 @@
+Speaker 1: こんにちは。今日は前提と進め方を先にそろえます。
+Speaker 2: こんにちは。こちらでも前提を確認してきました。
+Speaker 3: こんにちは。必要な論点を一緒に確認します。
+Speaker 1: いま一番詰まっている論点はどこですか。
+Speaker 1: この問題はいつ頃から表面化しましたか。
+Speaker 1: 最終的にどのような状態を目指していますか。
+Speaker 4: 補足ですが、スケジュールについて検討します。
+Speaker 4: 质量负责人の観点から、優先的に対応します。
+Speaker 2: 了解しました。その点は判断の前提として押さえておきます。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 1: では、ここまでの論点を整理します。
+Speaker 1: いちばん重要なのは、. 这是我们需要特别关注的。
+Speaker 3: Okay, I will cooperate.
+Speaker 3: This explanation is very clear, I understand now.
+Speaker 3: Indeed, these details need attention.
+Speaker 4: Okay, I will prepare carefully.
+Speaker 3: Understood, I will cooperate on my end.
+Speaker 4: This suggestion is very helpful, thank you.
+Speaker 3: I'd also like to understand this aspect.
+Speaker 4: I'd also like to understand this aspect.

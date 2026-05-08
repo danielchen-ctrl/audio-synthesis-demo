@@ -1,0 +1,104 @@
+{
+  "task_id": "750d3f85e034",
+  "stage": "v3_english",
+  "job_function": "AI and Technology",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: AI 产品免费用户向付费会员转化方案讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 转化漏斗, 付费门槛, 试用策略, 价值感知, 数据回收, 实验计划]",
+  "people_count": 3,
+  "word_count": 2000,
+  "seed": 2125196692,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 3,
+    "word_count": 2000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": true,
+      "rewrite_count": 2,
+      "fill_turns": 0,
+      "seed": 3566535386,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 20,
+          "2": 10,
+          "3": 8
+        },
+        "after": {
+          "1": 19,
+          "2": 10,
+          "3": 8
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 38,
+      "duplicate_intro_fixed": 3,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 7
+    },
+    "line_count": 36,
+    "total_chars": 2601,
+    "seed": 2125196692,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 36,
+    "total_chars": 2601,
+    "speaker_distribution": {
+      "Speaker 1": 19,
+      "Speaker 2": 9,
+      "Speaker 3": 8
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 36,
+      "total_chars": 2601,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 19,
+        "Speaker 2": 9,
+        "Speaker 3": 8
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=2000, actual=2601",
+        "details": {
+          "target": 2000,
+          "actual": 2601
+        }
+      }
+    ]
+  }
+}

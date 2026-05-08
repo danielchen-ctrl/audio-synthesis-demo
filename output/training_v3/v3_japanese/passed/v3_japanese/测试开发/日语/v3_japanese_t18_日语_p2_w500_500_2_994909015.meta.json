@@ -1,0 +1,70 @@
+{
+  "task_id": "cd929e2ceeb0",
+  "stage": "v3_japanese",
+  "job_function": "测试开发",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 支付系统上线前的退款安全、对账差错和稳定性准入评估]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 退款申请, 重复退款, 越权退款, 金额校验, 退款回调, 风控拦截, 资金安全风险]",
+  "people_count": 2,
+  "word_count": 500,
+  "seed": 994909015,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 2,
+    "word_count": 500,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 910786543,
+      "is_from_v2": false,
+      "placeholder_violations": 26,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 24
+    },
+    "line_count": 14,
+    "total_chars": 559,
+    "seed": 994909015,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 14,
+    "total_chars": 456,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 7
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 14,
+      "total_chars": 456,
+      "marker_count": 0,
+      "chinese_ratio": 0.1493,
+      "kana_ratio": 0.2729,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 7
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.8571
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

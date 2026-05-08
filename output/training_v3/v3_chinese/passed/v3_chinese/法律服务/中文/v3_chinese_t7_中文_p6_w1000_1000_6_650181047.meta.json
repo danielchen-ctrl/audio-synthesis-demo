@@ -1,0 +1,91 @@
+{
+  "task_id": "daff7bab67cf",
+  "stage": "v3_chinese",
+  "job_function": "法律服务",
+  "language": "中文",
+  "scenario": "【主题】企业年度法律顾问专项服务内容和交付安排讨论\n围绕企业年度法律顾问专项服务的范围和交付安排展开讨论，重点包括合同审查、合规咨询、法律意见输出、争议处理支持、服务边界确认、客户重点风险，以及专项服务的交付节奏和责任分工。",
+  "core_content": "核心关键词：风险识别、证据材料、处理方案、边界判断、执行安排、分工建议。围绕企业年度法律顾问专项服务的范围和交付安排展开讨论，重点包括合同审查、合规咨询、法律意见输出、争议处理支持、服务边界确认、客户重点风险，以及专项服务的交付节奏和责任分工。",
+  "people_count": 6,
+  "word_count": 1000,
+  "seed": 650181047,
+  "effective_params": {
+    "scenario_head": "【主题】企业年度法律顾问专项服务内容和交付安排讨论\n围绕企业年度法律顾问专项服务的范围和交付安排展开讨论，重点包括合同审",
+    "core_head": "核心关键词：风险识别、证据材料、处理方案、边界判断、执行安排、分工建议。围绕企业年度法律顾问专项服务的范围和交付安排展开",
+    "people_count": 6,
+    "word_count": 1000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 3283338169,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 1 前10轮仅出现1次（需要>=2）', 'Speaker 2 前10轮仅出现1次（需要>=2）', 'Speaker 2 占比14.0%不足（需要>=15%）', 'Speaker 3 占比14.0%不足（需要>=15%）', 'Speaker 5 占比9.3%不足（需要>=15%）', 'Speaker 6 占比9.3%不足（需要>=15%）', 'Speaker 4 占比9.3%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 1 前10轮仅出现1次（需要>=2）",
+          "Speaker 2 前10轮仅出现1次（需要>=2）",
+          "Speaker 2 占比14.0%不足（需要>=15%）",
+          "Speaker 3 占比14.0%不足（需要>=15%）",
+          "Speaker 5 占比9.3%不足（需要>=15%）",
+          "Speaker 6 占比9.3%不足（需要>=15%）",
+          "Speaker 4 占比9.3%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 7
+    },
+    "line_count": 37,
+    "total_chars": 894,
+    "seed": 650181047,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 37,
+    "total_chars": 894,
+    "speaker_distribution": {
+      "Speaker 1": 19,
+      "Speaker 2": 6,
+      "Speaker 3": 5,
+      "Speaker 4": 3,
+      "Speaker 5": 2,
+      "Speaker 6": 2
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 37,
+      "total_chars": 894,
+      "marker_count": 0,
+      "chinese_ratio": 0.5797,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 19,
+        "Speaker 2": 6,
+        "Speaker 3": 5,
+        "Speaker 4": 3,
+        "Speaker 5": 2,
+        "Speaker 6": 2
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

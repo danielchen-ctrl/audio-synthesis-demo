@@ -1,0 +1,119 @@
+{
+  "task_id": "687f8daed9d0",
+  "stage": "v3_korean",
+  "job_function": "Insurance",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 保险销售录音中的话术合规和质检问题复盘]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 录音质检, 销售话术, 风险点, 培训改进, 复盘闭环, 改进动作]",
+  "people_count": 4,
+  "word_count": 500,
+  "seed": 1299381274,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 4,
+    "word_count": 500,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 2286937463,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 18,
+          "2": 8,
+          "3": 7,
+          "4": 3
+        },
+        "after": {
+          "1": 17,
+          "2": 8,
+          "3": 7,
+          "4": 7
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 4,
+          "speakers_fixed": [
+            "Speaker 4"
+          ],
+          "early_fixed": [
+            "Speaker 4"
+          ],
+          "ratio_fixed": [
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "speaker_contributions": {
+            "Speaker 4": {
+              "challenge": 2,
+              "commitment": 2
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 40,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 30
+    },
+    "line_count": 26,
+    "total_chars": 1469,
+    "seed": 1299381274,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 26,
+    "total_chars": 1347,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 7,
+      "Speaker 3": 7,
+      "Speaker 4": 5
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 26,
+      "total_chars": 1347,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.2413,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 7,
+        "Speaker 3": 7,
+        "Speaker 4": 5
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.8077
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=500, actual=1347",
+        "details": {
+          "target": 500,
+          "actual": 1347
+        }
+      }
+    ]
+  }
+}

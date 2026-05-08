@@ -1,0 +1,104 @@
+{
+  "task_id": "cba735d5cdd2",
+  "stage": "v3_chinese",
+  "job_function": "零售行业",
+  "language": "中文",
+  "scenario": "【主题】提升老会员复购率的运营活动方案讨论\n围绕提升老会员复购率的运营方案展开讨论，重点分析会员消费频次、客单价变化、沉睡会员唤醒、优惠券和积分权益设计、用户分层运营、私域触达节奏，以及活动后的复购转化效果。",
+  "core_content": "核心关键词：会员分层、活动策略、复购触达、门店配合、效果验证、执行节奏。围绕提升老会员复购率的运营方案展开讨论，重点分析会员消费频次、客单价变化、沉睡会员唤醒、优惠券和积分权益设计、用户分层运营、私域触达节奏，以及活动后的复购转化效果。",
+  "people_count": 3,
+  "word_count": 1000,
+  "seed": 1657961243,
+  "effective_params": {
+    "scenario_head": "【主题】提升老会员复购率的运营活动方案讨论\n围绕提升老会员复购率的运营方案展开讨论，重点分析会员消费频次、客单价变化、沉",
+    "core_head": "核心关键词：会员分层、活动策略、复购触达、门店配合、效果验证、执行节奏。围绕提升老会员复购率的运营方案展开讨论，重点分析",
+    "people_count": 3,
+    "word_count": 1000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 2029169255,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 23,
+          "2": 7,
+          "3": 4
+        },
+        "after": {
+          "1": 23,
+          "2": 7,
+          "3": 7
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 3,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [
+            "Speaker 3"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 2,
+              "commitment": 1
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 16
+    },
+    "line_count": 37,
+    "total_chars": 844,
+    "seed": 1657961243,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 37,
+    "total_chars": 844,
+    "speaker_distribution": {
+      "Speaker 1": 23,
+      "Speaker 2": 7,
+      "Speaker 3": 7
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 37,
+      "total_chars": 844,
+      "marker_count": 0,
+      "chinese_ratio": 0.5789,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 23,
+        "Speaker 2": 7,
+        "Speaker 3": 7
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.9459
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

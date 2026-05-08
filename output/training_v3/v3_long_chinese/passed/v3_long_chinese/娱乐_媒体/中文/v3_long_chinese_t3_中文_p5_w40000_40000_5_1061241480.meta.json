@@ -1,0 +1,95 @@
+{
+  "task_id": "46f87767b54b",
+  "stage": "v3_long_chinese",
+  "job_function": "娱乐/媒体",
+  "language": "中文",
+  "scenario": "【主题】某艺人下季度品牌代言和商务合作机会讨论\n围绕某位艺人下一阶段的商业合作机会展开讨论，重点包括品牌代言匹配度、艺人报价、档期协调、粉丝画像、商业价值评估、宣发资源配合、合作权益设计，以及品牌方对曝光和转化效果的预期。",
+  "core_content": "核心关键词：商业定位、品牌匹配、报价策略、执行风险、转化目标、合作判断。围绕某位艺人下一阶段的商业合作机会展开讨论，重点包括品牌代言匹配度、艺人报价、档期协调、粉丝画像、商业价值评估、宣发资源配合、合作权益设计，以及品牌方对曝光和转化效果的预期。",
+  "people_count": 5,
+  "word_count": 40000,
+  "seed": 1061241480,
+  "effective_params": {
+    "scenario_head": "【主题】某艺人下季度品牌代言和商务合作机会讨论\n围绕某位艺人下一阶段的商业合作机会展开讨论，重点包括品牌代言匹配度、艺人",
+    "core_head": "核心关键词：商业定位、品牌匹配、报价策略、执行风险、转化目标、合作判断。围绕某位艺人下一阶段的商业合作机会展开讨论，重点",
+    "people_count": 5,
+    "word_count": 40000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 2481595936,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比4.9%不足（需要>=15%）', 'Speaker 5 占比4.9%不足（需要>=15%）', 'Speaker 4 占比5.7%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比4.9%不足（需要>=15%）",
+          "Speaker 5 占比4.9%不足（需要>=15%）",
+          "Speaker 4 占比5.7%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 1153,
+    "total_chars": 26049,
+    "seed": 1061241480,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 1153,
+    "total_chars": 26049,
+    "speaker_distribution": {
+      "Speaker 1": 285,
+      "Speaker 2": 384,
+      "Speaker 3": 257,
+      "Speaker 4": 190,
+      "Speaker 5": 37
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 1153,
+      "total_chars": 26049,
+      "marker_count": 0,
+      "chinese_ratio": 0.5461,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 285,
+        "Speaker 2": 384,
+        "Speaker 3": 257,
+        "Speaker 4": 190,
+        "Speaker 5": 37
+      },
+      "target_word_count": 40000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=40000, actual=26049",
+        "details": {
+          "target": 40000,
+          "actual": 26049
+        }
+      }
+    ]
+  }
+}

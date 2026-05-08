@@ -1,0 +1,114 @@
+{
+  "task_id": "25d8ffcb7edd",
+  "stage": "v3_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】朋友圈点赞评论、互动计数和多端状态一致性测试讨论\n围绕朋友圈点赞评论等社交互动功能的一致性测试展开讨论，重点关注点赞、取消点赞、评论发布、评论同步、互动计数、重复点击、并发互动、状态回显、消息通知、数据刷新，以及多端展示是否一致。",
+  "core_content": "核心关键词：点赞评论、互动计数、多端展示、状态回显、重复点击、并发互动、数据一致。围绕朋友圈点赞评论等社交互动功能的一致性测试展开讨论，重点关注点赞、取消点赞、评论发布、评论同步、互动计数、重复点击、并发互动、状态回显、消息通知、数据刷新，以及多端展示是否一致。",
+  "people_count": 3,
+  "word_count": 5000,
+  "seed": 1780613308,
+  "effective_params": {
+    "scenario_head": "【主题】朋友圈点赞评论、互动计数和多端状态一致性测试讨论\n围绕朋友圈点赞评论等社交互动功能的一致性测试展开讨论，重点关注",
+    "core_head": "核心关键词：点赞评论、互动计数、多端展示、状态回显、重复点击、并发互动、数据一致。围绕朋友圈点赞评论等社交互动功能的一致",
+    "people_count": 3,
+    "word_count": 5000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 2675883619,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 71,
+          "2": 32,
+          "3": 8
+        },
+        "after": {
+          "1": 71,
+          "2": 32,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 11,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [
+            "Speaker 3"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 8,
+              "commitment": 3
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 23
+    },
+    "line_count": 121,
+    "total_chars": 2583,
+    "seed": 1780613308,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 121,
+    "total_chars": 2583,
+    "speaker_distribution": {
+      "Speaker 1": 71,
+      "Speaker 2": 32,
+      "Speaker 3": 18
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 121,
+      "total_chars": 2583,
+      "marker_count": 0,
+      "chinese_ratio": 0.5548,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 71,
+        "Speaker 2": 32,
+        "Speaker 3": 18
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 0.8843
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=2583",
+        "details": {
+          "target": 5000,
+          "actual": 2583
+        }
+      }
+    ]
+  }
+}

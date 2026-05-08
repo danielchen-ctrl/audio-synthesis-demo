@@ -1,0 +1,111 @@
+{
+  "task_id": "589d1162117c",
+  "stage": "v3_long_chinese",
+  "job_function": "金融/投资",
+  "language": "中文",
+  "scenario": "【主题】中高净值客户年度资产配置方案沟通\n围绕中高净值客户年度资产配置方案展开沟通，重点讨论客户风险偏好、收益目标、现有资产结构、股票债券基金比例、市场波动影响、流动性需求、资产再平衡策略，以及长期投资规划。",
+  "core_content": "核心关键词：配置目标、风险偏好、资金安排、收益预期、调整策略、风险提示。围绕中高净值客户年度资产配置方案展开沟通，重点讨论客户风险偏好、收益目标、现有资产结构、股票债券基金比例、市场波动影响、流动性需求、资产再平衡策略，以及长期投资规划。",
+  "people_count": 3,
+  "word_count": 40000,
+  "seed": 524181287,
+  "effective_params": {
+    "scenario_head": "【主题】中高净值客户年度资产配置方案沟通\n围绕中高净值客户年度资产配置方案展开沟通，重点讨论客户风险偏好、收益目标、现有",
+    "core_head": "核心关键词：配置目标、风险偏好、资金安排、收益预期、调整策略、风险提示。围绕中高净值客户年度资产配置方案展开沟通，重点讨",
+    "people_count": 3,
+    "word_count": 40000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 18,
+      "seed": 1031381851,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 63,
+          "2": 34,
+          "3": 10
+        },
+        "after": {
+          "1": 63,
+          "2": 34,
+          "3": 18
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 8,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 5,
+              "commitment": 3
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 15
+    },
+    "line_count": 896,
+    "total_chars": 20184,
+    "seed": 524181287,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 896,
+    "total_chars": 20184,
+    "speaker_distribution": {
+      "Speaker 1": 281,
+      "Speaker 2": 386,
+      "Speaker 3": 229
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 896,
+      "total_chars": 20184,
+      "marker_count": 0,
+      "chinese_ratio": 0.5433,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 281,
+        "Speaker 2": 386,
+        "Speaker 3": 229
+      },
+      "target_word_count": 40000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=40000, actual=20184",
+        "details": {
+          "target": 40000,
+          "actual": 20184
+        }
+      }
+    ]
+  }
+}

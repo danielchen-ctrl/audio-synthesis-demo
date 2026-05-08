@@ -1,0 +1,109 @@
+{
+  "task_id": "998ab4478631",
+  "stage": "v3_chinese",
+  "job_function": "汽车行业",
+  "language": "中文",
+  "scenario": "【主题】新能源车型上市前的区域投放和销售策略讨论\n围绕一款新车型上市前的市场投放计划展开讨论，重点包括目标用户画像、区域投放节奏、经销商铺货、竞品车型对比、价格策略、试驾转化、销售目标拆解，以及上市期间的市场推广资源安排。",
+  "core_content": "核心关键词：投放节奏、渠道准备、卖点表达、库存规划、区域反馈、动作安排。围绕一款新车型上市前的市场投放计划展开讨论，重点包括目标用户画像、区域投放节奏、经销商铺货、竞品车型对比、价格策略、试驾转化、销售目标拆解，以及上市期间的市场推广资源安排。",
+  "people_count": 3,
+  "word_count": 2000,
+  "seed": 2017805113,
+  "effective_params": {
+    "scenario_head": "【主题】新能源车型上市前的区域投放和销售策略讨论\n围绕一款新车型上市前的市场投放计划展开讨论，重点包括目标用户画像、区域",
+    "core_head": "核心关键词：投放节奏、渠道准备、卖点表达、库存规划、区域反馈、动作安排。围绕一款新车型上市前的市场投放计划展开讨论，重点",
+    "people_count": 3,
+    "word_count": 2000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 11,
+      "seed": 3047897788,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 46,
+          "2": 21,
+          "3": 9
+        },
+        "after": {
+          "1": 46,
+          "2": 22,
+          "3": 13
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 5,
+          "speakers_fixed": [
+            "Speaker 3",
+            "Speaker 2"
+          ],
+          "early_fixed": [
+            "Speaker 2"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 2": {
+              "challenge": 1,
+              "commitment": 0
+            },
+            "Speaker 3": {
+              "challenge": 2,
+              "commitment": 2
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 18
+    },
+    "line_count": 81,
+    "total_chars": 1848,
+    "seed": 2017805113,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 81,
+    "total_chars": 1848,
+    "speaker_distribution": {
+      "Speaker 1": 46,
+      "Speaker 2": 22,
+      "Speaker 3": 13
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 81,
+      "total_chars": 1848,
+      "marker_count": 0,
+      "chinese_ratio": 0.5672,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 46,
+        "Speaker 2": 22,
+        "Speaker 3": 13
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.9506
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "task_id": "52f8b9f52bb4",
+  "stage": "v3_japanese",
+  "job_function": "保険",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 保险销售录音中的话术合规和质检问题复盘]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 录音质检, 销售话术, 风险点, 培训改进, 复盘闭环, 改进动作]",
+  "people_count": 3,
+  "word_count": 500,
+  "seed": 1660669453,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 3,
+    "word_count": 500,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 2000296145,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 18,
+          "2": 6,
+          "3": 5
+        },
+        "after": {
+          "1": 17,
+          "2": 6,
+          "3": 5
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 29,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 24
+    },
+    "line_count": 16,
+    "total_chars": 675,
+    "seed": 1660669453,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 16,
+    "total_chars": 566,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 3": 5,
+      "Speaker 2": 4
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 16,
+      "total_chars": 566,
+      "marker_count": 0,
+      "chinese_ratio": 0.1162,
+      "kana_ratio": 0.2378,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 3": 5,
+        "Speaker 2": 4
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.8125
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "task_id": "75836c476016",
+  "stage": "v3_long_chinese",
+  "job_function": "法律服务",
+  "language": "中文",
+  "scenario": "【主题】企业年度法律顾问专项服务内容和交付安排讨论\n围绕企业年度法律顾问专项服务的范围和交付安排展开讨论，重点包括合同审查、合规咨询、法律意见输出、争议处理支持、服务边界确认、客户重点风险，以及专项服务的交付节奏和责任分工。",
+  "core_content": "核心关键词：风险识别、证据材料、处理方案、边界判断、执行安排、分工建议。围绕企业年度法律顾问专项服务的范围和交付安排展开讨论，重点包括合同审查、合规咨询、法律意见输出、争议处理支持、服务边界确认、客户重点风险，以及专项服务的交付节奏和责任分工。",
+  "people_count": 3,
+  "word_count": 50000,
+  "seed": 1800571887,
+  "effective_params": {
+    "scenario_head": "【主题】企业年度法律顾问专项服务内容和交付安排讨论\n围绕企业年度法律顾问专项服务的范围和交付安排展开讨论，重点包括合同审",
+    "core_head": "核心关键词：风险识别、证据材料、处理方案、边界判断、执行安排、分工建议。围绕企业年度法律顾问专项服务的范围和交付安排展开",
+    "people_count": 3,
+    "word_count": 50000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 19,
+      "seed": 3542517976,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 66,
+          "2": 37,
+          "3": 10
+        },
+        "after": {
+          "1": 66,
+          "2": 37,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 9,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 5,
+              "commitment": 4
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 15
+    },
+    "line_count": 895,
+    "total_chars": 20291,
+    "seed": 1800571887,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 895,
+    "total_chars": 20291,
+    "speaker_distribution": {
+      "Speaker 1": 280,
+      "Speaker 2": 374,
+      "Speaker 3": 241
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 895,
+      "total_chars": 20291,
+      "marker_count": 0,
+      "chinese_ratio": 0.545,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 280,
+        "Speaker 2": 374,
+        "Speaker 3": 241
+      },
+      "target_word_count": 50000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=50000, actual=20291",
+        "details": {
+          "target": 50000,
+          "actual": 20291
+        }
+      }
+    ]
+  }
+}

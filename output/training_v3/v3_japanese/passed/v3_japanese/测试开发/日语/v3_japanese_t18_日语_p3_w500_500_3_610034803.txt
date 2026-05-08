@@ -1,0 +1,21 @@
+Speaker 1: こんにちは。今日は前提と進め方を先にそろえます。
+Speaker 2: こんにちは。こちらでも前提を確認してきました。
+Speaker 3: こんにちは。論点整理は進められます。
+Speaker 1: いま一番詰まっている論点はどこですか。
+Speaker 2: 理解しました。少し整理する時間をいただけますか。
+Speaker 1: 最も重要なのは：
+Speaker 1: この問題はいつ頃から表面化しましたか。
+Speaker 3: 運用面の影響も見たいので、確認してから返答します。
+Speaker 1: 最終的にどのような状態を目指していますか。
+Speaker 2: この点は確認して、整理でき次第ご報告します。
+Speaker 2: 各ステップで注意すべき点を先に確認したいです。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 2: 方向性はよさそうです。前提条件をもう少し具体化できますか。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 2: 了解しました。その点は判断の前提として押さえておきます。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 1: では、ここまでの論点を整理します。
+Speaker 3: Okay, I will cooperate.
+Speaker 1: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 2: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 3: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.

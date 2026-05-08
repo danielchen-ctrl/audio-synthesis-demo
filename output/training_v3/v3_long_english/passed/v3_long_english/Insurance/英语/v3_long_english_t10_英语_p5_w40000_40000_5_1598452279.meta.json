@@ -1,0 +1,96 @@
+{
+  "task_id": "798d945fae46",
+  "stage": "v3_long_english",
+  "job_function": "Insurance",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 保险销售录音中的话术合规和质检问题复盘]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 录音质检, 销售话术, 风险点, 培训改进, 复盘闭环, 改进动作]",
+  "people_count": 5,
+  "word_count": 40000,
+  "seed": 1598452279,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 5,
+    "word_count": 40000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 4126697337,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 4 前10轮仅出现1次（需要>=2）', 'Speaker 4 占比11.5%不足（需要>=15%）', 'Speaker 5 占比9.6%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 4 前10轮仅出现1次（需要>=2）",
+          "Speaker 4 占比11.5%不足（需要>=15%）",
+          "Speaker 5 占比9.6%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 46,
+      "duplicate_intro_fixed": 2,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 6
+    },
+    "line_count": 257,
+    "total_chars": 17037,
+    "seed": 1598452279,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 257,
+    "total_chars": 17037,
+    "speaker_distribution": {
+      "Speaker 1": 122,
+      "Speaker 2": 65,
+      "Speaker 3": 38,
+      "Speaker 4": 20,
+      "Speaker 5": 12
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 257,
+      "total_chars": 17037,
+      "marker_count": 0,
+      "chinese_ratio": 0.0012,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 122,
+        "Speaker 2": 65,
+        "Speaker 3": 38,
+        "Speaker 4": 20,
+        "Speaker 5": 12
+      },
+      "target_word_count": 40000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=40000, actual=17037",
+        "details": {
+          "target": 40000,
+          "actual": 17037
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "task_id": "1cc3dd161003",
+  "stage": "v3_long_english",
+  "job_function": "测试开发",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 支付系统上线前的退款安全、对账差错和稳定性准入评估]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 退款申请, 重复退款, 越权退款, 金额校验, 退款回调, 风控拦截, 资金安全风险]",
+  "people_count": 2,
+  "word_count": 20000,
+  "seed": 836165561,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 2,
+    "word_count": 20000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 2,
+      "seed": 601887713,
+      "is_from_v2": false,
+      "placeholder_violations": 40,
+      "duplicate_intro_fixed": 2,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 4
+    },
+    "line_count": 262,
+    "total_chars": 18471,
+    "seed": 836165561,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 262,
+    "total_chars": 18471,
+    "speaker_distribution": {
+      "Speaker 1": 161,
+      "Speaker 2": 101
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 262,
+      "total_chars": 18471,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 161,
+        "Speaker 2": 101
+      },
+      "target_word_count": 20000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

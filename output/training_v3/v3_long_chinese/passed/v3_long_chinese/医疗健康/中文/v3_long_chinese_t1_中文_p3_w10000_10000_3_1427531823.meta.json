@@ -1,0 +1,102 @@
+{
+  "task_id": "d70a55cdfa5b",
+  "stage": "v3_long_chinese",
+  "job_function": "医疗健康",
+  "language": "中文",
+  "scenario": "【主题】高血压患者复诊后的用药和生活习惯随访沟通\n围绕一名高血压或糖尿病患者复诊后的随访沟通，重点讨论近期血压血糖指标变化、用药依从性、饮食运动习惯、是否出现不适症状，以及医生或健康管理师后续需要调整的随访计划和生活干预建议。",
+  "core_content": "核心关键词：症状变化、用药执行、复查节点、风险提示、患者配合、随访安排、注意事项。围绕一名高血压或糖尿病患者复诊后的随访沟通，重点讨论近期血压血糖指标变化、用药依从性、饮食运动习惯、是否出现不适症状，以及医生或健康管理师后续需要调整的随访计划和生活干预建议。",
+  "people_count": 3,
+  "word_count": 10000,
+  "seed": 1427531823,
+  "effective_params": {
+    "scenario_head": "【主题】高血压患者复诊后的用药和生活习惯随访沟通\n围绕一名高血压或糖尿病患者复诊后的随访沟通，重点讨论近期血压血糖指标变",
+    "core_head": "核心关键词：症状变化、用药执行、复查节点、风险提示、患者配合、随访安排、注意事项。围绕一名高血压或糖尿病患者复诊后的随访",
+    "people_count": 3,
+    "word_count": 10000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 19,
+      "seed": 511258492,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 71,
+          "2": 30,
+          "3": 10
+        },
+        "after": {
+          "1": 71,
+          "2": 30,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 9,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 4,
+              "commitment": 5
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 14
+    },
+    "line_count": 380,
+    "total_chars": 10058,
+    "seed": 1427531823,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 380,
+    "total_chars": 10058,
+    "speaker_distribution": {
+      "Speaker 1": 183,
+      "Speaker 2": 151,
+      "Speaker 3": 46
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 380,
+      "total_chars": 10058,
+      "marker_count": 0,
+      "chinese_ratio": 0.5741,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 183,
+        "Speaker 2": 151,
+        "Speaker 3": 46
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

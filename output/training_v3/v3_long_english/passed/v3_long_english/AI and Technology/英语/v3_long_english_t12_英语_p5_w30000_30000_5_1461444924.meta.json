@@ -1,0 +1,87 @@
+{
+  "task_id": "2c131a4efb2b",
+  "stage": "v3_long_english",
+  "job_function": "AI and Technology",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: AI 产品免费用户向付费会员转化方案讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 转化漏斗, 付费门槛, 试用策略, 价值感知, 数据回收, 实验计划]",
+  "people_count": 5,
+  "word_count": 30000,
+  "seed": 1461444924,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 5,
+    "word_count": 30000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 1762993439,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 4 前10轮仅出现1次（需要>=2）', 'Speaker 5 占比11.5%不足（需要>=15%）', 'Speaker 4 占比9.6%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 4 前10轮仅出现1次（需要>=2）",
+          "Speaker 5 占比11.5%不足（需要>=15%）",
+          "Speaker 4 占比9.6%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 46,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 7
+    },
+    "line_count": 309,
+    "total_chars": 21522,
+    "seed": 1461444924,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 309,
+    "total_chars": 21522,
+    "speaker_distribution": {
+      "Speaker 1": 163,
+      "Speaker 2": 85,
+      "Speaker 3": 29,
+      "Speaker 4": 24,
+      "Speaker 5": 8
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 309,
+      "total_chars": 21522,
+      "marker_count": 0,
+      "chinese_ratio": 0.001,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 163,
+        "Speaker 2": 85,
+        "Speaker 3": 29,
+        "Speaker 4": 24,
+        "Speaker 5": 8
+      },
+      "target_word_count": 30000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "task_id": "dc4a7981c5f6",
+  "stage": "v3_korean",
+  "job_function": "测试开发",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 支付项目上线前的接入联调、下单回调和主流程验收讨论]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 支付接入, 第三方支付联调, 参数签名, 下单接口, 支付回调, 幂等处理, 主流程验收]",
+  "people_count": 2,
+  "word_count": 500,
+  "seed": 232502708,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 2,
+    "word_count": 500,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 3823429857,
+      "is_from_v2": false,
+      "placeholder_violations": 25,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 23
+    },
+    "line_count": 13,
+    "total_chars": 633,
+    "seed": 232502708,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 13,
+    "total_chars": 492,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 6
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 13,
+      "total_chars": 492,
+      "marker_count": 0,
+      "chinese_ratio": 0.017,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.3617,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 6
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.8462
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

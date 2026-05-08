@@ -1,0 +1,70 @@
+{
+  "task_id": "fff46c42c60f",
+  "stage": "v3_japanese",
+  "job_function": "测试开发",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 支付系统对账准确性和稳定性准入评估讨论]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 交易流水核对, 渠道账单比对, 金额不一致, 容量评估, 压测结论, 熔断限流, 发布门禁]",
+  "people_count": 2,
+  "word_count": 500,
+  "seed": 1457624075,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 2,
+    "word_count": 500,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 1014800526,
+      "is_from_v2": false,
+      "placeholder_violations": 24,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 22
+    },
+    "line_count": 12,
+    "total_chars": 533,
+    "seed": 1457624075,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 12,
+    "total_chars": 397,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 5
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 12,
+      "total_chars": 397,
+      "marker_count": 0,
+      "chinese_ratio": 0.1296,
+      "kana_ratio": 0.2556,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 5
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.8333
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

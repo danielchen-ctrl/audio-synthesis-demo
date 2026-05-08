@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "score": 68.0,
+  "max_score": 100.0,
+  "metrics": {
+    "line_count": 289,
+    "total_chars": 20741,
+    "marker_count": 0,
+    "chinese_ratio": 0.0014,
+    "kana_ratio": 0.0,
+    "korean_ratio": 0.0,
+    "speaker_distribution": {
+      "Speaker 1": 147,
+      "Speaker 2": 82,
+      "Speaker 3": 24,
+      "Speaker 4": 24,
+      "Speaker 5": 12
+    },
+    "target_word_count": 50000,
+    "unique_line_ratio": 1.0
+  },
+  "findings": [
+    {
+      "code": "missing_core_marker",
+      "severity": "warning",
+      "message": "缺少核心标记",
+      "details": {}
+    },
+    {
+      "code": "word_count_out_of_range",
+      "severity": "warning",
+      "message": "字数偏离目标范围: target=50000, actual=20741",
+      "details": {
+        "target": 50000,
+        "actual": 20741
+      }
+    }
+  ]
+}

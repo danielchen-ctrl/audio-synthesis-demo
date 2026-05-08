@@ -1,0 +1,81 @@
+{
+  "task_id": "261d6d1984e5",
+  "stage": "v3_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】朋友圈点赞评论、互动计数和多端状态一致性测试讨论\n围绕朋友圈点赞评论等社交互动功能的一致性测试展开讨论，重点关注点赞、取消点赞、评论发布、评论同步、互动计数、重复点击、并发互动、状态回显、消息通知、数据刷新，以及多端展示是否一致。",
+  "core_content": "核心关键词：点赞评论、互动计数、多端展示、状态回显、重复点击、并发互动、数据一致。围绕朋友圈点赞评论等社交互动功能的一致性测试展开讨论，重点关注点赞、取消点赞、评论发布、评论同步、互动计数、重复点击、并发互动、状态回显、消息通知、数据刷新，以及多端展示是否一致。",
+  "people_count": 4,
+  "word_count": 2000,
+  "seed": 1069394688,
+  "effective_params": {
+    "scenario_head": "【主题】朋友圈点赞评论、互动计数和多端状态一致性测试讨论\n围绕朋友圈点赞评论等社交互动功能的一致性测试展开讨论，重点关注",
+    "core_head": "核心关键词：点赞评论、互动计数、多端展示、状态回显、重复点击、并发互动、数据一致。围绕朋友圈点赞评论等社交互动功能的一致",
+    "people_count": 4,
+    "word_count": 2000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 12,
+      "seed": 1536817722,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比11.3%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比11.3%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 81,
+    "total_chars": 1662,
+    "seed": 1069394688,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 81,
+    "total_chars": 1662,
+    "speaker_distribution": {
+      "Speaker 1": 47,
+      "Speaker 2": 24,
+      "Speaker 3": 5,
+      "Speaker 4": 5
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 81,
+      "total_chars": 1662,
+      "marker_count": 0,
+      "chinese_ratio": 0.5461,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 47,
+        "Speaker 2": 24,
+        "Speaker 3": 5,
+        "Speaker 4": 5
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.9877
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

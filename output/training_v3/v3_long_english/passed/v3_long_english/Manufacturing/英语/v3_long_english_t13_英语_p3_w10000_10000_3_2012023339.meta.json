@@ -1,0 +1,95 @@
+{
+  "task_id": "269251615771",
+  "stage": "v3_long_english",
+  "job_function": "Manufacturing",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 生产线效率提升和瓶颈工序优化会议讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 瓶颈工序, 设备效率, 良率波动, 排产协同, 异常处理, 改善动作]",
+  "people_count": 3,
+  "word_count": 10000,
+  "seed": 2012023339,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 3,
+    "word_count": 10000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 2566023342,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 23,
+          "2": 9,
+          "3": 8
+        },
+        "after": {
+          "1": 22,
+          "2": 9,
+          "3": 8
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 40,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 135,
+    "total_chars": 10429,
+    "seed": 2012023339,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 135,
+    "total_chars": 10429,
+    "speaker_distribution": {
+      "Speaker 1": 82,
+      "Speaker 2": 37,
+      "Speaker 3": 16
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 135,
+      "total_chars": 10429,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 82,
+        "Speaker 2": 37,
+        "Speaker 3": 16
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

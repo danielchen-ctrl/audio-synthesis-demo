@@ -1,0 +1,111 @@
+{
+  "task_id": "a3c4e2da9aff",
+  "stage": "v3_long_english",
+  "job_function": "Automotive",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 新能源车型上市前的区域投放和销售策略讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 投放节奏, 渠道准备, 卖点表达, 库存规划, 区域反馈, 动作安排]",
+  "people_count": 4,
+  "word_count": 50000,
+  "seed": 927907749,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 4,
+    "word_count": 50000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 2,
+      "seed": 1941935860,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 23,
+          "2": 13,
+          "3": 9,
+          "4": 4
+        },
+        "after": {
+          "1": 22,
+          "2": 13,
+          "3": 9,
+          "4": 9
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 5,
+          "speakers_fixed": [
+            "Speaker 4"
+          ],
+          "early_fixed": [
+            "Speaker 4"
+          ],
+          "ratio_fixed": [
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "speaker_contributions": {
+            "Speaker 4": {
+              "challenge": 3,
+              "commitment": 2
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 54,
+      "duplicate_intro_fixed": 2,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 545,
+    "total_chars": 50134,
+    "seed": 927907749,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 545,
+    "total_chars": 50134,
+    "speaker_distribution": {
+      "Speaker 1": 124,
+      "Speaker 2": 67,
+      "Speaker 3": 48,
+      "Speaker 4": 306
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 545,
+      "total_chars": 50134,
+      "marker_count": 0,
+      "chinese_ratio": 0.0003,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 124,
+        "Speaker 2": 67,
+        "Speaker 3": 48,
+        "Speaker 4": 306
+      },
+      "target_word_count": 50000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

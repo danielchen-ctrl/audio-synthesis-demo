@@ -1,0 +1,111 @@
+{
+  "task_id": "eff79d4b31d6",
+  "stage": "v3_long_english",
+  "job_function": "Legal Services",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 企业年度法律顾问专项服务内容和交付安排讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 风险识别, 证据材料, 处理方案, 边界判断, 执行安排, 分工建议]",
+  "people_count": 4,
+  "word_count": 50000,
+  "seed": 799345060,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 4,
+    "word_count": 50000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 3478157742,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 21,
+          "2": 11,
+          "3": 8,
+          "4": 3
+        },
+        "after": {
+          "1": 20,
+          "2": 11,
+          "3": 8,
+          "4": 8
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 5,
+          "speakers_fixed": [
+            "Speaker 4"
+          ],
+          "early_fixed": [
+            "Speaker 4"
+          ],
+          "ratio_fixed": [
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "speaker_contributions": {
+            "Speaker 4": {
+              "challenge": 4,
+              "commitment": 1
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 48,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 545,
+    "total_chars": 50101,
+    "seed": 799345062,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 545,
+    "total_chars": 50101,
+    "speaker_distribution": {
+      "Speaker 1": 137,
+      "Speaker 2": 75,
+      "Speaker 3": 45,
+      "Speaker 4": 288
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 545,
+      "total_chars": 50101,
+      "marker_count": 0,
+      "chinese_ratio": 0.0003,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 137,
+        "Speaker 2": 75,
+        "Speaker 3": 45,
+        "Speaker 4": 288
+      },
+      "target_word_count": 50000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

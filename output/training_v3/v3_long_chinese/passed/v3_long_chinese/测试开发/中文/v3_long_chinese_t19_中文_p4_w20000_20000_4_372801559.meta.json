@@ -1,0 +1,82 @@
+{
+  "task_id": "4b30f1f3bbd2",
+  "stage": "v3_long_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】支付系统对账准确性和稳定性准入评估讨论\n围绕支付系统上线前的对账准确性和稳定性准入评估展开讨论，重点包括交易流水核对、渠道账单比对、金额不一致、漏单多单、差错处理、补偿机制、容量评估、性能基线、错误率、响应时间、熔断限流和发布门禁。",
+  "core_content": "核心关键词：交易流水核对、渠道账单比对、金额不一致、容量评估、压测结论、熔断限流、发布门禁。围绕支付系统上线前的对账准确性和稳定性准入评估展开讨论，重点包括交易流水核对、渠道账单比对、金额不一致、漏单多单、差错处理、补偿机制、容量评估、性能基线、错误率、响应时间、熔断限流和发布门禁。",
+  "people_count": 4,
+  "word_count": 20000,
+  "seed": 372801559,
+  "effective_params": {
+    "scenario_head": "【主题】支付系统对账准确性和稳定性准入评估讨论\n围绕支付系统上线前的对账准确性和稳定性准入评估展开讨论，重点包括交易流水",
+    "core_head": "核心关键词：交易流水核对、渠道账单比对、金额不一致、容量评估、压测结论、熔断限流、发布门禁。围绕支付系统上线前的对账准确",
+    "people_count": 4,
+    "word_count": 20000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 3183417897,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比8.9%不足（需要>=15%）', 'Speaker 4 占比8.1%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比8.9%不足（需要>=15%）",
+          "Speaker 4 占比8.1%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 842,
+    "total_chars": 20037,
+    "seed": 372801559,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 842,
+    "total_chars": 20037,
+    "speaker_distribution": {
+      "Speaker 1": 254,
+      "Speaker 2": 276,
+      "Speaker 3": 160,
+      "Speaker 4": 152
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 842,
+      "total_chars": 20037,
+      "marker_count": 0,
+      "chinese_ratio": 0.5538,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 254,
+        "Speaker 2": 276,
+        "Speaker 3": 160,
+        "Speaker 4": 152
+      },
+      "target_word_count": 20000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

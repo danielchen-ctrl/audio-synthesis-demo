@@ -1,0 +1,121 @@
+{
+  "task_id": "668c38ca97f8",
+  "stage": "v3_korean",
+  "job_function": "Legal Services",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 新广告投放素材的合规风险审核讨论]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 广告表述, 风险边界, 素材审核, 整改建议, 上线条件, 修改方案]",
+  "people_count": 4,
+  "word_count": 2000,
+  "seed": 1840829703,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 4,
+    "word_count": 2000,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 6,
+      "seed": 3279649268,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 35,
+          "2": 13,
+          "3": 8,
+          "4": 5
+        },
+        "after": {
+          "1": 34,
+          "2": 13,
+          "3": 12,
+          "4": 11
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 10,
+          "speakers_fixed": [
+            "Speaker 4",
+            "Speaker 3"
+          ],
+          "early_fixed": [
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 4",
+            "Speaker 3",
+            "Speaker 4",
+            "Speaker 3",
+            "Speaker 4",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 4": {
+              "challenge": 4,
+              "commitment": 2
+            },
+            "Speaker 3": {
+              "challenge": 1,
+              "commitment": 3
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 71,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 52
+    },
+    "line_count": 30,
+    "total_chars": 1823,
+    "seed": 1840829703,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 30,
+    "total_chars": 1707,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 3,
+      "Speaker 3": 12,
+      "Speaker 4": 9
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 30,
+      "total_chars": 1707,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.1239,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 3,
+        "Speaker 3": 12,
+        "Speaker 4": 9
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.9333
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

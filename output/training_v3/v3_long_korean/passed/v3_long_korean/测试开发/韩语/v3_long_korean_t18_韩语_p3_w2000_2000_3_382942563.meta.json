@@ -1,0 +1,103 @@
+{
+  "task_id": "fa972178a7ba",
+  "stage": "v3_long_korean",
+  "job_function": "测试开发",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 支付系统上线前的退款安全、对账差错和稳定性准入评估]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 退款申请, 重复退款, 越权退款, 金额校验, 退款回调, 风控拦截, 资金安全风险]",
+  "people_count": 3,
+  "word_count": 2000,
+  "seed": 382942563,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 3,
+    "word_count": 2000,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 6,
+      "seed": 3638175452,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 35,
+          "2": 17,
+          "3": 12
+        },
+        "after": {
+          "1": 34,
+          "2": 17,
+          "3": 12
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 64,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 56
+    },
+    "line_count": 24,
+    "total_chars": 916,
+    "seed": 382942563,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 24,
+    "total_chars": 786,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 6,
+      "Speaker 3": 12
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 24,
+      "total_chars": 786,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.3663,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 6,
+        "Speaker 3": 12
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.9167
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=2000, actual=786",
+        "details": {
+          "target": 2000,
+          "actual": 786
+        }
+      }
+    ]
+  }
+}

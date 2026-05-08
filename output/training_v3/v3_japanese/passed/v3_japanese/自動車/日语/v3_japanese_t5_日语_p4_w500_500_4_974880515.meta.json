@@ -1,0 +1,93 @@
+{
+  "task_id": "636a177d8a70",
+  "stage": "v3_japanese",
+  "job_function": "自動車",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 新能源车型上市前的区域投放和销售策略讨论]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 投放节奏, 渠道准备, 卖点表达, 库存规划, 区域反馈, 动作安排]",
+  "people_count": 4,
+  "word_count": 500,
+  "seed": 974880515,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 4,
+    "word_count": 500,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 815939779,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 2 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比14.7%不足（需要>=15%）', 'Speaker 4 占比14.7%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 2 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比14.7%不足（需要>=15%）",
+          "Speaker 4 占比14.7%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 30,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 23
+    },
+    "line_count": 18,
+    "total_chars": 772,
+    "seed": 974880515,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 18,
+    "total_chars": 662,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 3,
+      "Speaker 3": 5,
+      "Speaker 4": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 18,
+      "total_chars": 662,
+      "marker_count": 0,
+      "chinese_ratio": 0.1197,
+      "kana_ratio": 0.1927,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 3,
+        "Speaker 3": 5,
+        "Speaker 4": 3
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.8333
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=500, actual=662",
+        "details": {
+          "target": 500,
+          "actual": 662
+        }
+      }
+    ]
+  }
+}

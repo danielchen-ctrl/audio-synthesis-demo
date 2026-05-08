@@ -1,0 +1,70 @@
+{
+  "task_id": "b5ce37c21a47",
+  "stage": "v3_japanese",
+  "job_function": "人事・採用",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 运营岗位离职后紧急补岗的招聘进度沟通]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 岗位缺口, 优先级, 候选人画像, 渠道策略, 到岗时间, 招聘节奏]",
+  "people_count": 2,
+  "word_count": 500,
+  "seed": 1620783556,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 2,
+    "word_count": 500,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 4093638857,
+      "is_from_v2": false,
+      "placeholder_violations": 27,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 25
+    },
+    "line_count": 13,
+    "total_chars": 525,
+    "seed": 1620783556,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 13,
+    "total_chars": 430,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 6
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 13,
+      "total_chars": 430,
+      "marker_count": 0,
+      "chinese_ratio": 0.1436,
+      "kana_ratio": 0.265,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 6
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.8462
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

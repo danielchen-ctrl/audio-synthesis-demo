@@ -1,0 +1,78 @@
+{
+  "task_id": "b86dae34390e",
+  "stage": "v3_long_chinese",
+  "job_function": "制造业",
+  "language": "中文",
+  "scenario": "【主题】生产线效率提升和瓶颈工序优化会议讨论\n围绕生产线效率提升和瓶颈工序优化展开讨论，重点关注设备稼动率、良品率、异常停机、工时浪费、排产计划、自动化改造机会、产能提升空间，以及降本增效的落地措施。",
+  "core_content": "核心关键词：瓶颈工序、设备效率、良率波动、排产协同、异常处理、改善动作。围绕生产线效率提升和瓶颈工序优化展开讨论，重点关注设备稼动率、良品率、异常停机、工时浪费、排产计划、自动化改造机会、产能提升空间，以及降本增效的落地措施。",
+  "people_count": 2,
+  "word_count": 20000,
+  "seed": 582870777,
+  "effective_params": {
+    "scenario_head": "【主题】生产线效率提升和瓶颈工序优化会议讨论\n围绕生产线效率提升和瓶颈工序优化展开讨论，重点关注设备稼动率、良品率、异常",
+    "core_head": "核心关键词：瓶颈工序、设备效率、良率波动、排产协同、异常处理、改善动作。围绕生产线效率提升和瓶颈工序优化展开讨论，重点关",
+    "people_count": 2,
+    "word_count": 20000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 1188721288,
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 475,
+    "total_chars": 11861,
+    "seed": 582870777,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 475,
+    "total_chars": 11861,
+    "speaker_distribution": {
+      "Speaker 1": 234,
+      "Speaker 2": 241
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 475,
+      "total_chars": 11861,
+      "marker_count": 0,
+      "chinese_ratio": 0.5626,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 234,
+        "Speaker 2": 241
+      },
+      "target_word_count": 20000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=20000, actual=11861",
+        "details": {
+          "target": 20000,
+          "actual": 11861
+        }
+      }
+    ]
+  }
+}

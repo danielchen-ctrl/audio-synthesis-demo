@@ -1,0 +1,82 @@
+{
+  "task_id": "36e93a75203b",
+  "stage": "v3_long_chinese",
+  "job_function": "汽车行业",
+  "language": "中文",
+  "scenario": "【主题】新能源车型上市前的区域投放和销售策略讨论\n围绕一款新车型上市前的市场投放计划展开讨论，重点包括目标用户画像、区域投放节奏、经销商铺货、竞品车型对比、价格策略、试驾转化、销售目标拆解，以及上市期间的市场推广资源安排。",
+  "core_content": "核心关键词：投放节奏、渠道准备、卖点表达、库存规划、区域反馈、动作安排。围绕一款新车型上市前的市场投放计划展开讨论，重点包括目标用户画像、区域投放节奏、经销商铺货、竞品车型对比、价格策略、试驾转化、销售目标拆解，以及上市期间的市场推广资源安排。",
+  "people_count": 4,
+  "word_count": 20000,
+  "seed": 1420090193,
+  "effective_params": {
+    "scenario_head": "【主题】新能源车型上市前的区域投放和销售策略讨论\n围绕一款新车型上市前的市场投放计划展开讨论，重点包括目标用户画像、区域",
+    "core_head": "核心关键词：投放节奏、渠道准备、卖点表达、库存规划、区域反馈、动作安排。围绕一款新车型上市前的市场投放计划展开讨论，重点",
+    "people_count": 4,
+    "word_count": 20000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 19,
+      "seed": 1602139009,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比8.7%不足（需要>=15%）', 'Speaker 4 占比11.8%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比8.7%不足（需要>=15%）",
+          "Speaker 4 占比11.8%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 853,
+    "total_chars": 20024,
+    "seed": 1420090193,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 853,
+    "total_chars": 20024,
+    "speaker_distribution": {
+      "Speaker 1": 262,
+      "Speaker 2": 293,
+      "Speaker 3": 166,
+      "Speaker 4": 132
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 853,
+      "total_chars": 20024,
+      "marker_count": 0,
+      "chinese_ratio": 0.5512,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 262,
+        "Speaker 2": 293,
+        "Speaker 3": 166,
+        "Speaker 4": 132
+      },
+      "target_word_count": 20000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

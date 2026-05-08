@@ -1,0 +1,111 @@
+{
+  "task_id": "91a6cff32ae5",
+  "stage": "v3_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】朋友圈隐私可见范围、内容审核和权限控制测试讨论\n围绕朋友圈内容的隐私可见范围、权限控制和内容审核展开讨论，重点覆盖好友可见、分组可见、仅自己可见、黑名单屏蔽、访问权限校验、隐私泄露风险、敏感词检测、图片视频审核、人工复审和违规内容拦截。",
+  "core_content": "核心关键词：好友可见、分组可见、黑名单屏蔽、权限校验、敏感词检测、图片审核、违规内容拦截。围绕朋友圈内容的隐私可见范围、权限控制和内容审核展开讨论，重点覆盖好友可见、分组可见、仅自己可见、黑名单屏蔽、访问权限校验、隐私泄露风险、敏感词检测、图片视频审核、人工复审和违规内容拦截。",
+  "people_count": 3,
+  "word_count": 5000,
+  "seed": 917734098,
+  "effective_params": {
+    "scenario_head": "【主题】朋友圈隐私可见范围、内容审核和权限控制测试讨论\n围绕朋友圈内容的隐私可见范围、权限控制和内容审核展开讨论，重点覆",
+    "core_head": "核心关键词：好友可见、分组可见、黑名单屏蔽、权限校验、敏感词检测、图片审核、违规内容拦截。围绕朋友圈内容的隐私可见范围、",
+    "people_count": 3,
+    "word_count": 5000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 19,
+      "seed": 576207660,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 69,
+          "2": 32,
+          "3": 9
+        },
+        "after": {
+          "1": 69,
+          "2": 32,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 10,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 5,
+              "commitment": 5
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 21
+    },
+    "line_count": 118,
+    "total_chars": 2489,
+    "seed": 917734098,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 118,
+    "total_chars": 2489,
+    "speaker_distribution": {
+      "Speaker 1": 69,
+      "Speaker 2": 32,
+      "Speaker 3": 17
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 118,
+      "total_chars": 2489,
+      "marker_count": 0,
+      "chinese_ratio": 0.552,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 69,
+        "Speaker 2": 32,
+        "Speaker 3": 17
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 0.9322
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=2489",
+        "details": {
+          "target": 5000,
+          "actual": 2489
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "task_id": "50bd8ed2c4c8",
+  "stage": "v3_long_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】支付项目上线前的接入联调、下单回调和主流程验收讨论\n围绕支付项目上线前的接入联调和交易主链路验收展开讨论，重点覆盖第三方支付接口联调、参数签名、渠道配置、下单接口、订单创建、支付成功失败状态、支付回调、异步通知、幂等处理和主流程验收风险。",
+  "core_content": "核心关键词：支付接入、第三方支付联调、参数签名、下单接口、支付回调、幂等处理、主流程验收。围绕支付项目上线前的接入联调和交易主链路验收展开讨论，重点覆盖第三方支付接口联调、参数签名、渠道配置、下单接口、订单创建、支付成功失败状态、支付回调、异步通知、幂等处理和主流程验收风险。",
+  "people_count": 5,
+  "word_count": 40000,
+  "seed": 90478958,
+  "effective_params": {
+    "scenario_head": "【主题】支付项目上线前的接入联调、下单回调和主流程验收讨论\n围绕支付项目上线前的接入联调和交易主链路验收展开讨论，重点覆",
+    "core_head": "核心关键词：支付接入、第三方支付联调、参数签名、下单接口、支付回调、幂等处理、主流程验收。围绕支付项目上线前的接入联调和",
+    "people_count": 5,
+    "word_count": 40000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 1399335885,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比4.8%不足（需要>=15%）', 'Speaker 5 占比4.8%不足（需要>=15%）', 'Speaker 4 占比7.9%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比4.8%不足（需要>=15%）",
+          "Speaker 5 占比4.8%不足（需要>=15%）",
+          "Speaker 4 占比7.9%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 1080,
+    "total_chars": 24336,
+    "seed": 90478958,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 1080,
+    "total_chars": 24336,
+    "speaker_distribution": {
+      "Speaker 1": 269,
+      "Speaker 2": 356,
+      "Speaker 3": 239,
+      "Speaker 4": 179,
+      "Speaker 5": 37
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 1080,
+      "total_chars": 24336,
+      "marker_count": 0,
+      "chinese_ratio": 0.5454,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 269,
+        "Speaker 2": 356,
+        "Speaker 3": 239,
+        "Speaker 4": 179,
+        "Speaker 5": 37
+      },
+      "target_word_count": 40000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=40000, actual=24336",
+        "details": {
+          "target": 40000,
+          "actual": 24336
+        }
+      }
+    ]
+  }
+}

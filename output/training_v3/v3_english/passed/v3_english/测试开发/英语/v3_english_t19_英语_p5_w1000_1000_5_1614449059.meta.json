@@ -1,0 +1,95 @@
+{
+  "task_id": "95dba9a94e6b",
+  "stage": "v3_english",
+  "job_function": "测试开发",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 支付系统对账准确性和稳定性准入评估讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 交易流水核对, 渠道账单比对, 金额不一致, 容量评估, 压测结论, 熔断限流, 发布门禁]",
+  "people_count": 5,
+  "word_count": 1000,
+  "seed": 1614449059,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 5,
+    "word_count": 1000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 531287936,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 5 占比12.0%不足（需要>=15%）', 'Speaker 4 占比10.0%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 5 占比12.0%不足（需要>=15%）",
+          "Speaker 4 占比10.0%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 44,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 11
+    },
+    "line_count": 42,
+    "total_chars": 2942,
+    "seed": 1614449059,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 42,
+    "total_chars": 2942,
+    "speaker_distribution": {
+      "Speaker 1": 19,
+      "Speaker 2": 9,
+      "Speaker 3": 8,
+      "Speaker 4": 3,
+      "Speaker 5": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 42,
+      "total_chars": 2942,
+      "marker_count": 0,
+      "chinese_ratio": 0.0015,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 19,
+        "Speaker 2": 9,
+        "Speaker 3": 8,
+        "Speaker 4": 3,
+        "Speaker 5": 3
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=1000, actual=2942",
+        "details": {
+          "target": 1000,
+          "actual": 2942
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "task_id": "6cea3da53ee3",
+  "stage": "v3_chinese",
+  "job_function": "保险行业",
+  "language": "中文",
+  "scenario": "【主题】保险产品销售转化数据和客户异议洞察分析\n围绕保险产品销售转化数据和客户反馈展开洞察分析，重点讨论销售线索质量、客户画像、成交和拒保原因、客户异议类型、产品匹配度、销售话术效果、渠道表现，以及后续培训和策略优化方向。",
+  "core_content": "核心关键词：销售表现、客户反馈、转化瓶颈、团队差异、改善动作、管理改进。围绕保险产品销售转化数据和客户反馈展开洞察分析，重点讨论销售线索质量、客户画像、成交和拒保原因、客户异议类型、产品匹配度、销售话术效果、渠道表现，以及后续培训和策略优化方向。",
+  "people_count": 3,
+  "word_count": 1000,
+  "seed": 917087885,
+  "effective_params": {
+    "scenario_head": "【主题】保险产品销售转化数据和客户异议洞察分析\n围绕保险产品销售转化数据和客户反馈展开洞察分析，重点讨论销售线索质量、客",
+    "core_head": "核心关键词：销售表现、客户反馈、转化瓶颈、团队差异、改善动作、管理改进。围绕保险产品销售转化数据和客户反馈展开洞察分析，",
+    "people_count": 3,
+    "word_count": 1000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 2,
+      "seed": 2074806090,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 26,
+          "2": 5,
+          "3": 6
+        },
+        "after": {
+          "1": 26,
+          "2": 6,
+          "3": 6
+        },
+        "fix_report": {
+          "rounds": 2,
+          "insertions": 1,
+          "speakers_fixed": [
+            "Speaker 2"
+          ],
+          "early_fixed": [
+            "Speaker 2"
+          ],
+          "ratio_fixed": [
+            "Speaker 2"
+          ],
+          "speaker_contributions": {
+            "Speaker 2": {
+              "challenge": 1,
+              "commitment": 0
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 14
+    },
+    "line_count": 38,
+    "total_chars": 825,
+    "seed": 917087885,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 38,
+    "total_chars": 825,
+    "speaker_distribution": {
+      "Speaker 1": 26,
+      "Speaker 2": 6,
+      "Speaker 3": 6
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 38,
+      "total_chars": 825,
+      "marker_count": 0,
+      "chinese_ratio": 0.568,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 26,
+        "Speaker 2": 6,
+        "Speaker 3": 6
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

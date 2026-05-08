@@ -1,0 +1,80 @@
+{
+  "task_id": "f6e2085ebc02",
+  "stage": "v3_long_english",
+  "job_function": "测试开发",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 朋友圈隐私可见范围、内容审核和权限控制测试讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 好友可见, 分组可见, 黑名单屏蔽, 权限校验, 敏感词检测, 图片审核, 违规内容拦截]",
+  "people_count": 2,
+  "word_count": 20000,
+  "seed": 1457648824,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 2,
+    "word_count": 20000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 3,
+      "seed": 1616965535,
+      "is_from_v2": false,
+      "placeholder_violations": 44,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 4
+    },
+    "line_count": 194,
+    "total_chars": 13196,
+    "seed": 1457648824,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 194,
+    "total_chars": 13196,
+    "speaker_distribution": {
+      "Speaker 1": 114,
+      "Speaker 2": 80
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 194,
+      "total_chars": 13196,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 114,
+        "Speaker 2": 80
+      },
+      "target_word_count": 20000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=20000, actual=13196",
+        "details": {
+          "target": 20000,
+          "actual": 13196
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "task_id": "51473945ed9f",
+  "stage": "v3_long_chinese",
+  "job_function": "人力资源与招聘",
+  "language": "中文",
+  "scenario": "【主题】运营岗位离职后紧急补岗的招聘进度沟通\n围绕某个关键岗位人员离职后的补岗招聘沟通，重点讨论岗位空缺带来的业务影响、HC 是否已审批、候选人筛选进度、面试安排、用人部门反馈、offer 沟通节奏，以及如何缩短到岗周期。",
+  "core_content": "核心关键词：岗位缺口、优先级、候选人画像、渠道策略、到岗时间、招聘节奏。围绕某个关键岗位人员离职后的补岗招聘沟通，重点讨论岗位空缺带来的业务影响、HC 是否已审批、候选人筛选进度、面试安排、用人部门反馈、offer 沟通节奏，以及如何缩短到岗周期。",
+  "people_count": 5,
+  "word_count": 50000,
+  "seed": 1542003019,
+  "effective_params": {
+    "scenario_head": "【主题】运营岗位离职后紧急补岗的招聘进度沟通\n围绕某个关键岗位人员离职后的补岗招聘沟通，重点讨论岗位空缺带来的业务影响、",
+    "core_head": "核心关键词：岗位缺口、优先级、候选人画像、渠道策略、到岗时间、招聘节奏。围绕某个关键岗位人员离职后的补岗招聘沟通，重点讨",
+    "people_count": 5,
+    "word_count": 50000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 813983343,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比5.0%不足（需要>=15%）', 'Speaker 4 占比5.0%不足（需要>=15%）', 'Speaker 5 占比5.0%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比5.0%不足（需要>=15%）",
+          "Speaker 4 占比5.0%不足（需要>=15%）",
+          "Speaker 5 占比5.0%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 941,
+    "total_chars": 21459,
+    "seed": 1542003019,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 941,
+    "total_chars": 21459,
+    "speaker_distribution": {
+      "Speaker 1": 263,
+      "Speaker 2": 317,
+      "Speaker 3": 181,
+      "Speaker 5": 37,
+      "Speaker 4": 143
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 941,
+      "total_chars": 21459,
+      "marker_count": 0,
+      "chinese_ratio": 0.5463,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 263,
+        "Speaker 2": 317,
+        "Speaker 3": 181,
+        "Speaker 5": 37,
+        "Speaker 4": 143
+      },
+      "target_word_count": 50000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=50000, actual=21459",
+        "details": {
+          "target": 50000,
+          "actual": 21459
+        }
+      }
+    ]
+  }
+}

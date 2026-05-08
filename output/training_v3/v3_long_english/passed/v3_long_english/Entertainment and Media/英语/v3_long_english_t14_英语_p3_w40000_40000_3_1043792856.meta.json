@@ -1,0 +1,104 @@
+{
+  "task_id": "cde12fbc1d82",
+  "stage": "v3_long_english",
+  "job_function": "Entertainment and Media",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 内容平台本周增长数据和商业化策略周会]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 业务目标, 资源投入, 进展复盘, 重点风险, 下周动作, 分工安排]",
+  "people_count": 3,
+  "word_count": 40000,
+  "seed": 1043792856,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 3,
+    "word_count": 40000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 1102505546,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 22,
+          "2": 10,
+          "3": 8
+        },
+        "after": {
+          "1": 21,
+          "2": 10,
+          "3": 8
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 40,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 296,
+    "total_chars": 20991,
+    "seed": 1043792856,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 296,
+    "total_chars": 20991,
+    "speaker_distribution": {
+      "Speaker 1": 172,
+      "Speaker 2": 84,
+      "Speaker 3": 40
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 296,
+      "total_chars": 20991,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 172,
+        "Speaker 2": 84,
+        "Speaker 3": 40
+      },
+      "target_word_count": 40000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=40000, actual=20991",
+        "details": {
+          "target": 40000,
+          "actual": 20991
+        }
+      }
+    ]
+  }
+}

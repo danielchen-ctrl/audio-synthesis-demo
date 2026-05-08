@@ -1,0 +1,113 @@
+{
+  "task_id": "dfcf7de93b69",
+  "stage": "v3_long_english",
+  "job_function": "Manufacturing",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 生产线效率提升和瓶颈工序优化会议讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 瓶颈工序, 设备效率, 良率波动, 排产协同, 异常处理, 改善动作]",
+  "people_count": 4,
+  "word_count": 50000,
+  "seed": 1081270465,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 4,
+    "word_count": 50000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 3946981073,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 21,
+          "2": 11,
+          "3": 8,
+          "4": 3
+        },
+        "after": {
+          "1": 20,
+          "2": 11,
+          "3": 8,
+          "4": 8
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 5,
+          "speakers_fixed": [
+            "Speaker 4"
+          ],
+          "early_fixed": [
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "ratio_fixed": [
+            "Speaker 4",
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "speaker_contributions": {
+            "Speaker 4": {
+              "challenge": 2,
+              "commitment": 3
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 48,
+      "duplicate_intro_fixed": 2,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 566,
+    "total_chars": 50225,
+    "seed": 1081270465,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 566,
+    "total_chars": 50225,
+    "speaker_distribution": {
+      "Speaker 1": 180,
+      "Speaker 2": 94,
+      "Speaker 3": 39,
+      "Speaker 4": 253
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 566,
+      "total_chars": 50225,
+      "marker_count": 0,
+      "chinese_ratio": 0.0003,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 180,
+        "Speaker 2": 94,
+        "Speaker 3": 39,
+        "Speaker 4": 253
+      },
+      "target_word_count": 50000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

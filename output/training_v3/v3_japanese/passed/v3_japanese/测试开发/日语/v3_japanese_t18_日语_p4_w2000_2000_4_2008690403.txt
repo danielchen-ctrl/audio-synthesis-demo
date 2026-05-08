@@ -1,0 +1,34 @@
+Speaker 1: こんにちは。今日は進め方を一緒に整理したいです。
+Speaker 3: こんにちは。必要な論点を一緒に確認します。
+Speaker 1: いま一番詰まっている論点はどこですか。
+Speaker 2: この点は持ち帰って確認し、明日までに見解を返します。
+Speaker 1: 最も重要なのは：
+Speaker 1: この問題はいつ頃から表面化しましたか。
+Speaker 3: 運用面の影響も見たいので、確認してから返答します。
+Speaker 4: Walk me through the failure path: if network partition happens, how do we guarantee state consistency?
+Speaker 1: 最終的にどのような状態を目指していますか。
+Speaker 4: What happens if completion rate exceeds P99 < 500ms? Do we have automated circuit breakers in place?
+Speaker 2: その論点は重要なので、影響範囲を確認してから判断します。
+Speaker 2: 各ステップで注意すべき点を先に確認したいです。
+Speaker 4: 補足ですが、スケジュールについて確認が必要。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 4: I own design doc. I will deliver it by within 2 weeks. Success means throughput >= 95% and alerts wired to Slack channel.
+Speaker 4: What's the dependency on external systems? If they fail, how does this degrade gracefully?
+Speaker 2: 方向性はよさそうです。前提条件をもう少し具体化できますか。
+Speaker 4: 质量负责人の観点から、重点的に対応します。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 2: 了解しました。その点は判断の前提として押さえておきます。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 1: では、ここまでの論点を整理します。
+Speaker 3: Define the SLA for implementation plan. What's the P0 response time and escalation path?
+Speaker 4: What's the dependency on external systems? If they fail, how does this degrade gracefully?
+Speaker 4: Define the acceptance criteria for the implementation. What is the threshold for throughput, and what is the rollback trigger?
+Speaker 3: I'll ensure latency stays within P95 < 200ms range. Monitoring dashboard will be live by in 3 days.
+Speaker 3: Okay, I will cooperate.
+Speaker 3: This explanation is very clear, I understand now.
+Speaker 3: Indeed, these details need attention.
+Speaker 4: Okay, I will prepare carefully.
+Speaker 3: Understood, I will cooperate on my end.
+Speaker 4: This suggestion is very helpful, thank you.
+Speaker 3: I'd also like to understand this aspect.
+Speaker 4: I'd also like to understand this aspect.

@@ -1,0 +1,120 @@
+{
+  "task_id": "296d88802e98",
+  "stage": "v3_korean",
+  "job_function": "测试开发",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 支付系统上线前的退款安全、对账差错和稳定性准入评估]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 退款申请, 重复退款, 越权退款, 金额校验, 退款回调, 风控拦截, 资金安全风险]",
+  "people_count": 4,
+  "word_count": 500,
+  "seed": 1069318055,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 4,
+    "word_count": 500,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 744071082,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 18,
+          "2": 8,
+          "3": 7,
+          "4": 3
+        },
+        "after": {
+          "1": 17,
+          "2": 8,
+          "3": 7,
+          "4": 6
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 3,
+          "speakers_fixed": [
+            "Speaker 4"
+          ],
+          "early_fixed": [
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "ratio_fixed": [
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "speaker_contributions": {
+            "Speaker 4": {
+              "challenge": 2,
+              "commitment": 1
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 39,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 30
+    },
+    "line_count": 24,
+    "total_chars": 1296,
+    "seed": 1069318055,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 24,
+    "total_chars": 1166,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 3": 7,
+      "Speaker 4": 4,
+      "Speaker 2": 6
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 24,
+      "total_chars": 1166,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.2595,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 3": 7,
+        "Speaker 4": 4,
+        "Speaker 2": 6
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.7917
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=500, actual=1166",
+        "details": {
+          "target": 500,
+          "actual": 1166
+        }
+      }
+    ]
+  }
+}

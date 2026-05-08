@@ -1,0 +1,111 @@
+{
+  "task_id": "ecc871a29b16",
+  "stage": "v3_long_chinese",
+  "job_function": "房地产",
+  "language": "中文",
+  "scenario": "【主题】新楼盘库存去化压力和渠道促销策略讨论\n围绕某楼盘项目的库存去化压力和销售策略展开讨论，重点分析客户到访量、认购签约转化、竞品楼盘价格、渠道分销效果、促销政策设计、库存结构，以及如何提升短期成交效率。",
+  "core_content": "核心关键词：去化压力、客源结构、渠道效率、价格策略、案场转化、短期动作。围绕某楼盘项目的库存去化压力和销售策略展开讨论，重点分析客户到访量、认购签约转化、竞品楼盘价格、渠道分销效果、促销政策设计、库存结构，以及如何提升短期成交效率。",
+  "people_count": 3,
+  "word_count": 40000,
+  "seed": 899171854,
+  "effective_params": {
+    "scenario_head": "【主题】新楼盘库存去化压力和渠道促销策略讨论\n围绕某楼盘项目的库存去化压力和销售策略展开讨论，重点分析客户到访量、认购签",
+    "core_head": "核心关键词：去化压力、客源结构、渠道效率、价格策略、案场转化、短期动作。围绕某楼盘项目的库存去化压力和销售策略展开讨论，",
+    "people_count": 3,
+    "word_count": 40000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 3166171389,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 73,
+          "2": 31,
+          "3": 9
+        },
+        "after": {
+          "1": 73,
+          "2": 31,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 10,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 6,
+              "commitment": 4
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 19
+    },
+    "line_count": 858,
+    "total_chars": 19232,
+    "seed": 899171854,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 858,
+    "total_chars": 19232,
+    "speaker_distribution": {
+      "Speaker 1": 274,
+      "Speaker 2": 360,
+      "Speaker 3": 224
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 858,
+      "total_chars": 19232,
+      "marker_count": 0,
+      "chinese_ratio": 0.5418,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 274,
+        "Speaker 2": 360,
+        "Speaker 3": 224
+      },
+      "target_word_count": 40000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=40000, actual=19232",
+        "details": {
+          "target": 40000,
+          "actual": 19232
+        }
+      }
+    ]
+  }
+}

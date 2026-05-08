@@ -1,0 +1,96 @@
+{
+  "task_id": "c906d32e31a9",
+  "stage": "v3_english",
+  "job_function": "HR and Recruitment",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 运营岗位离职后紧急补岗的招聘进度沟通]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 岗位缺口, 优先级, 候选人画像, 渠道策略, 到岗时间, 招聘节奏]",
+  "people_count": 5,
+  "word_count": 1000,
+  "seed": 1673997290,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 5,
+    "word_count": 1000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 3479358804,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 5 前10轮仅出现1次（需要>=2）', 'Speaker 4 占比12.0%不足（需要>=15%）', 'Speaker 5 占比12.0%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 5 前10轮仅出现1次（需要>=2）",
+          "Speaker 4 占比12.0%不足（需要>=15%）",
+          "Speaker 5 占比12.0%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 44,
+      "duplicate_intro_fixed": 2,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 11
+    },
+    "line_count": 42,
+    "total_chars": 2798,
+    "seed": 1673997290,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 42,
+    "total_chars": 2798,
+    "speaker_distribution": {
+      "Speaker 1": 19,
+      "Speaker 2": 9,
+      "Speaker 3": 8,
+      "Speaker 4": 3,
+      "Speaker 5": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 42,
+      "total_chars": 2798,
+      "marker_count": 0,
+      "chinese_ratio": 0.0015,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 19,
+        "Speaker 2": 9,
+        "Speaker 3": 8,
+        "Speaker 4": 3,
+        "Speaker 5": 3
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=1000, actual=2798",
+        "details": {
+          "target": 1000,
+          "actual": 2798
+        }
+      }
+    ]
+  }
+}

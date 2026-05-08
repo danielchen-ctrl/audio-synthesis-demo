@@ -1,0 +1,69 @@
+{
+  "task_id": "bb9021b8dc07",
+  "stage": "v3_chinese",
+  "job_function": "制造业",
+  "language": "中文",
+  "scenario": "【主题】生产线效率提升和瓶颈工序优化会议讨论\n围绕生产线效率提升和瓶颈工序优化展开讨论，重点关注设备稼动率、良品率、异常停机、工时浪费、排产计划、自动化改造机会、产能提升空间，以及降本增效的落地措施。",
+  "core_content": "核心关键词：瓶颈工序、设备效率、良率波动、排产协同、异常处理、改善动作。围绕生产线效率提升和瓶颈工序优化展开讨论，重点关注设备稼动率、良品率、异常停机、工时浪费、排产计划、自动化改造机会、产能提升空间，以及降本增效的落地措施。",
+  "people_count": 2,
+  "word_count": 2000,
+  "seed": 443340160,
+  "effective_params": {
+    "scenario_head": "【主题】生产线效率提升和瓶颈工序优化会议讨论\n围绕生产线效率提升和瓶颈工序优化展开讨论，重点关注设备稼动率、良品率、异常",
+    "core_head": "核心关键词：瓶颈工序、设备效率、良率波动、排产协同、异常处理、改善动作。围绕生产线效率提升和瓶颈工序优化展开讨论，重点关",
+    "people_count": 2,
+    "word_count": 2000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 15,
+      "seed": 2716308265,
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 85,
+    "total_chars": 1701,
+    "seed": 443340160,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 85,
+    "total_chars": 1701,
+    "speaker_distribution": {
+      "Speaker 1": 59,
+      "Speaker 2": 26
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 85,
+      "total_chars": 1701,
+      "marker_count": 0,
+      "chinese_ratio": 0.5408,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 59,
+        "Speaker 2": 26
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.9882
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

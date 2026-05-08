@@ -1,0 +1,79 @@
+{
+  "task_id": "cd8e2e5bc3d5",
+  "stage": "v3_japanese",
+  "job_function": "エンタメ・メディア",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 内容平台本周增长数据和商业化策略周会]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 业务目标, 资源投入, 进展复盘, 重点风险, 下周动作, 分工安排]",
+  "people_count": 2,
+  "word_count": 1000,
+  "seed": 1326757886,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 2,
+    "word_count": 1000,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 2,
+      "seed": 1023918335,
+      "is_from_v2": false,
+      "placeholder_violations": 35,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 35
+    },
+    "line_count": 12,
+    "total_chars": 376,
+    "seed": 1326757886,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 12,
+    "total_chars": 291,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 6
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 12,
+      "total_chars": 291,
+      "marker_count": 0,
+      "chinese_ratio": 0.2258,
+      "kana_ratio": 0.3917,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 6
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.9167
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=1000, actual=291",
+        "details": {
+          "target": 1000,
+          "actual": 291
+        }
+      }
+    ]
+  }
+}

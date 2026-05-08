@@ -1,0 +1,26 @@
+Speaker 1: 안녕하세요. 오늘은 전제와 진행 방식을 먼저 맞추겠습니다.
+Speaker 2: 안녕하세요. 이쪽에서도 전제 조건을 확인해 두었습니다.
+Speaker 3: 안녕하세요. 논점 정리는 바로 진행할 수 있습니다.
+Speaker 4: What are the edge cases for this feature? Have we stress-tested against peak load scenarios?
+Speaker 1: 지금 가장 막히는 쟁점이 무엇인지 먼저 짚어볼까요.
+Speaker 1: 가장 중요한 것은:
+Speaker 4: What's the dependency on external systems? If they fail, how does this degrade gracefully?
+Speaker 2: 이 부분은 조금 더 파악한 뒤 다음 논의 때 더 구체적으로 답변드리겠습니다.
+Speaker 1: 이 문제는 언제부터 드러나기 시작했나요?
+Speaker 3: 운영 측 영향도 함께 확인한 뒤 답을 드리겠습니다.
+Speaker 4: What's the dependency on external systems? If they fail, how does this degrade gracefully?
+Speaker 1: 최종적으로 어떤 결과를 기대하고 계신가요?
+Speaker 2: 이 부분은 다시 확인한 뒤 정리해서 말씀드리겠습니다.
+Speaker 2: 각 단계에서 주의할 포인트를 먼저 확인하고 싶습니다.
+Speaker 3: 기술 구현 관점에서는 인터페이스 성능과 폴백 전략까지 함께 검토해야 합니다.
+Speaker 2: 방향은 괜찮아 보입니다. 전제 조건을 조금 더 구체화해 주실 수 있을까요.
+Speaker 4: I commit to coordinating the rollout across teams. Deliverable: implementation plan by by Q2 with sign-off from engineering lead.
+Speaker 3: 기술 구현 관점에서는 인터페이스 성능과 폴백 전략까지 함께 검토해야 합니다.
+Speaker 2: 이해했습니다. 그 부분은 판단의 전제로 잡아 두겠습니다.
+Speaker 3: 기술 구현 관점에서는 인터페이스 성능과 폴백 전략까지 함께 검토해야 합니다.
+Speaker 1: 좋습니다. 지금까지 논점을 정리해 보겠습니다.
+Speaker 3: Okay, I will cooperate.
+Speaker 1: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 2: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 3: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 4: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.

@@ -1,0 +1,27 @@
+Speaker 1: こんにちは。今日は進め方を一緒に整理したいです。
+Speaker 2: こんにちは。こちらでも前提を確認してきました。
+Speaker 4: Walk me through the failure path: if peak traffic happens, how do we guarantee state consistency?
+Speaker 1: いま一番詰まっている論点はどこですか。
+Speaker 1: 最も重要なのは：
+Speaker 2: 理解しました。少し整理する時間をいただけますか。
+Speaker 1: この問題はいつ頃から表面化しましたか。
+Speaker 3: この点はもう少し精査して、できるだけ早く明確に返答します。
+Speaker 4: What is the monitoring plan? Which dashboard, which alert threshold, and who is on-call for escalation?
+Speaker 1: 最終的にどのような状態を目指していますか。
+Speaker 2: この点は確認して、整理でき次第ご報告します。
+Speaker 4: 補足ですが、品質について調整します。
+Speaker 2: 各ステップで注意すべき点を先に確認したいです。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 4: 质量负责人の観点から、慎重に対応します。
+Speaker 2: 方向性はよさそうです。前提条件をもう少し具体化できますか。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 4: I own test report. I will deliver it by within 2 weeks. Success means error rate >= P95 < 200ms and alerts wired to PagerDuty.
+Speaker 4: I commit to risk mitigation with delivery by in 3 days. Acceptance criteria: stakeholder sign-off validated by tech lead.
+Speaker 2: 了解しました。その点は判断の前提として押さえておきます。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 1: では、ここまでの論点を整理します。
+Speaker 3: Okay, I will cooperate.
+Speaker 1: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 2: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 3: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 4: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.

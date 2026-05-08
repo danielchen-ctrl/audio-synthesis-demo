@@ -1,0 +1,101 @@
+{
+  "task_id": "3a18bb526ceb",
+  "stage": "v3_chinese",
+  "job_function": "房地产",
+  "language": "中文",
+  "scenario": "【主题】新楼盘库存去化压力和渠道促销策略讨论\n围绕某楼盘项目的库存去化压力和销售策略展开讨论，重点分析客户到访量、认购签约转化、竞品楼盘价格、渠道分销效果、促销政策设计、库存结构，以及如何提升短期成交效率。",
+  "core_content": "核心关键词：去化压力、客源结构、渠道效率、价格策略、案场转化、短期动作。围绕某楼盘项目的库存去化压力和销售策略展开讨论，重点分析客户到访量、认购签约转化、竞品楼盘价格、渠道分销效果、促销政策设计、库存结构，以及如何提升短期成交效率。",
+  "people_count": 3,
+  "word_count": 1000,
+  "seed": 864963036,
+  "effective_params": {
+    "scenario_head": "【主题】新楼盘库存去化压力和渠道促销策略讨论\n围绕某楼盘项目的库存去化压力和销售策略展开讨论，重点分析客户到访量、认购签",
+    "core_head": "核心关键词：去化压力、客源结构、渠道效率、价格策略、案场转化、短期动作。围绕某楼盘项目的库存去化压力和销售策略展开讨论，",
+    "people_count": 3,
+    "word_count": 1000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 2673603780,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 23,
+          "2": 6,
+          "3": 5
+        },
+        "after": {
+          "1": 23,
+          "2": 6,
+          "3": 7
+        },
+        "fix_report": {
+          "rounds": 2,
+          "insertions": 2,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 1,
+              "commitment": 1
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 15
+    },
+    "line_count": 36,
+    "total_chars": 817,
+    "seed": 864963036,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 36,
+    "total_chars": 817,
+    "speaker_distribution": {
+      "Speaker 1": 23,
+      "Speaker 2": 6,
+      "Speaker 3": 7
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 36,
+      "total_chars": 817,
+      "marker_count": 0,
+      "chinese_ratio": 0.5833,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 23,
+        "Speaker 2": 6,
+        "Speaker 3": 7
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.9444
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

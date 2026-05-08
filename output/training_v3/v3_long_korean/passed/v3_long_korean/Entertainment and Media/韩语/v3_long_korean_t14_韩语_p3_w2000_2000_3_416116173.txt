@@ -1,0 +1,24 @@
+Speaker 1: 안녕하세요. 오늘은 진행 방향을 먼저 정리해 보겠습니다.
+Speaker 2: 안녕하세요. 이쪽에서도 전제 조건을 확인해 두었습니다.
+Speaker 3: 안녕하세요. 필요한 논점을 함께 정리해 보겠습니다.
+Speaker 1: 지금 가장 막히는 쟁점이 무엇인지 먼저 짚어볼까요.
+Speaker 2: 중요한 쟁점이라 전제 조건을 확인한 뒤 판단하겠습니다.
+Speaker 1: 가장 중요한 것은:
+Speaker 1: 이 문제는 언제부터 드러나기 시작했나요?
+Speaker 3: 이 부분은 다시 확인한 뒤 정리해서 말씀드리겠습니다.
+Speaker 1: 최종적으로 어떤 결과를 기대하고 계신가요?
+Speaker 2: 이해했습니다. 생각을 정리할 시간을 조금 주실 수 있을까요?
+Speaker 2: 각 단계에서 주의할 포인트를 먼저 확인하고 싶습니다.
+Speaker 3: 기술 구현 관점에서는 인터페이스 성능과 폴백 전략까지 함께 검토해야 합니다.
+Speaker 2: 방향은 괜찮아 보입니다. 전제 조건을 조금 더 구체화해 주실 수 있을까요.
+Speaker 3: 기술 구현 관점에서는 인터페이스 성능과 폴백 전략까지 함께 검토해야 합니다.
+Speaker 2: 이해했습니다. 그 부분은 판단의 전제로 잡아 두겠습니다.
+Speaker 3: 기술 구현 관점에서는 인터페이스 성능과 폴백 전략까지 함께 검토해야 합니다.
+Speaker 1: 좋습니다. 지금까지 논점을 정리해 보겠습니다.
+Speaker 3: Okay, I will cooperate.
+Speaker 3: This explanation is very clear, I understand now.
+Speaker 3: Indeed, these details need attention.
+Speaker 3: Okay, I will prepare carefully.
+Speaker 3: Understood, I will cooperate on my end.
+Speaker 3: This suggestion is very helpful, thank you.
+Speaker 3: I'd also like to understand this aspect.

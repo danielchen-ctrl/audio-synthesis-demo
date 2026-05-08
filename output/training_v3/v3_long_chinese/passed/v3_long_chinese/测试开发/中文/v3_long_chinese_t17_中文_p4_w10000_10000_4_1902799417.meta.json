@@ -1,0 +1,82 @@
+{
+  "task_id": "176c4f18caf8",
+  "stage": "v3_long_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】支付项目上线前的接入联调、下单回调和主流程验收讨论\n围绕支付项目上线前的接入联调和交易主链路验收展开讨论，重点覆盖第三方支付接口联调、参数签名、渠道配置、下单接口、订单创建、支付成功失败状态、支付回调、异步通知、幂等处理和主流程验收风险。",
+  "core_content": "核心关键词：支付接入、第三方支付联调、参数签名、下单接口、支付回调、幂等处理、主流程验收。围绕支付项目上线前的接入联调和交易主链路验收展开讨论，重点覆盖第三方支付接口联调、参数签名、渠道配置、下单接口、订单创建、支付成功失败状态、支付回调、异步通知、幂等处理和主流程验收风险。",
+  "people_count": 4,
+  "word_count": 10000,
+  "seed": 1902799417,
+  "effective_params": {
+    "scenario_head": "【主题】支付项目上线前的接入联调、下单回调和主流程验收讨论\n围绕支付项目上线前的接入联调和交易主链路验收展开讨论，重点覆",
+    "core_head": "核心关键词：支付接入、第三方支付联调、参数签名、下单接口、支付回调、幂等处理、主流程验收。围绕支付项目上线前的接入联调和",
+    "people_count": 4,
+    "word_count": 10000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 179948652,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比8.8%不足（需要>=15%）', 'Speaker 4 占比8.0%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比8.8%不足（需要>=15%）",
+          "Speaker 4 占比8.0%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 394,
+    "total_chars": 10014,
+    "seed": 1902799417,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 394,
+    "total_chars": 10014,
+    "speaker_distribution": {
+      "Speaker 1": 173,
+      "Speaker 2": 148,
+      "Speaker 3": 40,
+      "Speaker 4": 33
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 394,
+      "total_chars": 10014,
+      "marker_count": 0,
+      "chinese_ratio": 0.5644,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 173,
+        "Speaker 2": 148,
+        "Speaker 3": 40,
+        "Speaker 4": 33
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

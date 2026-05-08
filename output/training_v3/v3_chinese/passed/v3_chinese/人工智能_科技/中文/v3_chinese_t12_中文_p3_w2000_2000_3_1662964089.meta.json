@@ -1,0 +1,104 @@
+{
+  "task_id": "3ce30a170421",
+  "stage": "v3_chinese",
+  "job_function": "人工智能/科技",
+  "language": "中文",
+  "scenario": "【主题】AI 产品免费用户向付费会员转化方案讨论\n围绕 AI 产品免费用户向付费会员转化的增长方案展开讨论，重点分析用户使用频次、核心功能触达、免费试用路径、价格套餐设计、付费权益说明、转化漏斗数据、用户留存，以及客服或运营如何促进订阅转化。",
+  "core_content": "核心关键词：转化漏斗、付费门槛、试用策略、价值感知、数据回收、实验计划。围绕 AI 产品免费用户向付费会员转化的增长方案展开讨论，重点分析用户使用频次、核心功能触达、免费试用路径、价格套餐设计、付费权益说明、转化漏斗数据、用户留存，以及客服或运营如何促进订阅转化。",
+  "people_count": 3,
+  "word_count": 2000,
+  "seed": 1662964089,
+  "effective_params": {
+    "scenario_head": "【主题】AI 产品免费用户向付费会员转化方案讨论\n围绕 AI 产品免费用户向付费会员转化的增长方案展开讨论，重点分析用户",
+    "core_head": "核心关键词：转化漏斗、付费门槛、试用策略、价值感知、数据回收、实验计划。围绕 AI 产品免费用户向付费会员转化的增长方案",
+    "people_count": 3,
+    "word_count": 2000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 12,
+      "seed": 2361813245,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 51,
+          "2": 21,
+          "3": 8
+        },
+        "after": {
+          "1": 51,
+          "2": 21,
+          "3": 14
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 6,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [
+            "Speaker 3"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 4,
+              "commitment": 2
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 19
+    },
+    "line_count": 86,
+    "total_chars": 1829,
+    "seed": 1662964089,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 86,
+    "total_chars": 1829,
+    "speaker_distribution": {
+      "Speaker 1": 51,
+      "Speaker 2": 21,
+      "Speaker 3": 14
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 86,
+      "total_chars": 1829,
+      "marker_count": 0,
+      "chinese_ratio": 0.5531,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 51,
+        "Speaker 2": 21,
+        "Speaker 3": 14
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.9186
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

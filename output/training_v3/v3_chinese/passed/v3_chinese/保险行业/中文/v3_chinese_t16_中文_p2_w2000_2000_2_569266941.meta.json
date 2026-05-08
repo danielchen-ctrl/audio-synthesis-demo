@@ -1,0 +1,69 @@
+{
+  "task_id": "5f5519830e8a",
+  "stage": "v3_chinese",
+  "job_function": "保险行业",
+  "language": "中文",
+  "scenario": "【主题】保险产品销售转化数据和客户异议洞察分析\n围绕保险产品销售转化数据和客户反馈展开洞察分析，重点讨论销售线索质量、客户画像、成交和拒保原因、客户异议类型、产品匹配度、销售话术效果、渠道表现，以及后续培训和策略优化方向。",
+  "core_content": "核心关键词：销售表现、客户反馈、转化瓶颈、团队差异、改善动作、管理改进。围绕保险产品销售转化数据和客户反馈展开洞察分析，重点讨论销售线索质量、客户画像、成交和拒保原因、客户异议类型、产品匹配度、销售话术效果、渠道表现，以及后续培训和策略优化方向。",
+  "people_count": 2,
+  "word_count": 2000,
+  "seed": 569266941,
+  "effective_params": {
+    "scenario_head": "【主题】保险产品销售转化数据和客户异议洞察分析\n围绕保险产品销售转化数据和客户反馈展开洞察分析，重点讨论销售线索质量、客",
+    "core_head": "核心关键词：销售表现、客户反馈、转化瓶颈、团队差异、改善动作、管理改进。围绕保险产品销售转化数据和客户反馈展开洞察分析，",
+    "people_count": 2,
+    "word_count": 2000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 15,
+      "seed": 761522535,
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 85,
+    "total_chars": 1689,
+    "seed": 569266941,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 85,
+    "total_chars": 1689,
+    "speaker_distribution": {
+      "Speaker 1": 55,
+      "Speaker 2": 30
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 85,
+      "total_chars": 1689,
+      "marker_count": 0,
+      "chinese_ratio": 0.5391,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 55,
+        "Speaker 2": 30
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.9529
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

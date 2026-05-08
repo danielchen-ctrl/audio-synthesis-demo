@@ -1,0 +1,90 @@
+{
+  "task_id": "04a5de380185",
+  "stage": "v3_chinese",
+  "job_function": "法律服务",
+  "language": "中文",
+  "scenario": "【主题】新广告投放素材的合规风险审核讨论\n围绕一批即将投放的广告素材进行合规审核讨论，重点检查宣传用语是否存在极限词或误导表达、资质信息是否完整、投放内容是否符合监管要求、潜在合规风险，以及需要修改的素材和文案方向。",
+  "core_content": "核心关键词：广告表述、风险边界、素材审核、整改建议、上线条件、修改方案。围绕一批即将投放的广告素材进行合规审核讨论，重点检查宣传用语是否存在极限词或误导表达、资质信息是否完整、投放内容是否符合监管要求、潜在合规风险，以及需要修改的素材和文案方向。",
+  "people_count": 6,
+  "word_count": 2000,
+  "seed": 2113008865,
+  "effective_params": {
+    "scenario_head": "【主题】新广告投放素材的合规风险审核讨论\n围绕一批即将投放的广告素材进行合规审核讨论，重点检查宣传用语是否存在极限词或误",
+    "core_head": "核心关键词：广告表述、风险边界、素材审核、整改建议、上线条件、修改方案。围绕一批即将投放的广告素材进行合规审核讨论，重点",
+    "people_count": 6,
+    "word_count": 2000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 8,
+      "seed": 2480528046,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 6 前10轮仅出现1次（需要>=2）', 'Speaker 2 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比9.0%不足（需要>=15%）', 'Speaker 6 占比6.4%不足（需要>=15%）', 'Speaker 4 占比5.1%不足（需要>=15%）', 'Speaker 5 占比6.4%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 6 前10轮仅出现1次（需要>=2）",
+          "Speaker 2 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比9.0%不足（需要>=15%）",
+          "Speaker 6 占比6.4%不足（需要>=15%）",
+          "Speaker 4 占比5.1%不足（需要>=15%）",
+          "Speaker 5 占比6.4%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 7
+    },
+    "line_count": 72,
+    "total_chars": 1652,
+    "seed": 2113008865,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 72,
+    "total_chars": 1652,
+    "speaker_distribution": {
+      "Speaker 1": 39,
+      "Speaker 2": 18,
+      "Speaker 3": 6,
+      "Speaker 4": 3,
+      "Speaker 5": 3,
+      "Speaker 6": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 72,
+      "total_chars": 1652,
+      "marker_count": 0,
+      "chinese_ratio": 0.5654,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 39,
+        "Speaker 2": 18,
+        "Speaker 3": 6,
+        "Speaker 4": 3,
+        "Speaker 5": 3,
+        "Speaker 6": 3
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.9722
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

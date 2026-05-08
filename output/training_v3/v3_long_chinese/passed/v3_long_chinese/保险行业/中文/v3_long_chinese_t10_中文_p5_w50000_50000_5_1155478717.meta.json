@@ -1,0 +1,94 @@
+{
+  "task_id": "9ca08f83f55f",
+  "stage": "v3_long_chinese",
+  "job_function": "保险行业",
+  "language": "中文",
+  "scenario": "【主题】保险销售录音中的话术合规和质检问题复盘\n围绕保险销售录音或回访内容的质检复盘展开讨论，重点检查销售话术是否合规、是否存在误导销售、风险提示是否充分、客户确认是否清晰、保单说明是否完整，以及后续整改和培训建议。",
+  "core_content": "核心关键词：录音质检、销售话术、风险点、培训改进、复盘闭环、改进动作。围绕保险销售录音或回访内容的质检复盘展开讨论，重点检查销售话术是否合规、是否存在误导销售、风险提示是否充分、客户确认是否清晰、保单说明是否完整，以及后续整改和培训建议。",
+  "people_count": 5,
+  "word_count": 50000,
+  "seed": 1155478717,
+  "effective_params": {
+    "scenario_head": "【主题】保险销售录音中的话术合规和质检问题复盘\n围绕保险销售录音或回访内容的质检复盘展开讨论，重点检查销售话术是否合规、",
+    "core_head": "核心关键词：录音质检、销售话术、风险点、培训改进、复盘闭环、改进动作。围绕保险销售录音或回访内容的质检复盘展开讨论，重点",
+    "people_count": 5,
+    "word_count": 50000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 19,
+      "seed": 2825958968,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比5.9%不足（需要>=15%）', 'Speaker 5 占比5.9%不足（需要>=15%）', 'Speaker 4 占比4.2%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比5.9%不足（需要>=15%）",
+          "Speaker 5 占比5.9%不足（需要>=15%）",
+          "Speaker 4 占比4.2%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 1381,
+    "total_chars": 30893,
+    "seed": 1155478717,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 1381,
+    "total_chars": 30893,
+    "speaker_distribution": {
+      "Speaker 1": 286,
+      "Speaker 2": 481,
+      "Speaker 3": 295,
+      "Speaker 4": 282,
+      "Speaker 5": 37
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 1381,
+      "total_chars": 30893,
+      "marker_count": 0,
+      "chinese_ratio": 0.5436,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 286,
+        "Speaker 2": 481,
+        "Speaker 3": 295,
+        "Speaker 4": 282,
+        "Speaker 5": 37
+      },
+      "target_word_count": 50000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=50000, actual=30893",
+        "details": {
+          "target": 50000,
+          "actual": 30893
+        }
+      }
+    ]
+  }
+}

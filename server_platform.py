@@ -39,6 +39,7 @@ from demo_app.embedded_server_main import (
     local_urls,
     make_app,
 )
+from demo_app.training_few_shot import invalidate_index as _invalidate_few_shot_index
 
 from src.webapp.db import init_db
 from src.webapp.routes import register_platform_routes
@@ -77,6 +78,9 @@ def main() -> None:
 
     # 5. 预热 manifest 缓存（后台线程）
     threading.Thread(target=_ensure_manifest_cache, daemon=True, name="manifest-cache-warmer").start()
+
+    # 6. 清除 few-shot 索引缓存，下次请求时重建（确保加载最新训练数据）
+    _invalidate_few_shot_index()
 
     # 6. 启动异步任务 worker（在 IOLoop 内）
     tornado.ioloop.IOLoop.current().call_later(0.1, start_worker)

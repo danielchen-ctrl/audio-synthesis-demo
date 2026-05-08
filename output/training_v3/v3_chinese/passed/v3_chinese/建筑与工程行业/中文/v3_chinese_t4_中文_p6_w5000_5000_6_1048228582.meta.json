@@ -1,0 +1,100 @@
+{
+  "task_id": "efcf6483ae46",
+  "stage": "v3_chinese",
+  "job_function": "建筑与工程行业",
+  "language": "中文",
+  "scenario": "【主题】工程项目临近交付前的进度风险和验收安排讨论\n围绕工程项目临近交付前的进度和验收安排展开讨论，重点关注施工进度是否滞后、材料到货情况、现场质量问题、分包协同、成本风险、延期隐患，以及甲方验收标准和竣工交付计划。",
+  "core_content": "核心关键词：交付进度、现场问题、成本控制、风险处理、验收节点、推进方案。围绕工程项目临近交付前的进度和验收安排展开讨论，重点关注施工进度是否滞后、材料到货情况、现场质量问题、分包协同、成本风险、延期隐患，以及甲方验收标准和竣工交付计划。",
+  "people_count": 6,
+  "word_count": 5000,
+  "seed": 1048228582,
+  "effective_params": {
+    "scenario_head": "【主题】工程项目临近交付前的进度风险和验收安排讨论\n围绕工程项目临近交付前的进度和验收安排展开讨论，重点关注施工进度是否",
+    "core_head": "核心关键词：交付进度、现场问题、成本控制、风险处理、验收节点、推进方案。围绕工程项目临近交付前的进度和验收安排展开讨论，",
+    "people_count": 6,
+    "word_count": 5000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 2876400751,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 4 前10轮仅出现1次（需要>=2）', 'Speaker 3 前10轮仅出现1次（需要>=2）', 'Speaker 6 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比3.3%不足（需要>=15%）', 'Speaker 6 占比4.1%不足（需要>=15%）', 'Speaker 4 占比4.9%不足（需要>=15%）', 'Speaker 5 占比4.1%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 4 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 前10轮仅出现1次（需要>=2）",
+          "Speaker 6 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比3.3%不足（需要>=15%）",
+          "Speaker 6 占比4.1%不足（需要>=15%）",
+          "Speaker 4 占比4.9%不足（需要>=15%）",
+          "Speaker 5 占比4.1%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 116,
+    "total_chars": 2310,
+    "seed": 1048228582,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 116,
+    "total_chars": 2310,
+    "speaker_distribution": {
+      "Speaker 1": 70,
+      "Speaker 2": 33,
+      "Speaker 3": 4,
+      "Speaker 5": 3,
+      "Speaker 6": 3,
+      "Speaker 4": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 116,
+      "total_chars": 2310,
+      "marker_count": 0,
+      "chinese_ratio": 0.5353,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 70,
+        "Speaker 2": 33,
+        "Speaker 3": 4,
+        "Speaker 5": 3,
+        "Speaker 6": 3,
+        "Speaker 4": 3
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 0.9741
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=2310",
+        "details": {
+          "target": 5000,
+          "actual": 2310
+        }
+      }
+    ]
+  }
+}

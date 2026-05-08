@@ -1,0 +1,126 @@
+{
+  "task_id": "4005a073eb49",
+  "stage": "v3_long_japanese",
+  "job_function": "测试开发",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 朋友圈动态发布、图文内容发布和多端分发一致性测试讨论]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 动态发布, 图文视频上传, 草稿保存, 发布失败, 多端同步, 状态一致, 端侧兼容]",
+  "people_count": 3,
+  "word_count": 5000,
+  "seed": 1980735703,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 3,
+    "word_count": 5000,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 12,
+      "seed": 4209290178,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 53,
+          "2": 18,
+          "3": 9
+        },
+        "after": {
+          "1": 52,
+          "2": 19,
+          "3": 14
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 6,
+          "speakers_fixed": [
+            "Speaker 3",
+            "Speaker 2"
+          ],
+          "early_fixed": [
+            "Speaker 3",
+            "Speaker 2",
+            "Speaker 2"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 1,
+              "commitment": 4
+            },
+            "Speaker 2": {
+              "challenge": 1,
+              "commitment": 0
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 86,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 72
+    },
+    "line_count": 29,
+    "total_chars": 1350,
+    "seed": 1980735704,
+    "generator": "embedded_bundle_chunked_v2",
+    "n_chunks": 2,
+    "n_valid_chunks": 2,
+    "chunk_size": 2500
+  },
+  "stats": {
+    "line_count": 29,
+    "total_chars": 1224,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 8,
+      "Speaker 3": 15
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 29,
+      "total_chars": 1224,
+      "marker_count": 0,
+      "chinese_ratio": 0.0783,
+      "kana_ratio": 0.1534,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 8,
+        "Speaker 3": 15
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=1224",
+        "details": {
+          "target": 5000,
+          "actual": 1224
+        }
+      }
+    ]
+  }
+}

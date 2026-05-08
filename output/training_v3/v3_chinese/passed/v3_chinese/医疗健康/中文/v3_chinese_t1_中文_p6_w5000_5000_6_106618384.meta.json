@@ -1,0 +1,99 @@
+{
+  "task_id": "a12d2475fc2d",
+  "stage": "v3_chinese",
+  "job_function": "医疗健康",
+  "language": "中文",
+  "scenario": "【主题】高血压患者复诊后的用药和生活习惯随访沟通\n围绕一名高血压或糖尿病患者复诊后的随访沟通，重点讨论近期血压血糖指标变化、用药依从性、饮食运动习惯、是否出现不适症状，以及医生或健康管理师后续需要调整的随访计划和生活干预建议。",
+  "core_content": "核心关键词：症状变化、用药执行、复查节点、风险提示、患者配合、随访安排、注意事项。围绕一名高血压或糖尿病患者复诊后的随访沟通，重点讨论近期血压血糖指标变化、用药依从性、饮食运动习惯、是否出现不适症状，以及医生或健康管理师后续需要调整的随访计划和生活干预建议。",
+  "people_count": 6,
+  "word_count": 5000,
+  "seed": 106618384,
+  "effective_params": {
+    "scenario_head": "【主题】高血压患者复诊后的用药和生活习惯随访沟通\n围绕一名高血压或糖尿病患者复诊后的随访沟通，重点讨论近期血压血糖指标变",
+    "core_head": "核心关键词：症状变化、用药执行、复查节点、风险提示、患者配合、随访安排、注意事项。围绕一名高血压或糖尿病患者复诊后的随访",
+    "people_count": 6,
+    "word_count": 5000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 4165736948,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 6 前10轮仅出现1次（需要>=2）', 'Speaker 2 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比5.5%不足（需要>=15%）', 'Speaker 4 占比3.9%不足（需要>=15%）', 'Speaker 6 占比3.9%不足（需要>=15%）', 'Speaker 5 占比3.9%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 6 前10轮仅出现1次（需要>=2）",
+          "Speaker 2 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比5.5%不足（需要>=15%）",
+          "Speaker 4 占比3.9%不足（需要>=15%）",
+          "Speaker 6 占比3.9%不足（需要>=15%）",
+          "Speaker 5 占比3.9%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 7
+    },
+    "line_count": 121,
+    "total_chars": 2796,
+    "seed": 106618384,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 121,
+    "total_chars": 2796,
+    "speaker_distribution": {
+      "Speaker 1": 68,
+      "Speaker 2": 37,
+      "Speaker 3": 6,
+      "Speaker 4": 4,
+      "Speaker 5": 3,
+      "Speaker 6": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 121,
+      "total_chars": 2796,
+      "marker_count": 0,
+      "chinese_ratio": 0.5672,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 68,
+        "Speaker 2": 37,
+        "Speaker 3": 6,
+        "Speaker 4": 4,
+        "Speaker 5": 3,
+        "Speaker 6": 3
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 0.9669
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=2796",
+        "details": {
+          "target": 5000,
+          "actual": 2796
+        }
+      }
+    ]
+  }
+}

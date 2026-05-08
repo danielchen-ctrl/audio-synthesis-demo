@@ -1,0 +1,79 @@
+{
+  "task_id": "c60a2f9c344c",
+  "stage": "v3_japanese",
+  "job_function": "测试开发",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 支付系统对账准确性和稳定性准入评估讨论]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 交易流水核对, 渠道账单比对, 金额不一致, 容量评估, 压测结论, 熔断限流, 发布门禁]",
+  "people_count": 2,
+  "word_count": 1000,
+  "seed": 825694658,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 2,
+    "word_count": 1000,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 2,
+      "seed": 3511678864,
+      "is_from_v2": false,
+      "placeholder_violations": 32,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 32
+    },
+    "line_count": 10,
+    "total_chars": 361,
+    "seed": 825694658,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 10,
+    "total_chars": 225,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 4
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 10,
+      "total_chars": 225,
+      "marker_count": 0,
+      "chinese_ratio": 0.2064,
+      "kana_ratio": 0.3924,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 4
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.9
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=1000, actual=225",
+        "details": {
+          "target": 1000,
+          "actual": 225
+        }
+      }
+    ]
+  }
+}

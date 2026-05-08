@@ -1,0 +1,31 @@
+Speaker 1: こんにちは。今日は進め方を一緒に整理したいです。
+Speaker 2: こんにちは。こちらでも前提を確認してきました。
+Speaker 3: こんにちは。論点整理は進められます。
+Speaker 1: いま一番詰まっている論点はどこですか。
+Speaker 2: この点はもう少し精査して、できるだけ早く明確に返答します。
+Speaker 1: 最も重要なのは：
+Speaker 4: How do we validate the rollout in production? What are the canary metrics and rollback criteria?
+Speaker 1: この問題はいつ頃から表面化しましたか。
+Speaker 4: If we miss the deadline by 15%, what's the business impact and mitigation plan?
+Speaker 3: 運用面も確認したいので、明日までに整理して返答します。
+Speaker 1: 最終的にどのような状態を目指していますか。
+Speaker 2: 理解しました。少し整理する時間をいただけますか。
+Speaker 4: 補足ですが、スケジュールについて検討します。
+Speaker 2: 方向性はよさそうです。前提条件をもう少し具体化できますか。
+Speaker 4: 质量负责人の観点から、優先的に対応します。
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 2: 了解しました。その点は判断の前提として押さえておきます。
+Speaker 4: Walk me through the failure path: if peak traffic happens, how do we guarantee state consistency?
+Speaker 4: What is the monitoring plan? Which dashboard, which alert threshold, and who is on-call for escalation?
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 1: では、ここまでの論点を整理します。
+Speaker 3: Okay, I will cooperate.
+Speaker 4: I will implement rollback automation by in 3 days. Success metric: completion rate reduction by 20% with zero regression.
+Speaker 3: This explanation is very clear, I understand now.
+Speaker 4: I'll ensure success rate stays within error rate < 1% range. Monitoring dashboard will be live by in 3 days.
+Speaker 3: Indeed, these details need attention.
+Speaker 4: Okay, I will prepare carefully.
+Speaker 3: Understood, I will cooperate on my end.
+Speaker 4: This suggestion is very helpful, thank you.
+Speaker 3: I'd also like to understand this aspect.
+Speaker 4: I'd also like to understand this aspect.

@@ -1,0 +1,115 @@
+{
+  "task_id": "3ecc91b4a15a",
+  "stage": "v3_long_japanese",
+  "job_function": "エンタメ・メディア",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 内容平台本周增长数据和商业化策略周会]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 业务目标, 资源投入, 进展复盘, 重点风险, 下周动作, 分工安排]",
+  "people_count": 3,
+  "word_count": 5000,
+  "seed": 607827989,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 3,
+    "word_count": 5000,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 11,
+      "seed": 2209571626,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 48,
+          "2": 19,
+          "3": 10
+        },
+        "after": {
+          "1": 47,
+          "2": 19,
+          "3": 13
+        },
+        "fix_report": {
+          "rounds": 2,
+          "insertions": 3,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 2,
+              "commitment": 1
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 80,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 69
+    },
+    "line_count": 27,
+    "total_chars": 1059,
+    "seed": 607827989,
+    "generator": "embedded_bundle_chunked_v2",
+    "n_chunks": 2,
+    "n_valid_chunks": 2,
+    "chunk_size": 2500
+  },
+  "stats": {
+    "line_count": 27,
+    "total_chars": 963,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 7,
+      "Speaker 3": 14
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 27,
+      "total_chars": 963,
+      "marker_count": 0,
+      "chinese_ratio": 0.1019,
+      "kana_ratio": 0.1866,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 7,
+        "Speaker 3": 14
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=963",
+        "details": {
+          "target": 5000,
+          "actual": 963
+        }
+      }
+    ]
+  }
+}

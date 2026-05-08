@@ -1,0 +1,114 @@
+{
+  "task_id": "e7c5d7ee92a8",
+  "stage": "v3_korean",
+  "job_function": "Real Estate",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 新楼盘库存去化压力和渠道促销策略讨论]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 去化压力, 客源结构, 渠道效率, 价格策略, 案场转化, 短期动作]",
+  "people_count": 3,
+  "word_count": 2000,
+  "seed": 1827228582,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 3,
+    "word_count": 2000,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 8,
+      "seed": 2816598053,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 40,
+          "2": 16,
+          "3": 9
+        },
+        "after": {
+          "1": 39,
+          "2": 16,
+          "3": 10
+        },
+        "fix_report": {
+          "rounds": 2,
+          "insertions": 1,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [
+            "Speaker 3"
+          ],
+          "ratio_fixed": [
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 1,
+              "commitment": 0
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 66,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 57
+    },
+    "line_count": 20,
+    "total_chars": 798,
+    "seed": 1827228582,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 20,
+    "total_chars": 678,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 4,
+      "Speaker 3": 10
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 20,
+      "total_chars": 678,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.2683,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 4,
+        "Speaker 3": 10
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.95
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=2000, actual=678",
+        "details": {
+          "target": 2000,
+          "actual": 678
+        }
+      }
+    ]
+  }
+}

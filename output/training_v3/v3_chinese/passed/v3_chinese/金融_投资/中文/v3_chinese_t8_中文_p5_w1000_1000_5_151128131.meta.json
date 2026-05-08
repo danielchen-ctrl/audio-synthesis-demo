@@ -1,0 +1,85 @@
+{
+  "task_id": "f6adc7b46bbd",
+  "stage": "v3_chinese",
+  "job_function": "金融/投资",
+  "language": "中文",
+  "scenario": "【主题】中高净值客户年度资产配置方案沟通\n围绕中高净值客户年度资产配置方案展开沟通，重点讨论客户风险偏好、收益目标、现有资产结构、股票债券基金比例、市场波动影响、流动性需求、资产再平衡策略，以及长期投资规划。",
+  "core_content": "核心关键词：配置目标、风险偏好、资金安排、收益预期、调整策略、风险提示。围绕中高净值客户年度资产配置方案展开沟通，重点讨论客户风险偏好、收益目标、现有资产结构、股票债券基金比例、市场波动影响、流动性需求、资产再平衡策略，以及长期投资规划。",
+  "people_count": 5,
+  "word_count": 1000,
+  "seed": 151128131,
+  "effective_params": {
+    "scenario_head": "【主题】中高净值客户年度资产配置方案沟通\n围绕中高净值客户年度资产配置方案展开沟通，重点讨论客户风险偏好、收益目标、现有",
+    "core_head": "核心关键词：配置目标、风险偏好、资金安排、收益预期、调整策略、风险提示。围绕中高净值客户年度资产配置方案展开沟通，重点讨",
+    "people_count": 5,
+    "word_count": 1000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 1006642870,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比12.5%不足（需要>=15%）', 'Speaker 4 占比7.5%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比12.5%不足（需要>=15%）",
+          "Speaker 4 占比7.5%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 7
+    },
+    "line_count": 35,
+    "total_chars": 835,
+    "seed": 151128131,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 35,
+    "total_chars": 835,
+    "speaker_distribution": {
+      "Speaker 1": 20,
+      "Speaker 2": 6,
+      "Speaker 3": 5,
+      "Speaker 4": 2,
+      "Speaker 5": 2
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 35,
+      "total_chars": 835,
+      "marker_count": 0,
+      "chinese_ratio": 0.5829,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 20,
+        "Speaker 2": 6,
+        "Speaker 3": 5,
+        "Speaker 4": 2,
+        "Speaker 5": 2
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

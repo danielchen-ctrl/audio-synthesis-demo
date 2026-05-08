@@ -1,0 +1,92 @@
+{
+  "task_id": "4fc53543f634",
+  "stage": "v3_japanese",
+  "job_function": "エンタメ・メディア",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 某艺人下季度品牌代言和商务合作机会讨论]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 商业定位, 品牌匹配, 报价策略, 执行风险, 转化目标, 合作判断]",
+  "people_count": 4,
+  "word_count": 1000,
+  "seed": 1569265202,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 4,
+    "word_count": 1000,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 479302055,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 4 前10轮仅出现1次（需要>=2）', 'Speaker 4 占比12.8%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 4 前10轮仅出现1次（需要>=2）",
+          "Speaker 4 占比12.8%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 35,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 29
+    },
+    "line_count": 16,
+    "total_chars": 517,
+    "seed": 1569265202,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 16,
+    "total_chars": 414,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 2,
+      "Speaker 3": 5,
+      "Speaker 4": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 16,
+      "total_chars": 414,
+      "marker_count": 0,
+      "chinese_ratio": 0.1521,
+      "kana_ratio": 0.2628,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 2,
+        "Speaker 3": 5,
+        "Speaker 4": 3
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=1000, actual=414",
+        "details": {
+          "target": 1000,
+          "actual": 414
+        }
+      }
+    ]
+  }
+}

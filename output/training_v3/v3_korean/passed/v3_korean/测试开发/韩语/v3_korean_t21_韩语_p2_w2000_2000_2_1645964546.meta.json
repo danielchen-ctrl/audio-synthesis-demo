@@ -1,0 +1,79 @@
+{
+  "task_id": "a6353a1cbf6b",
+  "stage": "v3_korean",
+  "job_function": "测试开发",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 朋友圈点赞评论、互动计数和多端状态一致性测试讨论]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 点赞评论, 互动计数, 多端展示, 状态回显, 重复点击, 并发互动, 数据一致]",
+  "people_count": 2,
+  "word_count": 2000,
+  "seed": 1645964546,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 2,
+    "word_count": 2000,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 10,
+      "seed": 1357684476,
+      "is_from_v2": false,
+      "placeholder_violations": 66,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 66
+    },
+    "line_count": 12,
+    "total_chars": 479,
+    "seed": 1645964546,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 12,
+    "total_chars": 356,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 6
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 12,
+      "total_chars": 356,
+      "marker_count": 0,
+      "chinese_ratio": 0.022,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.515,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 6
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.9167
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=2000, actual=356",
+        "details": {
+          "target": 2000,
+          "actual": 356
+        }
+      }
+    ]
+  }
+}

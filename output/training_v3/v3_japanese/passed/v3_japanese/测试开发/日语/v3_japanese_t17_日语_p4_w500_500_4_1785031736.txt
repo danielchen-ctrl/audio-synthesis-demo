@@ -1,0 +1,24 @@
+Speaker 1: こんにちは。今日は進め方を一緒に整理したいです。
+Speaker 3: こんにちは。必要な論点を一緒に確認します。
+Speaker 1: いま一番詰まっている論点はどこですか。
+Speaker 4: What is the monitoring plan? Which dashboard, which alert threshold, and who is on-call for escalation?
+Speaker 1: 最も重要なのは：
+Speaker 2: この点はもう少し情報を確認し、次回までに具体的な回答を用意します。
+Speaker 1: この問題はいつ頃から表面化しましたか。
+Speaker 4: Define the SLA for dashboard. What's the P0 response time and escalation path?
+Speaker 3: 理解しました。少し整理する時間をいただけますか。
+Speaker 3: What is the monitoring plan? Which dashboard, which alert threshold, and who is on-call for escalation?
+Speaker 1: 最終的にどのような状態を目指していますか。
+Speaker 2: この点はもう少し情報を確認し、次回までに具体的な回答を用意します。
+Speaker 4: 補足ですが、予算について確認が必要。
+Speaker 4: I will implement rollback automation by in 3 days. Success metric: error rate reduction by 15% with zero regression.
+Speaker 4: 质量负责人の観点から、重点的に対応します。
+Speaker 2: 了解しました。その点は判断の前提として押さえておきます。
+Speaker 3: I will run load testing by next Friday and provide evidence: risk assessment. Pass criteria: SLA compliance within 95%.
+Speaker 3: 技術面では、インターフェース性能とフォールバック戦略も含めて見直しが必要です。
+Speaker 1: では、ここまでの論点を整理します。
+Speaker 3: Okay, I will cooperate.
+Speaker 1: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 2: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 3: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.
+Speaker 4: One verifiable point: we must clarify boundary/criteria; otherwise we cannot proceed.

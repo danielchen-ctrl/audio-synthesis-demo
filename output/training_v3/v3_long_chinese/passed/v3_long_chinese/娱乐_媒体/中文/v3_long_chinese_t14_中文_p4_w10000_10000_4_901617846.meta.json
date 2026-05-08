@@ -1,0 +1,82 @@
+{
+  "task_id": "b1cb1de09f7b",
+  "stage": "v3_long_chinese",
+  "job_function": "娱乐/媒体",
+  "language": "中文",
+  "scenario": "【主题】内容平台本周增长数据和商业化策略周会\n围绕内容平台或媒体团队的战略周会展开讨论，重点复盘本周平台增长数据、内容策略执行情况、商业化进展、重点项目推进、资源协调问题、潜在风险事项，以及下周核心目标和行动计划。",
+  "core_content": "核心关键词：业务目标、资源投入、进展复盘、重点风险、下周动作、分工安排。围绕内容平台或媒体团队的战略周会展开讨论，重点复盘本周平台增长数据、内容策略执行情况、商业化进展、重点项目推进、资源协调问题、潜在风险事项，以及下周核心目标和行动计划。",
+  "people_count": 4,
+  "word_count": 10000,
+  "seed": 901617846,
+  "effective_params": {
+    "scenario_head": "【主题】内容平台本周增长数据和商业化策略周会\n围绕内容平台或媒体团队的战略周会展开讨论，重点复盘本周平台增长数据、内容策",
+    "core_head": "核心关键词：业务目标、资源投入、进展复盘、重点风险、下周动作、分工安排。围绕内容平台或媒体团队的战略周会展开讨论，重点复",
+    "people_count": 4,
+    "word_count": 10000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 19,
+      "seed": 1005386399,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比12.1%不足（需要>=15%）', 'Speaker 4 占比11.4%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比12.1%不足（需要>=15%）",
+          "Speaker 4 占比11.4%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 374,
+    "total_chars": 10033,
+    "seed": 901617846,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 374,
+    "total_chars": 10033,
+    "speaker_distribution": {
+      "Speaker 1": 164,
+      "Speaker 2": 142,
+      "Speaker 3": 33,
+      "Speaker 4": 35
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 374,
+      "total_chars": 10033,
+      "marker_count": 0,
+      "chinese_ratio": 0.5731,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 164,
+        "Speaker 2": 142,
+        "Speaker 3": 33,
+        "Speaker 4": 35
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

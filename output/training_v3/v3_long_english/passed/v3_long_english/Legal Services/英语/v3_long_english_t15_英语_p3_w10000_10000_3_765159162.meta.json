@@ -1,0 +1,95 @@
+{
+  "task_id": "36b58e226309",
+  "stage": "v3_long_english",
+  "job_function": "Legal Services",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 新广告投放素材的合规风险审核讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 广告表述, 风险边界, 素材审核, 整改建议, 上线条件, 修改方案]",
+  "people_count": 3,
+  "word_count": 10000,
+  "seed": 765159162,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 3,
+    "word_count": 10000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 2,
+      "seed": 2423422215,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 26,
+          "2": 10,
+          "3": 9
+        },
+        "after": {
+          "1": 25,
+          "2": 10,
+          "3": 9
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 45,
+      "duplicate_intro_fixed": 2,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 153,
+    "total_chars": 10720,
+    "seed": 765159162,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 153,
+    "total_chars": 10720,
+    "speaker_distribution": {
+      "Speaker 1": 88,
+      "Speaker 2": 42,
+      "Speaker 3": 23
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 153,
+      "total_chars": 10720,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 88,
+        "Speaker 2": 42,
+        "Speaker 3": 23
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

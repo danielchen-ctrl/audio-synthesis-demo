@@ -12,8 +12,8 @@ from training.training_types import ExecutionResult, TrainingTask
 
 Generator = Callable[[TrainingTask, int], tuple]
 
-# Maximum seconds a single generator() call may run before being abandoned.
-# 10-speaker tasks can spin inside the bundle for 30+ min; cap at 5 min.
+# Base timeout per generator() call. Scaled up for large word-count tasks:
+# 50k-word English tasks need ~600-900s; formula: max(300, word_count // 50).
 _GENERATOR_TIMEOUT_SECONDS = 300
 
 
@@ -22,6 +22,11 @@ def _call_with_timeout(fn, *args, timeout: int = _GENERATOR_TIMEOUT_SECONDS):
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
         future = pool.submit(fn, *args)
         return future.result(timeout=timeout)
+
+
+def _task_timeout(task: TrainingTask) -> int:
+    """Return per-task timeout scaled to word_count (min 300s)."""
+    return max(_GENERATOR_TIMEOUT_SECONDS, task.word_count // 50)
 
 
 def execute_tasks(
@@ -39,9 +44,10 @@ def execute_tasks(
         stats["total"] += 1
         success = False
         last_error = ""
+        timeout = _task_timeout(task)
         for retry in range(max_retries + 1):
             try:
-                lines, debug_info = _call_with_timeout(generator, task, retry)
+                lines, debug_info = _call_with_timeout(generator, task, retry, timeout=timeout)
                 validation = validate_with_quality_gate(task, lines)
                 score_report = score_dialogue(task, lines, validator_errors=validation["errors"])
                 result = ExecutionResult(

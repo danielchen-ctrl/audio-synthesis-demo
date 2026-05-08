@@ -1,0 +1,115 @@
+{
+  "task_id": "cbafcc75b8e4",
+  "stage": "v3_long_english",
+  "job_function": "Real Estate",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 新楼盘库存去化压力和渠道促销策略讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 去化压力, 客源结构, 渠道效率, 价格策略, 案场转化, 短期动作]",
+  "people_count": 4,
+  "word_count": 10000,
+  "seed": 1595966739,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 4,
+    "word_count": 10000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 1601176688,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 22,
+          "2": 10,
+          "3": 8,
+          "4": 3
+        },
+        "after": {
+          "1": 21,
+          "2": 10,
+          "3": 8,
+          "4": 9
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 6,
+          "speakers_fixed": [
+            "Speaker 4"
+          ],
+          "early_fixed": [
+            "Speaker 4",
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "ratio_fixed": [
+            "Speaker 4",
+            "Speaker 4",
+            "Speaker 4",
+            "Speaker 4"
+          ],
+          "speaker_contributions": {
+            "Speaker 4": {
+              "challenge": 3,
+              "commitment": 3
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 49,
+      "duplicate_intro_fixed": 2,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 140,
+    "total_chars": 11380,
+    "seed": 1595966739,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 140,
+    "total_chars": 11380,
+    "speaker_distribution": {
+      "Speaker 1": 64,
+      "Speaker 2": 28,
+      "Speaker 3": 18,
+      "Speaker 4": 30
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 140,
+      "total_chars": 11380,
+      "marker_count": 0,
+      "chinese_ratio": 0.0011,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 64,
+        "Speaker 2": 28,
+        "Speaker 3": 18,
+        "Speaker 4": 30
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

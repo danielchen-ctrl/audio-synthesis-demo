@@ -1,0 +1,103 @@
+{
+  "task_id": "28688483b5ed",
+  "stage": "v3_japanese",
+  "job_function": "小売",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 提升老会员复购率的运营活动方案讨论]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 会员分层, 活动策略, 复购触达, 门店配合, 效果验证, 执行节奏]",
+  "people_count": 3,
+  "word_count": 500,
+  "seed": 105594064,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 3,
+    "word_count": 500,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 2700734910,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 18,
+          "2": 8,
+          "3": 7
+        },
+        "after": {
+          "1": 17,
+          "2": 8,
+          "3": 7
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 33,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 28
+    },
+    "line_count": 20,
+    "total_chars": 771,
+    "seed": 105594064,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 20,
+    "total_chars": 683,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 7,
+      "Speaker 3": 6
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 20,
+      "total_chars": 683,
+      "marker_count": 0,
+      "chinese_ratio": 0.1367,
+      "kana_ratio": 0.2733,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 7,
+        "Speaker 3": 6
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.8
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=500, actual=683",
+        "details": {
+          "target": 500,
+          "actual": 683
+        }
+      }
+    ]
+  }
+}

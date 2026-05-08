@@ -1,0 +1,104 @@
+{
+  "task_id": "17fc498b861a",
+  "stage": "v3_long_english",
+  "job_function": "测试开发",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 朋友圈隐私可见范围、内容审核和权限控制测试讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 好友可见, 分组可见, 黑名单屏蔽, 权限校验, 敏感词检测, 图片审核, 违规内容拦截]",
+  "people_count": 3,
+  "word_count": 30000,
+  "seed": 87858133,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 3,
+    "word_count": 30000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 2,
+      "seed": 2670859859,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 26,
+          "2": 10,
+          "3": 9
+        },
+        "after": {
+          "1": 25,
+          "2": 10,
+          "3": 9
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 45,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 225,
+    "total_chars": 15085,
+    "seed": 87858133,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 225,
+    "total_chars": 15085,
+    "speaker_distribution": {
+      "Speaker 1": 124,
+      "Speaker 2": 64,
+      "Speaker 3": 37
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 225,
+      "total_chars": 15085,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 124,
+        "Speaker 2": 64,
+        "Speaker 3": 37
+      },
+      "target_word_count": 30000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=30000, actual=15085",
+        "details": {
+          "target": 30000,
+          "actual": 15085
+        }
+      }
+    ]
+  }
+}

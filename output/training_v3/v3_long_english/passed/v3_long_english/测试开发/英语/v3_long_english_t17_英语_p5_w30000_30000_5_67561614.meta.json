@@ -1,0 +1,94 @@
+{
+  "task_id": "d6684bca87f7",
+  "stage": "v3_long_english",
+  "job_function": "测试开发",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 支付项目上线前的接入联调、下单回调和主流程验收讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 支付接入, 第三方支付联调, 参数签名, 下单接口, 支付回调, 幂等处理, 主流程验收]",
+  "people_count": 5,
+  "word_count": 30000,
+  "seed": 67561614,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 5,
+    "word_count": 30000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 3078968872,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 5 占比9.1%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 5 占比9.1%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 46,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 6
+    },
+    "line_count": 256,
+    "total_chars": 16939,
+    "seed": 67561614,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 256,
+    "total_chars": 16939,
+    "speaker_distribution": {
+      "Speaker 1": 124,
+      "Speaker 2": 60,
+      "Speaker 3": 39,
+      "Speaker 4": 20,
+      "Speaker 5": 13
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 256,
+      "total_chars": 16939,
+      "marker_count": 0,
+      "chinese_ratio": 0.0012,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 124,
+        "Speaker 2": 60,
+        "Speaker 3": 39,
+        "Speaker 4": 20,
+        "Speaker 5": 13
+      },
+      "target_word_count": 30000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=30000, actual=16939",
+        "details": {
+          "target": 30000,
+          "actual": 16939
+        }
+      }
+    ]
+  }
+}

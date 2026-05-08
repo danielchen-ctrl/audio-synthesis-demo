@@ -1,0 +1,111 @@
+{
+  "task_id": "55535f6681a4",
+  "stage": "v3_long_chinese",
+  "job_function": "娱乐/媒体",
+  "language": "中文",
+  "scenario": "【主题】内容平台本周增长数据和商业化策略周会\n围绕内容平台或媒体团队的战略周会展开讨论，重点复盘本周平台增长数据、内容策略执行情况、商业化进展、重点项目推进、资源协调问题、潜在风险事项，以及下周核心目标和行动计划。",
+  "core_content": "核心关键词：业务目标、资源投入、进展复盘、重点风险、下周动作、分工安排。围绕内容平台或媒体团队的战略周会展开讨论，重点复盘本周平台增长数据、内容策略执行情况、商业化进展、重点项目推进、资源协调问题、潜在风险事项，以及下周核心目标和行动计划。",
+  "people_count": 3,
+  "word_count": 40000,
+  "seed": 210215809,
+  "effective_params": {
+    "scenario_head": "【主题】内容平台本周增长数据和商业化策略周会\n围绕内容平台或媒体团队的战略周会展开讨论，重点复盘本周平台增长数据、内容策",
+    "core_head": "核心关键词：业务目标、资源投入、进展复盘、重点风险、下周动作、分工安排。围绕内容平台或媒体团队的战略周会展开讨论，重点复",
+    "people_count": 3,
+    "word_count": 40000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 19,
+      "seed": 2683404761,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 60,
+          "2": 42,
+          "3": 9
+        },
+        "after": {
+          "1": 60,
+          "2": 42,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 10,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 5,
+              "commitment": 5
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 21
+    },
+    "line_count": 833,
+    "total_chars": 19922,
+    "seed": 210215809,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 833,
+    "total_chars": 19922,
+    "speaker_distribution": {
+      "Speaker 1": 273,
+      "Speaker 2": 335,
+      "Speaker 3": 225
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 833,
+      "total_chars": 19922,
+      "marker_count": 0,
+      "chinese_ratio": 0.5541,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 273,
+        "Speaker 2": 335,
+        "Speaker 3": 225
+      },
+      "target_word_count": 40000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=40000, actual=19922",
+        "details": {
+          "target": 40000,
+          "actual": 19922
+        }
+      }
+    ]
+  }
+}

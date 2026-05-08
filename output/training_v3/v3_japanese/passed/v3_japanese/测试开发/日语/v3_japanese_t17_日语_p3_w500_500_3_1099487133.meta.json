@@ -1,0 +1,105 @@
+{
+  "task_id": "dbca72d6dd0b",
+  "stage": "v3_japanese",
+  "job_function": "测试开发",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 支付项目上线前的接入联调、下单回调和主流程验收讨论]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 支付接入, 第三方支付联调, 参数签名, 下单接口, 支付回调, 幂等处理, 主流程验收]",
+  "people_count": 3,
+  "word_count": 500,
+  "seed": 1099487133,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 3,
+    "word_count": 500,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 2899606310,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 18,
+          "2": 4,
+          "3": 5
+        },
+        "after": {
+          "1": 17,
+          "2": 5,
+          "3": 5
+        },
+        "fix_report": {
+          "rounds": 2,
+          "insertions": 1,
+          "speakers_fixed": [
+            "Speaker 2"
+          ],
+          "early_fixed": [
+            "Speaker 2"
+          ],
+          "ratio_fixed": [
+            "Speaker 2"
+          ],
+          "speaker_contributions": {
+            "Speaker 2": {
+              "challenge": 1,
+              "commitment": 0
+            }
+          }
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 28,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 22
+    },
+    "line_count": 15,
+    "total_chars": 711,
+    "seed": 1099487133,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 15,
+    "total_chars": 584,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 3": 5,
+      "Speaker 2": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 15,
+      "total_chars": 584,
+      "marker_count": 0,
+      "chinese_ratio": 0.0865,
+      "kana_ratio": 0.1835,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 3": 5,
+        "Speaker 2": 3
+      },
+      "target_word_count": 500,
+      "unique_line_ratio": 0.8667
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

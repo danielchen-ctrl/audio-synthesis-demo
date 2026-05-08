@@ -1,0 +1,114 @@
+{
+  "task_id": "7e7b5dadea17",
+  "stage": "v3_long_chinese",
+  "job_function": "建筑与工程行业",
+  "language": "中文",
+  "scenario": "【主题】工程项目临近交付前的进度风险和验收安排讨论\n围绕工程项目临近交付前的进度和验收安排展开讨论，重点关注施工进度是否滞后、材料到货情况、现场质量问题、分包协同、成本风险、延期隐患，以及甲方验收标准和竣工交付计划。",
+  "core_content": "核心关键词：交付进度、现场问题、成本控制、风险处理、验收节点、推进方案。围绕工程项目临近交付前的进度和验收安排展开讨论，重点关注施工进度是否滞后、材料到货情况、现场质量问题、分包协同、成本风险、延期隐患，以及甲方验收标准和竣工交付计划。",
+  "people_count": 3,
+  "word_count": 40000,
+  "seed": 2050308269,
+  "effective_params": {
+    "scenario_head": "【主题】工程项目临近交付前的进度风险和验收安排讨论\n围绕工程项目临近交付前的进度和验收安排展开讨论，重点关注施工进度是否",
+    "core_head": "核心关键词：交付进度、现场问题、成本控制、风险处理、验收节点、推进方案。围绕工程项目临近交付前的进度和验收安排展开讨论，",
+    "people_count": 3,
+    "word_count": 40000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 1009361264,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 65,
+          "2": 39,
+          "3": 8
+        },
+        "after": {
+          "1": 65,
+          "2": 39,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 11,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [
+            "Speaker 3"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 7,
+              "commitment": 4
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 24
+    },
+    "line_count": 720,
+    "total_chars": 16577,
+    "seed": 2050308269,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 720,
+    "total_chars": 16577,
+    "speaker_distribution": {
+      "Speaker 1": 270,
+      "Speaker 2": 278,
+      "Speaker 3": 172
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 720,
+      "total_chars": 16577,
+      "marker_count": 0,
+      "chinese_ratio": 0.5466,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 270,
+        "Speaker 2": 278,
+        "Speaker 3": 172
+      },
+      "target_word_count": 40000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=40000, actual=16577",
+        "details": {
+          "target": 40000,
+          "actual": 16577
+        }
+      }
+    ]
+  }
+}

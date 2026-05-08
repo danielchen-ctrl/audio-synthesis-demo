@@ -1,0 +1,111 @@
+{
+  "task_id": "2d1bbd8905ed",
+  "stage": "v3_long_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】支付系统对账准确性和稳定性准入评估讨论\n围绕支付系统上线前的对账准确性和稳定性准入评估展开讨论，重点包括交易流水核对、渠道账单比对、金额不一致、漏单多单、差错处理、补偿机制、容量评估、性能基线、错误率、响应时间、熔断限流和发布门禁。",
+  "core_content": "核心关键词：交易流水核对、渠道账单比对、金额不一致、容量评估、压测结论、熔断限流、发布门禁。围绕支付系统上线前的对账准确性和稳定性准入评估展开讨论，重点包括交易流水核对、渠道账单比对、金额不一致、漏单多单、差错处理、补偿机制、容量评估、性能基线、错误率、响应时间、熔断限流和发布门禁。",
+  "people_count": 3,
+  "word_count": 40000,
+  "seed": 1015060383,
+  "effective_params": {
+    "scenario_head": "【主题】支付系统对账准确性和稳定性准入评估讨论\n围绕支付系统上线前的对账准确性和稳定性准入评估展开讨论，重点包括交易流水",
+    "core_head": "核心关键词：交易流水核对、渠道账单比对、金额不一致、容量评估、压测结论、熔断限流、发布门禁。围绕支付系统上线前的对账准确",
+    "people_count": 3,
+    "word_count": 40000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 2428797191,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 70,
+          "2": 35,
+          "3": 9
+        },
+        "after": {
+          "1": 70,
+          "2": 35,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 10,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 8,
+              "commitment": 2
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 21
+    },
+    "line_count": 840,
+    "total_chars": 19567,
+    "seed": 1015060384,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 840,
+    "total_chars": 19567,
+    "speaker_distribution": {
+      "Speaker 1": 287,
+      "Speaker 2": 332,
+      "Speaker 3": 221
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 840,
+      "total_chars": 19567,
+      "marker_count": 0,
+      "chinese_ratio": 0.5505,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 287,
+        "Speaker 2": 332,
+        "Speaker 3": 221
+      },
+      "target_word_count": 40000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=40000, actual=19567",
+        "details": {
+          "target": 40000,
+          "actual": 19567
+        }
+      }
+    ]
+  }
+}

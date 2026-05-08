@@ -1,0 +1,91 @@
+{
+  "task_id": "3f81899b3f0b",
+  "stage": "v3_long_chinese",
+  "job_function": "咨询/专业服务",
+  "language": "中文",
+  "scenario": "【主题】面向制造业客户的新咨询项目拓展沟通\n围绕面向某个行业客户的新项目拓展沟通，重点讨论客户当前业务痛点、潜在咨询需求、决策链路、客户拜访计划、解决方案初步方向、项目报价策略，以及后续如何推动商机转化。",
+  "core_content": "核心关键词：客户诉求、方案切入、关系推进、报价策略、交付匹配、推进动作。围绕面向某个行业客户的新项目拓展沟通，重点讨论客户当前业务痛点、潜在咨询需求、决策链路、客户拜访计划、解决方案初步方向、项目报价策略，以及后续如何推动商机转化。",
+  "people_count": 4,
+  "word_count": 50000,
+  "seed": 1640213532,
+  "effective_params": {
+    "scenario_head": "【主题】面向制造业客户的新咨询项目拓展沟通\n围绕面向某个行业客户的新项目拓展沟通，重点讨论客户当前业务痛点、潜在咨询需求",
+    "core_head": "核心关键词：客户诉求、方案切入、关系推进、报价策略、交付匹配、推进动作。围绕面向某个行业客户的新项目拓展沟通，重点讨论客",
+    "people_count": 4,
+    "word_count": 50000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 19,
+      "seed": 2477369617,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比9.0%不足（需要>=15%）', 'Speaker 4 占比8.2%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比9.0%不足（需要>=15%）",
+          "Speaker 4 占比8.2%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 1417,
+    "total_chars": 30543,
+    "seed": 1640213533,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 1417,
+    "total_chars": 30543,
+    "speaker_distribution": {
+      "Speaker 1": 297,
+      "Speaker 2": 542,
+      "Speaker 3": 314,
+      "Speaker 4": 264
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 1417,
+      "total_chars": 30543,
+      "marker_count": 0,
+      "chinese_ratio": 0.537,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 297,
+        "Speaker 2": 542,
+        "Speaker 3": 314,
+        "Speaker 4": 264
+      },
+      "target_word_count": 50000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=50000, actual=30543",
+        "details": {
+          "target": 50000,
+          "actual": 30543
+        }
+      }
+    ]
+  }
+}

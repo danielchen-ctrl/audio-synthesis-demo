@@ -21,6 +21,11 @@ dist/
 
 # Runtime / generated outputs
 output/
+# v3 训练产出 passed 目录（纳入版本管理作为 few-shot 语料）
+!output/training_v3/
+!output/training_v3/*/
+!output/training_v3/*/passed/
+!output/training_v3/*/passed/**
 reports/
 runtime/
 tmp/

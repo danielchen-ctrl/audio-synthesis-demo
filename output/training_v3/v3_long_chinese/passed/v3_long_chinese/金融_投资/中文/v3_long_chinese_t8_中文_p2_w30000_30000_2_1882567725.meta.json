@@ -1,0 +1,78 @@
+{
+  "task_id": "5f2f5c268203",
+  "stage": "v3_long_chinese",
+  "job_function": "金融/投资",
+  "language": "中文",
+  "scenario": "【主题】中高净值客户年度资产配置方案沟通\n围绕中高净值客户年度资产配置方案展开沟通，重点讨论客户风险偏好、收益目标、现有资产结构、股票债券基金比例、市场波动影响、流动性需求、资产再平衡策略，以及长期投资规划。",
+  "core_content": "核心关键词：配置目标、风险偏好、资金安排、收益预期、调整策略、风险提示。围绕中高净值客户年度资产配置方案展开沟通，重点讨论客户风险偏好、收益目标、现有资产结构、股票债券基金比例、市场波动影响、流动性需求、资产再平衡策略，以及长期投资规划。",
+  "people_count": 2,
+  "word_count": 30000,
+  "seed": 1882567725,
+  "effective_params": {
+    "scenario_head": "【主题】中高净值客户年度资产配置方案沟通\n围绕中高净值客户年度资产配置方案展开沟通，重点讨论客户风险偏好、收益目标、现有",
+    "core_head": "核心关键词：配置目标、风险偏好、资金安排、收益预期、调整策略、风险提示。围绕中高净值客户年度资产配置方案展开沟通，重点讨",
+    "people_count": 2,
+    "word_count": 30000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 17,
+      "seed": 2467346721,
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 7
+    },
+    "line_count": 599,
+    "total_chars": 14471,
+    "seed": 1882567725,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 599,
+    "total_chars": 14471,
+    "speaker_distribution": {
+      "Speaker 1": 278,
+      "Speaker 2": 321
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 599,
+      "total_chars": 14471,
+      "marker_count": 0,
+      "chinese_ratio": 0.5551,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 278,
+        "Speaker 2": 321
+      },
+      "target_word_count": 30000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=30000, actual=14471",
+        "details": {
+          "target": 30000,
+          "actual": 14471
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "task_id": "4025bb6c9d53",
+  "stage": "v3_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】支付系统上线前的退款安全、对账差错和稳定性准入评估\n围绕退款流程和资金安全相关测试展开讨论，重点关注退款申请、审核流程、原路退回、重复退款、越权退款、金额校验、退款状态同步、退款回调、风控拦截、异常退款处理，以及资金安全风险。",
+  "core_content": "核心关键词：退款申请、重复退款、越权退款、金额校验、退款回调、风控拦截、资金安全风险。围绕退款流程和资金安全相关测试展开讨论，重点关注退款申请、审核流程、原路退回、重复退款、越权退款、金额校验、退款状态同步、退款回调、风控拦截、异常退款处理，以及资金安全风险。",
+  "people_count": 6,
+  "word_count": 5000,
+  "seed": 22941502,
+  "effective_params": {
+    "scenario_head": "【主题】支付系统上线前的退款安全、对账差错和稳定性准入评估\n围绕退款流程和资金安全相关测试展开讨论，重点关注退款申请、审",
+    "core_head": "核心关键词：退款申请、重复退款、越权退款、金额校验、退款回调、风控拦截、资金安全风险。围绕退款流程和资金安全相关测试展开",
+    "people_count": 6,
+    "word_count": 5000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 3188626721,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 6 前10轮仅出现1次（需要>=2）', 'Speaker 2 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比4.8%不足（需要>=15%）', 'Speaker 4 占比3.2%不足（需要>=15%）', 'Speaker 5 占比4.0%不足（需要>=15%）', 'Speaker 6 占比4.0%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 6 前10轮仅出现1次（需要>=2）",
+          "Speaker 2 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比4.8%不足（需要>=15%）",
+          "Speaker 4 占比3.2%不足（需要>=15%）",
+          "Speaker 5 占比4.0%不足（需要>=15%）",
+          "Speaker 6 占比4.0%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 118,
+    "total_chars": 2634,
+    "seed": 22941502,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 118,
+    "total_chars": 2634,
+    "speaker_distribution": {
+      "Speaker 1": 72,
+      "Speaker 2": 32,
+      "Speaker 3": 5,
+      "Speaker 4": 3,
+      "Speaker 5": 3,
+      "Speaker 6": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 118,
+      "total_chars": 2634,
+      "marker_count": 0,
+      "chinese_ratio": 0.5577,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 72,
+        "Speaker 2": 32,
+        "Speaker 3": 5,
+        "Speaker 4": 3,
+        "Speaker 5": 3,
+        "Speaker 6": 3
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 0.9746
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=2634",
+        "details": {
+          "target": 5000,
+          "actual": 2634
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "task_id": "936a83998790",
+  "stage": "v3_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】支付系统对账准确性和稳定性准入评估讨论\n围绕支付系统上线前的对账准确性和稳定性准入评估展开讨论，重点包括交易流水核对、渠道账单比对、金额不一致、漏单多单、差错处理、补偿机制、容量评估、性能基线、错误率、响应时间、熔断限流和发布门禁。",
+  "core_content": "核心关键词：交易流水核对、渠道账单比对、金额不一致、容量评估、压测结论、熔断限流、发布门禁。围绕支付系统上线前的对账准确性和稳定性准入评估展开讨论，重点包括交易流水核对、渠道账单比对、金额不一致、漏单多单、差错处理、补偿机制、容量评估、性能基线、错误率、响应时间、熔断限流和发布门禁。",
+  "people_count": 3,
+  "word_count": 2000,
+  "seed": 611515391,
+  "effective_params": {
+    "scenario_head": "【主题】支付系统对账准确性和稳定性准入评估讨论\n围绕支付系统上线前的对账准确性和稳定性准入评估展开讨论，重点包括交易流水",
+    "core_head": "核心关键词：交易流水核对、渠道账单比对、金额不一致、容量评估、压测结论、熔断限流、发布门禁。围绕支付系统上线前的对账准确",
+    "people_count": 3,
+    "word_count": 2000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 12,
+      "seed": 3916602524,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 54,
+          "2": 19,
+          "3": 9
+        },
+        "after": {
+          "1": 54,
+          "2": 19,
+          "3": 14
+        },
+        "fix_report": {
+          "rounds": 2,
+          "insertions": 5,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 3,
+              "commitment": 2
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 18
+    },
+    "line_count": 87,
+    "total_chars": 1840,
+    "seed": 611515391,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 87,
+    "total_chars": 1840,
+    "speaker_distribution": {
+      "Speaker 1": 54,
+      "Speaker 2": 19,
+      "Speaker 3": 14
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 87,
+      "total_chars": 1840,
+      "marker_count": 0,
+      "chinese_ratio": 0.5564,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 54,
+        "Speaker 2": 19,
+        "Speaker 3": 14
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.931
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

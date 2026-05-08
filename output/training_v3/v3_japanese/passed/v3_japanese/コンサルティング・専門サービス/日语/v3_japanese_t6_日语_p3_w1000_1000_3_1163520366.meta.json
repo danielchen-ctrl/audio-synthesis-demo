@@ -1,0 +1,103 @@
+{
+  "task_id": "d04f5152105d",
+  "stage": "v3_japanese",
+  "job_function": "コンサルティング・専門サービス",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 面向制造业客户的新咨询项目拓展沟通]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 客户诉求, 方案切入, 关系推进, 报价策略, 交付匹配, 推进动作]",
+  "people_count": 3,
+  "word_count": 1000,
+  "seed": 1163520366,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 3,
+    "word_count": 1000,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 1270706801,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 20,
+          "2": 8,
+          "3": 7
+        },
+        "after": {
+          "1": 19,
+          "2": 8,
+          "3": 7
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 35,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 32
+    },
+    "line_count": 19,
+    "total_chars": 606,
+    "seed": 1163520366,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 19,
+    "total_chars": 502,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 6,
+      "Speaker 3": 7
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 19,
+      "total_chars": 502,
+      "marker_count": 0,
+      "chinese_ratio": 0.1866,
+      "kana_ratio": 0.3635,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 6,
+        "Speaker 3": 7
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.8947
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=1000, actual=502",
+        "details": {
+          "target": 1000,
+          "actual": 502
+        }
+      }
+    ]
+  }
+}

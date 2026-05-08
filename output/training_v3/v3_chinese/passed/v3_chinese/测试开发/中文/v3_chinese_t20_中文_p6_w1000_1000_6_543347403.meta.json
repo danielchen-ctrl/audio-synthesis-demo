@@ -1,0 +1,91 @@
+{
+  "task_id": "1a4f6a2b123a",
+  "stage": "v3_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】朋友圈动态发布、图文内容发布和多端分发一致性测试讨论\n围绕朋友圈或社交内容的发布和多端分发测试展开讨论，重点覆盖动态发布、文本图片视频上传、草稿保存、发布失败、内容校验、信息流展示、App/Web/小程序多端同步、消息分发、状态一致和端侧兼容问题。",
+  "core_content": "核心关键词：动态发布、图文视频上传、草稿保存、发布失败、多端同步、状态一致、端侧兼容。围绕朋友圈或社交内容的发布和多端分发测试展开讨论，重点覆盖动态发布、文本图片视频上传、草稿保存、发布失败、内容校验、信息流展示、App/Web/小程序多端同步、消息分发、状态一致和端侧兼容问题。",
+  "people_count": 6,
+  "word_count": 1000,
+  "seed": 543347403,
+  "effective_params": {
+    "scenario_head": "【主题】朋友圈动态发布、图文内容发布和多端分发一致性测试讨论\n围绕朋友圈或社交内容的发布和多端分发测试展开讨论，重点覆盖",
+    "core_head": "核心关键词：动态发布、图文视频上传、草稿保存、发布失败、多端同步、状态一致、端侧兼容。围绕朋友圈或社交内容的发布和多端分",
+    "people_count": 6,
+    "word_count": 1000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 1897085239,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 6 前10轮仅出现1次（需要>=2）', 'Speaker 5 前10轮仅出现1次（需要>=2）', 'Speaker 2 占比12.8%不足（需要>=15%）', 'Speaker 3 占比12.8%不足（需要>=15%）', 'Speaker 4 占比7.7%不足（需要>=15%）', 'Speaker 6 占比10.3%不足（需要>=15%）', 'Speaker 5 占比10.3%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 6 前10轮仅出现1次（需要>=2）",
+          "Speaker 5 前10轮仅出现1次（需要>=2）",
+          "Speaker 2 占比12.8%不足（需要>=15%）",
+          "Speaker 3 占比12.8%不足（需要>=15%）",
+          "Speaker 4 占比7.7%不足（需要>=15%）",
+          "Speaker 6 占比10.3%不足（需要>=15%）",
+          "Speaker 5 占比10.3%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 33,
+    "total_chars": 717,
+    "seed": 543347403,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 33,
+    "total_chars": 717,
+    "speaker_distribution": {
+      "Speaker 1": 18,
+      "Speaker 2": 5,
+      "Speaker 3": 4,
+      "Speaker 4": 2,
+      "Speaker 5": 2,
+      "Speaker 6": 2
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 33,
+      "total_chars": 717,
+      "marker_count": 0,
+      "chinese_ratio": 0.5683,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 18,
+        "Speaker 2": 5,
+        "Speaker 3": 4,
+        "Speaker 4": 2,
+        "Speaker 5": 2,
+        "Speaker 6": 2
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

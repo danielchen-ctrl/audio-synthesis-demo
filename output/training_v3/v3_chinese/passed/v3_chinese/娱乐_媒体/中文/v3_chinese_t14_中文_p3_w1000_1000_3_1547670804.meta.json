@@ -1,0 +1,101 @@
+{
+  "task_id": "7efc10ae22fa",
+  "stage": "v3_chinese",
+  "job_function": "娱乐/媒体",
+  "language": "中文",
+  "scenario": "【主题】内容平台本周增长数据和商业化策略周会\n围绕内容平台或媒体团队的战略周会展开讨论，重点复盘本周平台增长数据、内容策略执行情况、商业化进展、重点项目推进、资源协调问题、潜在风险事项，以及下周核心目标和行动计划。",
+  "core_content": "核心关键词：业务目标、资源投入、进展复盘、重点风险、下周动作、分工安排。围绕内容平台或媒体团队的战略周会展开讨论，重点复盘本周平台增长数据、内容策略执行情况、商业化进展、重点项目推进、资源协调问题、潜在风险事项，以及下周核心目标和行动计划。",
+  "people_count": 3,
+  "word_count": 1000,
+  "seed": 1547670804,
+  "effective_params": {
+    "scenario_head": "【主题】内容平台本周增长数据和商业化策略周会\n围绕内容平台或媒体团队的战略周会展开讨论，重点复盘本周平台增长数据、内容策",
+    "core_head": "核心关键词：业务目标、资源投入、进展复盘、重点风险、下周动作、分工安排。围绕内容平台或媒体团队的战略周会展开讨论，重点复",
+    "people_count": 3,
+    "word_count": 1000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 1297194728,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 22,
+          "2": 7,
+          "3": 5
+        },
+        "after": {
+          "1": 22,
+          "2": 7,
+          "3": 7
+        },
+        "fix_report": {
+          "rounds": 2,
+          "insertions": 2,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 1,
+              "commitment": 1
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 15
+    },
+    "line_count": 36,
+    "total_chars": 841,
+    "seed": 1547670804,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 36,
+    "total_chars": 841,
+    "speaker_distribution": {
+      "Speaker 1": 22,
+      "Speaker 2": 7,
+      "Speaker 3": 7
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 36,
+      "total_chars": 841,
+      "marker_count": 0,
+      "chinese_ratio": 0.5778,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 22,
+        "Speaker 2": 7,
+        "Speaker 3": 7
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.9722
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

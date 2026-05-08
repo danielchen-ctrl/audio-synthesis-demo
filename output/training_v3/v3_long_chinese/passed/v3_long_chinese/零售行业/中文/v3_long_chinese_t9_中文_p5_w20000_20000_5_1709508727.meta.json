@@ -1,0 +1,86 @@
+{
+  "task_id": "c4d9f712b4b4",
+  "stage": "v3_long_chinese",
+  "job_function": "零售行业",
+  "language": "中文",
+  "scenario": "【主题】提升老会员复购率的运营活动方案讨论\n围绕提升老会员复购率的运营方案展开讨论，重点分析会员消费频次、客单价变化、沉睡会员唤醒、优惠券和积分权益设计、用户分层运营、私域触达节奏，以及活动后的复购转化效果。",
+  "core_content": "核心关键词：会员分层、活动策略、复购触达、门店配合、效果验证、执行节奏。围绕提升老会员复购率的运营方案展开讨论，重点分析会员消费频次、客单价变化、沉睡会员唤醒、优惠券和积分权益设计、用户分层运营、私域触达节奏，以及活动后的复购转化效果。",
+  "people_count": 5,
+  "word_count": 20000,
+  "seed": 1709508727,
+  "effective_params": {
+    "scenario_head": "【主题】提升老会员复购率的运营活动方案讨论\n围绕提升老会员复购率的运营方案展开讨论，重点分析会员消费频次、客单价变化、沉",
+    "core_head": "核心关键词：会员分层、活动策略、复购触达、门店配合、效果验证、执行节奏。围绕提升老会员复购率的运营方案展开讨论，重点分析",
+    "people_count": 5,
+    "word_count": 20000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 1650755325,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 5 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比4.8%不足（需要>=15%）', 'Speaker 5 占比6.5%不足（需要>=15%）', 'Speaker 4 占比4.8%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 5 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比4.8%不足（需要>=15%）",
+          "Speaker 5 占比6.5%不足（需要>=15%）",
+          "Speaker 4 占比4.8%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 816,
+    "total_chars": 18767,
+    "seed": 1709508727,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 816,
+    "total_chars": 18767,
+    "speaker_distribution": {
+      "Speaker 1": 255,
+      "Speaker 2": 259,
+      "Speaker 3": 148,
+      "Speaker 4": 117,
+      "Speaker 5": 37
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 816,
+      "total_chars": 18767,
+      "marker_count": 0,
+      "chinese_ratio": 0.5473,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 255,
+        "Speaker 2": 259,
+        "Speaker 3": 148,
+        "Speaker 4": 117,
+        "Speaker 5": 37
+      },
+      "target_word_count": 20000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

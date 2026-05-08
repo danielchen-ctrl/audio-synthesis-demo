@@ -1,0 +1,106 @@
+{
+  "task_id": "ae487ab82f07",
+  "stage": "v3_long_japanese",
+  "job_function": "人事・採用",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 运营岗位离职后紧急补岗的招聘进度沟通]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 岗位缺口, 优先级, 候选人画像, 渠道策略, 到岗时间, 招聘节奏]",
+  "people_count": 3,
+  "word_count": 3000,
+  "seed": 1279153415,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 3,
+    "word_count": 3000,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 9,
+      "seed": 923061060,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 45,
+          "2": 19,
+          "3": 12
+        },
+        "after": {
+          "1": 44,
+          "2": 19,
+          "3": 12
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 76,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 68
+    },
+    "line_count": 23,
+    "total_chars": 732,
+    "seed": 1279153415,
+    "generator": "embedded_bundle_chunked_v2",
+    "n_chunks": 2,
+    "n_valid_chunks": 2,
+    "chunk_size": 2500
+  },
+  "stats": {
+    "line_count": 23,
+    "total_chars": 641,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 6,
+      "Speaker 3": 10
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 23,
+      "total_chars": 641,
+      "marker_count": 0,
+      "chinese_ratio": 0.1408,
+      "kana_ratio": 0.2424,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 6,
+        "Speaker 3": 10
+      },
+      "target_word_count": 3000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=3000, actual=641",
+        "details": {
+          "target": 3000,
+          "actual": 641
+        }
+      }
+    ]
+  }
+}

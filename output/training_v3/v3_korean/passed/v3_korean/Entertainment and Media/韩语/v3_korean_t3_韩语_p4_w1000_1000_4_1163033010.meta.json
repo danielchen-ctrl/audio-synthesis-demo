@@ -1,0 +1,92 @@
+{
+  "task_id": "e589d0121e48",
+  "stage": "v3_korean",
+  "job_function": "Entertainment and Media",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 某艺人下季度品牌代言和商务合作机会讨论]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 商业定位, 品牌匹配, 报价策略, 执行风险, 转化目标, 合作判断]",
+  "people_count": 4,
+  "word_count": 1000,
+  "seed": 1163033010,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 4,
+    "word_count": 1000,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 1732412130,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 2 占比13.2%不足（需要>=15%）', 'Speaker 4 占比13.2%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 2 占比13.2%不足（需要>=15%）",
+          "Speaker 4 占比13.2%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 34,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 30
+    },
+    "line_count": 14,
+    "total_chars": 537,
+    "seed": 1163033010,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 14,
+    "total_chars": 425,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 2,
+      "Speaker 3": 5,
+      "Speaker 4": 1
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 14,
+      "total_chars": 425,
+      "marker_count": 0,
+      "chinese_ratio": 0.0186,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.3463,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 2,
+        "Speaker 3": 5,
+        "Speaker 4": 1
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=1000, actual=425",
+        "details": {
+          "target": 1000,
+          "actual": 425
+        }
+      }
+    ]
+  }
+}

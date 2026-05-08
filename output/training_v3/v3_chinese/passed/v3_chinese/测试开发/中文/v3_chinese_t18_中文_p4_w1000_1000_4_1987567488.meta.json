@@ -1,0 +1,121 @@
+{
+  "task_id": "872c869a1598",
+  "stage": "v3_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】支付系统上线前的退款安全、对账差错和稳定性准入评估\n围绕退款流程和资金安全相关测试展开讨论，重点关注退款申请、审核流程、原路退回、重复退款、越权退款、金额校验、退款状态同步、退款回调、风控拦截、异常退款处理，以及资金安全风险。",
+  "core_content": "核心关键词：退款申请、重复退款、越权退款、金额校验、退款回调、风控拦截、资金安全风险。围绕退款流程和资金安全相关测试展开讨论，重点关注退款申请、审核流程、原路退回、重复退款、越权退款、金额校验、退款状态同步、退款回调、风控拦截、异常退款处理，以及资金安全风险。",
+  "people_count": 4,
+  "word_count": 1000,
+  "seed": 1987567488,
+  "effective_params": {
+    "scenario_head": "【主题】支付系统上线前的退款安全、对账差错和稳定性准入评估\n围绕退款流程和资金安全相关测试展开讨论，重点关注退款申请、审",
+    "core_head": "核心关键词：退款申请、重复退款、越权退款、金额校验、退款回调、风控拦截、资金安全风险。围绕退款流程和资金安全相关测试展开",
+    "people_count": 4,
+    "word_count": 1000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 1836857290,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 21,
+          "2": 6,
+          "3": 5,
+          "4": 4
+        },
+        "after": {
+          "1": 21,
+          "2": 7,
+          "3": 7,
+          "4": 7
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 6,
+          "speakers_fixed": [
+            "Speaker 3",
+            "Speaker 4",
+            "Speaker 2"
+          ],
+          "early_fixed": [
+            "Speaker 2"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 4",
+            "Speaker 3",
+            "Speaker 4",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 2": {
+              "challenge": 1,
+              "commitment": 0
+            },
+            "Speaker 4": {
+              "challenge": 1,
+              "commitment": 2
+            },
+            "Speaker 3": {
+              "challenge": 1,
+              "commitment": 1
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 18
+    },
+    "line_count": 41,
+    "total_chars": 953,
+    "seed": 1987567488,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 41,
+    "total_chars": 953,
+    "speaker_distribution": {
+      "Speaker 1": 21,
+      "Speaker 2": 7,
+      "Speaker 3": 7,
+      "Speaker 4": 6
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 41,
+      "total_chars": 953,
+      "marker_count": 0,
+      "chinese_ratio": 0.5817,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 21,
+        "Speaker 2": 7,
+        "Speaker 3": 7,
+        "Speaker 4": 6
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.9024
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

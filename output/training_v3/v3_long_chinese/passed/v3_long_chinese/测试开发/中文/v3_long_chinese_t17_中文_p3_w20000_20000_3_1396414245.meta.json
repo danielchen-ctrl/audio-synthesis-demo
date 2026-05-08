@@ -1,0 +1,113 @@
+{
+  "task_id": "c1817701f01b",
+  "stage": "v3_long_chinese",
+  "job_function": "测试开发",
+  "language": "中文",
+  "scenario": "【主题】支付项目上线前的接入联调、下单回调和主流程验收讨论\n围绕支付项目上线前的接入联调和交易主链路验收展开讨论，重点覆盖第三方支付接口联调、参数签名、渠道配置、下单接口、订单创建、支付成功失败状态、支付回调、异步通知、幂等处理和主流程验收风险。",
+  "core_content": "核心关键词：支付接入、第三方支付联调、参数签名、下单接口、支付回调、幂等处理、主流程验收。围绕支付项目上线前的接入联调和交易主链路验收展开讨论，重点覆盖第三方支付接口联调、参数签名、渠道配置、下单接口、订单创建、支付成功失败状态、支付回调、异步通知、幂等处理和主流程验收风险。",
+  "people_count": 3,
+  "word_count": 20000,
+  "seed": 1396414245,
+  "effective_params": {
+    "scenario_head": "【主题】支付项目上线前的接入联调、下单回调和主流程验收讨论\n围绕支付项目上线前的接入联调和交易主链路验收展开讨论，重点覆",
+    "core_head": "核心关键词：支付接入、第三方支付联调、参数签名、下单接口、支付回调、幂等处理、主流程验收。围绕支付项目上线前的接入联调和",
+    "people_count": 3,
+    "word_count": 20000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 601309317,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 67,
+          "2": 36,
+          "3": 8
+        },
+        "after": {
+          "1": 67,
+          "2": 37,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 12,
+          "speakers_fixed": [
+            "Speaker 2",
+            "Speaker 3"
+          ],
+          "early_fixed": [
+            "Speaker 2",
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3",
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 2": {
+              "challenge": 1,
+              "commitment": 0
+            },
+            "Speaker 3": {
+              "challenge": 6,
+              "commitment": 5
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 20
+    },
+    "line_count": 789,
+    "total_chars": 18632,
+    "seed": 1396414245,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 789,
+    "total_chars": 18632,
+    "speaker_distribution": {
+      "Speaker 1": 274,
+      "Speaker 2": 300,
+      "Speaker 3": 215
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 789,
+      "total_chars": 18632,
+      "marker_count": 0,
+      "chinese_ratio": 0.553,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 274,
+        "Speaker 2": 300,
+        "Speaker 3": 215
+      },
+      "target_word_count": 20000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

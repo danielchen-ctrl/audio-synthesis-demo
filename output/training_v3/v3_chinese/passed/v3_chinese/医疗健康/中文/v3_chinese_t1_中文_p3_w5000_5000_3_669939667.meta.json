@@ -1,0 +1,111 @@
+{
+  "task_id": "885180b879d7",
+  "stage": "v3_chinese",
+  "job_function": "医疗健康",
+  "language": "中文",
+  "scenario": "【主题】高血压患者复诊后的用药和生活习惯随访沟通\n围绕一名高血压或糖尿病患者复诊后的随访沟通，重点讨论近期血压血糖指标变化、用药依从性、饮食运动习惯、是否出现不适症状，以及医生或健康管理师后续需要调整的随访计划和生活干预建议。",
+  "core_content": "核心关键词：症状变化、用药执行、复查节点、风险提示、患者配合、随访安排、注意事项。围绕一名高血压或糖尿病患者复诊后的随访沟通，重点讨论近期血压血糖指标变化、用药依从性、饮食运动习惯、是否出现不适症状，以及医生或健康管理师后续需要调整的随访计划和生活干预建议。",
+  "people_count": 3,
+  "word_count": 5000,
+  "seed": 669939667,
+  "effective_params": {
+    "scenario_head": "【主题】高血压患者复诊后的用药和生活习惯随访沟通\n围绕一名高血压或糖尿病患者复诊后的随访沟通，重点讨论近期血压血糖指标变",
+    "core_head": "核心关键词：症状变化、用药执行、复查节点、风险提示、患者配合、随访安排、注意事项。围绕一名高血压或糖尿病患者复诊后的随访",
+    "people_count": 3,
+    "word_count": 5000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 1459075820,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 67,
+          "2": 39,
+          "3": 10
+        },
+        "after": {
+          "1": 67,
+          "2": 39,
+          "3": 20
+        },
+        "fix_report": {
+          "rounds": 3,
+          "insertions": 10,
+          "speakers_fixed": [
+            "Speaker 3"
+          ],
+          "early_fixed": [],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 3": {
+              "challenge": 7,
+              "commitment": 3
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 14
+    },
+    "line_count": 123,
+    "total_chars": 2960,
+    "seed": 669939667,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 123,
+    "total_chars": 2960,
+    "speaker_distribution": {
+      "Speaker 1": 67,
+      "Speaker 2": 39,
+      "Speaker 3": 17
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 123,
+      "total_chars": 2960,
+      "marker_count": 0,
+      "chinese_ratio": 0.5813,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 67,
+        "Speaker 2": 39,
+        "Speaker 3": 17
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 0.9106
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=2960",
+        "details": {
+          "target": 5000,
+          "actual": 2960
+        }
+      }
+    ]
+  }
+}

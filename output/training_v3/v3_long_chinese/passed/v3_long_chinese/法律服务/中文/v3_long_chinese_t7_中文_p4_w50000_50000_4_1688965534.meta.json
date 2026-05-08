@@ -1,0 +1,91 @@
+{
+  "task_id": "e51ce826987e",
+  "stage": "v3_long_chinese",
+  "job_function": "法律服务",
+  "language": "中文",
+  "scenario": "【主题】企业年度法律顾问专项服务内容和交付安排讨论\n围绕企业年度法律顾问专项服务的范围和交付安排展开讨论，重点包括合同审查、合规咨询、法律意见输出、争议处理支持、服务边界确认、客户重点风险，以及专项服务的交付节奏和责任分工。",
+  "core_content": "核心关键词：风险识别、证据材料、处理方案、边界判断、执行安排、分工建议。围绕企业年度法律顾问专项服务的范围和交付安排展开讨论，重点包括合同审查、合规咨询、法律意见输出、争议处理支持、服务边界确认、客户重点风险，以及专项服务的交付节奏和责任分工。",
+  "people_count": 4,
+  "word_count": 50000,
+  "seed": 1688965534,
+  "effective_params": {
+    "scenario_head": "【主题】企业年度法律顾问专项服务内容和交付安排讨论\n围绕企业年度法律顾问专项服务的范围和交付安排展开讨论，重点包括合同审",
+    "core_head": "核心关键词：风险识别、证据材料、处理方案、边界判断、执行安排、分工建议。围绕企业年度法律顾问专项服务的范围和交付安排展开",
+    "people_count": 4,
+    "word_count": 50000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 19,
+      "seed": 2304769317,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比9.3%不足（需要>=15%）', 'Speaker 4 占比11.6%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比9.3%不足（需要>=15%）",
+          "Speaker 4 占比11.6%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 7
+    },
+    "line_count": 1433,
+    "total_chars": 31961,
+    "seed": 1688965534,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 1433,
+    "total_chars": 31961,
+    "speaker_distribution": {
+      "Speaker 1": 282,
+      "Speaker 2": 531,
+      "Speaker 3": 294,
+      "Speaker 4": 326
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 1433,
+      "total_chars": 31961,
+      "marker_count": 0,
+      "chinese_ratio": 0.5424,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 282,
+        "Speaker 2": 531,
+        "Speaker 3": 294,
+        "Speaker 4": 326
+      },
+      "target_word_count": 50000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=50000, actual=31961",
+        "details": {
+          "target": 50000,
+          "actual": 31961
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "task_id": "fbb9724414eb",
+  "stage": "v3_long_english",
+  "job_function": "Retail",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 提升老会员复购率的运营活动方案讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 会员分层, 活动策略, 复购触达, 门店配合, 效果验证, 执行节奏]",
+  "people_count": 2,
+  "word_count": 10000,
+  "seed": 1952905536,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 2,
+    "word_count": 10000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 2,
+      "seed": 1628992414,
+      "is_from_v2": false,
+      "placeholder_violations": 40,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 4
+    },
+    "line_count": 133,
+    "total_chars": 10042,
+    "seed": 1952905536,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 133,
+    "total_chars": 10042,
+    "speaker_distribution": {
+      "Speaker 1": 83,
+      "Speaker 2": 50
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 133,
+      "total_chars": 10042,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 83,
+        "Speaker 2": 50
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

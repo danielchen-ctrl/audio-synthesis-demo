@@ -1,0 +1,110 @@
+{
+  "task_id": "781fecc4d2a3",
+  "stage": "v3_long_chinese",
+  "job_function": "保险行业",
+  "language": "中文",
+  "scenario": "【主题】保险销售录音中的话术合规和质检问题复盘\n围绕保险销售录音或回访内容的质检复盘展开讨论，重点检查销售话术是否合规、是否存在误导销售、风险提示是否充分、客户确认是否清晰、保单说明是否完整，以及后续整改和培训建议。",
+  "core_content": "核心关键词：录音质检、销售话术、风险点、培训改进、复盘闭环、改进动作。围绕保险销售录音或回访内容的质检复盘展开讨论，重点检查销售话术是否合规、是否存在误导销售、风险提示是否充分、客户确认是否清晰、保单说明是否完整，以及后续整改和培训建议。",
+  "people_count": 3,
+  "word_count": 30000,
+  "seed": 18725499,
+  "effective_params": {
+    "scenario_head": "【主题】保险销售录音中的话术合规和质检问题复盘\n围绕保险销售录音或回访内容的质检复盘展开讨论，重点检查销售话术是否合规、",
+    "core_head": "核心关键词：录音质检、销售话术、风险点、培训改进、复盘闭环、改进动作。围绕保险销售录音或回访内容的质检复盘展开讨论，重点",
+    "people_count": 3,
+    "word_count": 30000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 1375257231,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 69,
+          "2": 34,
+          "3": 9
+        },
+        "after": {
+          "1": 69,
+          "2": 35,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 11,
+          "speakers_fixed": [
+            "Speaker 2",
+            "Speaker 3"
+          ],
+          "early_fixed": [
+            "Speaker 2"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 2": {
+              "challenge": 1,
+              "commitment": 0
+            },
+            "Speaker 3": {
+              "challenge": 6,
+              "commitment": 4
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 21
+    },
+    "line_count": 960,
+    "total_chars": 21559,
+    "seed": 18725499,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 960,
+    "total_chars": 21559,
+    "speaker_distribution": {
+      "Speaker 1": 282,
+      "Speaker 2": 407,
+      "Speaker 3": 271
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 960,
+      "total_chars": 21559,
+      "marker_count": 0,
+      "chinese_ratio": 0.5433,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 282,
+        "Speaker 2": 407,
+        "Speaker 3": 271
+      },
+      "target_word_count": 30000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

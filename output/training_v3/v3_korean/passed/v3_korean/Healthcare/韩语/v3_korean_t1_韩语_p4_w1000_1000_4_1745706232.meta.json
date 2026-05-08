@@ -1,0 +1,82 @@
+{
+  "task_id": "f027454423ed",
+  "stage": "v3_korean",
+  "job_function": "Healthcare",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 高血压患者复诊后的用药和生活习惯随访沟通]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 症状变化, 用药执行, 复查节点, 风险提示, 患者配合, 随访安排, 注意事项]",
+  "people_count": 4,
+  "word_count": 1000,
+  "seed": 1745706232,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 4,
+    "word_count": 1000,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 1307674247,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 4 前10轮仅出现1次（需要>=2）']",
+        "issues": [
+          "Speaker 4 前10轮仅出现1次（需要>=2）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 41,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 35
+    },
+    "line_count": 21,
+    "total_chars": 1000,
+    "seed": 1745706232,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 21,
+    "total_chars": 894,
+    "speaker_distribution": {
+      "Speaker 1": 7,
+      "Speaker 2": 6,
+      "Speaker 3": 7,
+      "Speaker 4": 1
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 21,
+      "total_chars": 894,
+      "marker_count": 0,
+      "chinese_ratio": 0.0096,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.3066,
+      "speaker_distribution": {
+        "Speaker 1": 7,
+        "Speaker 2": 6,
+        "Speaker 3": 7,
+        "Speaker 4": 1
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.7619
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "task_id": "bb3e257cccf9",
+  "stage": "v3_chinese",
+  "job_function": "人工智能/科技",
+  "language": "中文",
+  "scenario": "【主题】AI 产品免费用户向付费会员转化方案讨论\n围绕 AI 产品免费用户向付费会员转化的增长方案展开讨论，重点分析用户使用频次、核心功能触达、免费试用路径、价格套餐设计、付费权益说明、转化漏斗数据、用户留存，以及客服或运营如何促进订阅转化。",
+  "core_content": "核心关键词：转化漏斗、付费门槛、试用策略、价值感知、数据回收、实验计划。围绕 AI 产品免费用户向付费会员转化的增长方案展开讨论，重点分析用户使用频次、核心功能触达、免费试用路径、价格套餐设计、付费权益说明、转化漏斗数据、用户留存，以及客服或运营如何促进订阅转化。",
+  "people_count": 5,
+  "word_count": 5000,
+  "seed": 1220902081,
+  "effective_params": {
+    "scenario_head": "【主题】AI 产品免费用户向付费会员转化方案讨论\n围绕 AI 产品免费用户向付费会员转化的增长方案展开讨论，重点分析用户",
+    "core_head": "核心关键词：转化漏斗、付费门槛、试用策略、价值感知、数据回收、实验计划。围绕 AI 产品免费用户向付费会员转化的增长方案",
+    "people_count": 5,
+    "word_count": 5000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 2541373931,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 3 占比5.6%不足（需要>=15%）', 'Speaker 5 占比5.6%不足（需要>=15%）', 'Speaker 4 占比4.8%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 3 占比5.6%不足（需要>=15%）",
+          "Speaker 5 占比5.6%不足（需要>=15%）",
+          "Speaker 4 占比4.8%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 117,
+    "total_chars": 2340,
+    "seed": 1220902081,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 117,
+    "total_chars": 2340,
+    "speaker_distribution": {
+      "Speaker 1": 73,
+      "Speaker 2": 31,
+      "Speaker 3": 6,
+      "Speaker 4": 4,
+      "Speaker 5": 3
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 117,
+      "total_chars": 2340,
+      "marker_count": 0,
+      "chinese_ratio": 0.5394,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 73,
+        "Speaker 2": 31,
+        "Speaker 3": 6,
+        "Speaker 4": 4,
+        "Speaker 5": 3
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 0.9744
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=2340",
+        "details": {
+          "target": 5000,
+          "actual": 2340
+        }
+      }
+    ]
+  }
+}

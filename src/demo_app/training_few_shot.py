@@ -157,7 +157,8 @@ _FILE_CACHE: OrderedDict[str, str] = OrderedDict()
 _FILE_CACHE_MAX = 48
 
 # 新训练数据最低分门槛：低于此分的文件不纳入 few-shot 索引（旧语料库不受此限制）
-_MIN_NEW_SAMPLE_SCORE = 70.0
+# v3数据分值只有68和80两档（68=字数略偏、80=完美），65覆盖全部通过样本
+_MIN_NEW_SAMPLE_SCORE = 65.0
 
 # ── 低质量占位符行过滤正则 ────────────────────────────────────────────────
 _PLACEHOLDER_RE = re.compile(
@@ -199,7 +200,7 @@ _PLACEHOLDER_RE = re.compile(
     r"|Okay, I will (cooperate|prepare carefully)"
 )
 
-_MAX_EXCERPT_CHARS = 600
+_MAX_EXCERPT_CHARS = 1200
 _SKIP_HEAD_RATIO = 0.15
 
 # 旧语料库文件最少行数：少于此行数的文件不纳入索引
@@ -324,8 +325,14 @@ def _scan_passed_dir(
     index: dict,
     parse_fn,
     count_ref: list[int],
+    long_tier: bool = False,
 ) -> None:
-    """通用扫描函数：遍历 passed/{batch}/{Category}/{language}/*.txt 并入索引。"""
+    """通用扫描函数：遍历 passed/{batch}/{Category}/{language}/*.txt 并入索引。
+
+    long_tier=True 时给分数加 15 分，使长对话样本优先排在检索结果前面。
+    长对话样本词汇更丰富、转折更自然，作为风格参考效果更好。
+    """
+    score_boost = 15.0 if long_tier else 0.0
     for batch_sub in passed_root.iterdir():
         if not batch_sub.is_dir():
             continue
@@ -345,14 +352,14 @@ def _scan_passed_dir(
                     score = _read_score(txt_file)
                     if score < _MIN_NEW_SAMPLE_SCORE:
                         continue
-                    index.setdefault((t_id, lang_code), []).append((score, txt_file))
+                    index.setdefault((t_id, lang_code), []).append((score + score_boost, txt_file))
                     count_ref[0] += 1
 
 
 def _build_index() -> dict[tuple[str, str], list[tuple[float, Path]]]:
     """扫描新训练产出（v2 + v3）+ 旧语料库，构建统一的 (template_id, lang) → samples 索引。
 
-    优先级：v3 训练数据（score 80+）≥ v2 训练数据 > 旧语料库（score 65）
+    优先级：v3 long tier（+15分加成）> v3 short tier > v2 > 旧语料库
     """
     index: dict[tuple[str, str], list[tuple[float, Path]]] = {}
     new_count = [0]
@@ -373,7 +380,9 @@ def _build_index() -> dict[tuple[str, str], list[tuple[float, Path]]]:
                 continue
             passed_root = batch_dir / "passed"
             if passed_root.exists():
-                _scan_passed_dir(passed_root, index, _parse_template_id_v3, new_count)
+                # long tier 批次（v3_long_*）词汇更丰富，加分优先
+                is_long = batch_dir.name.startswith("v3_long_")
+                _scan_passed_dir(passed_root, index, _parse_template_id_v3, new_count, long_tier=is_long)
 
     # ── 旧语料库：demo/training_long_dialogue/ ────────────────────────────
     old_count = _index_old_corpus(index)

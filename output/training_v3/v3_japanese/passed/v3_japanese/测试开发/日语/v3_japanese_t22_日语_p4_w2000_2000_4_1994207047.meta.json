@@ -1,0 +1,93 @@
+{
+  "task_id": "d52dbf195875",
+  "stage": "v3_japanese",
+  "job_function": "测试开发",
+  "language": "日语",
+  "scenario": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic context: 朋友圈隐私可见范围、内容审核和权限控制测试讨论]",
+  "core_content": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keywords: 好友可见, 分组可见, 黑名单屏蔽, 权限校验, 敏感词检测, 图片审核, 违规内容拦截]",
+  "people_count": 4,
+  "word_count": 2000,
+  "seed": 1994207047,
+  "effective_params": {
+    "scenario_head": "シナリオ：日本語で進行する業務対話。実務的で、意思決定と次のアクションが明確な会話にすること。\n[Topic conte",
+    "core_head": "必須要件：具体的な事実、担当アクション、未解決リスク、依存関係、次の進め方を日本語で明確に含めること。\n[Keyword",
+    "people_count": 4,
+    "word_count": 2000,
+    "language": "日语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 7,
+      "seed": 780644480,
+      "role_kpi_closure": {
+        "enabled": true,
+        "success": false,
+        "error": "RoleKPI修复失败：达到最大修复轮数4，仍有问题：['Speaker 2 前10轮仅出现1次（需要>=2）', 'Speaker 3 占比11.8%不足（需要>=15%）', 'Speaker 4 占比8.8%不足（需要>=15%）']",
+        "issues": [
+          "Speaker 2 前10轮仅出现1次（需要>=2）",
+          "Speaker 3 占比11.8%不足（需要>=15%）",
+          "Speaker 4 占比8.8%不足（需要>=15%）"
+        ]
+      },
+      "is_from_v2": false,
+      "placeholder_violations": 64,
+      "naturalness_applied": true,
+      "naturalness_language": "Japanese",
+      "naturalness_rewrites": 54
+    },
+    "line_count": 20,
+    "total_chars": 707,
+    "seed": 1994207047,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 20,
+    "total_chars": 580,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 2,
+      "Speaker 3": 7,
+      "Speaker 4": 5
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 20,
+      "total_chars": 580,
+      "marker_count": 0,
+      "chinese_ratio": 0.1099,
+      "kana_ratio": 0.2015,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 2,
+        "Speaker 3": 7,
+        "Speaker 4": 5
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 0.95
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=2000, actual=580",
+        "details": {
+          "target": 2000,
+          "actual": 580
+        }
+      }
+    ]
+  }
+}

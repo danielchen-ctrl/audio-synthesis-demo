@@ -1,0 +1,106 @@
+{
+  "task_id": "eea7c92f1839",
+  "stage": "v3_long_korean",
+  "job_function": "Insurance",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 保险产品销售转化数据和客户异议洞察分析]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 销售表现, 客户反馈, 转化瓶颈, 团队差异, 改善动作, 管理改进]",
+  "people_count": 3,
+  "word_count": 5000,
+  "seed": 137326801,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 3,
+    "word_count": 5000,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 10,
+      "seed": 429127472,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 44,
+          "2": 24,
+          "3": 12
+        },
+        "after": {
+          "1": 43,
+          "2": 24,
+          "3": 12
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 80,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 72
+    },
+    "line_count": 26,
+    "total_chars": 1298,
+    "seed": 137326801,
+    "generator": "embedded_bundle_chunked_v2",
+    "n_chunks": 2,
+    "n_valid_chunks": 2,
+    "chunk_size": 2500
+  },
+  "stats": {
+    "line_count": 26,
+    "total_chars": 1180,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 6,
+      "Speaker 3": 14
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 26,
+      "total_chars": 1180,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.228,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 6,
+        "Speaker 3": 14
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=1180",
+        "details": {
+          "target": 5000,
+          "actual": 1180
+        }
+      }
+    ]
+  }
+}

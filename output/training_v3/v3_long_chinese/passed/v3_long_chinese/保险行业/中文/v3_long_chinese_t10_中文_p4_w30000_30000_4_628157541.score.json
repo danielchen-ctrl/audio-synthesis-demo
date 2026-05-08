@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "score": 80.0,
+  "max_score": 100.0,
+  "metrics": {
+    "line_count": 1279,
+    "total_chars": 28926,
+    "marker_count": 0,
+    "chinese_ratio": 0.5448,
+    "kana_ratio": 0.0,
+    "korean_ratio": 0.0,
+    "speaker_distribution": {
+      "Speaker 1": 287,
+      "Speaker 2": 458,
+      "Speaker 3": 257,
+      "Speaker 4": 277
+    },
+    "target_word_count": 30000,
+    "unique_line_ratio": 1.0
+  },
+  "findings": [
+    {
+      "code": "missing_core_marker",
+      "severity": "warning",
+      "message": "缺少核心标记",
+      "details": {}
+    }
+  ]
+}

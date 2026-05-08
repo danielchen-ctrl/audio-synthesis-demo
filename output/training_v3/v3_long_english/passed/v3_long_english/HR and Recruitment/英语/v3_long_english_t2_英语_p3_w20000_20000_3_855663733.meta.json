@@ -1,0 +1,95 @@
+{
+  "task_id": "9b484c83f489",
+  "stage": "v3_long_english",
+  "job_function": "HR and Recruitment",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 运营岗位离职后紧急补岗的招聘进度沟通]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 岗位缺口, 优先级, 候选人画像, 渠道策略, 到岗时间, 招聘节奏]",
+  "people_count": 3,
+  "word_count": 20000,
+  "seed": 855663733,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 3,
+    "word_count": 20000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 2,
+      "seed": 4134375946,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 24,
+          "2": 12,
+          "3": 9
+        },
+        "after": {
+          "1": 23,
+          "2": 12,
+          "3": 9
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 45,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 225,
+    "total_chars": 15084,
+    "seed": 855663733,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 225,
+    "total_chars": 15084,
+    "speaker_distribution": {
+      "Speaker 1": 122,
+      "Speaker 2": 65,
+      "Speaker 3": 38
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 225,
+      "total_chars": 15084,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 122,
+        "Speaker 2": 65,
+        "Speaker 3": 38
+      },
+      "target_word_count": 20000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

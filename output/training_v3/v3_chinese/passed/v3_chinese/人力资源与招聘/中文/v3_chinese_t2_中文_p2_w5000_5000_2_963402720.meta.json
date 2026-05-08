@@ -1,0 +1,78 @@
+{
+  "task_id": "bb4400a19f64",
+  "stage": "v3_chinese",
+  "job_function": "人力资源与招聘",
+  "language": "中文",
+  "scenario": "【主题】运营岗位离职后紧急补岗的招聘进度沟通\n围绕某个关键岗位人员离职后的补岗招聘沟通，重点讨论岗位空缺带来的业务影响、HC 是否已审批、候选人筛选进度、面试安排、用人部门反馈、offer 沟通节奏，以及如何缩短到岗周期。",
+  "core_content": "核心关键词：岗位缺口、优先级、候选人画像、渠道策略、到岗时间、招聘节奏。围绕某个关键岗位人员离职后的补岗招聘沟通，重点讨论岗位空缺带来的业务影响、HC 是否已审批、候选人筛选进度、面试安排、用人部门反馈、offer 沟通节奏，以及如何缩短到岗周期。",
+  "people_count": 2,
+  "word_count": 5000,
+  "seed": 963402720,
+  "effective_params": {
+    "scenario_head": "【主题】运营岗位离职后紧急补岗的招聘进度沟通\n围绕某个关键岗位人员离职后的补岗招聘沟通，重点讨论岗位空缺带来的业务影响、",
+    "core_head": "核心关键词：岗位缺口、优先级、候选人画像、渠道策略、到岗时间、招聘节奏。围绕某个关键岗位人员离职后的补岗招聘沟通，重点讨",
+    "people_count": 2,
+    "word_count": 5000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 3048257053,
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 13
+    },
+    "line_count": 106,
+    "total_chars": 2145,
+    "seed": 963402720,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 106,
+    "total_chars": 2145,
+    "speaker_distribution": {
+      "Speaker 1": 72,
+      "Speaker 2": 34
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 106,
+      "total_chars": 2145,
+      "marker_count": 0,
+      "chinese_ratio": 0.543,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 72,
+        "Speaker 2": 34
+      },
+      "target_word_count": 5000,
+      "unique_line_ratio": 0.9717
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=5000, actual=2145",
+        "details": {
+          "target": 5000,
+          "actual": 2145
+        }
+      }
+    ]
+  }
+}

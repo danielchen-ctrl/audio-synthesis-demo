@@ -1,0 +1,110 @@
+{
+  "task_id": "6bdb2c032834",
+  "stage": "v3_long_chinese",
+  "job_function": "娱乐/媒体",
+  "language": "中文",
+  "scenario": "【主题】某艺人下季度品牌代言和商务合作机会讨论\n围绕某位艺人下一阶段的商业合作机会展开讨论，重点包括品牌代言匹配度、艺人报价、档期协调、粉丝画像、商业价值评估、宣发资源配合、合作权益设计，以及品牌方对曝光和转化效果的预期。",
+  "core_content": "核心关键词：商业定位、品牌匹配、报价策略、执行风险、转化目标、合作判断。围绕某位艺人下一阶段的商业合作机会展开讨论，重点包括品牌代言匹配度、艺人报价、档期协调、粉丝画像、商业价值评估、宣发资源配合、合作权益设计，以及品牌方对曝光和转化效果的预期。",
+  "people_count": 3,
+  "word_count": 10000,
+  "seed": 2081271964,
+  "effective_params": {
+    "scenario_head": "【主题】某艺人下季度品牌代言和商务合作机会讨论\n围绕某位艺人下一阶段的商业合作机会展开讨论，重点包括品牌代言匹配度、艺人",
+    "core_head": "核心关键词：商业定位、品牌匹配、报价策略、执行风险、转化目标、合作判断。围绕某位艺人下一阶段的商业合作机会展开讨论，重点",
+    "people_count": 3,
+    "word_count": 10000,
+    "language": "中文"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 20,
+      "seed": 143153479,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 68,
+          "2": 34,
+          "3": 9
+        },
+        "after": {
+          "1": 68,
+          "2": 35,
+          "3": 19
+        },
+        "fix_report": {
+          "rounds": 4,
+          "insertions": 11,
+          "speakers_fixed": [
+            "Speaker 2",
+            "Speaker 3"
+          ],
+          "early_fixed": [
+            "Speaker 2"
+          ],
+          "ratio_fixed": [
+            "Speaker 3",
+            "Speaker 3",
+            "Speaker 3"
+          ],
+          "speaker_contributions": {
+            "Speaker 2": {
+              "challenge": 1,
+              "commitment": 0
+            },
+            "Speaker 3": {
+              "challenge": 5,
+              "commitment": 5
+            }
+          }
+        }
+      },
+      "is_from_v2": false,
+      "naturalness_applied": true,
+      "naturalness_language": "Chinese",
+      "naturalness_rewrites": 22
+    },
+    "line_count": 387,
+    "total_chars": 10007,
+    "seed": 2081271964,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 387,
+    "total_chars": 10007,
+    "speaker_distribution": {
+      "Speaker 1": 190,
+      "Speaker 2": 145,
+      "Speaker 3": 52
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 387,
+      "total_chars": 10007,
+      "marker_count": 0,
+      "chinese_ratio": 0.5679,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 190,
+        "Speaker 2": 145,
+        "Speaker 3": 52
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

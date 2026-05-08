@@ -1,0 +1,71 @@
+{
+  "task_id": "4f3fa21bd9ab",
+  "stage": "v3_english",
+  "job_function": "测试开发",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 支付系统对账准确性和稳定性准入评估讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 交易流水核对, 渠道账单比对, 金额不一致, 容量评估, 压测结论, 熔断限流, 发布门禁]",
+  "people_count": 2,
+  "word_count": 2000,
+  "seed": 429434376,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 2,
+    "word_count": 2000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": true,
+      "rewrite_count": 2,
+      "fill_turns": 0,
+      "seed": 2026634787,
+      "is_from_v2": false,
+      "placeholder_violations": 34,
+      "duplicate_intro_fixed": 1,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 32,
+    "total_chars": 2477,
+    "seed": 429434376,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 32,
+    "total_chars": 2477,
+    "speaker_distribution": {
+      "Speaker 1": 19,
+      "Speaker 2": 13
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 32,
+      "total_chars": 2477,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 19,
+        "Speaker 2": 13
+      },
+      "target_word_count": 2000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}

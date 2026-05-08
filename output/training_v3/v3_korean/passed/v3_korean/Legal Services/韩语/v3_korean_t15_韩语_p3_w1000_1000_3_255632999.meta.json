@@ -1,0 +1,103 @@
+{
+  "task_id": "9c0d0df249c5",
+  "stage": "v3_korean",
+  "job_function": "Legal Services",
+  "language": "韩语",
+  "scenario": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topic context: 新广告投放素材的合规风险审核讨论]",
+  "core_content": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요.\n[Keywords: 广告表述, 风险边界, 素材审核, 整改建议, 上线条件, 修改方案]",
+  "people_count": 3,
+  "word_count": 1000,
+  "seed": 255632999,
+  "effective_params": {
+    "scenario_head": "시나리오: 한국어로 진행되는 업무 대화입니다. 실무적이고 의사결정과 다음 행동이 분명해야 합니다.\n[Topi",
+    "core_head": "핵심 요구사항: 구체적인 사실, 담당 액션, 남은 리스크, 의존 관계, 다음 단계 요약을 한국어로 포함하세요",
+    "people_count": 3,
+    "word_count": 1000,
+    "language": "韩语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 0,
+      "seed": 2724198873,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 19,
+          "2": 9,
+          "3": 7
+        },
+        "after": {
+          "1": 18,
+          "2": 9,
+          "3": 7
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 35,
+      "naturalness_applied": true,
+      "naturalness_language": "Korean",
+      "naturalness_rewrites": 32
+    },
+    "line_count": 19,
+    "total_chars": 704,
+    "seed": 255632999,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 19,
+    "total_chars": 588,
+    "speaker_distribution": {
+      "Speaker 1": 6,
+      "Speaker 2": 6,
+      "Speaker 3": 7
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 68.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 19,
+      "total_chars": 588,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.4724,
+      "speaker_distribution": {
+        "Speaker 1": 6,
+        "Speaker 2": 6,
+        "Speaker 3": 7
+      },
+      "target_word_count": 1000,
+      "unique_line_ratio": 0.8947
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      },
+      {
+        "code": "word_count_out_of_range",
+        "severity": "warning",
+        "message": "字数偏离目标范围: target=1000, actual=588",
+        "details": {
+          "target": 1000,
+          "actual": 588
+        }
+      }
+    ]
+  }
+}

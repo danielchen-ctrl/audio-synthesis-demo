@@ -1,0 +1,95 @@
+{
+  "task_id": "d6fcc8abaddc",
+  "stage": "v3_long_english",
+  "job_function": "Retail",
+  "language": "英语",
+  "scenario": "Scenario: A professional business discussion conducted in English. Keep the conversation practical, decision-oriented, and easy to follow.\n[Topic context: 提升老会员复购率的运营活动方案讨论]",
+  "core_content": "Core requirements: include concrete facts, assigned actions, open risks, dependencies, and a clear next-step summary in English.\n[Keywords: 会员分层, 活动策略, 复购触达, 门店配合, 效果验证, 执行节奏]",
+  "people_count": 3,
+  "word_count": 10000,
+  "seed": 943613648,
+  "effective_params": {
+    "scenario_head": "Scenario: A professional business discussion conducted in En",
+    "core_head": "Core requirements: include concrete facts, assigned actions,",
+    "people_count": 3,
+    "word_count": 10000,
+    "language": "英语"
+  },
+  "debug_info": {
+    "rewrite_info": {
+      "rewrite_triggered": false,
+      "rewrite_count": 0,
+      "fill_turns": 1,
+      "seed": 394168443,
+      "role_kpi_closure": {
+        "enabled": true,
+        "before": {
+          "1": 23,
+          "2": 9,
+          "3": 8
+        },
+        "after": {
+          "1": 22,
+          "2": 9,
+          "3": 8
+        },
+        "fix_report": {
+          "rounds": 0,
+          "insertions": 0,
+          "speakers_fixed": [],
+          "early_fixed": [],
+          "ratio_fixed": [],
+          "speaker_contributions": {}
+        }
+      },
+      "core_marker_fixed": true,
+      "is_from_v2": false,
+      "placeholder_violations": 40,
+      "duplicate_intro_fixed": 2,
+      "naturalness_applied": true,
+      "naturalness_language": "English",
+      "naturalness_rewrites": 5
+    },
+    "line_count": 133,
+    "total_chars": 10153,
+    "seed": 943613648,
+    "generator": "embedded_bundle_v1"
+  },
+  "stats": {
+    "line_count": 133,
+    "total_chars": 10153,
+    "speaker_distribution": {
+      "Speaker 1": 83,
+      "Speaker 2": 33,
+      "Speaker 3": 17
+    }
+  },
+  "quality": {
+    "passed": true,
+    "score": 80.0,
+    "max_score": 100.0,
+    "metrics": {
+      "line_count": 133,
+      "total_chars": 10153,
+      "marker_count": 0,
+      "chinese_ratio": 0.0,
+      "kana_ratio": 0.0,
+      "korean_ratio": 0.0,
+      "speaker_distribution": {
+        "Speaker 1": 83,
+        "Speaker 2": 33,
+        "Speaker 3": 17
+      },
+      "target_word_count": 10000,
+      "unique_line_ratio": 1.0
+    },
+    "findings": [
+      {
+        "code": "missing_core_marker",
+        "severity": "warning",
+        "message": "缺少核心标记",
+        "details": {}
+      }
+    ]
+  }
+}
