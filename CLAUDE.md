@@ -48,7 +48,7 @@ python tools/training/run_v3_parallel.py --long
 python tools/training/run_v3_parallel.py --long --resume
 ```
 
-输出目录：`output/training_v3/{batch}/passed/`（已纳入版本管理）
+输出目录：`output/training_v3/{batch}/passed/`（已纳入版本管理，commit `14eebec9`）
 
 **Quick progress check:**
 ```bash
@@ -116,9 +116,19 @@ v2 数据存于 `output/training_v2/`，已完成部分：
 
 ---
 
-## 🖥 Platform — Current Status (2026-05-07)
+## 🖥 Platform — Current Status (2026-05-08)
 
-**Phase: Live. 音色审计完成，TTS 警告追踪已上线，UI 多项优化。**
+**Phase: Live. Few-shot 索引已升级使用 v3 训练数据，服务器重启后自动加载。**
+
+### 近期变更（2026-05-08，commit 14eebec9）
+
+| 文件 | 改动 |
+|------|------|
+| `src/demo_app/training_few_shot.py` | `_MIN_NEW_SAMPLE_SCORE` 70→65（覆盖全部 v3 通过样本）；`_MAX_EXCERPT_CHARS` 600→1200；long tier 样本 +15 分优先排序 |
+| `training/training_executor.py` | 超时从固定 300s 改为自适应 `max(300, word_count//50)`，修复大字数任务超时无记录问题 |
+| `server_platform.py` | 启动时调用 `invalidate_index()`，确保每次重启加载最新训练数据 |
+
+Few-shot 索引现有 **4115 条**（v3 long 934 + v3 short 1033 + v2 1203 + 旧语料 945），覆盖 176 个（场景×语言）组合。
 
 ### 近期变更（2026-05-07，commit 9efbba27）
 
@@ -337,17 +347,19 @@ demo-data/
 runtime/
   platform.db                      ← SQLite DB (gitignored; auto-created on first start)
   cache/                           ← bundle extraction cache (gitignored; regenerated at startup)
-training/                          ← training pipeline v2
-  training_executor.py             ← task runner with 300s per-task timeout
+training/                          ← training pipeline v3
+  training_executor.py             ← task runner; adaptive timeout max(300, word_count//50)
   quality_scoring.py / dialogue_validators.py / training_storage.py
-  plan_v2_data.py / data/training_jobs_b*.jsonl
+  legacy_generation.py             ← dialogue generation adapter; _CHUNK_SIZE=2500 for ja/ko
+  data/v3_jobs_*.jsonl             ← pre-built job files for 8 batches (short+long × 4 langs)
+output/training_v3/               ← v3 training output (committed to repo)
+  {batch}/passed/                  ← 1937 passed samples, 22 scenarios × 4 langs × 500-50k chars
 tools/training/
-  run_all_batches.py               ← B0→B5 sequential runner (v2, superseded by v3)
   run_v3_parallel.py               ← v3 parallel runner (current main entry point)
-  build_v3_jobs.py                 ← v3 job builder
+  build_v3_jobs.py                 ← v3 job builder (short + long tier)
+  run_all_batches.py               ← B0→B5 sequential runner (v2, superseded)
 docs/
   real-human-tts-integration.md   ← 真人 TTS API 接入方案 v4.1（规划中）
-  training-plan-v2-execution.md   ← v2 training execution guide (reference only)
   platform-changes.md             ← platform change log
 ```
 
@@ -420,7 +432,7 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 1. Parameters sanitised (`_safe_profile`, `_safe_generation_context`)
 2. Language normalised to canonical form (`_canonical_language`)
 3. Non-CJK profile fields translated to the target language (`_sanitize_profile_for_language`)
-4. Few-shot example injected from `demo-data/training_long_dialogue/` (`few_shot_selector.get_few_shot_example`)
+4. Few-shot example injected: `get_topic_few_shot_example(template_label, language)` → 优先查 `output/training_v3/*/passed/`（v3 long tier 优先），回退到旧语料库 `demo-data/training_long_dialogue/`
 5. `_generate_long_dialogue_lines()` → calls bundle LLM, loops with dedup until word-count target is met
 6. Three post-processing passes: `repair_dialogue_quality` → `merge_keywords_into_lines` → `stabilize_dialogue_constraints`
 7. Written to `demo-data/{timestamp}/{basename}.txt` + `manifest.json`; registered in in-memory LRU cache (`_manifest_cache`, 500-entry cap)
@@ -471,14 +483,20 @@ The restoration script (after `<script src="/static/app.js">`) overrides `showCo
 
 ### Training corpus and few-shot
 
-`demo-data/training_long_dialogue/` is **committed to the repo** (force-tracked despite `demo-data/` being in `.gitignore`). Files follow the naming pattern `{domain_id}_{lang_short}_spk{N}_wc5000.txt`.
+两套 few-shot 语料，由 `training_few_shot.py` 统一索引：
 
-- **14 domains**: `ai_tech`, `commercialization`, `construction`, `consulting`, `finance`, `hr_recruit`, `insurance`, `legal`, `manufacturing`, `media_strategy`, `medical`, `realestate`, `retail`, `test_dev`
-- **9 languages**: `zh`, `en`, `ja`, `ko`, `fr`, `de`, `es`, `pt`, `yue`
-- **5 speaker variants per combination**: `spk2` through `spk6` (priority order when selecting: spk3 → spk2 → spk4 → spk5)
-- Total: 630 files
+**v3 训练数据**（主要来源，4115 条索引，优先级最高）
+- 路径：`output/training_v3/*/passed/`（已纳入版本管理）
+- 1937 条通过样本：22 场景 × 4 语言（zh/en/ja/ko）× 500–50000 字
+- Long tier（10k-50k 字）样本得分 +15 加成，排序优先
+- 最低分门槛 65（覆盖所有 passed 样本），excerpt 长度 1200 字符
 
-`few_shot_selector.py` maps human-readable domain/language names to file IDs via `_DOMAIN_TO_ID` and `_LANG_TO_SHORT`. An LRU file cache (32-entry cap) avoids repeated disk reads. If no match is found, an empty string is returned silently — generation still works without few-shot guidance.
+**旧语料库**（回退来源）
+- 路径：`demo-data/training_long_dialogue/`（force-tracked）
+- 630 个文件：14 domains × 9 languages × 5 speaker variants（spk2–spk6）
+- `few_shot_selector.py` 通过 `_DOMAIN_TO_ID` / `_LANG_TO_SHORT` 映射查找
+
+索引在服务器启动时清除（`invalidate_index()`），首次请求时懒加载重建。
 
 ### YAML rules and caching
 
