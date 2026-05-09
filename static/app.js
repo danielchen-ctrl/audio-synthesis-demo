@@ -161,10 +161,10 @@ const VOICE_LIBRARY = {
 // 新增音色时同步修改此处和 src/demo_app/voice_resolver.py
 const COSYVOICE_VOICE_CATALOG = {
   Chinese: [
-    { value: "36d3429a3c98", label: "maryzhang（女·真人·普通话）", gender: "female" }
+    { value: "36d3429a3c98", label: "maryzhang（女·真人）", gender: "female" }
   ],
   English: [
-    { value: "c3e9f75ae993", label: "willwu（男·真人·英语）", gender: "male" }
+    { value: "c3e9f75ae993", label: "willwu（男·真人）", gender: "male" }
   ]
   // 待扩充：Japanese / Korean / ...（对应语言有真人音色后在此添加）
 };
@@ -188,7 +188,7 @@ function createDefaultFormState() {
     dialogueId: "",
     generatedTextFileName: "",
     voiceAssignments: { "1": "", "2": "" },
-    ttsEngine: "edge_tts",   // "edge_tts" | "real_human"
+    ttsEngine: "real_human", // "edge_tts" | "real_human"  默认真人音色
     outputFormat: "MP3",
     preciseDuration: "",
     folder: FALLBACK_ONLINE_AUDIO_CONFIG.defaults.folder,
