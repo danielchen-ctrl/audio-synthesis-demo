@@ -710,15 +710,25 @@ function speakerCountValue() {
 
 function activeVoiceOptions() {
   if (state.form.ttsEngine === "real_human") {
-    // 真人音色：返回当前语言的 CosyVoice 音色（无则返回空数组）
-    return COSYVOICE_VOICE_CATALOG[currentLanguageBackend()] || [];
+    // 真人音色：展示全部克隆音色（不按语言过滤，zero_shot 模式支持跨语言使用）
+    return allRealHumanVoices();
   }
   return VOICE_LIBRARY[currentLanguageBackend()] || VOICE_LIBRARY.Chinese;
 }
 
-/** 当前语言是否有可用的真人克隆音色 */
+/** 合并去重后的全部真人克隆音色列表 */
+function allRealHumanVoices() {
+  const seen = new Set();
+  return Object.values(COSYVOICE_VOICE_CATALOG).flat().filter(v => {
+    if (seen.has(v.value)) return false;
+    seen.add(v.value);
+    return true;
+  });
+}
+
+/** 是否存在任何可用的真人克隆音色 */
 function hasRealHumanVoices() {
-  return (COSYVOICE_VOICE_CATALOG[currentLanguageBackend()] || []).length > 0;
+  return allRealHumanVoices().length > 0;
 }
 
 function gatherVoiceAssignments() {
@@ -1177,8 +1187,9 @@ function renderKeywordHighlightPreview() {
 
 function renderSubmitState() {
   const busy = state.form.isGeneratingText || state.form.isSubmittingAudio;
-  el.generateTextBtn.disabled = busy;
-  el.regenTextBtn.disabled = busy;
+  // 文本生成按钮：仅在正在生成文本时禁用，音频合成期间允许重新生成文本
+  el.generateTextBtn.disabled = state.form.isGeneratingText;
+  el.regenTextBtn.disabled = state.form.isGeneratingText;
   const hasText = currentMode() !== "llm" || Boolean(normalizeText(el.previewText.value));
   el.submitAudioBtn.disabled = busy || !allVoicesSelected() || !hasText;
   el.cancelModalBtn.disabled = busy;
@@ -2093,6 +2104,7 @@ async function handleGenerateText() {
   const error = validateLlmBeforeGenerateText();
   if (error) {
     setModalMessage(error, "error");
+    showToast("err", error);   // 主题/参数未填时给明显 toast 提示
     return;
   }
 
