@@ -2135,8 +2135,7 @@ def repair_dialogue_quality(
         }
 
     context = _normalize_generation_context(generation_context)
-    force_rebuild = bool(context.get("discussion_axes") or context.get("role_briefs") or target >= 700)
-    if not force_rebuild and not _needs_dialogue_repair(lines, expected_people, target):
+    if not _needs_dialogue_repair(lines, expected_people, target):
         return list(lines), {"language": canonical, "repaired": False, "reason": "quality_ok"}
 
     repaired = _build_structured_chinese_dialogue(
@@ -2159,7 +2158,7 @@ def repair_dialogue_quality(
     return repaired, {
         "language": canonical,
         "repaired": True,
-        "reason": "structured_rebuild" if force_rebuild else "quality_repair",
+        "reason": "quality_repair",
         "original_line_count": len(lines),
         "repaired_line_count": len(repaired),
         "target_word_count": target,
