@@ -1517,6 +1517,21 @@ function renderDetail(f){
         <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${esc(reason)}</td>
         <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${latency}</td>
       </tr>${errRow}`;
+    }).join('');
+    ttsMetaHtml=`
+      <div class="meta-section detail-meta-full" style="margin-top:0">
+        <h4 style="margin-bottom:8px">🎤 TTS 合成诊断</h4>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="color:var(--text3)">
+            <th style="padding:4px 8px;text-align:left;font-weight:500"></th>
+            <th style="padding:4px 8px;text-align:left;font-weight:500">说话人</th>
+            <th style="padding:4px 8px;text-align:left;font-weight:500">实际引擎</th>
+            <th style="padding:4px 8px;text-align:left;font-weight:500">降级原因</th>
+            <th style="padding:4px 8px;text-align:left;font-weight:500">耗时</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
   }
 
   document.getElementById('detail-body').innerHTML=`
