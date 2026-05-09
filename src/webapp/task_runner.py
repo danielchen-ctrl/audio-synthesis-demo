@@ -26,6 +26,28 @@ import src.webapp.db as db
 
 logger = logging.getLogger(__name__)
 
+
+# ── runtime.yaml 加载（懒加载，缓存首次结果） ──────────────────────────────────
+
+_runtime_cfg_cache: dict | None = None
+
+
+def _load_runtime_cfg() -> dict:
+    global _runtime_cfg_cache
+    if _runtime_cfg_cache is not None:
+        return _runtime_cfg_cache
+    try:
+        import yaml
+        cfg_path = ROOT / "config" / "runtime.yaml"
+        if cfg_path.exists():
+            _runtime_cfg_cache = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
+        else:
+            _runtime_cfg_cache = {}
+    except Exception as exc:
+        logger.warning("[task_runner] 无法读取 runtime.yaml: %s", exc)
+        _runtime_cfg_cache = {}
+    return _runtime_cfg_cache
+
 _task_queue: asyncio.Queue = asyncio.Queue()
 
 
@@ -98,6 +120,239 @@ def _safe_basename(topic: str) -> str:
     slug = re.sub(r"[^\w一-龥\-]", "_", (topic or "")[:40]).strip("_")
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     return f"{slug}_{ts}" if slug else ts
+
+
+# ── 真人 TTS 合成辅助函数 ──────────────────────────────────────────────────────
+
+async def _fallback_edge_tts(req: Any, output_path: Path) -> Any:
+    """
+    用 edge_tts 合成一个 SynthesisRequest，作为 real_human 降级路径。
+    output_path 应以 .mp3 结尾（edge_tts 原生输出格式）。
+    返回 SynthesisResult（来自 demo_app.tts_provider）。
+    """
+    import time
+    from demo_app.tts_provider import SynthesisResult
+    from demo_app.voice_resolver import EDGE_DEFAULT_VOICES
+
+    t0 = time.monotonic()
+    text = "".join(req.segments)
+    # 使用语言默认 edge_tts 音色（不使用 real_human voice_id）
+    voice_id = EDGE_DEFAULT_VOICES.get(req.voice_spec.language, "zh-CN-XiaoxiaoNeural")
+
+    try:
+        import edge_tts
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        communicate = edge_tts.Communicate(text, voice_id)
+        await communicate.save(str(output_path))
+        ms = int((time.monotonic() - t0) * 1000)
+        return SynthesisResult(
+            request=req,
+            audio_path=output_path,
+            provider_used="edge_tts",
+            degraded=True,              # 相对于期望的 real_human 来说是降级
+            degraded_reason="real_human_fallback",
+            latency_ms=ms,
+            api_response_code=None,
+            request_chars=len(text),
+            audio_duration_ms=0,
+            timeline_source="estimated",
+        )
+    except Exception as exc:
+        ms = int((time.monotonic() - t0) * 1000)
+        logger.warning("[task_runner] edge_tts 降级合成也失败: speaker=%s err=%s", req.speaker, exc)
+        return SynthesisResult(
+            request=req,
+            audio_path=None,
+            provider_used="edge_tts",
+            degraded=True,
+            degraded_reason="provider_error",
+            latency_ms=ms,
+            api_response_code=None,
+            request_chars=len(text),
+            audio_duration_ms=0,
+            timeline_source="original",
+        )
+
+
+async def _concat_audio_segments(seg_files: list[Path], output_path: Path) -> None:
+    """
+    用 ffmpeg concat demuxer 将多个音频片段（WAV/MP3 混合）拼接为单个文件。
+    输出格式由 output_path 后缀决定（.mp3 / .wav）。
+    """
+    import subprocess
+    import tempfile
+    from demo_app.embedded_server_main import _ffmpeg_path
+
+    # 过滤不存在的片段（降级失败时可能为 None）
+    valid = [f for f in seg_files if f and f.exists() and f.stat().st_size > 0]
+    if not valid:
+        raise RuntimeError("没有有效的音频片段可供拼接")
+
+    if len(valid) == 1:
+        # 单片段：直接 transcode（或 copy 如格式一致）
+        ffmpeg = _ffmpeg_path()
+        codec = "libmp3lame" if output_path.suffix == ".mp3" else "pcm_s16le"
+        subprocess.run(
+            [ffmpeg, "-y", "-i", str(valid[0]), "-c:a", codec, str(output_path)],
+            check=True, capture_output=True,
+        )
+        return
+
+    # 多片段：写 concat list 文件
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".txt", delete=False, encoding="utf-8"
+    ) as fh:
+        for sf in valid:
+            # Windows 路径反斜线需转为正斜线
+            fh.write(f"file '{sf.as_posix()}'\n")
+        list_file = fh.name
+
+    try:
+        ffmpeg = _ffmpeg_path()
+        codec = "libmp3lame" if output_path.suffix == ".mp3" else "pcm_s16le"
+        cmd = [
+            ffmpeg, "-y",
+            "-f", "concat", "-safe", "0",
+            "-i", list_file,
+            "-c:a", codec,
+            str(output_path),
+        ]
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(
+            None,
+            lambda: subprocess.run(cmd, check=True, capture_output=True),
+        )
+    finally:
+        Path(list_file).unlink(missing_ok=True)
+
+
+async def _synthesize_with_real_human(
+    line_tuples: list[tuple[str, str]],
+    language: str,
+    save_dir: Path,
+    basename: str,
+    task: dict,
+    output_format: str = "mp3",
+) -> dict:
+    """
+    使用 RealHumanProvider (CosyVoice) 逐段合成。
+    - 每段独立合成，失败时自动降级到 edge_tts
+    - 返回与 _synthesize_audio_from_lines 兼容的结果字典（含 tts_meta）
+    """
+    from demo_app.voice_resolver import build_synthesis_requests
+    from demo_app.real_human_tts import load_real_human_provider
+
+    # ── 解析 voice_assignments / voice_map ───────────────────────────────────
+    voice_assignments: dict = {}
+    va_raw = task.get("voice_assignments") or "{}"
+    if isinstance(va_raw, str):
+        try:
+            voice_assignments = json.loads(va_raw)
+        except Exception:
+            pass
+    elif isinstance(va_raw, dict):
+        voice_assignments = va_raw
+
+    voice_map: dict = {}
+    vm_raw = task.get("voice_map") or "{}"
+    if isinstance(vm_raw, str):
+        try:
+            voice_map = json.loads(vm_raw)
+        except Exception:
+            pass
+
+    # ── 加载 Provider ─────────────────────────────────────────────────────────
+    provider = load_real_human_provider(_load_runtime_cfg())
+    effective_provider = "real_human" if provider else "edge_tts"
+
+    if not provider:
+        logger.warning(
+            "[task_runner] RealHumanProvider 未配置（REAL_HUMAN_TTS_API_URL 未设置），"
+            "降级到全量 edge_tts"
+        )
+
+    # ── 构建 SynthesisRequest 列表（段落合并） ────────────────────────────────
+    synthesis_requests = build_synthesis_requests(
+        line_tuples,
+        language=language,
+        voice_assignments=voice_assignments,
+        voice_map=voice_map,
+        effective_provider=effective_provider,
+    )
+
+    seg_files: list[Path | None] = []
+    tts_meta: list[dict] = []
+    fallback_reasons: list[str] = []
+
+    # ── 逐段合成 ─────────────────────────────────────────────────────────────
+    for idx, req in enumerate(synthesis_requests):
+        seg_wav  = save_dir / f"_seg_{idx:04d}.wav"
+        seg_mp3  = save_dir / f"_seg_{idx:04d}.mp3"
+        result = None
+
+        if provider and req.voice_spec.provider == "real_human":
+            # 尝试真人合成 → WAV
+            result = await provider.synthesize(req, seg_wav)
+            if result.degraded:
+                reason = result.degraded_reason or "unknown"
+                logger.warning(
+                    "[task_runner] real_human 降级 seg=%d speaker=%s reason=%s",
+                    idx, req.speaker, reason,
+                )
+                fallback_reasons.append(f"seg{idx}:{reason}")
+                # 降级到 edge_tts → MP3
+                result = await _fallback_edge_tts(req, seg_mp3)
+                seg_files.append(seg_mp3 if (result.audio_path and result.audio_path.exists()) else None)
+            else:
+                seg_files.append(seg_wav)
+        else:
+            # 直接走 edge_tts（语言无真人音色 or provider 未配置）
+            result = await _fallback_edge_tts(req, seg_mp3)
+            seg_files.append(seg_mp3 if (result.audio_path and result.audio_path.exists()) else None)
+
+        tts_meta.append({
+            "segment_idx": idx,
+            "speaker": req.speaker,
+            "provider_used": result.provider_used if result else "edge_tts",
+            "degraded": result.degraded if result else True,
+            "degraded_reason": result.degraded_reason if result else "no_provider",
+            "latency_ms": result.latency_ms if result else 0,
+            "chars": result.request_chars if result else 0,
+            "job_id": result.job_id if result else None,
+            "poll_count": result.poll_count if result else None,
+        })
+
+    # ── 拼接所有片段 ─────────────────────────────────────────────────────────
+    final_ext = f".{output_format}"
+    final_path = save_dir / f"{basename}{final_ext}"
+    valid_segs = [f for f in seg_files if f]
+
+    try:
+        await _concat_audio_segments(valid_segs, final_path)
+    finally:
+        # 清理临时片段文件
+        for f in seg_files:
+            if f:
+                try:
+                    f.unlink()
+                except Exception:
+                    pass
+
+    # ── 构造返回值 ────────────────────────────────────────────────────────────
+    warn = ""
+    if fallback_reasons:
+        warn = "real_human_partial_fallback:" + ",".join(fallback_reasons)
+    elif not provider:
+        warn = "real_human_unavailable:all_edge_tts"
+
+    return {
+        "audio_file_path": str(final_path),
+        "output_format": output_format,
+        "warning": warn,
+        "tts_meta": json.dumps(tts_meta, ensure_ascii=False),
+        "segments_json_path": None,
+        "transcript_srt_path": None,
+    }
 
 
 # ── 核心处理逻辑 ──────────────────────────────────────────────────────────────
@@ -216,18 +471,26 @@ async def _process_task(task_id: str) -> None:
     save_dir.mkdir(parents=True, exist_ok=True)
     basename = _safe_basename(topic)
 
+    tts_provider = task.get("tts_provider") or "edge_tts"
+
     try:
-        bundle_server = load_bundle_server()
-        audio_result: dict = await _synthesize_audio_from_lines(
-            line_tuples,
-            language,
-            save_dir,
-            basename,
-            bundle_server,
-            selected_voice_map=voice_map or None,
-            output_format=output_format,
-            include_scripts=include_scripts,
-        )
+        if tts_provider == "real_human":
+            audio_result: dict = await _synthesize_with_real_human(
+                line_tuples, language, save_dir, basename, task,
+                output_format=output_format,
+            )
+        else:
+            bundle_server = load_bundle_server()
+            audio_result = await _synthesize_audio_from_lines(
+                line_tuples,
+                language,
+                save_dir,
+                basename,
+                bundle_server,
+                selected_voice_map=voice_map or None,
+                output_format=output_format,
+                include_scripts=include_scripts,
+            )
     except Exception as exc:
         logger.exception("Task %s synthesis failed", task_id)
         db.update_task_status(task_id, "failed", error_msg=str(exc))
@@ -289,6 +552,7 @@ async def _process_task(task_id: str) -> None:
             "topic": topic,
             "transcript_json": transcript_json,
             "transcript_srt": transcript_srt,
+            "tts_meta": audio_result.get("tts_meta"),   # 真人 TTS 逐段详情（可能为 None）
         }
     )
 

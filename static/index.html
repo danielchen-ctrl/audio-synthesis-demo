@@ -1337,13 +1337,32 @@ function renderTaskGrid(tasks){
     }
     const failedPip=t.status==='failed'?`<div class="pipeline" style="opacity:.45;filter:grayscale(1)">${STEPS.map((label,idx)=>`<div class="step done"><div class="step-dot"></div><div class="step-lbl">${label}</div></div>`).slice(0,3).join('')}<div class="step"><div class="step-dot" style="background:var(--danger)">✕</div><div class="step-lbl" style="color:var(--danger)">失败</div></div></div>`:'';
     const isTextOnly=t.generation_mode==='text_only';
-    const isTtsWarn=t.status==='completed'&&(t.error_msg||'').startsWith('[TTS_WARN]');
+    const warnMsg=(t.error_msg||'');
+    const isTtsWarn=t.status==='completed'&&warnMsg.startsWith('[TTS_WARN]');
+    // 真人 TTS 降级细分
+    const ttsBody=warnMsg.replace('[TTS_WARN]','').trim();
+    const isRealHumanPartial=isTtsWarn&&ttsBody.startsWith('real_human_partial_fallback:');
+    const isRealHumanUnavail=isTtsWarn&&ttsBody.startsWith('real_human_unavailable:');
+    const isRealHumanProvider=t.tts_provider==='real_human';
+    // 状态徽章
+    let statusLabel=lbl[t.status]||t.status;
+    let statusKey=t.status;
+    if(isTtsWarn){statusKey='tts-warn';statusLabel=isRealHumanPartial?'⚠️ 部分降级':isRealHumanUnavail?'ℹ️ TTS未配置':'⚠️ 备用引擎';}
+    // 警告提示行
+    let warnRow='';
+    if(isTtsWarn){
+      if(isRealHumanPartial) warnRow=`<div class="task-warn">⚠️ 真人TTS部分片段降级到 edge_tts（详见 tts_meta）</div>`;
+      else if(isRealHumanUnavail) warnRow=`<div class="task-warn">ℹ️ 真人TTS未配置（REAL_HUMAN_TTS_API_URL），已用 edge_tts 全程合成</div>`;
+      else warnRow=`<div class="task-warn">⚠️ 在线TTS失败，已用备用引擎生成（音质可能降低）</div>`;
+    }else if(warnMsg&&t.status==='failed'){warnRow=`<div class="task-err">❌ ${esc(warnMsg)}</div>`;}
+    // TTS 引擎标签（仅真人TTS任务显示）
+    const ttsTag=isRealHumanProvider&&t.status==='completed'&&!isTtsWarn?`<span style="font-size:11px;color:var(--success);margin-left:6px">🎤 真人音色</span>`:'';
     return`<div class="task-card${t.status==='failed'?' task-card-failed':isTtsWarn?' task-card-tts-warn':''}">
-      <div class="task-card-hdr"><div class="task-topic">${esc(t.topic||'（无主题）')}</div><span class="status status-${isTtsWarn?'tts-warn':t.status}">${run?'<span class="pulse"></span>':''}${isTtsWarn?'⚠️ 备用引擎':lbl[t.status]||t.status}</span></div>
+      <div class="task-card-hdr"><div class="task-topic">${esc(t.topic||'（无主题）')}${ttsTag}</div><span class="status status-${statusKey}">${run?'<span class="pulse"></span>':''}${statusLabel}</span></div>
       <div class="task-meta"><span>🌐 ${esc(LANG_ZH[t.language]||t.language||'中文')}</span>${isTextOnly?`<span>📄 仅生成文本</span>`:`<span>👥 ${t.people_count||2}人</span>`}<span>📝 ${t.word_count||1000}字</span></div>
       <div class="task-meta" style="margin-top:2px"><span>📅 ${fmtDate(t.created_at)}</span><span style="color:var(--text3)">${timeAgo(t.created_at)}</span></div>
       ${t.status!=='failed'?pipHtml:failedPip}
-      ${isTtsWarn?`<div class="task-warn">⚠️ 在线TTS失败，已用备用引擎生成（音质可能降低）</div>`:t.error_msg&&t.status==='failed'?`<div class="task-err">❌ ${esc(t.error_msg)}</div>`:''}
+      ${warnRow}
       ${t.status==='completed'&&t.file_id?`<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="openDetail('${t.file_id}','tasks')">查看详情 →</button></div>`:''}
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
         ${t.status==='failed'?`<button class="btn btn-ghost btn-sm" onclick="retryTask('${t.task_id}')" style="font-size:11px;color:var(--warning)">↺ 重试</button>`:'<span></span>'}

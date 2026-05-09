@@ -8,3 +8,26 @@ backends:
   audio: source_policy
   text_bundle_fallback: enabled
   audio_bundle_fallback: enabled
+
+# ── 真人 TTS (CosyVoice) 配置 ──────────────────────────────────────────────
+# api_url 优先从环境变量 REAL_HUMAN_TTS_API_URL 读取；
+# 环境变量未设置时使用此处的 api_url（留空则真人 TTS 不可用）。
+tts:
+  provider: auto          # auto | edge_tts | real_human（auto = 按任务 tts_provider 字段决定）
+  fallback_strategy: edge_then_bundle   # 降级链：real_human → edge_tts → bundle
+
+  real_human:
+    api_url: "http://10.0.20.10:8188"  # CosyVoice API 地址（LAN 内网）
+    timeout_sec: 60
+    max_retries: 2
+
+  # 已注册克隆音色（同步自 voice_resolver.COSYVOICE_VOICE_CATALOG）
+  voice_catalog:
+    Chinese:
+      - voice_id: "36d3429a3c98"
+        name: maryzhang
+        gender: female
+    English:
+      - voice_id: "c3e9f75ae993"
+        name: willwu
+        gender: male

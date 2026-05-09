@@ -79,11 +79,39 @@ def _conn() -> sqlite3.Connection:
     return c
 
 
+def _add_column_if_missing(conn: sqlite3.Connection, table: str, col: str, col_def: str) -> bool:
+    """如果列不存在则 ALTER TABLE 添加，已存在直接返回 False。"""
+    rows = conn.execute(f"PRAGMA table_info({table})").fetchall()
+    existing = {r["name"] for r in rows}
+    if col not in existing:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {col_def}")
+        return True
+    return False
+
+
+def _run_tts_migration(conn: sqlite3.Connection) -> bool:
+    """
+    幂等迁移：为 tasks / audio_files 表补充真人 TTS 相关列。
+    返回 True 表示本次执行了至少一处变更。
+    """
+    changed = False
+    changed |= _add_column_if_missing(conn, "tasks", "tts_provider",
+                                      "TEXT DEFAULT 'edge_tts'")
+    changed |= _add_column_if_missing(conn, "tasks", "tts_fallback_strategy",
+                                      "TEXT DEFAULT 'edge_then_bundle'")
+    changed |= _add_column_if_missing(conn, "tasks", "voice_assignments",
+                                      "TEXT DEFAULT '{}'")
+    changed |= _add_column_if_missing(conn, "audio_files", "tts_meta",
+                                      "TEXT DEFAULT NULL")
+    return changed
+
+
 def init_db() -> None:
-    """创建数据库文件并初始化表结构（幂等）。"""
+    """创建数据库文件并初始化表结构（幂等），并执行 TTS 列迁移。"""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with _conn() as c:
         c.executescript(_SCHEMA)
+        _run_tts_migration(c)
 
 
 def now_iso() -> str:
@@ -99,14 +127,20 @@ def new_id() -> str:
 def create_task(data: dict) -> dict:
     tid = new_id()
     now = now_iso()
+    # voice_assignments 接受 dict 或 JSON 字符串
+    va = data.get("voice_assignments", {})
+    if isinstance(va, dict):
+        va = json.dumps(va, ensure_ascii=False)
     with _conn() as c:
         c.execute(
             """
             INSERT INTO tasks
                 (task_id, status, generation_mode, topic, language, people_count,
                  word_count, template, keywords, custom_prompt, input_text,
-                 voice_map, output_format, include_scripts, created_at, updated_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                 voice_map, output_format, include_scripts,
+                 tts_provider, tts_fallback_strategy, voice_assignments,
+                 created_at, updated_at)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,
             (
                 tid,
@@ -123,6 +157,9 @@ def create_task(data: dict) -> dict:
                 json.dumps(data.get("voice_map", {}), ensure_ascii=False),
                 data.get("output_format", "mp3"),
                 1 if data.get("include_scripts") else 0,
+                data.get("tts_provider", "edge_tts"),
+                data.get("tts_fallback_strategy", "edge_then_bundle"),
+                va,
                 now,
                 now,
             ),
@@ -200,8 +237,8 @@ def create_audio_file(data: dict) -> dict:
             INSERT INTO audio_files
                 (file_id, task_id, file_name, file_path, source, duration, format,
                  file_size, language, speaker_count, scene, topic,
-                 transcript_json, transcript_srt, tags, folder_id, created_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                 transcript_json, transcript_srt, tags, folder_id, tts_meta, created_at)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,
             (
                 fid,
@@ -220,6 +257,7 @@ def create_audio_file(data: dict) -> dict:
                 data.get("transcript_srt"),
                 json.dumps(data.get("tags", []), ensure_ascii=False),
                 data.get("folder_id"),
+                data.get("tts_meta"),   # JSON str | None
                 now,
             ),
         )
