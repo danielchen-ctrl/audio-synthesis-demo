@@ -157,6 +157,18 @@ const VOICE_LIBRARY = {
   ]
 };
 
+// 真人克隆音色目录（与 voice_resolver.COSYVOICE_VOICE_CATALOG 同步）
+// 新增音色时同步修改此处和 src/demo_app/voice_resolver.py
+const COSYVOICE_VOICE_CATALOG = {
+  Chinese: [
+    { value: "36d3429a3c98", label: "maryzhang（女·真人·普通话）", gender: "female" }
+  ],
+  English: [
+    { value: "c3e9f75ae993", label: "willwu（男·真人·英语）", gender: "male" }
+  ]
+  // 待扩充：Japanese / Korean / ...（对应语言有真人音色后在此添加）
+};
+
 function createDefaultFormState() {
   return {
     mode: "llm",
@@ -176,6 +188,7 @@ function createDefaultFormState() {
     dialogueId: "",
     generatedTextFileName: "",
     voiceAssignments: { "1": "", "2": "" },
+    ttsEngine: "edge_tts",   // "edge_tts" | "real_human"
     outputFormat: "MP3",
     preciseDuration: "",
     folder: FALLBACK_ONLINE_AUDIO_CONFIG.defaults.folder,
@@ -269,6 +282,8 @@ const el = {
   previewKeywordGroup: document.getElementById("previewKeywordGroup"),
   previewKeywordHighlight: document.getElementById("previewKeywordHighlight"),
   voiceLanguageLabel: document.getElementById("voiceLanguageLabel"),
+  ttsEdgeBtn: document.getElementById("ttsEdgeBtn"),
+  ttsRealHumanBtn: document.getElementById("ttsRealHumanBtn"),
   speakerVoiceRows: document.getElementById("speakerVoiceRows"),
   voiceWarning: document.getElementById("voiceWarning"),
   outputFormat: document.getElementById("outputFormat"),
@@ -694,7 +709,16 @@ function speakerCountValue() {
 }
 
 function activeVoiceOptions() {
+  if (state.form.ttsEngine === "real_human") {
+    // 真人音色：返回当前语言的 CosyVoice 音色（无则返回空数组）
+    return COSYVOICE_VOICE_CATALOG[currentLanguageBackend()] || [];
+  }
   return VOICE_LIBRARY[currentLanguageBackend()] || VOICE_LIBRARY.Chinese;
+}
+
+/** 当前语言是否有可用的真人克隆音色 */
+function hasRealHumanVoices() {
+  return (COSYVOICE_VOICE_CATALOG[currentLanguageBackend()] || []).length > 0;
 }
 
 function gatherVoiceAssignments() {
@@ -707,7 +731,37 @@ function gatherVoiceAssignments() {
   return mapping;
 }
 
+/** 切换 TTS 引擎，重新渲染音色行 */
+function setTtsEngine(engine) {
+  state.form.ttsEngine = engine;
+  ensureVoiceAssignmentsShape();   // 切换后重新分配音色
+  renderVoiceRows();
+  renderSubmitState();
+  persistState();
+}
+
+/**
+ * 收集真人音色模式的 voice_assignments。
+ * 返回格式：{ "1": { provider:"real_human", voice_id:"..." }, ... }
+ * 若语言无克隆音色，返回空对象（后端自动降级 edge_tts）。
+ */
+function gatherRealHumanVoiceAssignments() {
+  const lang = currentLanguageBackend();
+  const catalog = COSYVOICE_VOICE_CATALOG[lang] || [];
+  if (!catalog.length) return {};
+  const assignments = {};
+  for (let s = 1; s <= speakerCountValue(); s++) {
+    const voiceId = state.form.voiceAssignments[String(s)] || catalog[0].value;
+    if (voiceId) {
+      assignments[String(s)] = { provider: "real_human", voice_id: voiceId };
+    }
+  }
+  return assignments;
+}
+
 function allVoicesSelected() {
+  // 真人音色模式下，无该语言的克隆音色 → 自动降级 edge_tts，无需手动选择
+  if (state.form.ttsEngine === "real_human" && !hasRealHumanVoices()) return true;
   for (let speaker = 1; speaker <= speakerCountValue(); speaker += 1) {
     if (!state.form.voiceAssignments[String(speaker)]) {
       return false;
@@ -1012,7 +1066,13 @@ function ensureVoiceAssignmentsShape() {
   const count = speakerCountValue();
   const prevCount = Object.keys(state.form.voiceAssignments).length;
   const nextAssignments = {};
-  if (prevCount !== count) {
+
+  if (!voices.length) {
+    // 无可用音色（如真人模式下该语言无克隆音色）— 清空，行数保持
+    for (let speaker = 1; speaker <= count; speaker += 1) {
+      nextAssignments[String(speaker)] = "";
+    }
+  } else if (prevCount !== count) {
     // 人数变化：对所有说话人重新分配，循环不同音色
     for (let speaker = 1; speaker <= count; speaker += 1) {
       nextAssignments[String(speaker)] = voices[(speaker - 1) % voices.length] || "";
@@ -1035,6 +1095,15 @@ function renderVoiceRows() {
   el.voiceLanguageLabel.textContent = currentLanguageLabel();
   const options = activeVoiceOptions();
   el.speakerVoiceRows.innerHTML = "";
+
+  // 真人音色模式 + 当前语言无克隆音色 → 显示提示，不渲染下拉框
+  if (state.form.ttsEngine === "real_human" && !options.length) {
+    const hint = document.createElement("div");
+    hint.className = "tts-no-catalog-hint";
+    hint.textContent = `该语言（${currentLanguageLabel()}）暂无真人克隆音色，合成时所有说话人将自动使用 edge_tts。`;
+    el.speakerVoiceRows.appendChild(hint);
+    return;
+  }
 
   for (let speaker = 1; speaker <= speakerCountValue(); speaker += 1) {
     const row = document.createElement("div");
@@ -1116,6 +1185,17 @@ function renderSubmitState() {
   el.closeModalBtn.disabled = busy;
   el.voiceWarning.classList.toggle("hidden", allVoicesSelected());
   el.generateTextBtn.textContent = state.form.isGeneratingText ? "正在生成文本..." : "✨ 生成对话文本";
+  // 真人音色模式下提交按钮文案提示后台任务
+  if (!state.form.isSubmittingAudio) {
+    el.submitAudioBtn.textContent = state.form.ttsEngine === "real_human"
+      ? "🎤 提交真人TTS任务"
+      : "🎵 生成音频";
+  }
+  // 切换 toggle 按钮高亮
+  if (el.ttsEdgeBtn && el.ttsRealHumanBtn) {
+    el.ttsEdgeBtn.classList.toggle("tts-active", state.form.ttsEngine !== "real_human");
+    el.ttsRealHumanBtn.classList.toggle("tts-active", state.form.ttsEngine === "real_human");
+  }
 }
 
 function renderModalVisibility() {
@@ -2067,12 +2147,78 @@ async function handleGenerateText() {
   }
 }
 
+/**
+ * 真人音色模式：把对话文本作为直接输入任务提交到平台任务队列。
+ * 关闭弹窗并跳转到生成任务页。
+ */
+async function submitRealHumanTask(workingText, dialogueId) {
+  const topic = currentTitle() || "真人音色生成";
+  const language = currentLanguageBackend();
+  const voiceAssignments = gatherRealHumanVoiceAssignments();
+
+  // 规范化文本（对话行格式）
+  const inputText = normalizeText(workingText);
+  if (!inputText) {
+    setModalMessage("请先生成或输入对话文本", "error");
+    return;
+  }
+
+  state.form.isSubmittingAudio = true;
+  setModalMessage("正在提交真人TTS任务...", "info");
+  renderSubmitState();
+
+  try {
+    const res = await fetchJson("/api/platform/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        generation_mode: "direct",
+        input_text: inputText,
+        topic,
+        language,
+        people_count: speakerCountValue(),
+        word_count: inputText.length,
+        tts_provider: "real_human",
+        tts_fallback_strategy: "edge_then_bundle",
+        voice_assignments: voiceAssignments,
+        output_format: (el.outputFormat ? el.outputFormat.value : "MP3").toLowerCase(),
+      })
+    });
+    if (res.ok) {
+      state.modalOpen = false;
+      el.modalOverlay.classList.remove("open");
+      showToast("ok", "🎤 真人TTS任务已提交，请在【生成任务】页查看进度");
+      // 跳转到任务页并刷新
+      if (typeof goTo === "function") goTo("tasks");
+      if (typeof loadTasks === "function") loadTasks();
+      if (typeof startTaskPoll === "function") startTaskPoll();
+    }
+  } catch (err) {
+    setModalMessage(`提交失败：${err.message || err}`, "error");
+  } finally {
+    state.form.isSubmittingAudio = false;
+    renderSubmitState();
+  }
+}
+
 async function submitAudioGeneration() {
   readFormFromDom();
   const validationError = validateBeforeSubmit();
   if (validationError) {
     setModalMessage(validationError, "error");
     renderSubmitState();
+    return;
+  }
+
+  // ── 真人音色模式：提交后台任务，不走内联合成 ─────────────────────────────
+  if (state.form.ttsEngine === "real_human") {
+    const workingText = currentWorkingText();
+    // LLM 模式需先生成文本
+    if (currentMode() === "llm" && !normalizeText(el.previewText.value)) {
+      setModalMessage("请先生成对话文本，再提交真人TTS任务", "error");
+      return;
+    }
+    await submitRealHumanTask(workingText, state.form.dialogueId);
     return;
   }
 
@@ -2394,6 +2540,9 @@ function bindEvents() {
     renderSubmitState();
     persistState();
   });
+  // TTS 引擎切换按钮
+  if (el.ttsEdgeBtn) el.ttsEdgeBtn.addEventListener("click", () => setTtsEngine("edge_tts"));
+  if (el.ttsRealHumanBtn) el.ttsRealHumanBtn.addEventListener("click", () => setTtsEngine("real_human"));
   el.outputFormat.addEventListener("change", () => {
     readFormFromDom();
     persistState();

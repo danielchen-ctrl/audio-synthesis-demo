@@ -447,6 +447,12 @@ html[data-theme="light"] .mini-player-row td{background:#1E293B;color:#E2E8F0}
 html[data-theme="light"] .comp-banner{background:#1e3a5f}
 /* theme toggle button */
 .theme-toggle{font-size:15px;padding:4px 8px;line-height:1}
+/* TTS 引擎切换 */
+.tts-engine-row{display:flex;gap:8px;margin:10px 0 12px;align-items:center}
+.tts-engine-btn{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);font-size:13px;cursor:pointer;transition:border-color .15s,background .15s,color .15s;white-space:nowrap}
+.tts-engine-btn:hover{border-color:var(--primary);color:var(--primary)}
+.tts-engine-btn.tts-active{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 12%,transparent);color:var(--primary);font-weight:600}
+.tts-no-catalog-hint{font-size:12px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px}
 
 /* ── Share bar (LAN link footer) ── */
 .share-bar{position:fixed;bottom:0;left:0;right:0;height:36px;background:linear-gradient(90deg,#1e1b4b 0%,#312e81 50%,#1e1b4b 100%);border-top:1px solid rgba(99,102,241,.35);display:flex;align-items:center;padding:0 16px;gap:10px;z-index:90;font-size:12px;color:rgba(255,255,255,.75)}
@@ -804,6 +810,10 @@ html[data-theme="light"] .share-bar{background:linear-gradient(90deg,#1e1b4b 0%,
         <div class="form-hint" style="margin-top:4px;margin-bottom:10px">范围 1–10，须与对话文本中的 Speaker 数量一致</div>
         <div class="voice-language-hint">
           当前语言：<span id="voiceLanguageLabel">中文（普通话）</span> — 音色列表已按语言筛选
+        </div>
+        <div class="tts-engine-row">
+          <button id="ttsEdgeBtn"      class="tts-engine-btn tts-active" type="button">🔊 合成音色</button>
+          <button id="ttsRealHumanBtn" class="tts-engine-btn"            type="button">🎤 真人音色</button>
         </div>
         <div id="speakerVoiceRows" class="speaker-rows"></div>
         <div id="voiceWarning" class="inline-warning hidden">请为所有说话人选择音色</div>
