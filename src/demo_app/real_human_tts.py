@@ -1,14 +1,27 @@
 """
 demo_app/real_human_tts.py
 ==========================
-RealHumanProvider — CosyVoice TTS API 实现（zero_shot 克隆模式）。
+RealHumanProvider — CosyVoice TTS API 实现。
 
-API 端点（http://10.0.20.10:8188）：
-  POST /api/tts/async              提交异步合成任务，返回 task_id
-  GET  /api/task/{task_id}         轮询任务状态 → {status, filename}
-  GET  /api/download/{filename}    下载生成的 WAV 音频
+使用 OpenAI-compatible 端点（经实测可用，2026-05-10）：
+  POST /v1/audio/speech   JSON body → 直接返回 WAV 音频字节（同步）
 
-当前可用音色（GET /v1/voices，2026-05-10 确认）：
+废弃的端点（zero_shot 模式要求上传 prompt_wav，不支持仅传 spk_id）：
+  POST /api/tts/async     → 失败：Invalid file: None
+  GET  /api/task/{id}     → 轮询（已废弃）
+  GET  /api/download/{f}  → 下载（已废弃）
+
+/v1/audio/speech 请求格式（JSON）：
+  {
+    "model":           "cosyvoice-v3",  // 可从 GET /v1/models 获取
+    "input":           <text>,
+    "voice":           <voice_id>,      // 注册音色的 ID（或名称）
+    "response_format": "wav",
+    "speed":           1.0
+  }
+响应：直接返回 WAV 音频字节（Content-Type: audio/wav 或 audio/x-wav）。
+
+当前可用音色（GET /v1/voices/custom，2026-05-10 确认）：
   中文: maryzhang  voice_id=36d3429a3c98
   英文: willwu     voice_id=c3e9f75ae993
 
@@ -18,6 +31,7 @@ HTTP 调用通过 requests + asyncio.run_in_executor 在线程池执行，
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import time
 from pathlib import Path
@@ -35,7 +49,7 @@ from demo_app.tts_provider import (
 
 logger = logging.getLogger(__name__)
 
-# ── CosyVoice 能力声明（基于 openapi.json + Swagger UI 截图核对） ──────────────
+# ── CosyVoice 能力声明 ──────────────────────────────────────────────────────────
 COSYVOICE_CAPABILITIES = ProviderCapabilities(
     tier="B",
     supports_ssml=False,
@@ -44,19 +58,18 @@ COSYVOICE_CAPABILITIES = ProviderCapabilities(
     supports_pause_control=True,      # speed 字段
     max_chars_per_request=500,
     output_formats=["wav"],
-    async_mode=True,                  # /api/tts/async → poll → download
+    async_mode=False,                 # /v1/audio/speech 是同步接口
 )
 
-# 轮询间隔（秒）和最大超时
-_DEFAULT_POLL_INTERVAL = 2.0
-_DEFAULT_TIMEOUT_SEC   = 60
+_DEFAULT_TIMEOUT_SEC = 60
+_DEFAULT_MODEL       = "cosyvoice-v3"
 
 
 class RealHumanProvider(TTSProvider):
     """
     CosyVoice TTS Provider。
-    合成模式：zero_shot（使用 /v1/voices/create 注册的 spk_id）。
-    失败时由调用方（task_runner）负责降级至 EdgeTTSProvider。
+    使用 /v1/audio/speech（OpenAI-compatible 同步接口）。
+    失败时由调用方（task_runner）负责降级至 edge_tts。
     """
 
     capabilities = COSYVOICE_CAPABILITIES
@@ -66,15 +79,17 @@ class RealHumanProvider(TTSProvider):
         api_url: str,
         timeout_sec: int = _DEFAULT_TIMEOUT_SEC,
         max_retries: int = 2,
+        model: str = _DEFAULT_MODEL,
     ):
         self.api_url = api_url.rstrip("/")
         self.timeout_sec = timeout_sec
         self.max_retries = max_retries
+        self.model = model
         self._session = _requests.Session()
-        self._session.headers.update({"Accept": "application/json"})
+        self._session.headers.update({"Accept": "*/*"})
 
     def supports_multi_segment(self) -> bool:
-        return False  # 每次请求合成单一 speaker 的一段文本
+        return False
 
     def available_voices(self, language: str) -> list[VoiceSpec]:
         from demo_app.voice_resolver import COSYVOICE_VOICE_CATALOG
@@ -90,94 +105,45 @@ class RealHumanProvider(TTSProvider):
 
     # ── 底层 HTTP（同步，在 run_in_executor 线程中调用） ──────────────────────
 
-    def _post_tts_async(self, text: str, spk_id: str, speed: float = 1.0) -> str:
+    def _call_speech_v1(
+        self,
+        text: str,
+        voice_id: str,
+        speed: float,
+        output_path: Path,
+    ) -> None:
         """
-        POST /api/tts/async 提交合成任务。
-        返回 task_id 字符串。
+        POST /v1/audio/speech → 直接写入 WAV 文件。
+        抛出异常由调用方捕获并分类。
         """
-        url = f"{self.api_url}/api/tts/async"
-        data = {
-            "text":   text,
-            "mode":   "zero_shot",
-            "spk_id": spk_id,
-            "speed":  str(speed),
+        url = f"{self.api_url}/v1/audio/speech"
+        payload = {
+            "model":           self.model,
+            "input":           text,
+            "voice":           voice_id,
+            "response_format": "wav",
+            "speed":           speed,
         }
-        resp = self._session.post(url, data=data, timeout=30)
-        resp.raise_for_status()
-        result = resp.json()
-        # 兼容多种可能的 key 名
-        task_id = (
-            result.get("task_id")
-            or result.get("job_id")
-            or result.get("id")
-            or result.get("taskId")
+        resp = self._session.post(
+            url,
+            json=payload,
+            timeout=self.timeout_sec,
         )
-        if not task_id:
-            raise RuntimeError(f"CosyVoice 未返回 task_id，响应: {result}")
-        logger.debug("[cosyvoice] 提交 ✓ task_id=%s text_len=%d", task_id, len(text))
-        return str(task_id)
-
-    def _get_task_status(self, task_id: str) -> dict:
-        """GET /api/task/{task_id} 查询任务状态。"""
-        url = f"{self.api_url}/api/task/{task_id}"
-        resp = self._session.get(url, timeout=10)
         resp.raise_for_status()
-        return resp.json()
 
-    def _download_audio(self, filename: str, output_path: Path) -> None:
-        """GET /api/download/{filename} 下载音频到本地路径。"""
-        url = f"{self.api_url}/api/download/{filename}"
-        resp = self._session.get(url, timeout=30, stream=True)
-        resp.raise_for_status()
+        # 校验是否为音频内容
+        content_type = resp.headers.get("Content-Type", "")
+        if resp.content and len(resp.content) < 100:
+            raise RuntimeError(
+                f"/v1/audio/speech 返回内容过小（{len(resp.content)} bytes），"
+                f"Content-Type={content_type}，body={resp.content[:200]}"
+            )
+
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, "wb") as f:
-            for chunk in resp.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-        size = output_path.stat().st_size if output_path.exists() else 0
-        logger.debug("[cosyvoice] 下载 ✓ %s → %s (%d bytes)", filename, output_path.name, size)
-
-    def _poll_until_done(self, task_id: str) -> tuple[str, int]:
-        """
-        同步轮询直到任务完成或超时。
-        返回 (filename, poll_count)。
-        """
-        elapsed = 0.0
-        poll_count = 0
-        while elapsed < self.timeout_sec:
-            status_resp = self._get_task_status(task_id)
-            poll_count += 1
-            status = str(status_resp.get("status", "")).lower()
-
-            if status in ("completed", "done", "success", "finished"):
-                filename = (
-                    status_resp.get("filename")
-                    or status_resp.get("file")
-                    or status_resp.get("result_file")
-                    or status_resp.get("output_file")
-                    or status_resp.get("output")
-                )
-                if not filename:
-                    raise RuntimeError(
-                        f"CosyVoice task={task_id} 完成但无 filename，响应: {status_resp}"
-                    )
-                logger.debug(
-                    "[cosyvoice] 轮询 ✓ task_id=%s poll=%d filename=%s",
-                    task_id, poll_count, filename,
-                )
-                return str(filename), poll_count
-
-            if status in ("failed", "error"):
-                raise RuntimeError(
-                    f"CosyVoice task={task_id} 失败: "
-                    f"{status_resp.get('error') or status_resp.get('message') or status_resp}"
-                )
-
-            time.sleep(_DEFAULT_POLL_INTERVAL)
-            elapsed += _DEFAULT_POLL_INTERVAL
-
-        raise TimeoutError(
-            f"CosyVoice task={task_id} 超时 {self.timeout_sec}s（已 poll {poll_count} 次）"
+        output_path.write_bytes(resp.content)
+        logger.debug(
+            "[cosyvoice] /v1/audio/speech ✓ voice=%s text_len=%d size=%d bytes",
+            voice_id, len(text), len(resp.content),
         )
 
     # ── 主合成接口 ────────────────────────────────────────────────────────────
@@ -191,79 +157,40 @@ class RealHumanProvider(TTSProvider):
         """
         t0 = time.monotonic()
         text = "".join(request.segments)
-        spk_id = request.voice_spec.voice_id
+        voice_id = request.voice_spec.voice_id
+        speed = request.voice_spec.speed
         request_chars = len(text)
 
-        if not spk_id:
+        if not voice_id:
             return self._make_error_result(
                 request, "param_error", "voice_id 为空，无法调用 CosyVoice",
                 t0, request_chars,
             )
 
         loop = asyncio.get_event_loop()
-        task_id: Optional[str] = None
 
-        # ── Phase 1: 提交 ─────────────────────────────────────────────────────
         try:
-            task_id = await loop.run_in_executor(
+            await loop.run_in_executor(
                 None,
-                lambda: self._post_tts_async(text, spk_id, request.voice_spec.speed),
+                lambda: self._call_speech_v1(text, voice_id, speed, output_path),
             )
         except Exception as exc:
             return self._classify_error(request, exc, t0, request_chars)
 
-        submit_ms = int((time.monotonic() - t0) * 1000)
-        t1 = time.monotonic()
-
-        # ── Phase 2: 轮询 ─────────────────────────────────────────────────────
-        filename: Optional[str] = None
-        poll_count = 0
-        try:
-            filename, poll_count = await loop.run_in_executor(
-                None, lambda: self._poll_until_done(task_id)
-            )
-        except TimeoutError as exc:
-            return self._make_error_result(
-                request, "timeout", str(exc), t0, request_chars,
-                job_id=task_id, submit_ms=submit_ms,
-            )
-        except Exception as exc:
-            return self._classify_error(
-                request, exc, t0, request_chars,
-                job_id=task_id, submit_ms=submit_ms,
-            )
-
-        t2 = time.monotonic()
-
-        # ── Phase 3: 下载 ─────────────────────────────────────────────────────
-        try:
-            await loop.run_in_executor(
-                None, lambda: self._download_audio(filename, output_path)
-            )
-        except Exception as exc:
-            return self._make_error_result(
-                request, "provider_error", f"下载失败: {exc}", t0, request_chars,
-                job_id=task_id, submit_ms=submit_ms, poll_count=poll_count,
-            )
-
-        download_ms = int((time.monotonic() - t2) * 1000)
         total_ms = int((time.monotonic() - t0) * 1000)
 
-        # ── 验证文件非空 ──────────────────────────────────────────────────────
+        # 最终校验
         file_size = output_path.stat().st_size if output_path.exists() else 0
         if file_size < 100:
             return self._make_error_result(
                 request, "empty_audio",
                 f"音频文件过小（{file_size} bytes），可能合成失败",
                 t0, request_chars,
-                job_id=task_id, submit_ms=submit_ms, poll_count=poll_count,
             )
 
         logger.info(
-            "[cosyvoice] ✅ speaker=%s chars=%d task_id=%s "
-            "submit=%dms poll=%d download=%dms total=%dms",
-            request.speaker, request_chars, task_id,
-            submit_ms, poll_count, download_ms, total_ms,
+            "[cosyvoice] ✅ speaker=%s chars=%d voice=%s total=%dms size=%d",
+            request.speaker, request_chars, voice_id, total_ms, file_size,
         )
 
         return SynthesisResult(
@@ -275,12 +202,8 @@ class RealHumanProvider(TTSProvider):
             latency_ms=total_ms,
             api_response_code=200,
             request_chars=request_chars,
-            audio_duration_ms=0,      # 由调用方 ffprobe 探针填写
+            audio_duration_ms=0,
             timeline_source="estimated",
-            job_id=task_id,
-            submit_latency_ms=submit_ms,
-            poll_count=poll_count,
-            download_latency_ms=download_ms,
         )
 
     # ── 错误处理辅助 ──────────────────────────────────────────────────────────
@@ -293,8 +216,8 @@ class RealHumanProvider(TTSProvider):
         request_chars: int,
         **kwargs,
     ) -> SynthesisResult:
-        """将 requests 异常分类为六类之一。"""
-        reason = "provider_error"
+        """将 requests 异常分类，返回带诊断信息的失败结果。"""
+        reason = f"provider_error:{type(exc).__name__}"
         if isinstance(exc, _requests.exceptions.Timeout):
             reason = "timeout"
         elif isinstance(exc, _requests.exceptions.HTTPError):
@@ -304,15 +227,12 @@ class RealHumanProvider(TTSProvider):
             elif code in (401, 403):
                 reason = "auth_failure"
             elif code == 400:
-                reason = "param_error"
-            elif 500 <= code < 600:
-                reason = f"provider_error:{type(exc).__name__}"
+                reason = f"param_error:{type(exc).__name__}"
             else:
-                reason = f"http_{code}"
-        else:
-            # 包含具体异常类型，方便诊断（如 ConnectionRefusedError、JSONDecodeError 等）
-            reason = f"provider_error:{type(exc).__name__}"
-        return self._make_error_result(request, reason, str(exc), t0, request_chars, **kwargs)
+                reason = f"http_{code}:{type(exc).__name__}"
+        return self._make_error_result(
+            request, reason, str(exc), t0, request_chars, **kwargs
+        )
 
     def _make_error_result(
         self,
@@ -321,16 +241,13 @@ class RealHumanProvider(TTSProvider):
         msg: str,
         t0: float,
         request_chars: int,
-        job_id: Optional[str] = None,
-        submit_ms: Optional[int] = None,
-        poll_count: Optional[int] = None,
+        **kwargs,
     ) -> SynthesisResult:
         ms = int((time.monotonic() - t0) * 1000)
         logger.warning(
             "[cosyvoice] ❌ speaker=%s reason=%s msg=%s",
             request.speaker, reason, msg,
         )
-        # 截断到 300 字符，避免超大 API 响应体撑爆 tts_meta JSON
         short_msg = msg[:300] + "…" if len(msg) > 300 else msg
         return SynthesisResult(
             request=request,
@@ -343,10 +260,6 @@ class RealHumanProvider(TTSProvider):
             request_chars=request_chars,
             audio_duration_ms=0,
             timeline_source="original",
-            job_id=job_id,
-            submit_latency_ms=submit_ms,
-            poll_count=poll_count,
-            download_latency_ms=None,
             error_msg=short_msg,
         )
 
@@ -375,5 +288,5 @@ def load_real_human_provider(runtime_cfg: dict) -> Optional[RealHumanProvider]:
         timeout_sec=int(tts_cfg.get("timeout_sec", _DEFAULT_TIMEOUT_SEC)),
         max_retries=int(tts_cfg.get("max_retries", 2)),
     )
-    logger.info("[cosyvoice] Provider 就绪，api_url=%s", api_url)
+    logger.info("[cosyvoice] Provider 就绪（/v1/audio/speech），api_url=%s", api_url)
     return provider

@@ -2172,6 +2172,7 @@ async function submitRealHumanTask(workingText, dialogueId) {
   const inputText = normalizeText(workingText);
   if (!inputText) {
     setModalMessage("请先生成或输入对话文本", "error");
+    showToast("err", "请先生成对话文本，再提交真人TTS任务");
     return;
   }
 
@@ -2206,7 +2207,9 @@ async function submitRealHumanTask(workingText, dialogueId) {
       if (typeof startTaskPoll === "function") startTaskPoll();
     }
   } catch (err) {
-    setModalMessage(`提交失败：${err.message || err}`, "error");
+    const msg = `提交失败：${err.message || err}`;
+    setModalMessage(msg, "error");
+    showToast("err", msg);
   } finally {
     state.form.isSubmittingAudio = false;
     renderSubmitState();
@@ -2228,6 +2231,7 @@ async function submitAudioGeneration() {
     // LLM 模式需先生成文本
     if (currentMode() === "llm" && !normalizeText(el.previewText.value)) {
       setModalMessage("请先生成对话文本，再提交真人TTS任务", "error");
+      showToast("err", "请先生成对话文本，再提交真人TTS任务");
       return;
     }
     await submitRealHumanTask(workingText, state.form.dialogueId);
