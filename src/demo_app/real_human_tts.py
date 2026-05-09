@@ -306,7 +306,12 @@ class RealHumanProvider(TTSProvider):
             elif code == 400:
                 reason = "param_error"
             elif 500 <= code < 600:
-                reason = "provider_error"
+                reason = f"provider_error:{type(exc).__name__}"
+            else:
+                reason = f"http_{code}"
+        else:
+            # 包含具体异常类型，方便诊断（如 ConnectionRefusedError、JSONDecodeError 等）
+            reason = f"provider_error:{type(exc).__name__}"
         return self._make_error_result(request, reason, str(exc), t0, request_chars, **kwargs)
 
     def _make_error_result(

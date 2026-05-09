@@ -290,17 +290,19 @@ async def _synthesize_with_real_human(
         seg_mp3  = save_dir / f"_seg_{idx:04d}.mp3"
         result = None
 
+        rh_failure_reason: str | None = None  # 真人合成的原始失败原因（覆盖前保存）
+
         if provider and req.voice_spec.provider == "real_human":
             # 尝试真人合成 → WAV
             result = await provider.synthesize(req, seg_wav)
             if result.degraded:
-                reason = result.degraded_reason or "unknown"
+                rh_failure_reason = result.degraded_reason or "unknown"
                 logger.warning(
                     "[task_runner] real_human 降级 seg=%d speaker=%s reason=%s",
-                    idx, req.speaker, reason,
+                    idx, req.speaker, rh_failure_reason,
                 )
-                fallback_reasons.append(f"seg{idx}:{reason}")
-                # 降级到 edge_tts → MP3
+                fallback_reasons.append(f"seg{idx}:{rh_failure_reason}")
+                # 降级到 edge_tts → MP3（result 会被覆盖，先保存了失败原因）
                 result = await _fallback_edge_tts(req, seg_mp3)
                 seg_files.append(seg_mp3 if (result.audio_path and result.audio_path.exists()) else None)
             else:
@@ -314,8 +316,9 @@ async def _synthesize_with_real_human(
             "segment_idx": idx,
             "speaker": req.speaker,
             "provider_used": result.provider_used if result else "edge_tts",
-            "degraded": result.degraded if result else True,
-            "degraded_reason": result.degraded_reason if result else "no_provider",
+            "degraded": (rh_failure_reason is not None) or (result.degraded if result else True),
+            # 优先显示真人合成的原始失败原因，而不是 edge_tts 降级结果的原因
+            "degraded_reason": rh_failure_reason or (result.degraded_reason if result else "no_provider"),
             "latency_ms": result.latency_ms if result else 0,
             "chars": result.request_chars if result else 0,
             "job_id": result.job_id if result else None,
