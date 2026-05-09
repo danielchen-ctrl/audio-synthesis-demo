@@ -1490,34 +1490,33 @@ function renderDetail(f){
       provider_error:'API错误',empty_audio:'空音频',
       no_provider:'无Provider',
     };
+    function fmtReason(r){
+      if(!r) return '';
+      // 处理复合原因如 "provider_error:RuntimeError"
+      if(r.includes(':')){
+        const [base,...rest]=r.split(':');
+        const baseZh=REASON_ZH[base]||base;
+        return baseZh+' ('+rest.join(':')+ ')';
+      }
+      return REASON_ZH[r]||r;
+    }
     const rows=ttsMeta.map(s=>{
       const ok=!s.degraded;
       const icon=ok?'✅':'⚠️';
-      const reason=s.degraded_reason?( REASON_ZH[s.degraded_reason]||s.degraded_reason ):'';
+      const reason=fmtReason(s.degraded_reason);
       const provider=s.provider_used||'—';
       const latency=s.latency_ms?s.latency_ms+'ms':'—';
+      // 错误消息行（仅失败段落）
+      const errRow=(!ok && s.error_msg)?`<tr>
+        <td colspan="5" style="padding:2px 8px 6px 32px;font-size:11px;color:var(--danger);font-family:monospace;word-break:break-all;opacity:.85">${esc(s.error_msg)}</td>
+      </tr>`:'';
       return`<tr>
         <td style="padding:4px 8px;font-size:12px">${icon}</td>
         <td style="padding:4px 8px;font-size:12px">${esc(s.speaker||('段'+s.segment_idx))}</td>
         <td style="padding:4px 8px;font-size:12px;color:${ok?'var(--success)':'var(--warning)'}">${provider}</td>
         <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${esc(reason)}</td>
         <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${latency}</td>
-      </tr>`;
-    }).join('');
-    ttsMetaHtml=`
-      <div class="meta-section detail-meta-full" style="margin-top:0">
-        <h4 style="margin-bottom:8px">🎤 TTS 合成诊断</h4>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead><tr style="color:var(--text3)">
-            <th style="padding:4px 8px;text-align:left;font-weight:500"></th>
-            <th style="padding:4px 8px;text-align:left;font-weight:500">说话人</th>
-            <th style="padding:4px 8px;text-align:left;font-weight:500">实际引擎</th>
-            <th style="padding:4px 8px;text-align:left;font-weight:500">降级原因</th>
-            <th style="padding:4px 8px;text-align:left;font-weight:500">耗时</th>
-          </tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>`;
+      </tr>${errRow}`;
   }
 
   document.getElementById('detail-body').innerHTML=`

@@ -89,6 +89,8 @@ class SynthesisResult:
     submit_latency_ms: Optional[int] = None
     poll_count: Optional[int] = None
     download_latency_ms: Optional[int] = None
+    # 失败时的原始错误消息（截断到 300 字符，方便 tts_meta 诊断）
+    error_msg: Optional[str] = None
 
 
 @dataclass

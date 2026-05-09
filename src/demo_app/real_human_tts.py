@@ -330,6 +330,8 @@ class RealHumanProvider(TTSProvider):
             "[cosyvoice] ❌ speaker=%s reason=%s msg=%s",
             request.speaker, reason, msg,
         )
+        # 截断到 300 字符，避免超大 API 响应体撑爆 tts_meta JSON
+        short_msg = msg[:300] + "…" if len(msg) > 300 else msg
         return SynthesisResult(
             request=request,
             audio_path=None,
@@ -345,6 +347,7 @@ class RealHumanProvider(TTSProvider):
             submit_latency_ms=submit_ms,
             poll_count=poll_count,
             download_latency_ms=None,
+            error_msg=short_msg,
         )
 
 

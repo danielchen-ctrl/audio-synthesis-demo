@@ -291,12 +291,14 @@ async def _synthesize_with_real_human(
         result = None
 
         rh_failure_reason: str | None = None  # 真人合成的原始失败原因（覆盖前保存）
+        rh_error_msg: str | None = None       # 真人合成的原始错误消息（含 API 实际响应）
 
         if provider and req.voice_spec.provider == "real_human":
             # 尝试真人合成 → WAV
             result = await provider.synthesize(req, seg_wav)
             if result.degraded:
                 rh_failure_reason = result.degraded_reason or "unknown"
+                rh_error_msg = result.error_msg
                 logger.warning(
                     "[task_runner] real_human 降级 seg=%d speaker=%s reason=%s",
                     idx, req.speaker, rh_failure_reason,
@@ -319,6 +321,8 @@ async def _synthesize_with_real_human(
             "degraded": (rh_failure_reason is not None) or (result.degraded if result else True),
             # 优先显示真人合成的原始失败原因，而不是 edge_tts 降级结果的原因
             "degraded_reason": rh_failure_reason or (result.degraded_reason if result else "no_provider"),
+            # 真人合成失败时，保存原始错误消息（含 API 实际响应，方便诊断接口格式问题）
+            "error_msg": rh_error_msg if rh_failure_reason else None,
             "latency_ms": result.latency_ms if result else 0,
             "chars": result.request_chars if result else 0,
             "job_id": result.job_id if result else None,
