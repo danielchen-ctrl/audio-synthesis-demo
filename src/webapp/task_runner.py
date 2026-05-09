@@ -226,6 +226,60 @@ async def _concat_audio_segments(seg_files: list[Path], output_path: Path) -> No
         Path(list_file).unlink(missing_ok=True)
 
 
+async def _synthesize_one_segment(
+    idx: int,
+    req: Any,
+    provider: Any,
+    save_dir: Path,
+    semaphore: asyncio.Semaphore,
+) -> tuple:
+    """
+    并发工作单元：合成单个段落，带 Semaphore 限流。
+    返回 (idx, result, seg_file, rh_failure_reason, rh_error_msg)。
+    所有异常均在内部消化，不向外抛出。
+    """
+    seg_wav = save_dir / f"_seg_{idx:04d}.wav"
+    seg_mp3 = save_dir / f"_seg_{idx:04d}.mp3"
+    rh_failure_reason: str | None = None
+    rh_error_msg: str | None = None
+    seg_file: Path | None = None
+
+    async with semaphore:
+        try:
+            if provider and req.voice_spec.provider == "real_human":
+                result = await provider.synthesize(req, seg_wav)
+                if result.degraded:
+                    rh_failure_reason = result.degraded_reason or "unknown"
+                    rh_error_msg = result.error_msg
+                    logger.warning(
+                        "[task_runner] real_human 降级 seg=%d speaker=%s reason=%s",
+                        idx, req.speaker, rh_failure_reason,
+                    )
+                    result = await _fallback_edge_tts(req, seg_mp3)
+                    seg_file = seg_mp3 if (result.audio_path and result.audio_path.exists()) else None
+                else:
+                    seg_file = seg_wav
+            else:
+                # 直接走 edge_tts（语言无真人音色 or provider 未配置）
+                result = await _fallback_edge_tts(req, seg_mp3)
+                seg_file = seg_mp3 if (result.audio_path and result.audio_path.exists()) else None
+        except Exception as exc:
+            logger.error("[task_runner] seg=%d 合成异常: %s", idx, exc)
+            from demo_app.tts_provider import SynthesisResult
+            result = SynthesisResult(
+                request=req, audio_path=None, provider_used="edge_tts",
+                degraded=True, degraded_reason="provider_error",
+                latency_ms=0, api_response_code=None,
+                request_chars=len("".join(req.segments)),
+                audio_duration_ms=0, timeline_source="original",
+                error_msg=str(exc)[:300],
+            )
+            rh_failure_reason = "provider_error"
+            rh_error_msg = str(exc)[:300]
+
+    return idx, result, seg_file, rh_failure_reason, rh_error_msg
+
+
 async def _synthesize_with_real_human(
     line_tuples: list[tuple[str, str]],
     language: str,
@@ -235,7 +289,8 @@ async def _synthesize_with_real_human(
     output_format: str = "mp3",
 ) -> dict:
     """
-    使用 RealHumanProvider (CosyVoice) 逐段合成。
+    使用 RealHumanProvider (CosyVoice) 并发合成所有段落。
+    - asyncio.gather 并发，Semaphore 限流（默认 5 路）
     - 每段独立合成，失败时自动降级到 edge_tts
     - 返回与 _synthesize_audio_from_lines 兼容的结果字典（含 tts_meta）
     """
@@ -271,6 +326,15 @@ async def _synthesize_with_real_human(
             "降级到全量 edge_tts"
         )
 
+    # ── 并发度配置 ────────────────────────────────────────────────────────────
+    max_concurrency = int(
+        _load_runtime_cfg()
+        .get("tts", {})
+        .get("real_human", {})
+        .get("max_concurrency", 5)
+    )
+    semaphore = asyncio.Semaphore(max_concurrency)
+
     # ── 构建 SynthesisRequest 列表（段落合并） ────────────────────────────────
     synthesis_requests = build_synthesis_requests(
         line_tuples,
@@ -280,48 +344,33 @@ async def _synthesize_with_real_human(
         effective_provider=effective_provider,
     )
 
+    # ── 并发合成所有段落 ──────────────────────────────────────────────────────
+    tasks = [
+        _synthesize_one_segment(idx, req, provider, save_dir, semaphore)
+        for idx, req in enumerate(synthesis_requests)
+    ]
+    raw_results = await asyncio.gather(*tasks)
+
+    # 按原始顺序排列（gather 顺序已确定，但防御性排序）
+    raw_results = sorted(raw_results, key=lambda r: r[0])
+
+    # ── 组装结果列表 ──────────────────────────────────────────────────────────
     seg_files: list[Path | None] = []
     tts_meta: list[dict] = []
     fallback_reasons: list[str] = []
 
-    # ── 逐段合成 ─────────────────────────────────────────────────────────────
-    for idx, req in enumerate(synthesis_requests):
-        seg_wav  = save_dir / f"_seg_{idx:04d}.wav"
-        seg_mp3  = save_dir / f"_seg_{idx:04d}.mp3"
-        result = None
+    for idx, result, seg_file, rh_failure_reason, rh_error_msg in raw_results:
+        seg_files.append(seg_file)
+        if rh_failure_reason:
+            fallback_reasons.append(f"seg{idx}:{rh_failure_reason}")
 
-        rh_failure_reason: str | None = None  # 真人合成的原始失败原因（覆盖前保存）
-        rh_error_msg: str | None = None       # 真人合成的原始错误消息（含 API 实际响应）
-
-        if provider and req.voice_spec.provider == "real_human":
-            # 尝试真人合成 → WAV
-            result = await provider.synthesize(req, seg_wav)
-            if result.degraded:
-                rh_failure_reason = result.degraded_reason or "unknown"
-                rh_error_msg = result.error_msg
-                logger.warning(
-                    "[task_runner] real_human 降级 seg=%d speaker=%s reason=%s",
-                    idx, req.speaker, rh_failure_reason,
-                )
-                fallback_reasons.append(f"seg{idx}:{rh_failure_reason}")
-                # 降级到 edge_tts → MP3（result 会被覆盖，先保存了失败原因）
-                result = await _fallback_edge_tts(req, seg_mp3)
-                seg_files.append(seg_mp3 if (result.audio_path and result.audio_path.exists()) else None)
-            else:
-                seg_files.append(seg_wav)
-        else:
-            # 直接走 edge_tts（语言无真人音色 or provider 未配置）
-            result = await _fallback_edge_tts(req, seg_mp3)
-            seg_files.append(seg_mp3 if (result.audio_path and result.audio_path.exists()) else None)
-
+        req = synthesis_requests[idx]
         tts_meta.append({
             "segment_idx": idx,
             "speaker": req.speaker,
             "provider_used": result.provider_used if result else "edge_tts",
             "degraded": (rh_failure_reason is not None) or (result.degraded if result else True),
-            # 优先显示真人合成的原始失败原因，而不是 edge_tts 降级结果的原因
             "degraded_reason": rh_failure_reason or (result.degraded_reason if result else "no_provider"),
-            # 真人合成失败时，保存原始错误消息（含 API 实际响应，方便诊断接口格式问题）
             "error_msg": rh_error_msg if rh_failure_reason else None,
             "latency_ms": result.latency_ms if result else 0,
             "chars": result.request_chars if result else 0,

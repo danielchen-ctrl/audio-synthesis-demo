@@ -20,6 +20,7 @@ tts:
     api_url: "http://10.0.20.10:8188"  # CosyVoice API 地址（LAN 内网）
     timeout_sec: 60
     max_retries: 2
+    max_concurrency: 5                 # 并发合成段落数上限（同时发起的 /v1/audio/speech 请求数）
 
   # 已注册克隆音色（同步自 voice_resolver.COSYVOICE_VOICE_CATALOG）
   voice_catalog:
