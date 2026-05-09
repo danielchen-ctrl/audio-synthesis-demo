@@ -1043,7 +1043,14 @@ function debounceLoad(key){clearTimeout(_debounceTimers[key]);_debounceTimers[ke
 function getFolderName(id){if(!id)return '根目录';const f=_allFolders.find(x=>x.folder_id===id);return f?f.name:id;}
 
 // ══ Navigation ═══════════════════════════════════════════════════════════════
+function stopDetailAudio(){
+  const a=document.getElementById('det-audio');
+  if(a&&!a.paused){a.pause();a.currentTime=0;}
+  const b=document.getElementById('det-play');if(b)b.textContent='▶';
+  const w=document.getElementById('det-wave');if(w)w.classList.remove('playing');
+}
 function goTo(p,opts){
+  if(p!=='detail')stopDetailAudio();   // 离开详情页时停止播放
   ['home','myaudio','tasks','trash','detail'].forEach(x=>{
     document.getElementById('page-'+x).classList.toggle('hidden',x!==p);
   });
@@ -1472,6 +1479,47 @@ function renderDetail(f){
           </div>
         </div>`;
 
+  // tts_meta 段落诊断区块（仅真人TTS任务有数据）
+  let ttsMeta=[];try{ttsMeta=JSON.parse(f.tts_meta||'[]');}catch(e){}
+  let ttsMetaHtml='';
+  if(ttsMeta.length){
+    const REASON_ZH={
+      real_human_fallback:'降级→edge_tts',
+      timeout:'超时',rate_limit:'限流',
+      auth_failure:'鉴权失败',param_error:'参数错误',
+      provider_error:'API错误',empty_audio:'空音频',
+      no_provider:'无Provider',
+    };
+    const rows=ttsMeta.map(s=>{
+      const ok=!s.degraded;
+      const icon=ok?'✅':'⚠️';
+      const reason=s.degraded_reason?( REASON_ZH[s.degraded_reason]||s.degraded_reason ):'';
+      const provider=s.provider_used||'—';
+      const latency=s.latency_ms?s.latency_ms+'ms':'—';
+      return`<tr>
+        <td style="padding:4px 8px;font-size:12px">${icon}</td>
+        <td style="padding:4px 8px;font-size:12px">${esc(s.speaker||('段'+s.segment_idx))}</td>
+        <td style="padding:4px 8px;font-size:12px;color:${ok?'var(--success)':'var(--warning)'}">${provider}</td>
+        <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${esc(reason)}</td>
+        <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${latency}</td>
+      </tr>`;
+    }).join('');
+    ttsMetaHtml=`
+      <div class="meta-section detail-meta-full" style="margin-top:0">
+        <h4 style="margin-bottom:8px">🎤 TTS 合成诊断</h4>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="color:var(--text3)">
+            <th style="padding:4px 8px;text-align:left;font-weight:500"></th>
+            <th style="padding:4px 8px;text-align:left;font-weight:500">说话人</th>
+            <th style="padding:4px 8px;text-align:left;font-weight:500">实际引擎</th>
+            <th style="padding:4px 8px;text-align:left;font-weight:500">降级原因</th>
+            <th style="padding:4px 8px;text-align:left;font-weight:500">耗时</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
   document.getElementById('detail-body').innerHTML=`
     <div class="detail-wrap">
       <div class="detail-player">${playerHtml}
@@ -1505,6 +1553,7 @@ function renderDetail(f){
             <span class="meta-val" id="dv-tags-wrap" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">${tagHtml}</span>
           </div>
         </div>
+        ${ttsMetaHtml}
       </div>
     </div>`;
   // Store current file data for editing
