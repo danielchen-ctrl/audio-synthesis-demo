@@ -116,9 +116,42 @@ v2 数据存于 `output/training_v2/`，已完成部分：
 
 ---
 
-## 🖥 Platform — Current Status (2026-05-08)
+## 🖥 Platform — Current Status (2026-05-10)
 
-**Phase: Live. Few-shot 索引已升级使用 v3 训练数据，服务器重启后自动加载。**
+**Phase: Live. 真人 TTS Phase 1 已上线。Few-shot 索引使用 v3 训练数据，服务器重启后自动加载。**
+
+### 近期变更（2026-05-10，第三批）
+
+| 文件 | 改动 |
+|------|------|
+| `src/webapp/task_runner.py` | `_concat_audio_segments()`：concat demuxer（`-f concat`）→ **filter_complex concat**（`[0:a][1:a]...concat=n=N:v=0:a=1[aout]`），全段先解码为 PCM 再拼接重编码，对输入格式/采样率差异完全兼容，消除拼接点爆音/跳帧；单片段路径补 `run_in_executor` 避免阻塞事件循环 |
+| `src/webapp/task_runner.py` | `_fallback_edge_tts()`：edge_tts 合成后新增 ffmpeg 重编码步骤（`-ar 44100 -ac 1`），统一降级片段与 real_human 片段的格式，避免 24kHz stereo 混入 44100Hz mono 拼接链；修复 `raw_path.rename()` 在 Windows 目标已存在时报 `FileExistsError`（改为 `replace()`）；修复 `with_suffix(".raw.mp3")` 在 Python 3.12+ 报 `ValueError`（改为 `parent / f"{stem}.raw.mp3"`）；全函数 `get_event_loop` → `get_running_loop` |
+| `src/webapp/task_runner.py` | `_convert_wav_to_mp3()`：重新启用 silenceremove，改用极保守阈值 **-65dB**（原 -40dB 阈值误删正常语音，本次修复）；`start_duration=0.05s`、`stop_duration=0.15s`，仅裁 CosyVoice 数字静音（~-90dB），不影响正常语音（> -40dB） |
+
+### 近期变更（2026-05-10，第二批）
+
+| 文件 | 改动 |
+|------|------|
+| `static/app.js` | 新增 `submitEdgeTtsTask()`：合成音色模式改为提交平台任务队列（非阻塞），与真人音色行为一致；`submitAudioGeneration()` 增加 edge_tts 分支；按钮文案 → "真人音色生成音频" / "合成音色生成音频" |
+| `static/app.js` | `gatherRealHumanVoiceAssignments()`：校验改为对**全局**注册音色验证（允许跨语言显式使用）；`ensureVoiceAssignmentsShape()`：`cycleVoices` 改为 maryzhang 固定排第一（任意语言任务 Speaker1=maryzhang，Speaker2=willwu），确保合成质量最好的音色优先分配给主说话人 |
+| `static/app.js` | 手动模式新增主题输入框：`el.manualTopic`、`readFormFromDom`、`syncFormToDom`、事件监听；`currentTitle()` 已有逻辑，提交时 `topic` 自动使用输入标题 |
+| `static/index.html` | `#manualSection` 新增 `id="manualTopic"` 输入框（主题标题，可选，提交后作为音频文件标题） |
+| `src/demo_app/voice_resolver.py` | `resolve_voice_spec()`：voice_id 校验改为对全局注册音色（跨所有语言），允许跨语言克隆音色显式使用 |
+| `src/webapp/task_runner.py` | `_synthesize_one_segment()`：WAV→MP3 失败时改为降级 edge_tts（不再保留 WAV 进 concat，避免 codec 混合导致逐字播放） |
+| `src/webapp/task_runner.py` | `_convert_wav_to_mp3()`：暂时移除 silenceremove（-40dB 误删正常语音，待后续以保守阈值重新引入） |
+
+### 近期变更（2026-05-10，第一批）
+
+| 文件 | 改动 |
+|------|------|
+| `src/demo_app/tts_provider.py` | 新增：VoiceSpec / SynthesisRequest / SynthesisResult / ProviderCapabilities 数据模型 + TTSProvider ABC |
+| `src/demo_app/real_human_tts.py` | 新增：RealHumanProvider（CosyVoice `/v1/audio/speech`），`_classify_error` 含异常类型名，`error_msg` 字段截断 300 字 |
+| `src/demo_app/voice_resolver.py` | 新增：COSYVOICE_VOICE_CATALOG + resolve_voice_spec + build_synthesis_requests（max_chars=500 段落合并）；`resolve_voice_spec` 初版加语言校验 |
+| `src/webapp/task_runner.py` | `_synthesize_with_real_human`：asyncio.gather 并发 + Semaphore 限流；`_synthesize_one_segment`：单段合成 + 超时重试 + WAV→MP3 转换；`_convert_wav_to_mp3`：`-ar 44100 -ac 1` 统一格式；`_concat_audio_segments`：`-ar 44100 -ac 1` 标准化输出；`list_tasks` JOIN audio_files 获取 file_duration |
+| `src/webapp/db.py` | `list_tasks()` 改为 `LEFT JOIN audio_files` 带回 `file_duration` 字段，任务卡片可显示音频时长 |
+| `config/runtime.yaml` | `tts.real_human.max_concurrency` 3→1（防并发响应串扰）；`timeout_sec` 120；`max_retries` 2；完整 voice_catalog 配置 |
+| `static/app.js` | 新增 `COSYVOICE_VOICE_CATALOG`（中/英）；`ttsEngine` 默认 `"real_human"`；`gatherRealHumanVoiceAssignments` 加语言目录校验；音色标签去掉语言后缀 |
+| `static/index.html` | 真人音色按钮置左并默认选中；tts_meta 诊断表格（含 `error_msg` 红字行）；进度条改为 `onmousedown` 支持拖拽（detail + mini player）；任务卡片显示 `⏱ 时长` |
 
 ### 近期变更（2026-05-08，commit 14eebec9）
 
@@ -204,37 +237,57 @@ Schema per entry:
 
 ---
 
-## 🎙 真人 TTS API 接入 — 规划中（2026-05-07）
+## 🎙 真人 TTS API 接入 — Phase 1 已完成（2026-05-10）
 
-**Phase: 方案已通过审核（v4.1 终版），等待 API 文档后进入 Phase 1 开发。**
+**Phase: Phase 1 全部上线 ✅。CosyVoice `/v1/audio/speech` 端点已接入，中英文真人克隆音色可用。**
 
 完整方案见：[`docs/real-human-tts-integration.md`](docs/real-human-tts-integration.md)
 
-### 方案概要
-
-当前 edge_tts Neural 合成存在拼接感明显、韵律不连贯等问题。方案核心设计：
-
-- **Provider 抽象层**：`EdgeTTSProvider` / `RealHumanProvider` / `BundleProvider` 统一接口，`TTSRouter` 路由
-- **段落合并**：同角色连续句合并为段落请求，消除句间机械停顿
-- **能力分级**：A 档（整段多 speaker）/ B 档（段落单 speaker）/ C 档（单句），按 `ProviderCapabilities` 字段驱动，不靠字符串硬判断
-- **tts_meta**：`audio_files` 表新增 JSON 字段，逐段记录 provider、耗时、降级原因、时间轴来源
-- **兼容策略**：`voice_map` 只读不写，新任务写 `voice_assignments`；公共 `voice_resolver.py` 兼容两种格式
-
-### 待新增文件（Phase 1 开工后）
+### 已实现文件
 
 ```
 src/demo_app/
-  tts_provider.py      ← TTSProvider 抽象 + TTSRouter + ProviderCapabilities + EdgeTTS/Bundle 迁入
-  real_human_tts.py    ← RealHumanProvider（依赖 API 文档）
-  voice_resolver.py    ← VoiceSpec.from_dict + resolve_voice_spec（新旧格式兼容）
+  tts_provider.py      ← VoiceSpec / SynthesisRequest / SynthesisResult / ProviderCapabilities 数据模型 + TTSProvider ABC
+  real_human_tts.py    ← RealHumanProvider（CosyVoice /v1/audio/speech 同步端点）
+  voice_resolver.py    ← COSYVOICE_VOICE_CATALOG + resolve_voice_spec + build_synthesis_requests
 ```
 
-### 开工前置条件
+### CosyVoice API 关键信息
 
-1. API 文档（接口地址、鉴权、请求/响应格式）
-2. ProviderCapabilities 逐项确认（决定合成粒度）
-3. 音色 ID 列表（至少中/英）
-4. DB 路线：**路线 A（扩列）已确认**
+- **端点**：`POST /v1/audio/speech`（OpenAI-compatible，JSON body → WAV bytes 直接返回）
+- **废弃端点**：`/api/tts/async`（zero_shot 模式需要 `prompt_wav`，仅传 `spk_id` 报 "Invalid file: None"）
+- **请求格式**：`{"model": "cosyvoice-v3", "input": "<text>", "voice": "<voice_id>", "response_format": "wav", "speed": 1.0}`
+- **当前可用音色**（`GET /v1/voices/custom`，2026-05-10 确认）：
+
+| 语言 | voice_id | 名称 | 性别 |
+|------|----------|------|------|
+| Chinese | `36d3429a3c98` | maryzhang | female |
+| English | `c3e9f75ae993` | willwu | male |
+
+新增音色同步修改 `src/demo_app/voice_resolver.py` 的 `COSYVOICE_VOICE_CATALOG` 和 `config/runtime.yaml` 的 `voice_catalog` 以及 `static/app.js` 的 `COSYVOICE_VOICE_CATALOG`（三处保持一致）。
+
+### 真人 TTS 合成流程（`task_runner._synthesize_with_real_human`）
+
+1. 从 DB 读取 `voice_assignments`（JSON）→ `build_synthesis_requests()` 将 `line_tuples` 合并为段落级请求（同 speaker 连续行合并，最大 500 字）
+2. `asyncio.gather` + `asyncio.Semaphore(max_concurrency)` 并发合成（当前 `max_concurrency=1`，串行安全）
+3. 每段调用 `RealHumanProvider.synthesize()` → `_call_speech_v1()` 在 `run_in_executor` 线程中执行 HTTP 请求
+4. 超时时按 `max_retries` 重试（当前配置 2 次）
+5. 最终失败 → `_fallback_edge_tts()` 降级合成
+6. **WAV→MP3 + 静音裁剪**：real_human 成功后调用 `_convert_wav_to_mp3()`，`silenceremove` 过滤器去除头部（≥50ms）和过长尾部静音（保留最多 300ms），`-ar 44100 -ac 1` 统一格式
+7. **WAV→MP3 失败时**：不再保留 WAV 进入 concat（会导致 codec 混合 → 逐字播放），改为降级 edge_tts 确保格式统一
+8. `_concat_audio_segments()` 用 ffmpeg concat demuxer 拼接所有 MP3 片段，`-ar 44100 -ac 1` 标准化输出
+
+### 并发安全注意事项
+
+- **`max_concurrency: 1`（当前默认）**：串行合成，防止 CosyVoice 服务器并发响应串扰（高并发时曾出现响应内容写入错误片段文件，导致音频重复）
+- 若要提速可调为 2，但 ≥3 时 CosyVoice 在负载下偶发响应混淆
+- WAV 和 MP3 **绝对不能混合** concat：ffmpeg concat demuxer 要求所有输入 codec 相同，WAV(pcm)/MP3 混合会导致逐字播放或噪音。WAV→MP3 失败时必须降级 edge_tts，不可将 WAV 放入 concat 列表
+
+### voice_id 音色分配规则
+
+**自动分配（`ensureVoiceAssignmentsShape`）**：`cycleVoices` 优先从当前任务语言的目录循环，防止英语任务自动分配到中文音色（maryzhang 合成英文会逐字发音甚至输出中文）。当前语言无专属音色时扩展到全局。
+
+**显式选择验证（`gatherRealHumanVoiceAssignments` + `voice_resolver.resolve_voice_spec`）**：只要 voice_id 在全局注册音色中存在即合法（跨语言显式使用允许，如用 willwu 合成中文）。真正无效的 voice_id（未注册）才被替换为默认音色。
 
 ---
 
@@ -324,11 +377,14 @@ src/
     training_few_shot.py           ← retrieves topic-matched samples from training output
     multilingual_naturalness.py    ← three-pass LLM post-processing (repair → keywords → stabilize)
     rule_loader.py                 ← lru_cache loader for the three YAML rule files in config/
+    tts_provider.py                ← TTS 数据模型（VoiceSpec/SynthesisRequest/SynthesisResult）+ TTSProvider ABC
+    real_human_tts.py              ← RealHumanProvider：CosyVoice /v1/audio/speech 接入
+    voice_resolver.py              ← COSYVOICE_VOICE_CATALOG + resolve_voice_spec + build_synthesis_requests
   webapp/
-    db.py                          ← SQLite helpers (audio_files, tasks, folders tables)
+    db.py                          ← SQLite helpers (audio_files, tasks, folders tables)；list_tasks JOIN file_duration
     handlers.py                    ← all /api/platform/* Tornado handlers
     routes.py                      ← PLATFORM_ROUTES list + register_platform_routes()
-    task_runner.py                 ← background task worker (enqueue / poll loop)
+    task_runner.py                 ← background task worker；含 _synthesize_with_real_human 真人TTS合成路径
 static/
   index.html                       ← single-page platform UI (nav + modals + platform pages)
   app.js                           ← ~100KB: generation modal logic, state machine
@@ -381,16 +437,16 @@ Three tables in `runtime/platform.db`:
 | `tasks` | task_id, status, generation_mode, topic, language, people_count, word_count, error_msg, file_id, voice_map, output_format, keywords, template, custom_prompt, input_text, include_scripts | statuses: queued → generating_text → synthesizing → completed / failed；参数拆列存储（无 params_json） |
 | `folders` | folder_id, name, parent_id | used to group files in 我的文件 view |
 
-**待新增列（真人 TTS Phase 1 开工时迁移）：**
+**Phase 1 已新增列（`db._run_tts_migration()` 幂等执行）：**
 
 | 表 | 列 | 说明 |
 |----|----|------|
-| `tasks` | `tts_provider` TEXT DEFAULT 'edge_tts' | 期望 provider |
+| `tasks` | `tts_provider` TEXT DEFAULT 'edge_tts' | 期望 provider（`edge_tts` / `real_human`） |
 | `tasks` | `tts_fallback_strategy` TEXT DEFAULT 'edge_then_bundle' | 降级策略 |
-| `tasks` | `voice_assignments` TEXT DEFAULT '{}' | 新格式音色参数 JSON |
-| `audio_files` | `tts_meta` TEXT DEFAULT NULL | 逐段降级详情 JSON |
+| `tasks` | `voice_assignments` TEXT DEFAULT '{}' | 新格式音色参数 JSON，格式：`{"1": {"provider":"real_human","voice_id":"36d3429a3c98"}}` |
+| `audio_files` | `tts_meta` TEXT DEFAULT NULL | 逐段合成诊断 JSON（provider、latency、degraded_reason、error_msg 等） |
 
-迁移由 `db._run_tts_migration()` 幂等执行（PRAGMA table_info 检查后再 ALTER TABLE）。
+`list_tasks()` 通过 `LEFT JOIN audio_files` 附带 `file_duration` 字段（用于任务卡片时长显示），不影响其他查询。
 
 `src/webapp/db.py` provides all helpers; `src/webapp/task_runner.py` polls for queued tasks and drives them through the status machine.
 
@@ -451,11 +507,12 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 56 working voices across 13 languages (28 deprecated voices removed 2026-05-07). Backend auto-assignment uses `VOICE_CATALOG`; frontend dropdown uses `VOICE_LIBRARY` in `app.js`. Both were updated in the same audit.
 
 **Platform task generation (`POST /api/platform/tasks` → task worker)**
-1. Payload params stored as individual columns in DB (no params_json), status set to `queued`
+1. Payload params stored as individual columns in DB (no params_json), status set to `queued`；`tts_provider`（edge_tts / real_human）、`voice_assignments`（JSON）同步写入
 2. `src/webapp/task_runner.py` polling loop picks up queued tasks
-3. Calls same internal generate + synthesise pipeline
-4. On success: writes audio to `storage/generated/`, updates DB with result path; if `audio_result["warning"]` is set, stores `error_msg="[TTS_WARN] ..."` to surface fallback in UI
-5. On failure: stores error_msg, sets status `failed`
+3. **edge_tts 路径**：调用 `_synthesize_audio_from_lines()`（legacy pipeline）
+4. **real_human 路径**（`tts_provider == "real_human"`）：调用 `_synthesize_with_real_human()` → `build_synthesis_requests` 合并段落 → asyncio.gather + Semaphore 并发合成 → WAV→MP3 格式统一 → ffmpeg concat
+5. On success: writes audio to `storage/generated/`，`tts_meta` JSON 写入 DB；if `audio_result["warning"]` is set, stores `error_msg="[TTS_WARN] ..."` 显示橙色降级警告
+6. On failure: stores error_msg, sets status `failed`
 
 ### Key global state in `embedded_server_main.py`
 

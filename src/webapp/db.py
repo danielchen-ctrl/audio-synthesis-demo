@@ -176,7 +176,10 @@ def get_task(task_id: str) -> dict | None:
 def list_tasks(limit: int = 50, offset: int = 0) -> list[dict]:
     with _conn() as c:
         rows = c.execute(
-            "SELECT * FROM tasks ORDER BY created_at DESC LIMIT ? OFFSET ?",
+            """SELECT t.*, af.duration AS file_duration
+               FROM tasks t
+               LEFT JOIN audio_files af ON t.file_id = af.file_id
+               ORDER BY t.created_at DESC LIMIT ? OFFSET ?""",
             (limit, offset),
         ).fetchall()
     return [dict(r) for r in rows]

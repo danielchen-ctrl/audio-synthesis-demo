@@ -273,6 +273,7 @@ const el = {
   wordCountLimit: document.getElementById("wordCountLimit"),
   keywordWrap: document.getElementById("keywordWrap"),
   keywordInput: document.getElementById("keywordInput"),
+  manualTopic: document.getElementById("manualTopic"),
   manualLanguage: document.getElementById("manualLanguage"),
   manualText: document.getElementById("manualText"),
   speakerCount: document.getElementById("speakerCount"),
@@ -757,11 +758,17 @@ function setTtsEngine(engine) {
  */
 function gatherRealHumanVoiceAssignments() {
   const lang = currentLanguageBackend();
-  const catalog = COSYVOICE_VOICE_CATALOG[lang] || [];
-  if (!catalog.length) return {};
+  const langCatalog = COSYVOICE_VOICE_CATALOG[lang] || [];
+  // 全局已注册音色（跨语言可用，CosyVoice zero_shot 支持跨语言合成）
+  const allVoices = allRealHumanVoices();
+  if (!allVoices.length) return {};
+  const allVoiceIds = new Set(allVoices.map(v => v.value));
+  // 回退优先用当前语言的第一个音色，否则用全局第一个
+  const fallbackVoiceId = (langCatalog[0] || allVoices[0])?.value || "";
   const assignments = {};
   for (let s = 1; s <= speakerCountValue(); s++) {
-    const voiceId = state.form.voiceAssignments[String(s)] || catalog[0].value;
+    const storedId = state.form.voiceAssignments[String(s)];
+    const voiceId = (storedId && allVoiceIds.has(storedId)) ? storedId : fallbackVoiceId;
     if (voiceId) {
       assignments[String(s)] = { provider: "real_human", voice_id: voiceId };
     }
@@ -857,6 +864,7 @@ function readFormFromDom() {
   state.form.customPrompt = el.customPrompt.value;
   state.form.llmLanguage = el.llmLanguage.value;
   state.form.wordCountLimit = el.wordCountLimit.value;
+  state.form.manualTopic = el.manualTopic ? el.manualTopic.value.trim() : "";
   state.form.manualLanguage = el.manualLanguage.value;
   state.form.manualText = el.manualText.value;
   state.form.speakerCount = speakerCountValue();
@@ -879,6 +887,7 @@ function syncFormToDom() {
   el.wordCountLimit.min = String(wordCountRange().min);
   el.wordCountLimit.max = String(wordCountRange().max);
   el.wordCountLimit.value = state.form.wordCountLimit || defaultWordCountLimit();
+  if (el.manualTopic) el.manualTopic.value = state.form.manualTopic || "";
   el.manualLanguage.value = state.form.manualLanguage || LANGUAGE_OPTIONS[0].backend;
   el.manualText.value = state.form.manualText || "";
   el.speakerCount.value = String(state.form.speakerCount || 2);
@@ -1072,10 +1081,33 @@ function renderPresetTopics() {
 }
 
 function ensureVoiceAssignmentsShape() {
+  // voices：全部可选音色（用于合法性校验，允许用户明确选择跨语言音色）
   const voices = activeVoiceOptions().map((item) => item.value);
   const count = speakerCountValue();
   const prevCount = Object.keys(state.form.voiceAssignments).length;
   const nextAssignments = {};
+
+  // cycleVoices：自动分配时的循环池。
+  // 真人音色模式：maryzhang 合成质量最稳定，始终排第一（Speaker 1 优先分到最好的音色）。
+  // 剩余说话人依次分配其他音色；超出音色数量时循环复用。
+  // 例：2 人任务 → Speaker1=maryzhang, Speaker2=willwu（任意语言任务均如此）
+  //     3 人任务 → Speaker1=maryzhang, Speaker2=willwu, Speaker3=maryzhang
+  const PREFERRED_VOICE_ID = "36d3429a3c98"; // maryzhang — 当前最佳克隆音色，固定排第一
+  let cycleVoices = voices;
+  if (state.form.ttsEngine === "real_human" && voices.length > 0) {
+    if (voices.includes(PREFERRED_VOICE_ID)) {
+      const others = voices.filter(v => v !== PREFERRED_VOICE_ID);
+      cycleVoices = [PREFERRED_VOICE_ID, ...others];
+    } else {
+      // maryzhang 不可用时回退：当前语言音色在前，其余语言音色补后
+      const lang = currentLanguageBackend();
+      const langVoiceIds = (COSYVOICE_VOICE_CATALOG[lang] || []).map(v => v.value);
+      if (langVoiceIds.length > 0) {
+        const otherVoiceIds = voices.filter(v => !langVoiceIds.includes(v));
+        cycleVoices = [...langVoiceIds, ...otherVoiceIds];
+      }
+    }
+  }
 
   if (!voices.length) {
     // 无可用音色（如真人模式下该语言无克隆音色）— 清空，行数保持
@@ -1083,17 +1115,17 @@ function ensureVoiceAssignmentsShape() {
       nextAssignments[String(speaker)] = "";
     }
   } else if (prevCount !== count) {
-    // 人数变化：对所有说话人重新分配，循环不同音色
+    // 人数变化：对所有说话人重新分配，循环当前语言音色
     for (let speaker = 1; speaker <= count; speaker += 1) {
-      nextAssignments[String(speaker)] = voices[(speaker - 1) % voices.length] || "";
+      nextAssignments[String(speaker)] = cycleVoices[(speaker - 1) % cycleVoices.length] || "";
     }
   } else {
-    // 人数未变：保留已有合法音色，仅修复无效项
+    // 人数未变：保留已有合法音色（包括用户明确选择的跨语言音色），仅修复无效项
     for (let speaker = 1; speaker <= count; speaker += 1) {
       const current = state.form.voiceAssignments[String(speaker)];
       nextAssignments[String(speaker)] = voices.includes(current)
         ? current
-        : voices[(speaker - 1) % voices.length] || "";
+        : cycleVoices[(speaker - 1) % cycleVoices.length] || "";
     }
   }
   state.form.voiceAssignments = nextAssignments;
@@ -1196,11 +1228,11 @@ function renderSubmitState() {
   el.closeModalBtn.disabled = busy;
   el.voiceWarning.classList.toggle("hidden", allVoicesSelected());
   el.generateTextBtn.textContent = state.form.isGeneratingText ? "正在生成文本..." : "✨ 生成对话文本";
-  // 真人音色模式下提交按钮文案提示后台任务
+  // 根据 TTS 引擎更新提交按钮文案
   if (!state.form.isSubmittingAudio) {
     el.submitAudioBtn.textContent = state.form.ttsEngine === "real_human"
-      ? "🎤 提交真人TTS任务"
-      : "🎵 生成音频";
+      ? "🎤 真人音色生成音频"
+      : "🎵 合成音色生成音频";
   }
   // 切换 toggle 按钮高亮
   if (el.ttsEdgeBtn && el.ttsRealHumanBtn) {
@@ -2216,6 +2248,61 @@ async function submitRealHumanTask(workingText, dialogueId) {
   }
 }
 
+/**
+ * 合成音色模式：把对话文本作为直接输入任务提交到平台任务队列。
+ * 行为与 submitRealHumanTask 一致：关闭弹窗并跳转到生成任务页。
+ */
+async function submitEdgeTtsTask(workingText) {
+  const topic = currentTitle() || "合成音色生成";
+  const language = currentLanguageBackend();
+  const voiceMap = gatherVoiceAssignments();
+
+  const inputText = normalizeText(workingText);
+  if (!inputText) {
+    setModalMessage("请先生成或输入对话文本", "error");
+    showToast("err", "请先生成对话文本，再提交合成音色任务");
+    return;
+  }
+
+  state.form.isSubmittingAudio = true;
+  setModalMessage("正在提交合成音色任务...", "info");
+  renderSubmitState();
+
+  try {
+    const res = await fetchJson("/api/platform/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        generation_mode: "direct",
+        input_text: inputText,
+        topic,
+        language,
+        people_count: speakerCountValue(),
+        word_count: inputText.length,
+        tts_provider: "edge_tts",
+        tts_fallback_strategy: "edge_then_bundle",
+        voice_map: voiceMap,
+        output_format: (el.outputFormat ? el.outputFormat.value : "MP3").toLowerCase(),
+      })
+    });
+    if (res.ok) {
+      state.modalOpen = false;
+      el.modalOverlay.classList.remove("open");
+      showToast("ok", "🎵 合成音色任务已提交，请在【生成任务】页查看进度");
+      if (typeof goTo === "function") goTo("tasks");
+      if (typeof loadTasks === "function") loadTasks();
+      if (typeof startTaskPoll === "function") startTaskPoll();
+    }
+  } catch (err) {
+    const msg = `提交失败：${err.message || err}`;
+    setModalMessage(msg, "error");
+    showToast("err", msg);
+  } finally {
+    state.form.isSubmittingAudio = false;
+    renderSubmitState();
+  }
+}
+
 async function submitAudioGeneration() {
   readFormFromDom();
   const validationError = validateBeforeSubmit();
@@ -2235,6 +2322,19 @@ async function submitAudioGeneration() {
       return;
     }
     await submitRealHumanTask(workingText, state.form.dialogueId);
+    return;
+  }
+
+  // ── 合成音色模式：同样提交后台任务，非阻塞 ──────────────────────────────
+  if (state.form.ttsEngine === "edge_tts") {
+    const workingText = currentWorkingText();
+    // LLM 模式需先生成文本
+    if (currentMode() === "llm" && !normalizeText(el.previewText.value)) {
+      setModalMessage("请先生成对话文本，再提交合成音色任务", "error");
+      showToast("err", "请先生成对话文本，再提交合成音色任务");
+      return;
+    }
+    await submitEdgeTtsTask(workingText);
     return;
   }
 
@@ -2598,6 +2698,12 @@ function bindEvents() {
     applyPresetSelection(presetTopicById(el.presetTopicSelect.value));
   });
 
+  if (el.manualTopic) {
+    el.manualTopic.addEventListener("input", () => {
+      state.form.manualTopic = el.manualTopic.value.trim();
+      debouncedPersistState();
+    });
+  }
   el.manualText.addEventListener("input", () => {
     state.form.manualText = el.manualText.value;
     debouncedPersistState();

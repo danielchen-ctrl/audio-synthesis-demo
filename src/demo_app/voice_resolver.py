@@ -105,11 +105,27 @@ def resolve_voice_spec(
     """
     # 1. 新格式 voice_assignments
     if voice_assignments and speaker_id in voice_assignments:
-        return VoiceSpec.from_dict(
+        spec = VoiceSpec.from_dict(
             voice_assignments[speaker_id],
             language=language,
             fallback_provider=effective_provider,
         )
+        # 安全校验：real_human voice_id 必须在全局已注册音色中。
+        # CosyVoice zero_shot 支持跨语言合成，允许用英文克隆音色合成中文（反之亦然），
+        # 因此只检查 voice_id 是否在全局目录中注册，不限制必须属于当前语言。
+        if spec.provider == "real_human":
+            all_valid_ids = {
+                v["voice_id"]
+                for lang_voices in COSYVOICE_VOICE_CATALOG.values()
+                for v in lang_voices
+            }
+            if all_valid_ids and spec.voice_id not in all_valid_ids:
+                logger.warning(
+                    "[voice_resolver] voice_id=%s 未在全局音色目录中注册，自动替换为默认音色",
+                    spec.voice_id,
+                )
+                return default_voice_spec(language, speaker_id, effective_provider)
+        return spec
     # 2. 旧格式 voice_map（只读）
     if voice_map and speaker_id in voice_map:
         return VoiceSpec(

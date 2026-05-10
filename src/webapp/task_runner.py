@@ -128,11 +128,15 @@ async def _fallback_edge_tts(req: Any, output_path: Path) -> Any:
     """
     用 edge_tts 合成一个 SynthesisRequest，作为 real_human 降级路径。
     output_path 应以 .mp3 结尾（edge_tts 原生输出格式）。
+    合成后统一重编码为 44100Hz mono，确保与 real_human 片段格式一致，
+    避免 concat 拼接处出现采样率/声道差异导致的噪音。
     返回 SynthesisResult（来自 demo_app.tts_provider）。
     """
+    import subprocess
     import time
     from demo_app.tts_provider import SynthesisResult
     from demo_app.voice_resolver import EDGE_DEFAULT_VOICES
+    from demo_app.embedded_server_main import _ffmpeg_path
 
     t0 = time.monotonic()
     text = "".join(req.segments)
@@ -142,8 +146,33 @@ async def _fallback_edge_tts(req: Any, output_path: Path) -> Any:
     try:
         import edge_tts
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        # edge_tts 原生输出为 24kHz stereo MP3（因平台而异）
+        # 使用 parent/stem 拼接避免 with_suffix(".raw.mp3") 在 Python 3.12+ 因多点后缀报 ValueError
+        raw_path = output_path.parent / f"{output_path.stem}.raw.mp3"
         communicate = edge_tts.Communicate(text, voice_id)
-        await communicate.save(str(output_path))
+        await communicate.save(str(raw_path))
+
+        # 统一重编码为 44100Hz mono，与 real_human 片段格式一致
+        # 避免 filter_complex 遇到不同采样率时产生拼接噪音
+        loop = asyncio.get_running_loop()
+        try:
+            await loop.run_in_executor(
+                None,
+                lambda: subprocess.run(
+                    [_ffmpeg_path(), "-y", "-i", str(raw_path),
+                     "-c:a", "libmp3lame", "-q:a", "3",
+                     "-ar", "44100", "-ac", "1",
+                     str(output_path)],
+                    check=True, capture_output=True,
+                ),
+            )
+            raw_path.unlink(missing_ok=True)
+        except Exception as enc_exc:
+            # 重编码失败时回退到原始文件（不完美但好过没有音频）
+            logger.warning("[task_runner] edge_tts 重编码失败，使用原始 MP3: %s", enc_exc)
+            # replace() 在 Windows 上可安全覆盖已存在的目标文件（rename 不行）
+            raw_path.replace(output_path)
+
         ms = int((time.monotonic() - t0) * 1000)
         return SynthesisResult(
             request=req,
@@ -176,11 +205,12 @@ async def _fallback_edge_tts(req: Any, output_path: Path) -> Any:
 
 async def _concat_audio_segments(seg_files: list[Path], output_path: Path) -> None:
     """
-    用 ffmpeg concat demuxer 将多个音频片段（WAV/MP3 混合）拼接为单个文件。
+    用 ffmpeg filter_complex concat 将多个音频片段拼接为单个文件。
+    与 concat demuxer（-f concat）相比，filter_complex 将所有输入先解码为 PCM
+    再拼接重编码，对输入格式/采样率差异完全兼容，不会在拼接点产生爆音或跳帧。
     输出格式由 output_path 后缀决定（.mp3 / .wav）。
     """
     import subprocess
-    import tempfile
     from demo_app.embedded_server_main import _ffmpeg_path
 
     # 过滤不存在的片段（降级失败时可能为 None）
@@ -188,44 +218,51 @@ async def _concat_audio_segments(seg_files: list[Path], output_path: Path) -> No
     if not valid:
         raise RuntimeError("没有有效的音频片段可供拼接")
 
+    ffmpeg = _ffmpeg_path()
+    codec = "libmp3lame" if output_path.suffix == ".mp3" else "pcm_s16le"
+
     if len(valid) == 1:
-        # 单片段：直接 transcode（或 copy 如格式一致）
-        ffmpeg = _ffmpeg_path()
-        codec = "libmp3lame" if output_path.suffix == ".mp3" else "pcm_s16le"
-        subprocess.run(
-            [ffmpeg, "-y", "-i", str(valid[0]), "-c:a", codec, str(output_path)],
-            check=True, capture_output=True,
+        # 单片段：直接 transcode，统一格式（用 run_in_executor 避免阻塞事件循环）
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(
+            None,
+            lambda: subprocess.run(
+                [ffmpeg, "-y", "-i", str(valid[0]),
+                 "-c:a", codec, "-ar", "44100", "-ac", "1",
+                 str(output_path)],
+                check=True, capture_output=True,
+            ),
         )
         return
 
-    # 多片段：写 concat list 文件
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".txt", delete=False, encoding="utf-8"
-    ) as fh:
-        for sf in valid:
-            # Windows 路径反斜线需转为正斜线
-            fh.write(f"file '{sf.as_posix()}'\n")
-        list_file = fh.name
+    # 多片段：使用 filter_complex concat
+    # 构建 -i 参数列表
+    input_args: list[str] = []
+    for f in valid:
+        input_args += ["-i", str(f)]
 
-    try:
-        ffmpeg = _ffmpeg_path()
-        codec = "libmp3lame" if output_path.suffix == ".mp3" else "pcm_s16le"
-        cmd = [
-            ffmpeg, "-y",
-            "-f", "concat", "-safe", "0",
-            "-i", list_file,
+    n = len(valid)
+    # filter_complex: [0:a][1:a]...[n-1:a]concat=n=N:v=0:a=1[aout]
+    filter_str = "".join(f"[{i}:a]" for i in range(n)) + f"concat=n={n}:v=0:a=1[aout]"
+
+    cmd = (
+        [ffmpeg, "-y"]
+        + input_args
+        + [
+            "-filter_complex", filter_str,
+            "-map", "[aout]",
             "-c:a", codec,
-            "-ar", "44100",   # 统一输出采样率（WAV/MP3 混合输入时防止拼接噪音）
+            "-ar", "44100",   # 统一输出采样率
             "-ac", "1",       # 统一单声道
             str(output_path),
         ]
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(
-            None,
-            lambda: subprocess.run(cmd, check=True, capture_output=True),
-        )
-    finally:
-        Path(list_file).unlink(missing_ok=True)
+    )
+
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(
+        None,
+        lambda: subprocess.run(cmd, check=True, capture_output=True),
+    )
 
 
 async def _convert_wav_to_mp3(wav_path: Path, mp3_path: Path) -> bool:
@@ -236,16 +273,23 @@ async def _convert_wav_to_mp3(wav_path: Path, mp3_path: Path) -> bool:
     import subprocess
     from demo_app.embedded_server_main import _ffmpeg_path
     try:
-        loop = asyncio.get_event_loop()
-        # 注意：不在此处使用 silenceremove 过滤器。
-        # CosyVoice 输出 WAV 的音量动态范围因语言和说话人差异较大，
-        # 固定 dB 阈值的 silenceremove 容易将正常语音误判为静音并整段删除，
-        # 实测导致中文/英文音频被裁减至仅剩 3~9 秒。
-        # 头尾静音问题留给 CosyVoice 服务端配置处理，或后续通过探针检测按需裁剪。
+        loop = asyncio.get_running_loop()
+        # silenceremove 使用极保守阈值（-65dB）：
+        # - CosyVoice 在每段语音前后可能有数秒数字静音（~-90dB 或更低）
+        # - -65dB 仅裁掉真正的数字静音，不影响正常语音（语音一般 > -40dB）
+        # - start_duration=0.05: 至少 50ms 静音才裁，避免误裁爆破音起始
+        # - stop_duration=0.15: 尾部至少 150ms 静音才裁，留自然尾音
+        # 注意：曾用 -40dB 阈值，实测中文/英文被裁至仅剩 3~9s，已放弃；-65dB 经测安全。
+        silence_filter = (
+            "silenceremove="
+            "start_periods=1:start_duration=0.05:start_threshold=-65dB:"
+            "stop_periods=1:stop_duration=0.15:stop_threshold=-65dB"
+        )
         await loop.run_in_executor(
             None,
             lambda: subprocess.run(
                 [_ffmpeg_path(), "-y", "-i", str(wav_path),
+                 "-af", silence_filter,
                  "-c:a", "libmp3lame", "-q:a", "3",
                  "-ar", "44100", "-ac", "1",   # 统一采样率/声道，避免 concat 拼接噪音
                  str(mp3_path)],
@@ -533,7 +577,7 @@ async def _process_task(task_id: str) -> None:
                 "keyword_terms": json.loads(task.get("keywords") or "[]"),
             }
             bundle_server = load_bundle_server()
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             result: dict = await loop.run_in_executor(
                 None, lambda: _generate_text_payload(bundle_server, payload)
             )
