@@ -1,0 +1,40 @@
+接入真人API前置确认
+1.API文档(接口地址、鉴权、请求/响应格式)
+2.能力确认:对照ProviderCapabilities逐项填写(决定合成粒度度和停顿策略)
+3.音色ID列表(至少中/英)
+
+
+1. API 文档
+- 接口地址：
+- 鉴权方式：
+- 请求示例：
+- 响应示例：
+- 错误码：
+- 是否同步/异步：
+
+2. ProviderCapabilities（API 到底支持能力的确认表）
+- supports_multi_speaker:
+- supports_ssml:
+- supports_word_timestamps:
+- supports_pause_control:
+- max_chars_per_request:
+- async_mode:
+- output_formats:
+- sample_rate:
+
+3. 音色 ID 列表
+- 中文男声：
+- 中文女声：
+- 英文男声：
+- 英文女声：
+- 默认推荐音色：
+
+| 字段       | 用途            |
+| -------- | ------------- |
+| voice_id | 后端实际调用 API 用  |
+| 展示名      | 前端给用户看        |
+| 语言       | 中文 / 英文 / 日文等 |
+| 性别       | 男 / 女         |
+| 风格       | 自然、客服、播报、情绪化等 |
+| 是否推荐     | 默认给用户选哪个      |
+

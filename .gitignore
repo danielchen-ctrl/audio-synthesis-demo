@@ -69,6 +69,10 @@ training/data/training_jobs_b2_*.jsonl
 training/data/training_jobs_b3_*.jsonl
 training/data/training_jobs_b4_*.jsonl
 
+# Local design artifacts (binaries / large prototype HTML — keep on disk, not in git)
+docs/*.docx
+docs/音频语料生成平台_原型.html
+
 # Platform
 runtime/platform.db
 runtime/platform.db-shm
