@@ -215,6 +215,8 @@ async def _concat_audio_segments(seg_files: list[Path], output_path: Path) -> No
             "-f", "concat", "-safe", "0",
             "-i", list_file,
             "-c:a", codec,
+            "-ar", "44100",   # 统一输出采样率（WAV/MP3 混合输入时防止拼接噪音）
+            "-ac", "1",       # 统一单声道
             str(output_path),
         ]
         loop = asyncio.get_event_loop()
@@ -226,16 +228,50 @@ async def _concat_audio_segments(seg_files: list[Path], output_path: Path) -> No
         Path(list_file).unlink(missing_ok=True)
 
 
+async def _convert_wav_to_mp3(wav_path: Path, mp3_path: Path) -> bool:
+    """
+    将 WAV 文件转换为 MP3（统一格式，避免 ffmpeg concat 混合 WAV/MP3 时的噪音）。
+    成功后删除原 WAV，返回 True；失败时保留 WAV，返回 False。
+    """
+    import subprocess
+    from demo_app.embedded_server_main import _ffmpeg_path
+    try:
+        loop = asyncio.get_event_loop()
+        # 注意：不在此处使用 silenceremove 过滤器。
+        # CosyVoice 输出 WAV 的音量动态范围因语言和说话人差异较大，
+        # 固定 dB 阈值的 silenceremove 容易将正常语音误判为静音并整段删除，
+        # 实测导致中文/英文音频被裁减至仅剩 3~9 秒。
+        # 头尾静音问题留给 CosyVoice 服务端配置处理，或后续通过探针检测按需裁剪。
+        await loop.run_in_executor(
+            None,
+            lambda: subprocess.run(
+                [_ffmpeg_path(), "-y", "-i", str(wav_path),
+                 "-c:a", "libmp3lame", "-q:a", "3",
+                 "-ar", "44100", "-ac", "1",   # 统一采样率/声道，避免 concat 拼接噪音
+                 str(mp3_path)],
+                check=True, capture_output=True,
+            ),
+        )
+        wav_path.unlink(missing_ok=True)
+        return True
+    except Exception as exc:
+        logger.warning("[task_runner] WAV→MP3 转换失败 %s: %s", wav_path.name, exc)
+        return False
+
+
 async def _synthesize_one_segment(
     idx: int,
     req: Any,
     provider: Any,
     save_dir: Path,
     semaphore: asyncio.Semaphore,
+    max_retries: int = 0,
 ) -> tuple:
     """
     并发工作单元：合成单个段落，带 Semaphore 限流。
-    返回 (idx, result, seg_file, rh_failure_reason, rh_error_msg)。
+    - real_human 超时时最多重试 max_retries 次（来自 runtime.yaml tts.real_human.max_retries）
+    - real_human 成功后将 WAV 转为 MP3，保证 ffmpeg concat 格式一致（消除噪音）
+    - 返回 (idx, result, seg_file, rh_failure_reason, rh_error_msg)
     所有异常均在内部消化，不向外抛出。
     """
     seg_wav = save_dir / f"_seg_{idx:04d}.wav"
@@ -247,8 +283,27 @@ async def _synthesize_one_segment(
     async with semaphore:
         try:
             if provider and req.voice_spec.provider == "real_human":
+                # ── 首次合成 ────────────────────────────────────────────────────
                 result = await provider.synthesize(req, seg_wav)
+
+                # ── 超时重试（最多 max_retries 次）──────────────────────────────
+                retries_left = max_retries
+                while result.degraded and result.degraded_reason == "timeout" and retries_left > 0:
+                    retries_left -= 1
+                    logger.info(
+                        "[task_runner] real_human 超时，重试 seg=%d（剩余 %d 次）",
+                        idx, retries_left,
+                    )
+                    seg_wav_retry = save_dir / f"_seg_{idx:04d}_r{max_retries - retries_left}.wav"
+                    retry_result = await provider.synthesize(req, seg_wav_retry)
+                    if not retry_result.degraded:
+                        result = retry_result
+                        seg_wav = seg_wav_retry   # 改用重试成功的文件
+                    else:
+                        seg_wav_retry.unlink(missing_ok=True)
+
                 if result.degraded:
+                    # 最终仍失败 → 记录原始失败原因，降级到 edge_tts
                     rh_failure_reason = result.degraded_reason or "unknown"
                     rh_error_msg = result.error_msg
                     logger.warning(
@@ -258,7 +313,24 @@ async def _synthesize_one_segment(
                     result = await _fallback_edge_tts(req, seg_mp3)
                     seg_file = seg_mp3 if (result.audio_path and result.audio_path.exists()) else None
                 else:
-                    seg_file = seg_wav
+                    # real_human 成功 → WAV→MP3 统一格式，消除拼接噪音
+                    ok = await _convert_wav_to_mp3(seg_wav, seg_mp3)
+                    if ok:
+                        seg_file = seg_mp3
+                    else:
+                        # WAV→MP3 转换失败 → 降级 edge_tts。
+                        # 不能将 WAV 直接送入 concat demuxer：ffmpeg concat demuxer
+                        # 要求所有输入流 codec 相同，WAV(pcm)/MP3 混合会导致逐字播放或噪音。
+                        logger.warning(
+                            "[task_runner] WAV→MP3 转换失败 seg=%d，降级 edge_tts 保证格式一致",
+                            idx,
+                        )
+                        seg_wav.unlink(missing_ok=True)
+                        result = await _fallback_edge_tts(req, seg_mp3)
+                        seg_file = seg_mp3 if (result.audio_path and result.audio_path.exists()) else None
+                        if rh_failure_reason is None:
+                            rh_failure_reason = "wav_to_mp3_failed"
+                            rh_error_msg = "WAV→MP3 conversion failed; fell back to edge_tts"
             else:
                 # 直接走 edge_tts（语言无真人音色 or provider 未配置）
                 result = await _fallback_edge_tts(req, seg_mp3)
@@ -326,13 +398,10 @@ async def _synthesize_with_real_human(
             "降级到全量 edge_tts"
         )
 
-    # ── 并发度配置 ────────────────────────────────────────────────────────────
-    max_concurrency = int(
-        _load_runtime_cfg()
-        .get("tts", {})
-        .get("real_human", {})
-        .get("max_concurrency", 5)
-    )
+    # ── 并发度 & 重试配置 ─────────────────────────────────────────────────────
+    rh_cfg = _load_runtime_cfg().get("tts", {}).get("real_human", {})
+    max_concurrency = int(rh_cfg.get("max_concurrency", 5))
+    max_retries = int(rh_cfg.get("max_retries", 0))
     semaphore = asyncio.Semaphore(max_concurrency)
 
     # ── 构建 SynthesisRequest 列表（段落合并） ────────────────────────────────
@@ -346,7 +415,7 @@ async def _synthesize_with_real_human(
 
     # ── 并发合成所有段落 ──────────────────────────────────────────────────────
     tasks = [
-        _synthesize_one_segment(idx, req, provider, save_dir, semaphore)
+        _synthesize_one_segment(idx, req, provider, save_dir, semaphore, max_retries)
         for idx, req in enumerate(synthesis_requests)
     ]
     raw_results = await asyncio.gather(*tasks)

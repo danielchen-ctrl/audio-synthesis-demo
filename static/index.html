@@ -781,6 +781,16 @@ html[data-theme="light"] .share-bar{background:linear-gradient(90deg,#1e1b4b 0%,
 
       <section id="manualSection" class="modal-section hidden">
         <div class="section-title">文本内容</div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label class="form-label" for="manualTopic">主题标题</label>
+          <input
+            id="manualTopic"
+            type="text"
+            class="input-field"
+            placeholder="可选：输入主题，生成后作为音频文件标题"
+            maxlength="120"
+          />
+        </div>
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label" for="manualLanguage">文本语言<span class="req">*</span></label>
@@ -1376,7 +1386,7 @@ function renderTaskGrid(tasks){
     const ttsTag=isRealHumanProvider&&t.status==='completed'&&!isTtsWarn?`<span style="font-size:11px;color:var(--success);margin-left:6px">🎤 真人音色</span>`:'';
     return`<div class="task-card${t.status==='failed'?' task-card-failed':isTtsWarn?' task-card-tts-warn':''}">
       <div class="task-card-hdr"><div class="task-topic">${esc(t.topic||'（无主题）')}${ttsTag}</div><span class="status status-${statusKey}">${run?'<span class="pulse"></span>':''}${statusLabel}</span></div>
-      <div class="task-meta"><span>🌐 ${esc(LANG_ZH[t.language]||t.language||'中文')}</span>${isTextOnly?`<span>📄 仅生成文本</span>`:`<span>👥 ${t.people_count||2}人</span>`}<span>📝 ${t.word_count||1000}字</span></div>
+      <div class="task-meta"><span>🌐 ${esc(LANG_ZH[t.language]||t.language||'中文')}</span>${isTextOnly?`<span>📄 仅生成文本</span>`:`<span>👥 ${t.people_count||2}人</span>`}<span>📝 ${t.word_count||1000}字</span>${(t.file_duration&&t.status==='completed')?`<span>⏱ ${fmtDur(t.file_duration)}</span>`:''}</div>
       <div class="task-meta" style="margin-top:2px"><span>📅 ${fmtDate(t.created_at)}</span><span style="color:var(--text3)">${timeAgo(t.created_at)}</span></div>
       ${t.status!=='failed'?pipHtml:failedPip}
       ${warnRow}
@@ -1474,7 +1484,7 @@ function renderDetail(f){
           <audio id="det-audio" src="${fileUrl}" preload="metadata" style="display:none"></audio>
           <div class="audio-ctrl">
             <button class="play-btn" id="det-play" onclick="toggleDetPlay()">▶</button>
-            <div class="prog-bar" onclick="seekDet(event,this)"><div class="prog-fill" id="det-fill"></div></div>
+            <div class="prog-bar" onmousedown="startDetDrag(event,this)"><div class="prog-fill" id="det-fill"></div></div>
             <span class="time-txt" id="det-time">00:00 / ${fmtDur(f.duration)}</span>
           </div>
         </div>`;
@@ -1595,6 +1605,7 @@ function toggleDetPlay(){
   else{a.pause();b.textContent='▶';if(w)w.classList.remove('playing');}
 }
 function seekDet(e,bar){const a=document.getElementById('det-audio');if(!a||!a.duration)return;const r=bar.getBoundingClientRect();a.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*a.duration;}
+function startDetDrag(e,bar){e.preventDefault();seekDet(e,bar);const mv=ev=>{seekDet(ev,bar);};const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);}
 
 // ══ File ops ═════════════════════════════════════════════════════════════════
 async function softDeleteFile(id,key){try{await API.del('/api/platform/files/'+id);showToast('ok','已移入回收站');if(key==='home')loadHome();else if(key==='my')loadMy();}catch(e){showToast('err','删除失败');}}
@@ -1777,7 +1788,7 @@ function showMiniPlayer(btn,fileId,fileName){
   const td=pr.insertCell(0);td.colSpan=cols||8;
   td.innerHTML=`<div class="mini-player">
     <button class="mini-play" id="mp-play">▶</button>
-    <div class="mini-prog" onclick="seekMini(event,this)"><div class="mini-prog-fill" id="mp-fill"></div></div>
+    <div class="mini-prog" onmousedown="startMiniDrag(event,this)"><div class="mini-prog-fill" id="mp-fill"></div></div>
     <span id="mp-time" style="font-size:12px;color:rgba(255,255,255,.8);white-space:nowrap">00:00</span>
     <span style="font-size:12px;color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis;max-width:160px;white-space:nowrap">${esc(fileName)}</span>
     <button style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);font-size:12px" onclick="closeMiniPlayer(this)">✕</button>
@@ -1791,6 +1802,7 @@ function showMiniPlayer(btn,fileId,fileName){
   _miniAudio.play().then(()=>{if(pb)pb.textContent='⏸';}).catch(()=>{});
 }
 function seekMini(e,bar){if(!_miniAudio||!_miniAudio.duration)return;const r=bar.getBoundingClientRect();_miniAudio.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*_miniAudio.duration;}
+function startMiniDrag(e,bar){e.preventDefault();seekMini(e,bar);const mv=ev=>{seekMini(ev,bar);};const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);}
 function closeMiniPlayer(btn){if(_miniAudio){_miniAudio.pause();_miniAudio=null;}const r=btn.closest('.mini-player-row');if(r)r.remove();}
 
 // ══ Modals ════════════════════════════════════════════════════════════════════
@@ -2066,6 +2078,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       const hasRunning=nowRunning.size>0;
       // Nav badge colour
       const nb=document.getElementById('nav-tasks');if(nb)nb.style.color=hasRunning?'var(--warning)':'';
+      // 实时更新首页"进行中"统计卡（无需等任务完成）
+      _refreshActiveTasksDisplay(nowRunning.size);
       // When on tasks page, always refresh the grid (keep current page)
       if(_page==='tasks'){
         renderTaskGrid(tasks);
