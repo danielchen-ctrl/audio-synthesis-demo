@@ -25,6 +25,9 @@ from src.webapp.handlers import (
     TrashHandler,
     TrashRestoreHandler,
     UploadHandler,
+    VoiceCatalogHandler,
+    VoiceCreateHandler,
+    VoiceDeleteHandler,
 )
 
 PLATFORM_ROUTES = [
@@ -53,6 +56,11 @@ PLATFORM_ROUTES = [
     (r"/api/platform/batch/download", BatchDownloadHandler),
     # Stats
     (r"/api/platform/stats", StatsHandler),
+    # Voice catalog（单一来源，给前端 fetch）
+    (r"/api/voice_catalog", VoiceCatalogHandler),
+    # Voice management — 上传/删除真人克隆音色
+    (r"/api/voice_catalog/create", VoiceCreateHandler),
+    (r"/api/voice_catalog/([^/]+)", VoiceDeleteHandler),
     # Legacy demo
     (r"/legacy", LegacyPageHandler),
 ]

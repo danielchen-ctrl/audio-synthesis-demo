@@ -157,17 +157,24 @@ const VOICE_LIBRARY = {
   ]
 };
 
-// 真人克隆音色目录（与 voice_resolver.COSYVOICE_VOICE_CATALOG 同步）
-// 新增音色时同步修改此处和 src/demo_app/voice_resolver.py
-const COSYVOICE_VOICE_CATALOG = {
-  Chinese: [
-    { value: "36d3429a3c98", label: "maryzhang（女·真人）", gender: "female" }
-  ],
-  English: [
-    { value: "c3e9f75ae993", label: "willwu（男·真人）", gender: "male" }
-  ]
-  // 待扩充：Japanese / Korean / ...（对应语言有真人音色后在此添加）
-};
+// 真人克隆音色目录 — 单一来源是 config/runtime.yaml（tts.real_human.voice_catalog）
+// 启动时通过 GET /api/voice_catalog 加载（见 init() 中的 loadVoiceCatalog 调用）。
+// 新增音色：改 yaml → 重启服务 → 刷新页面（前后端自动同步）。
+let COSYVOICE_VOICE_CATALOG = {};
+
+async function loadVoiceCatalog(fetchPromise) {
+  try {
+    const payload = fetchPromise ? await fetchPromise : await fetchJson("/api/voice_catalog");
+    // PlatformHandler 把响应包成 {ok:true, data:{...}}；兼容直接返回原始对象的场景
+    const catalog = (payload && payload.data) ? payload.data : payload;
+    if (catalog && typeof catalog === "object") {
+      COSYVOICE_VOICE_CATALOG = catalog;
+    }
+  } catch (e) {
+    console.error("[voice_catalog] 加载失败，真人音色将不可用:", e);
+    COSYVOICE_VOICE_CATALOG = {};
+  }
+}
 
 function createDefaultFormState() {
   return {
@@ -2735,13 +2742,165 @@ function bindEvents() {
   el.legacyTaskTableBody.addEventListener("click", handleTaskTableClick);
 }
 
+// ══ 音色管理弹窗 ═════════════════════════════════════════════════════════════
+
+let _vmFile = null; // 待上传的音频文件
+
+/** 打开音色管理弹窗 */
+function openVoiceMgmt() {
+  _vmFile = null;
+  const fi = document.getElementById("vm-file-input");
+  if (fi) fi.value = "";
+  const fn = document.getElementById("vm-file-name");
+  if (fn) fn.textContent = "点击或拖拽上传参考音频（3–30 秒）";
+  ["vm-name","vm-ref-text"].forEach(id => { const el2 = document.getElementById(id); if (el2) el2.value = ""; });
+  const st = document.getElementById("vm-status");
+  if (st) st.textContent = "";
+  const btn = document.getElementById("vm-submit-btn");
+  if (btn) { btn.disabled = false; btn.textContent = "上传并注册音色"; }
+  const overlay = document.getElementById("modal-voice-mgmt");
+  if (overlay) overlay.classList.add("open");
+  vmRefreshList();
+}
+
+/** 处理音频文件选择 */
+function vmHandleFile(file) {
+  if (!file) return;
+  _vmFile = file;
+  const fn = document.getElementById("vm-file-name");
+  if (fn) fn.textContent = `✅ ${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+  const area = document.getElementById("vm-upload-area");
+  if (area) area.style.borderColor = "var(--primary)";
+}
+
+/** 刷新已注册音色列表 */
+async function vmRefreshList() {
+  const listEl = document.getElementById("vm-list");
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="color:var(--text3);font-size:13px">加载中…</div>';
+  try {
+    const res = await fetchJson("/api/voice_catalog");
+    const catalog = res.data || res || {};
+    // 展平所有语言的音色
+    const allVoices = [];
+    const LANG_CN = { Chinese:"中文", English:"英文", Japanese:"日语", Korean:"韩语" };
+    for (const [lang, voices] of Object.entries(catalog)) {
+      for (const v of (voices || [])) {
+        allVoices.push({ ...v, language: lang, langLabel: LANG_CN[lang] || lang });
+      }
+    }
+    if (!allVoices.length) {
+      listEl.innerHTML = '<div style="color:var(--text3);font-size:13px">暂无注册音色</div>';
+      return;
+    }
+    listEl.innerHTML = "";
+    for (const v of allVoices) {
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:6px;background:var(--bg2);gap:10px";
+      const info = document.createElement("div");
+      info.innerHTML = `<span style="font-weight:600;font-size:13px">${v.name}</span> `
+        + `<span style="font-size:11px;color:var(--text3);margin-left:6px">${v.langLabel} · ${v.gender === "male" ? "男" : "女"} · ${v.value}</span>`;
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn btn-danger";
+      delBtn.style.cssText = "padding:4px 10px;font-size:12px;flex-shrink:0";
+      delBtn.textContent = "删除";
+      delBtn.onclick = () => vmDeleteVoice(v.value, v.name, row);
+      row.appendChild(info);
+      row.appendChild(delBtn);
+      listEl.appendChild(row);
+    }
+  } catch (e) {
+    listEl.innerHTML = `<div style="color:var(--danger);font-size:13px">加载失败: ${e.message}</div>`;
+  }
+}
+
+/** 删除音色 */
+async function vmDeleteVoice(voiceId, name, rowEl) {
+  const ok = await showConfirm("删除音色", `确定删除「${name}」？已分配该音色的任务将自动降级到合成音色。`);
+  if (!ok) return;
+  try {
+    const res = await fetch(`/api/voice_catalog/${encodeURIComponent(voiceId)}`, { method: "DELETE" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    rowEl.remove();
+    // 重新加载全局目录
+    await loadVoiceCatalog();
+    renderVoiceRows();
+    showToast("ok", `音色「${name}」已删除`);
+  } catch (e) {
+    showToast("err", `删除失败: ${e.message}`);
+  }
+}
+
+/** 提交新音色上传 */
+async function vmSubmit() {
+  const name = (document.getElementById("vm-name")?.value || "").trim();
+  const language = document.getElementById("vm-language")?.value || "Chinese";
+  const gender = document.getElementById("vm-gender")?.value || "female";
+  const refText = (document.getElementById("vm-ref-text")?.value || "").trim();
+  const statusEl = document.getElementById("vm-status");
+  const btn = document.getElementById("vm-submit-btn");
+
+  if (!_vmFile) { if (statusEl) statusEl.textContent = "❌ 请先上传参考音频文件"; return; }
+  if (!name) { if (statusEl) statusEl.textContent = "❌ 请填写音色名称"; return; }
+
+  btn.disabled = true;
+  btn.textContent = "上传中…";
+  if (statusEl) statusEl.textContent = "正在上传并克隆音色，请稍候（约10–60秒）…";
+
+  try {
+    const fd = new FormData();
+    fd.append("audio", _vmFile, _vmFile.name);
+    fd.append("name", name);
+    fd.append("language", language);
+    fd.append("gender", gender);
+    fd.append("text", refText);
+
+    const res = await fetch("/api/voice_catalog/create", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    const { voice_id } = data.data || data;
+    if (statusEl) statusEl.textContent = `✅ 音色「${name}」注册成功！voice_id: ${voice_id}`;
+    btn.textContent = "注册成功 ✓";
+
+    // 清空表单
+    _vmFile = null;
+    const fi = document.getElementById("vm-file-input");
+    if (fi) fi.value = "";
+    document.getElementById("vm-file-name").textContent = "点击或拖拽上传参考音频（3–30 秒）";
+    document.getElementById("vm-name").value = "";
+    document.getElementById("vm-ref-text").value = "";
+    const area = document.getElementById("vm-upload-area");
+    if (area) area.style.borderColor = "";
+
+    // 热重载目录 + 刷新列表和音色行
+    await loadVoiceCatalog();
+    renderVoiceRows();
+    vmRefreshList();
+    showToast("ok", `真人音色「${name}」已注册`);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = "上传并注册音色";
+      if (statusEl) statusEl.textContent = "";
+    }, 3000);
+  } catch (e) {
+    if (statusEl) statusEl.textContent = `❌ 上传失败: ${e.message}`;
+    btn.disabled = false;
+    btn.textContent = "上传并注册音色";
+  }
+}
+
 async function init() {
   restoreState();
-  // 两个接口同时发出请求，顺序处理（presets 依赖 config 设置的 templateCatalog）
+  // 三个接口并发发起，按依赖关系顺序 await（presets 依赖 config 设置的 templateCatalog）
   const configFetch = fetchJson("/api/online_audio_config");
   const presetsFetch = fetchJson("/api/preset_topics");
+  const catalogFetch = fetchJson("/api/voice_catalog");
   await loadOnlineAudioConfig(configFetch);
   await loadPresetTopics(presetsFetch);
+  await loadVoiceCatalog(catalogFetch);
   bindEvents();
   renderAll();
   loadServerInfo(); // 不阻塞 init，share box 异步更新

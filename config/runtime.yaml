@@ -18,18 +18,37 @@ tts:
 
   real_human:
     api_url: "http://10.0.20.10:8188"  # CosyVoice API 地址（LAN 内网）
-    timeout_sec: 120                   # 单段超时秒数；并发下服务器可能较慢，建议 ≥ 90
+    timeout_sec: 120                   # 单段超时秒数，建议 ≥ 90
     max_retries: 2
-    max_concurrency: 1                 # ⚠️ 串行合成（1路）：防止并发请求导致服务器混淆响应顺序引起重复对话
-                                       # 提速需求可调高，但 >2 时 CosyVoice 在高负载下偶发响应串扰
+    max_concurrency: 1                 # CosyVoice 为单 GPU 队列，吞吐恒定 ~6 chars/s；
+                                       # 并发不缩短总耗时（level=1 vs level=8 wall_time 完全相同），
+                                       # 增大并发只会拉高单段 p50（1路=3.5s，8路=32.6s）。
+                                       # 保持 1 是最优解。实测：runtime/cosyvoice_probe_full.json
+    max_chars_per_segment: 500         # 同说话人连续行合并上限（字符数）。
+                                       # 合成速度取决于 GPU 总吞吐（~6 chars/sec），与该值无关。
+                                       # 值越小 → 段数越多、单段完成越快、进度更新越频繁。
+                                       # 值越大 → HTTP 请求越少、长段生成效率略高。
+                                       # 中文推荐 200–500，英文推荐 400–800。
 
-  # 已注册克隆音色（同步自 voice_resolver.COSYVOICE_VOICE_CATALOG）
-  voice_catalog:
-    Chinese:
-      - voice_id: "36d3429a3c98"
-        name: maryzhang
-        gender: female
-    English:
-      - voice_id: "c3e9f75ae993"
-        name: willwu
-        gender: male
+    # ── 真人音色目录（单一来源） ────────────────────────────────────────────
+    # 这是 CosyVoice 克隆音色的唯一权威源。
+    #   Python 端：voice_resolver._load_voice_catalog_from_yaml() 启动时读取
+    #   浏览器端：GET /api/voice_catalog 由后端基于本配置生成
+    # 新增音色：在此添加条目 → 重启服务器 → 前端刷新页面（前后端自动同步）。
+    #
+    # lisi 备用可用 voice_id（A/B 试听用，需要时把下面 ed35d3674bb0 替换即可）：
+    #   1f8f9dc3b62f, 0d7b569f5645, 254f8f5a9efb, 7d5bc5e0d1eb
+    # 失效 voice_id（实测返回 500，请勿启用）：
+    #   227f07e81eb1, 268517ecf605, 2a90e77c54d4
+    voice_catalog:
+      Chinese:
+        - voice_id: "36d3429a3c98"
+          name: maryzhang
+          gender: female
+        - voice_id: "ed35d3674bb0"
+          name: lisi
+          gender: male
+      English:
+        - voice_id: "c3e9f75ae993"
+          name: willwu
+          gender: male

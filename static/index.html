@@ -824,6 +824,7 @@ html[data-theme="light"] .share-bar{background:linear-gradient(90deg,#1e1b4b 0%,
         <div class="tts-engine-row">
           <button id="ttsRealHumanBtn" class="tts-engine-btn tts-active" type="button">🎤 真人音色</button>
           <button id="ttsEdgeBtn"      class="tts-engine-btn"            type="button">🔊 合成音色</button>
+          <button id="voiceMgmtBtn" class="tts-engine-btn" type="button" onclick="openVoiceMgmt()" title="上传/删除克隆音色">⚙️ 管理音色</button>
         </div>
         <div id="speakerVoiceRows" class="speaker-rows"></div>
         <div id="voiceWarning" class="inline-warning hidden">请为所有说话人选择音色</div>
@@ -996,6 +997,77 @@ html[data-theme="light"] .share-bar{background:linear-gradient(90deg,#1e1b4b 0%,
         <kbd>Esc</kbd><span>关闭当前弹窗</span>
       </div>
       <div style="margin-top:14px;font-size:12px;color:var(--text3)">在输入框内输入时快捷键不触发。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 音色管理弹窗 ── -->
+<div class="mo-overlay" id="modal-voice-mgmt">
+  <div class="mo" style="max-width:620px;width:95vw">
+    <div class="mo-hdr">
+      <span class="mo-title">🎙 管理真人克隆音色</span>
+      <button class="mo-close" onclick="closeModal('modal-voice-mgmt')">✕</button>
+    </div>
+    <div class="mo-body" style="padding:0">
+
+      <!-- 已注册音色列表 -->
+      <div style="padding:16px 20px 8px">
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px">已注册音色</div>
+        <div id="vm-list" style="display:flex;flex-direction:column;gap:8px;min-height:40px">
+          <div style="color:var(--text3);font-size:13px">加载中…</div>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border1);margin:8px 0">
+
+      <!-- 添加新音色 -->
+      <div style="padding:8px 20px 20px">
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px">➕ 添加新音色</div>
+
+        <!-- 音频上传区 -->
+        <div id="vm-upload-area" onclick="document.getElementById('vm-file-input').click()"
+             ondragover="event.preventDefault();this.classList.add('drag-over')"
+             ondragleave="this.classList.remove('drag-over')"
+             ondrop="event.preventDefault();this.classList.remove('drag-over');vmHandleFile(event.dataTransfer.files[0])"
+             style="border:2px dashed var(--border1);border-radius:8px;padding:18px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:12px">
+          <input type="file" id="vm-file-input" accept="audio/*" style="display:none" onchange="vmHandleFile(this.files[0])">
+          <div id="vm-file-name" style="font-size:13px;color:var(--text3)">点击或拖拽上传参考音频（3–30 秒）</div>
+        </div>
+
+        <!-- 字段行 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px">音色名称 *</label>
+            <input id="vm-name" type="text" placeholder="如：张三" style="width:100%;padding:8px 10px;border:1px solid var(--border1);border-radius:6px;background:var(--bg2);color:var(--text1);font-size:13px">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px">语言</label>
+            <select id="vm-language" style="width:100%;padding:8px 10px;border:1px solid var(--border1);border-radius:6px;background:var(--bg2);color:var(--text1);font-size:13px">
+              <option value="Chinese">中文</option>
+              <option value="English">English</option>
+              <option value="Japanese">日本語</option>
+              <option value="Korean">한국어</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px">性别</label>
+            <select id="vm-gender" style="width:100%;padding:8px 10px;border:1px solid var(--border1);border-radius:6px;background:var(--bg2);color:var(--text1);font-size:13px">
+              <option value="female">女声</option>
+              <option value="male">男声</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px">参考文本（留空自动识别）</label>
+            <input id="vm-ref-text" type="text" placeholder="音频中说的内容" style="width:100%;padding:8px 10px;border:1px solid var(--border1);border-radius:6px;background:var(--bg2);color:var(--text1);font-size:13px">
+          </div>
+        </div>
+
+        <div id="vm-status" style="font-size:12px;color:var(--text3);margin-bottom:8px;min-height:18px"></div>
+        <button id="vm-submit-btn" class="btn btn-primary" style="width:100%" onclick="vmSubmit()">上传并注册音色</button>
+      </div>
+
     </div>
   </div>
 </div>

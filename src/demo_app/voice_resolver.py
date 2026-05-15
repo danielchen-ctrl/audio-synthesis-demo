@@ -10,6 +10,7 @@ demo_app/voice_resolver.py
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Optional
 
 from demo_app.tts_provider import VoiceSpec
@@ -18,18 +19,174 @@ logger = logging.getLogger(__name__)
 
 
 # ── CosyVoice 已注册克隆音色目录 ─────────────────────────────────────────────
-# 来源：GET http://10.0.20.10:8188/v1/voices（2026-05-10 确认）
-# 扩充时直接在此添加条目，无需改其他代码。
+# 单一来源：config/runtime.yaml 的 tts.real_human.voice_catalog
+# 新增/修改音色只需改 yaml，重启服务即可生效（前后端自动同步）。
+#
+# 服务器上注册了多个同名 "李四" voice_id（共 8 个，同一克隆人多次注册），
+# 实测 3 个返回 500、5 个可用。yaml 中只挂载 created_at 最晚的 ed35d3674bb0
+# （推测为最终调优版）。备用 voice_id 见 runtime.yaml 注释。
 
-COSYVOICE_VOICE_CATALOG: dict[str, list[dict]] = {
-    "Chinese": [
-        {"voice_id": "36d3429a3c98", "name": "maryzhang", "gender": "female"},
-    ],
-    "English": [
-        {"voice_id": "c3e9f75ae993", "name": "willwu", "gender": "male"},
-    ],
-    # 待扩充：Japanese / Korean / ...
-}
+_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "runtime.yaml"
+
+
+def _load_voice_catalog_from_yaml() -> dict[str, list[dict]]:
+    """
+    从 runtime.yaml 加载 voice_catalog；失败时返回空 dict（fail-safe）。
+    返回结构与历史硬编码一致：{language: [{voice_id, name, gender}, ...]}
+    """
+    try:
+        import yaml
+    except ImportError:
+        logger.error("[voice_resolver] PyYAML 未安装，无法加载 voice_catalog")
+        return {}
+    if not _CONFIG_PATH.exists():
+        logger.warning("[voice_resolver] %s 不存在，voice_catalog 为空", _CONFIG_PATH)
+        return {}
+    try:
+        cfg = yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8")) or {}
+    except Exception as exc:
+        logger.error("[voice_resolver] 解析 %s 失败: %s", _CONFIG_PATH, exc)
+        return {}
+    raw = cfg.get("tts", {}).get("real_human", {}).get("voice_catalog", {}) or {}
+    # 字段标准化：兼容 yaml 中 voice_id 写成数字 / 缺 gender 等场景
+    normalized: dict[str, list[dict]] = {}
+    for lang, entries in raw.items():
+        if not isinstance(entries, list):
+            continue
+        cleaned = []
+        for e in entries:
+            if not isinstance(e, dict):
+                continue
+            vid = str(e.get("voice_id", "")).strip()
+            name = str(e.get("name", "")).strip()
+            if not vid or not name:
+                continue
+            cleaned.append({
+                "voice_id": vid,
+                "name":     name,
+                "gender":   str(e.get("gender", "female")).strip() or "female",
+            })
+        if cleaned:
+            normalized[lang] = cleaned
+    logger.info(
+        "[voice_resolver] 加载 voice_catalog: %s",
+        {k: [v["name"] for v in vs] for k, vs in normalized.items()},
+    )
+    return normalized
+
+
+COSYVOICE_VOICE_CATALOG: dict[str, list[dict]] = _load_voice_catalog_from_yaml()
+
+
+def reload_voice_catalog() -> dict[str, list[dict]]:
+    """重新从 yaml 加载并更新模块级 COSYVOICE_VOICE_CATALOG。供测试 / hot-reload 使用。"""
+    global COSYVOICE_VOICE_CATALOG
+    new_catalog = _load_voice_catalog_from_yaml()
+    COSYVOICE_VOICE_CATALOG.clear()
+    COSYVOICE_VOICE_CATALOG.update(new_catalog)
+    return COSYVOICE_VOICE_CATALOG
+
+
+def _get_cosyvoice_api_url() -> str:
+    """从 runtime.yaml 读取 CosyVoice API URL（优先环境变量）。"""
+    import os
+    env_url = os.environ.get("REAL_HUMAN_TTS_API_URL", "").strip()
+    if env_url:
+        return env_url
+    try:
+        import yaml
+        cfg = yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8")) or {}
+        return (cfg.get("tts", {}).get("real_human", {}).get("api_url", "") or "").strip()
+    except Exception:
+        return ""
+
+
+def _save_voice_catalog_to_yaml(catalog: dict) -> None:
+    """
+    将 voice_catalog 写回 runtime.yaml，仅覆盖 tts.real_human.voice_catalog 字段，
+    保留文件中其他所有配置（使用 yaml round-trip 保持结构）。
+    """
+    try:
+        import yaml
+    except ImportError:
+        logger.error("[voice_resolver] PyYAML 未安装，无法保存 voice_catalog")
+        return
+    try:
+        cfg = yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8")) or {}
+        # 确保嵌套路径存在
+        cfg.setdefault("tts", {}).setdefault("real_human", {})["voice_catalog"] = catalog
+        _CONFIG_PATH.write_text(
+            yaml.dump(cfg, allow_unicode=True, default_flow_style=False, sort_keys=False),
+            encoding="utf-8",
+        )
+        logger.info("[voice_resolver] voice_catalog 已保存到 %s", _CONFIG_PATH)
+    except Exception as exc:
+        logger.error("[voice_resolver] 保存 voice_catalog 失败: %s", exc)
+        raise
+
+
+def create_voice_in_catalog(language: str, voice_id: str, name: str, gender: str = "female") -> None:
+    """将新音色添加到 voice_catalog，保存 yaml，并热重载模块级变量。"""
+    try:
+        import yaml
+        cfg = yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8")) or {}
+        catalog: dict = cfg.get("tts", {}).get("real_human", {}).get("voice_catalog", {}) or {}
+    except Exception:
+        catalog = {}
+
+    entries = catalog.setdefault(language, [])
+    # 避免重复插入同一 voice_id
+    if not any(str(v.get("voice_id", "")) == voice_id for v in entries):
+        entries.append({"voice_id": voice_id, "name": name, "gender": gender})
+
+    _save_voice_catalog_to_yaml(catalog)
+    reload_voice_catalog()
+    logger.info("[voice_resolver] 新音色已注册: %s / %s (%s) lang=%s", name, voice_id, gender, language)
+
+
+def delete_voice_from_catalog(voice_id: str) -> bool:
+    """从 voice_catalog 移除指定 voice_id，保存 yaml，并热重载。返回是否找到并删除。"""
+    try:
+        import yaml
+        cfg = yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8")) or {}
+        catalog: dict = cfg.get("tts", {}).get("real_human", {}).get("voice_catalog", {}) or {}
+    except Exception:
+        return False
+
+    found = False
+    for lang in list(catalog.keys()):
+        before_len = len(catalog[lang])
+        catalog[lang] = [v for v in catalog[lang] if str(v.get("voice_id", "")) != voice_id]
+        if len(catalog[lang]) < before_len:
+            found = True
+        if not catalog[lang]:
+            del catalog[lang]
+
+    if found:
+        _save_voice_catalog_to_yaml(catalog)
+        reload_voice_catalog()
+        logger.info("[voice_resolver] 音色已删除: %s", voice_id)
+    return found
+
+
+def get_voice_catalog_for_frontend() -> dict[str, list[dict]]:
+    """
+    生成前端友好格式：{language: [{value, label, gender, name}, ...]}
+    label 形如 "maryzhang（女·真人）" — 在后端集中拼装，避免前端格式漂移。
+    """
+    _GENDER_CN = {"female": "女", "male": "男"}
+    out: dict[str, list[dict]] = {}
+    for lang, voices in COSYVOICE_VOICE_CATALOG.items():
+        out[lang] = [
+            {
+                "value":  v["voice_id"],
+                "name":   v["name"],
+                "gender": v.get("gender", "female"),
+                "label":  f"{v['name']}（{_GENDER_CN.get(v.get('gender', 'female'), '女')}·真人）",
+            }
+            for v in voices
+        ]
+    return out
 
 # edge_tts 各语言默认音色（语言无真人音色时回退）
 EDGE_DEFAULT_VOICES: dict[str, str] = {

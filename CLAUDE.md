@@ -116,9 +116,27 @@ v2 数据存于 `output/training_v2/`，已完成部分：
 
 ---
 
-## 🖥 Platform — Current Status (2026-05-10)
+## 🖥 Platform — Current Status (2026-05-13)
 
-**Phase: Live. 真人 TTS Phase 1 已上线。Few-shot 索引使用 v3 训练数据，服务器重启后自动加载。**
+**Phase: Live. 真人 TTS Phase 1 已上线。音色目录已单源化（runtime.yaml 为唯一权威）。Few-shot 索引使用 v3 训练数据，服务器重启后自动加载。**
+
+### 近期变更（2026-05-13）— 音色目录单源化
+
+| 文件 | 改动 |
+|------|------|
+| `config/runtime.yaml` | `voice_catalog` 从 `tts.voice_catalog` 上挪到 `tts.real_human.voice_catalog`（4 格缩进，结构语义对称）；标注为**单一权威源**——新增音色只改这一处即可，无需同步前后端 |
+| `src/demo_app/voice_resolver.py` | 删除硬编码 `COSYVOICE_VOICE_CATALOG`；新增 `_load_voice_catalog_from_yaml()` 模块加载时读 yaml；`reload_voice_catalog()` 支持热加载；`get_voice_catalog_for_frontend()` 生成前端格式（含 `label` 字段）。`COSYVOICE_VOICE_CATALOG` 模块级变量保留作为向后兼容导入名，由 yaml 派生而非硬编码 |
+| `src/webapp/handlers.py` | 新增 `VoiceCatalogHandler` 处理 `GET /api/voice_catalog`，返回 `get_voice_catalog_for_frontend()` 结果 |
+| `src/webapp/routes.py` | 注册 `/api/voice_catalog` 路由 |
+| `static/app.js` | `COSYVOICE_VOICE_CATALOG` 从 `const` 改为 `let`（初值 `{}`）；新增 `loadVoiceCatalog()`，`init()` 中并发 fetch + await；删除所有硬编码音色数据 |
+| `tools/tts/cosyvoice_concurrency_probe.py` | 新增并发实测脚本（5 等级 × 3 轮 × 6 样本），实测报告写入 `runtime/cosyvoice_probe_full.json` |
+
+**关键结论 — CosyVoice 并发实测（2026-05-13）：** 服务端为单 GPU 队列，吞吐**恒定 6.1 cps**（所有并发等级），并发对总耗时无收益但显著恶化单段 p50（串行 3.5s → 8 并发 32.6s）。`max_concurrency=1` 是最优解。详见 `runtime/cosyvoice_probe_full.json` 和 `tools/tts/cosyvoice_concurrency_probe.py`。
+
+**扩音色流程（已验证）：**
+1. 编辑 `config/runtime.yaml` 的 `tts.real_human.voice_catalog` 加一条
+2. 重启服务器 → `voice_resolver` 模块加载时自动从 yaml 重读
+3. 浏览器刷新页面 → `init()` 调 `/api/voice_catalog` 拉到最新值
 
 ### 近期变更（2026-05-10，第三批）
 
@@ -249,7 +267,9 @@ Schema per entry:
 src/demo_app/
   tts_provider.py      ← VoiceSpec / SynthesisRequest / SynthesisResult / ProviderCapabilities 数据模型 + TTSProvider ABC
   real_human_tts.py    ← RealHumanProvider（CosyVoice /v1/audio/speech 同步端点）
-  voice_resolver.py    ← COSYVOICE_VOICE_CATALOG + resolve_voice_spec + build_synthesis_requests
+  voice_resolver.py    ← 单源加载 voice_catalog (from runtime.yaml) + resolve_voice_spec + build_synthesis_requests + get_voice_catalog_for_frontend
+src/webapp/
+  handlers.py          ← VoiceCatalogHandler 处理 GET /api/voice_catalog
 ```
 
 ### CosyVoice API 关键信息
@@ -257,14 +277,15 @@ src/demo_app/
 - **端点**：`POST /v1/audio/speech`（OpenAI-compatible，JSON body → WAV bytes 直接返回）
 - **废弃端点**：`/api/tts/async`（zero_shot 模式需要 `prompt_wav`，仅传 `spk_id` 报 "Invalid file: None"）
 - **请求格式**：`{"model": "cosyvoice-v3", "input": "<text>", "voice": "<voice_id>", "response_format": "wav", "speed": 1.0}`
-- **当前可用音色**（`GET /v1/voices/custom`，2026-05-10 确认）：
+- **当前注册音色**（`GET /v1/voices/custom`，2026-05-13 复核；服务器还有 8 个同名"李四"，5 个可用、3 个返回 500，本平台仅挂载 created_at 最晚的 `ed35d3674bb0`，备用 voice_id 见 runtime.yaml 注释）：
 
 | 语言 | voice_id | 名称 | 性别 |
 |------|----------|------|------|
 | Chinese | `36d3429a3c98` | maryzhang | female |
+| Chinese | `ed35d3674bb0` | lisi | male |
 | English | `c3e9f75ae993` | willwu | male |
 
-新增音色同步修改 `src/demo_app/voice_resolver.py` 的 `COSYVOICE_VOICE_CATALOG` 和 `config/runtime.yaml` 的 `voice_catalog` 以及 `static/app.js` 的 `COSYVOICE_VOICE_CATALOG`（三处保持一致）。
+**新增音色：** 只改 `config/runtime.yaml` 的 `tts.real_human.voice_catalog` → 重启服务器 → 刷新浏览器。后端 `voice_resolver._load_voice_catalog_from_yaml()` 启动时读 yaml；前端 `app.js` 启动时调 `/api/voice_catalog` 拉同一份数据。**三处副本时代已结束**（2026-05-13 单源化）。
 
 ### 真人 TTS 合成流程（`task_runner._synthesize_with_real_human`）
 
@@ -379,10 +400,11 @@ src/
     rule_loader.py                 ← lru_cache loader for the three YAML rule files in config/
     tts_provider.py                ← TTS 数据模型（VoiceSpec/SynthesisRequest/SynthesisResult）+ TTSProvider ABC
     real_human_tts.py              ← RealHumanProvider：CosyVoice /v1/audio/speech 接入
-    voice_resolver.py              ← COSYVOICE_VOICE_CATALOG + resolve_voice_spec + build_synthesis_requests
+    voice_resolver.py              ← 单源加载 voice_catalog (from runtime.yaml)，提供 resolve_voice_spec /
+    │                                 build_synthesis_requests / reload_voice_catalog / get_voice_catalog_for_frontend
   webapp/
     db.py                          ← SQLite helpers (audio_files, tasks, folders tables)；list_tasks JOIN file_duration
-    handlers.py                    ← all /api/platform/* Tornado handlers
+    handlers.py                    ← all /api/platform/* Tornado handlers + VoiceCatalogHandler (/api/voice_catalog)
     routes.py                      ← PLATFORM_ROUTES list + register_platform_routes()
     task_runner.py                 ← background task worker；含 _synthesize_with_real_human 真人TTS合成路径
 static/
@@ -391,7 +413,7 @@ static/
   styles.css                       ← CSS variables, light/dark theme, component styles
 config/
   app.yaml                         ← host/port/GUI title
-  runtime.yaml                     ← backend routing flags (source_first vs bundle_fallback)
+  runtime.yaml                     ← backend routing flags + tts.real_human config + **唯一权威 voice_catalog**
   preset_topics.json               ← 22 preset dialogue scenarios (loaded by _load_preset_topics)
   online_audio_ui.json             ← preset theme catalog (18 industry templates) and UI defaults
   text_quality_rules.yaml          ← persona/conflict rules consumed by multilingual_naturalness.py

@@ -444,8 +444,14 @@ async def _synthesize_with_real_human(
 
     # ── 并发度 & 重试配置 ─────────────────────────────────────────────────────
     rh_cfg = _load_runtime_cfg().get("tts", {}).get("real_human", {})
-    max_concurrency = int(rh_cfg.get("max_concurrency", 5))
+    max_concurrency = int(rh_cfg.get("max_concurrency", 1))
     max_retries = int(rh_cfg.get("max_retries", 0))
+    # max_chars_per_segment：同说话人连续行合并上限。
+    # CosyVoice 为单 GPU 队列，总吞吐恒定 ~6 cps，并发无法加速。
+    # 较小值 → 段落更短、每段更快完成、进度更新更频繁（但总时间不变）。
+    # 较大值 → 更少 HTTP 往返，单段效率略高（测量约 4.2x realtime@500chars vs 1.2x@12chars）。
+    # 推荐：中文对话 200–500，英文对话 400–800。
+    max_chars = int(rh_cfg.get("max_chars_per_segment", 500))
     semaphore = asyncio.Semaphore(max_concurrency)
 
     # ── 构建 SynthesisRequest 列表（段落合并） ────────────────────────────────
@@ -455,6 +461,7 @@ async def _synthesize_with_real_human(
         voice_assignments=voice_assignments,
         voice_map=voice_map,
         effective_provider=effective_provider,
+        max_chars=max_chars,
     )
 
     # ── 并发合成所有段落 ──────────────────────────────────────────────────────

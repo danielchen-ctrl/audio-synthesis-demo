@@ -745,6 +745,144 @@ class StatsHandler(PlatformHandler):
         })
 
 
+# ── Voice Catalog (单一来源，前后端共用) ──────────────────────────────────────
+
+class VoiceCatalogHandler(PlatformHandler):
+    """
+    GET /api/voice_catalog
+    返回前端格式 catalog：{language: [{value, label, gender, name}, ...]}
+    数据源：config/runtime.yaml 的 tts.real_human.voice_catalog（唯一权威）
+    """
+
+    def get(self) -> None:
+        from demo_app.voice_resolver import get_voice_catalog_for_frontend
+        self.ok(get_voice_catalog_for_frontend())
+
+
+class VoiceCreateHandler(PlatformHandler):
+    """
+    POST /api/voice_catalog/create
+    上传音频 → CosyVoice 克隆 → 写入 runtime.yaml → 热重载
+
+    multipart 字段：
+      audio    (file)   参考音频文件（3-30 秒）
+      name     (str)    音色名称
+      language (str)    语言，如 Chinese / English
+      gender   (str)    female / male
+      text     (str)    参考文本（可选，留空服务端 ASR 自动识别）
+    """
+
+    async def post(self) -> None:
+        if not self.request.files.get("audio"):
+            raise HTTPError(400, reason="缺少 audio 字段（参考音频文件）")
+
+        upload = self.request.files["audio"][0]
+        audio_bytes: bytes = upload["body"]
+        audio_filename: str = upload["filename"]
+
+        name = (self.get_body_argument("name", "") or "").strip()
+        language = (self.get_body_argument("language", "Chinese") or "Chinese").strip()
+        gender = (self.get_body_argument("gender", "female") or "female").strip()
+        ref_text = (self.get_body_argument("text", "") or "").strip()
+
+        if not name:
+            raise HTTPError(400, reason="音色名称不能为空")
+
+        import asyncio
+        import requests as _rq
+        from demo_app.voice_resolver import _get_cosyvoice_api_url, create_voice_in_catalog
+
+        api_url = _get_cosyvoice_api_url()
+        if not api_url:
+            raise HTTPError(503, reason="CosyVoice API 未配置（runtime.yaml tts.real_human.api_url）")
+
+        def _do_create():
+            resp = _rq.post(
+                f"{api_url}/v1/voices/create",
+                files={"audio": (audio_filename, audio_bytes)},
+                data={"name": name, "text": ref_text},
+                timeout=120,
+            )
+            resp.raise_for_status()
+            try:
+                return resp.json()
+            except Exception:
+                return {}
+
+        loop = asyncio.get_running_loop()
+        try:
+            result = await loop.run_in_executor(None, _do_create)
+        except _rq.HTTPError as exc:
+            raise HTTPError(502, reason=f"CosyVoice 服务器错误 {exc.response.status_code}: {exc.response.text[:200]}")
+        except Exception as exc:
+            raise HTTPError(502, reason=f"CosyVoice 请求失败: {exc}")
+
+        # 兼容多种返回格式
+        voice_id = (
+            result.get("id")
+            or result.get("voice_id")
+            or (result.get("voice") or {}).get("id")
+        )
+        if not voice_id:
+            # 刷新列表取最新一条作为刚注册的音色
+            try:
+                def _fetch_latest():
+                    r = _rq.get(f"{api_url}/v1/voices/custom", timeout=15)
+                    r.raise_for_status()
+                    voices = r.json().get("voices", [])
+                    return voices[-1]["id"] if voices else None
+                voice_id = await loop.run_in_executor(None, _fetch_latest)
+            except Exception:
+                pass
+
+        if not voice_id:
+            raise HTTPError(502, reason=f"CosyVoice 未返回 voice_id，原始响应: {result}")
+
+        create_voice_in_catalog(language=language, voice_id=voice_id, name=name, gender=gender)
+
+        self.set_status(201)
+        self.ok({"voice_id": voice_id, "name": name, "language": language, "gender": gender})
+
+
+class VoiceDeleteHandler(PlatformHandler):
+    """
+    DELETE /api/voice_catalog/<voice_id>
+    从 CosyVoice 服务器删除音色（可选），并从 runtime.yaml 中移除。
+    query param: delete_remote=1（默认）/ 0 — 是否同时删除 CosyVoice 服务端记录
+    """
+
+    async def delete(self, voice_id: str) -> None:
+        import asyncio
+        import requests as _rq
+        from demo_app.voice_resolver import _get_cosyvoice_api_url, delete_voice_from_catalog
+
+        delete_remote = self.get_query_argument("delete_remote", "1") != "0"
+        api_url = _get_cosyvoice_api_url()
+
+        if delete_remote and api_url:
+            def _do_delete():
+                try:
+                    resp = _rq.delete(f"{api_url}/v1/voices/{voice_id}", timeout=30)
+                    return resp.status_code
+                except Exception:
+                    return 0
+
+            loop = asyncio.get_running_loop()
+            status = await loop.run_in_executor(None, _do_delete)
+            if status not in (200, 204, 404):
+                # 非 404 的失败不阻断本地删除，只记录警告
+                import logging
+                logging.getLogger(__name__).warning(
+                    "[VoiceDeleteHandler] CosyVoice DELETE /v1/voices/%s 返回 %s", voice_id, status
+                )
+
+        found = delete_voice_from_catalog(voice_id)
+        if not found:
+            raise HTTPError(404, reason=f"音色 {voice_id} 不在本地目录中")
+
+        self.ok({"voice_id": voice_id, "deleted": True})
+
+
 # ── Legacy Demo Page ──────────────────────────────────────────────────────────
 
 class LegacyPageHandler(RequestHandler):
