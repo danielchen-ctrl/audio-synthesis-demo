@@ -40,15 +40,22 @@ tts:
     #   1f8f9dc3b62f, 0d7b569f5645, 254f8f5a9efb, 7d5bc5e0d1eb
     # 失效 voice_id（实测返回 500，请勿启用）：
     #   227f07e81eb1, 268517ecf605, 2a90e77c54d4
+    # AI-男-英语（49da1353f8ad, fcd231f52834）：注册成功但合成返回 500，参考音频质量不足，暂未启用
     voice_catalog:
       Chinese:
-        - voice_id: "36d3429a3c98"
-          name: maryzhang
-          gender: female
-        - voice_id: "ed35d3674bb0"
-          name: lisi
-          gender: male
+      - voice_id: 36d3429a3c98
+        name: maryzhang
+        gender: female
+      - voice_id: ed35d3674bb0
+        name: lisi
+        gender: male
+      - voice_id: 06b1d3b50f22
+        name: AI-男音
+        gender: female
       English:
-        - voice_id: "c3e9f75ae993"
-          name: willwu
-          gender: male
+      - voice_id: c3e9f75ae993
+        name: willwu
+        gender: male
+      - voice_id: 1d8c3af1d010
+        name: AI-男音2
+        gender: male

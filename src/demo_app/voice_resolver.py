@@ -103,8 +103,11 @@ def _get_cosyvoice_api_url() -> str:
 
 def _save_voice_catalog_to_yaml(catalog: dict) -> None:
     """
-    将 voice_catalog 写回 runtime.yaml，仅覆盖 tts.real_human.voice_catalog 字段，
-    保留文件中其他所有配置（使用 yaml round-trip 保持结构）。
+    将 voice_catalog 写回 runtime.yaml，**只替换 voice_catalog 块**，
+    保留文件中所有其他配置和注释（包括备用/失效 voice_id 注释）。
+
+    实现：逐行定位 `    voice_catalog:` 行，替换该行到下一个同级或更高级 key 之间的内容，
+    不触碰文件其他部分。
     """
     try:
         import yaml
@@ -112,16 +115,64 @@ def _save_voice_catalog_to_yaml(catalog: dict) -> None:
         logger.error("[voice_resolver] PyYAML 未安装，无法保存 voice_catalog")
         return
     try:
-        cfg = yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8")) or {}
-        # 确保嵌套路径存在
-        cfg.setdefault("tts", {}).setdefault("real_human", {})["voice_catalog"] = catalog
-        _CONFIG_PATH.write_text(
-            yaml.dump(cfg, allow_unicode=True, default_flow_style=False, sort_keys=False),
-            encoding="utf-8",
-        )
-        logger.info("[voice_resolver] voice_catalog 已保存到 %s", _CONFIG_PATH)
+        text = _CONFIG_PATH.read_text(encoding="utf-8")
     except Exception as exc:
-        logger.error("[voice_resolver] 保存 voice_catalog 失败: %s", exc)
+        logger.error("[voice_resolver] 读取 %s 失败: %s", _CONFIG_PATH, exc)
+        raise
+
+    lines = text.splitlines(keepends=True)
+
+    # 找到 `    voice_catalog:` 行（real_human 下 4-space indent）
+    start_idx: int | None = None
+    for i, line in enumerate(lines):
+        if line.rstrip() == "    voice_catalog:":
+            start_idx = i
+            break
+
+    if start_idx is None:
+        # 块不存在，回退全量写入（注释丢失，但极少发生）
+        logger.warning("[voice_resolver] 未找到 voice_catalog 块，回退全量写入（注释将丢失）")
+        try:
+            cfg = yaml.safe_load(text) or {}
+            cfg.setdefault("tts", {}).setdefault("real_human", {})["voice_catalog"] = catalog
+            _CONFIG_PATH.write_text(
+                yaml.dump(cfg, allow_unicode=True, default_flow_style=False, sort_keys=False),
+                encoding="utf-8",
+            )
+        except Exception as exc:
+            logger.error("[voice_resolver] 保存 voice_catalog 失败: %s", exc)
+            raise
+        return
+
+    # 找到 voice_catalog 块的结束行：下一个 indent ≤ 4 的非空非注释行，或 EOF
+    end_idx = len(lines)
+    for i in range(start_idx + 1, len(lines)):
+        stripped = lines[i].lstrip()
+        if not stripped or stripped.startswith("#"):
+            continue  # 空行和注释行不终止块
+        leading = len(lines[i]) - len(stripped)
+        if leading <= 4:
+            end_idx = i
+            break
+
+    # 生成新的 voice_catalog YAML 块（4-space 缩进）
+    catalog_yaml = yaml.dump(
+        {"voice_catalog": catalog},
+        allow_unicode=True,
+        default_flow_style=False,
+        sort_keys=False,
+    )
+    new_block_lines = [
+        ("    " + l if l.strip() else l) + "\n"
+        for l in catalog_yaml.splitlines()
+    ]
+
+    new_lines = lines[:start_idx] + new_block_lines + lines[end_idx:]
+    try:
+        _CONFIG_PATH.write_text("".join(new_lines), encoding="utf-8")
+        logger.info("[voice_resolver] voice_catalog 已保存到 %s（注释已保留）", _CONFIG_PATH)
+    except Exception as exc:
+        logger.error("[voice_resolver] 写入 %s 失败: %s", _CONFIG_PATH, exc)
         raise
 
 

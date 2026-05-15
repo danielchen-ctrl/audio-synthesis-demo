@@ -305,7 +305,8 @@ const el = {
   confirmDialog: document.getElementById("confirmDialog"),
   confirmMessage: document.getElementById("confirmMessage"),
   confirmOkBtn: document.getElementById("confirmOkBtn"),
-  confirmCancelBtn: document.getElementById("confirmCancelBtn")
+  confirmCancelBtn: document.getElementById("confirmCancelBtn"),
+  voiceMgmtBtn: document.getElementById("voiceMgmtBtn")
 };
 
 function cloneOnlineAudioConfig(config = FALLBACK_ONLINE_AUDIO_CONFIG) {
@@ -2666,6 +2667,7 @@ function bindEvents() {
   // TTS 引擎切换按钮
   if (el.ttsEdgeBtn) el.ttsEdgeBtn.addEventListener("click", () => setTtsEngine("edge_tts"));
   if (el.ttsRealHumanBtn) el.ttsRealHumanBtn.addEventListener("click", () => setTtsEngine("real_human"));
+  if (el.voiceMgmtBtn) el.voiceMgmtBtn.addEventListener("click", openVoiceMgmt);
   el.outputFormat.addEventListener("change", () => {
     readFormFromDom();
     persistState();
@@ -2759,7 +2761,12 @@ function openVoiceMgmt() {
   const btn = document.getElementById("vm-submit-btn");
   if (btn) { btn.disabled = false; btn.textContent = "上传并注册音色"; }
   const overlay = document.getElementById("modal-voice-mgmt");
-  if (overlay) overlay.classList.add("open");
+  if (overlay) {
+    overlay.classList.add("open");
+    // 强制内联 style，防止 CSS 缓存导致弹窗不可见
+    overlay.style.display = "flex";
+    overlay.style.zIndex = "9999";
+  }
   vmRefreshList();
 }
 

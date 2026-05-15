@@ -116,9 +116,33 @@ v2 数据存于 `output/training_v2/`，已完成部分：
 
 ---
 
-## 🖥 Platform — Current Status (2026-05-13)
+## 🖥 Platform — Current Status (2026-05-16)
 
-**Phase: Live. 真人 TTS Phase 1 已上线。音色目录已单源化（runtime.yaml 为唯一权威）。Few-shot 索引使用 v3 训练数据，服务器重启后自动加载。**
+**Phase: Live. 真人 TTS Phase 1 已上线。音色目录已单源化（runtime.yaml 为唯一权威）。支持在线管理（上传/删除）真人克隆音色。**
+
+### 近期变更（2026-05-16）— 音色管理 UI + 在线注册/删除接口
+
+| 文件 | 改动 |
+|------|------|
+| `static/index.html` | 新增 `#modal-voice-mgmt` 音色管理弹窗（上传参考音频、填写名称/语言/性别、注册新音色；列出已注册音色并支持删除）；按钮从"管理音色"改名为"⚙️ 管理真人音色"并调整到中间位置（真人音色 → 管理真人音色 → 合成音色）；`.mo-overlay` z-index 200→700；`closeModal()` 同步清除内联 style；修复 `--border1`/`--text1` 未定义 CSS 变量（→ `--border`/`--text`） |
+| `static/app.js` | 新增 `openVoiceMgmt()`（强制内联 style z-index:9999，绕过 CSS 缓存）、`vmHandleFile()`、`vmRefreshList()`、`vmDeleteVoice()`、`vmSubmit()`；`voiceMgmtBtn` 加入 `el` 对象并在 `bindEvents()` 中以 `addEventListener` 绑定（双保险，兼容 onclick 属性） |
+| `src/webapp/handlers.py` | 新增 `VoiceCreateHandler`（`POST /api/voice_catalog/create`）：接收 multipart（audio/name/language/gender/text），代理到 CosyVoice `/v1/voices/create`，支持 3 种 voice_id 响应格式，返回 201；新增 `VoiceDeleteHandler`（`DELETE /api/voice_catalog/<voice_id>`）：可选 `delete_remote=1` 删除 CosyVoice 服务器端音色，始终从本地 catalog 删除 |
+| `src/webapp/routes.py` | 注册 `/api/voice_catalog/create`（specific，在 regex 路由前）和 `/api/voice_catalog/([^/]+)` |
+| `src/demo_app/voice_resolver.py` | 新增 `_get_cosyvoice_api_url()`（优先环境变量）；`_save_voice_catalog_to_yaml()`（逐行定位 `voice_catalog:` 块替换，**保留文件全部注释**）；`create_voice_in_catalog()`；`delete_voice_from_catalog()` |
+| `config/runtime.yaml` | 恢复 maryzhang（36d3429a3c98）到中文目录；移除失效音色 fcd231f52834（合成返回 500）；新增用户上传的 AI-男音（06b1d3b50f22，中文）和 AI-男音2（1d8c3af1d010，英文） |
+
+**音色管理 API（新增）：**
+```
+POST   /api/voice_catalog/create          ← multipart: audio(file) + name + language + gender + text(可选)
+DELETE /api/voice_catalog/<voice_id>      ← ?delete_remote=0|1（默认 0，仅删本地）
+GET    /api/voice_catalog                 ← 已有，返回前端格式 catalog
+```
+
+**CosyVoice 音色注册注意事项（2026-05-16 实测）：**
+- `/v1/voices/create` 成功（返回 voice_id）≠ 合成可用：注册 API 总是成功，但合成时可能返回 500
+- 失败原因通常是参考音频质量不足（录音有噪音/背景音/多人/时长不足）
+- 推荐参考音频：单人朗读、清晰无噪音、10–30 秒、无背景音乐
+- 工具脚本：`tools/test_voice_e2e.py`（完整 E2E：create → verify catalog → verify yaml → delete）
 
 ### 近期变更（2026-05-13）— 音色目录单源化
 
@@ -231,6 +255,9 @@ Batch    POST      /api/platform/batch/move
          POST      /api/platform/batch/delete
          GET       /api/platform/batch/download
 Stats    GET       /api/platform/stats
+Voices   GET       /api/voice_catalog               ← 获取前端格式音色目录
+         POST      /api/voice_catalog/create        ← 上传参考音频注册新克隆音色（multipart）
+         DELETE    /api/voice_catalog/<voice_id>    ← 删除音色（?delete_remote=0|1）
 Legacy   GET       /legacy
 ```
 
@@ -259,17 +286,19 @@ Schema per entry:
 
 **Phase: Phase 1 全部上线 ✅。CosyVoice `/v1/audio/speech` 端点已接入，中英文真人克隆音色可用。**
 
-完整方案见：[`docs/real-human-tts-integration.md`](docs/real-human-tts-integration.md)
-
 ### 已实现文件
 
 ```
 src/demo_app/
   tts_provider.py      ← VoiceSpec / SynthesisRequest / SynthesisResult / ProviderCapabilities 数据模型 + TTSProvider ABC
   real_human_tts.py    ← RealHumanProvider（CosyVoice /v1/audio/speech 同步端点）
-  voice_resolver.py    ← 单源加载 voice_catalog (from runtime.yaml) + resolve_voice_spec + build_synthesis_requests + get_voice_catalog_for_frontend
+  voice_resolver.py    ← 单源加载 voice_catalog (from runtime.yaml) + resolve_voice_spec + build_synthesis_requests
+  │                       + get_voice_catalog_for_frontend + create_voice_in_catalog + delete_voice_from_catalog
+  │                       + _save_voice_catalog_to_yaml（逐行替换，保留所有注释）
 src/webapp/
-  handlers.py          ← VoiceCatalogHandler 处理 GET /api/voice_catalog
+  handlers.py          ← VoiceCatalogHandler (GET) + VoiceCreateHandler (POST) + VoiceDeleteHandler (DELETE)
+tools/
+  test_voice_e2e.py    ← E2E 测试：create → verify catalog → verify yaml → delete
 ```
 
 ### CosyVoice API 关键信息
@@ -277,13 +306,15 @@ src/webapp/
 - **端点**：`POST /v1/audio/speech`（OpenAI-compatible，JSON body → WAV bytes 直接返回）
 - **废弃端点**：`/api/tts/async`（zero_shot 模式需要 `prompt_wav`，仅传 `spk_id` 报 "Invalid file: None"）
 - **请求格式**：`{"model": "cosyvoice-v3", "input": "<text>", "voice": "<voice_id>", "response_format": "wav", "speed": 1.0}`
-- **当前注册音色**（`GET /v1/voices/custom`，2026-05-13 复核；服务器还有 8 个同名"李四"，5 个可用、3 个返回 500，本平台仅挂载 created_at 最晚的 `ed35d3674bb0`，备用 voice_id 见 runtime.yaml 注释）：
+- **当前注册音色**（`GET /v1/voices/custom`，2026-05-16 更新；服务器还有 8 个同名"李四"，5 个可用、3 个返回 500，本平台仅挂载 created_at 最晚的 `ed35d3674bb0`，备用 voice_id 见 runtime.yaml 注释）：
 
-| 语言 | voice_id | 名称 | 性别 |
-|------|----------|------|------|
-| Chinese | `36d3429a3c98` | maryzhang | female |
-| Chinese | `ed35d3674bb0` | lisi | male |
-| English | `c3e9f75ae993` | willwu | male |
+| 语言 | voice_id | 名称 | 性别 | 状态 |
+|------|----------|------|------|------|
+| Chinese | `36d3429a3c98` | maryzhang | female | ✅ 可用 |
+| Chinese | `ed35d3674bb0` | lisi | male | ✅ 可用 |
+| Chinese | `06b1d3b50f22` | AI-男音 | male | ✅ 可用（2026-05-16 新增）|
+| English | `c3e9f75ae993` | willwu | male | ✅ 可用 |
+| English | `1d8c3af1d010` | AI-男音2 | male | ✅ 可用（2026-05-16 新增）|
 
 **新增音色：** 只改 `config/runtime.yaml` 的 `tts.real_human.voice_catalog` → 重启服务器 → 刷新浏览器。后端 `voice_resolver._load_voice_catalog_from_yaml()` 启动时读 yaml；前端 `app.js` 启动时调 `/api/voice_catalog` 拉同一份数据。**三处副本时代已结束**（2026-05-13 单源化）。
 
@@ -437,8 +468,7 @@ tools/training/
   build_v3_jobs.py                 ← v3 job builder (short + long tier)
   run_all_batches.py               ← B0→B5 sequential runner (v2, superseded)
 docs/
-  real-human-tts-integration.md   ← 真人 TTS API 接入方案 v4.1（规划中）
-  platform-changes.md             ← platform change log
+  PROJECT_EXPLANATION.md          ← project overview / file map / module deep dive
 ```
 
 ### The "bundle" concept
