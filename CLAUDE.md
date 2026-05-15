@@ -124,8 +124,8 @@ v2 数据存于 `output/training_v2/`，已完成部分：
 
 | 文件 | 改动 |
 |------|------|
-| `src/demo_app/embedded_server_main.py` | `_generate_text_payload()` / `_create_manual_dialogue_payload()` 加 `save_dir: Path \| None = None` 参数，默认 `storage/generated/<dialogue_id>/`，不再写 `demo-data/<timestamp>/`；`_ensure_manifest_cache()` 改为双源扫描（`storage/generated/*/manifest.json` + 旧 `demo-data/*/manifest.json` 兼容历史任务）；`_resolve_audio_target` 和详情下载接口的兜底路径 `demo-data` → `storage/generated`；`_task_storage_dir` 允许两个根（storage/generated / demo-data）让旧任务仍可删除 |
-| `src/webapp/task_runner.py` | 调 `_generate_text_payload` 时显式传 `save_dir=storage/generated/<task_id>/`，文本生成直接落到任务目录；text_only 模式不再单独写 txt，复用 `result["text_path"]`（避免同目录两份 .txt） |
+| `src/demo_app/embedded_server_main.py` | `_generate_text_payload()` / `_create_manual_dialogue_payload()` 加 `save_dir: Path \| None = None` 参数，默认 `storage/generated/<dialogue_id>/`，不再写 `demo-data/<timestamp>/`；`_ensure_manifest_cache()` 改为双源扫描（`storage/generated/*/manifest.json` + 旧 `demo-data/*/manifest.json` 兼容历史任务），并改用 `setdefault` 保证 mtime 倒序遍历下同 dialogue_id 重复时**最新条目胜出**；`_resolve_audio_target` 和详情下载接口的兜底路径 `demo-data` → `storage/generated`；`_task_storage_dir` 允许两个根（storage/generated / demo-data）让旧任务仍可删除 |
+| `src/webapp/task_runner.py` | 调 `_generate_text_payload` 时显式传 `save_dir=storage/generated/<task_id>/`，文本生成直接落到任务目录；**复用 `result["basename"]` 作为音频文件 basename**（修复 txt 与 mp3 同目录但 basename 不一致的 bug——之前 txt 用 bundle 生成的含 timestamp basename、mp3 用 `_safe_basename(topic)`）；text_only 模式不再单独写 txt，复用 `result["text_path"]`（避免同目录两份 .txt）；direct 输入模式保留 `_safe_basename(topic)` 兜底 |
 | `CLAUDE.md` | 更新 Request lifecycle 描述与目录布局说明 |
 
 **目录结构（新）**：
@@ -133,15 +133,17 @@ v2 数据存于 `output/training_v2/`，已完成部分：
 storage/generated/
 ├── <task_id>/                 ← 平台任务（16 字符 hex）
 │   ├── manifest.json
-│   ├── <主题>_<ts>.txt
-│   └── <主题>_<ts>.mp3
+│   ├── <basename>.txt         ← txt 与 mp3 共用同一 basename
+│   └── <basename>.mp3
 └── <dialogue_id>/             ← legacy 模态框任务（8 字符）
     ├── manifest.json
-    ├── <主题>.txt
-    └── <主题>.mp3
+    ├── <basename>.txt
+    └── <basename>.mp3
 ```
 
 **向后兼容**：`demo-data/<timestamp>/` 历史任务保留不删，manifest cache 启动时一并扫描，legacy 模态框的任务详情/重播仍可正常打开。
+
+**已知边界**：direct 模式（用户在 manual 表单粘贴文本、不走 LLM）目录里只有 `.mp3`，没有 `.txt`/`manifest.json`——预存在行为，本次未引入也未修复。如需统一可让 task_runner 在 direct 路径也写一份 txt + manifest。
 
 ### 近期变更（2026-05-16）— 音色管理 UI + 在线注册/删除接口
 
