@@ -560,6 +560,7 @@ async def _process_task(task_id: str) -> None:
     include_scripts = bool(task.get("include_scripts", 0))
     voice_map: dict[str, str] = json.loads(task.get("voice_map") or "{}")
     dialogue_id: str | None = None
+    text_path_from_payload: str | None = None
 
     # ── Step 1: 生成文本 ───────────────────────────────────────────────────
     db.update_task_status(task_id, "generating_text")
@@ -584,13 +585,18 @@ async def _process_task(task_id: str) -> None:
                 "keyword_terms": json.loads(task.get("keywords") or "[]"),
             }
             bundle_server = load_bundle_server()
+            task_save_dir = ROOT / "storage" / "generated" / task_id
             loop = asyncio.get_running_loop()
             result: dict = await loop.run_in_executor(
-                None, lambda: _generate_text_payload(bundle_server, payload)
+                None,
+                lambda: _generate_text_payload(
+                    bundle_server, payload, save_dir=task_save_dir
+                ),
             )
             if not result.get("ok"):
                 raise RuntimeError(result.get("error") or "文本生成失败（未知错误）")
             dialogue_id = result["dialogue_id"]
+            text_path_from_payload = result.get("text_path")
             line_tuples = _parse_lines(result["dialogue_text"])
             if not line_tuples:
                 raise RuntimeError("LLM 返回文本为空或格式错误")
@@ -604,10 +610,15 @@ async def _process_task(task_id: str) -> None:
     if generation_mode == "text_only":
         save_dir = ROOT / "storage" / "generated" / task_id
         save_dir.mkdir(parents=True, exist_ok=True)
-        basename = _safe_basename(topic)
-        txt_path = save_dir / f"{basename}.txt"
-        text_content = "\n".join(f"{spk}: {txt}" for spk, txt in line_tuples)
-        txt_path.write_text(text_content, encoding="utf-8")
+        if text_path_from_payload:
+            # LLM 分支：_generate_text_payload 已写好 txt（含 bundle 标准渲染 + manifest），直接复用
+            txt_path = Path(text_path_from_payload)
+        else:
+            # direct 输入兜底：自己写一份
+            basename = _safe_basename(topic)
+            txt_path = save_dir / f"{basename}.txt"
+            text_content = "\n".join(f"{spk}: {txt}" for spk, txt in line_tuples)
+            txt_path.write_text(text_content, encoding="utf-8")
         file_size = txt_path.stat().st_size
 
         tx_json: str | None = json.dumps(

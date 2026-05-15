@@ -855,7 +855,11 @@ def _generate_long_dialogue_lines(
     return accumulated, last_rewrite_info
 
 
-def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[str, Any]:
+def _generate_text_payload(
+    bundle_server: Any,
+    payload: dict[str, Any],
+    save_dir: Path | None = None,
+) -> dict[str, Any]:
     language = _canonical_language(str(payload.get("audio_language") or payload.get("language") or "Chinese"))
     lbl = _prompt_labels(language)
     profile, generation_context = _normalize_request_params(payload, language)
@@ -997,7 +1001,8 @@ def _generate_text_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     dialogue_id = _new_dialogue_id()
     basename = _basename_from_title(title, timestamp, bundle_server.generate_basename(profile, language, timestamp))
-    save_dir = ROOT / "demo-data" / timestamp
+    if save_dir is None:
+        save_dir = ROOT / "storage" / "generated" / dialogue_id
     save_dir.mkdir(parents=True, exist_ok=True)
     text_path = save_dir / f"{basename}.txt"
     text_path.write_text(dialogue_text, encoding="utf-8")
@@ -1082,23 +1087,28 @@ def _ensure_manifest_cache() -> None:
     with _manifest_cache_lock:
         if _manifest_cache_loaded:
             return
-        demo_root = ROOT / "demo-data"
-        if demo_root.exists():
-            # Sort by mtime desc and cap at _MANIFEST_CACHE_MAX so that
-            # large historical demo-data/ trees don't fill memory on startup.
-            all_manifests = sorted(
-                demo_root.glob("*/manifest.json"),
-                key=lambda p: p.stat().st_mtime,
-                reverse=True,
-            )[:_MANIFEST_CACHE_MAX]
-            for manifest_path in all_manifests:
-                try:
-                    manifest = _read_json(manifest_path)
-                    did = manifest.get("dialogue_id")
-                    if did:
-                        _manifest_cache[did] = (manifest_path, manifest)
-                except Exception:
-                    continue
+        # Scan both the new single-source root (storage/generated/<id>/manifest.json)
+        # and the legacy demo-data/<timestamp>/manifest.json tree so that historical
+        # tasks created before the migration remain readable.
+        candidates: list[Path] = []
+        for root in (ROOT / "storage" / "generated", ROOT / "demo-data"):
+            if root.exists():
+                candidates.extend(root.glob("*/manifest.json"))
+        # Sort by mtime desc and cap at _MANIFEST_CACHE_MAX so large historical
+        # trees don't fill memory on startup.
+        all_manifests = sorted(
+            candidates,
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )[:_MANIFEST_CACHE_MAX]
+        for manifest_path in all_manifests:
+            try:
+                manifest = _read_json(manifest_path)
+                did = manifest.get("dialogue_id")
+                if did:
+                    _manifest_cache[did] = (manifest_path, manifest)
+            except Exception:
+                continue
         _manifest_cache_loaded = True
 
 
@@ -1212,7 +1222,11 @@ def _save_dialogue_edit(bundle_server: Any, dialogue_id: str, dialogue_text: str
     }
 
 
-def _create_manual_dialogue_payload(bundle_server: Any, payload: dict[str, Any]) -> dict[str, Any]:
+def _create_manual_dialogue_payload(
+    bundle_server: Any,
+    payload: dict[str, Any],
+    save_dir: Path | None = None,
+) -> dict[str, Any]:
     title = str(payload.get("title") or "在线生成音频").strip() or "在线生成音频"
     language = _canonical_language(str(payload.get("language") or payload.get("audio_language") or "Chinese"))
     people_count = max(1, min(10, _safe_int(payload.get("people_count"), 2)))
@@ -1227,7 +1241,8 @@ def _create_manual_dialogue_payload(bundle_server: Any, payload: dict[str, Any])
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     dialogue_id = _new_dialogue_id()
     basename = _basename_from_title(title, timestamp, "manual_dialogue")
-    save_dir = ROOT / "demo-data" / timestamp
+    if save_dir is None:
+        save_dir = ROOT / "storage" / "generated" / dialogue_id
     save_dir.mkdir(parents=True, exist_ok=True)
     text_path = save_dir / f"{basename}.txt"
     text_path.write_text(dialogue_text, encoding="utf-8")
@@ -1320,7 +1335,7 @@ def _cleanup_extra_audio_formats(audio_paths: dict[str, Path], keep_format: str)
 
 
 def _resolve_audio_target(manifest: dict[str, Any], dialogue_id: str) -> Path | None:
-    save_dir = Path(manifest.get("save_dir") or ROOT / "demo-data")
+    save_dir = Path(manifest.get("save_dir") or ROOT / "storage" / "generated")
     basename = str(manifest.get("basename") or dialogue_id)
     audio_path = str(manifest.get("audio_path") or "").strip()
     if audio_path:
@@ -1344,14 +1359,28 @@ def _task_storage_dir(manifest_path: Path, manifest: dict[str, Any]) -> Path:
     except OSError:
         resolved = candidate.absolute()
 
-    demo_root = (ROOT / "demo-data").resolve()
-    try:
-        resolved.relative_to(demo_root)
-    except ValueError as exc:
-        raise HTTPError(400, reason="task save_dir is outside demo-data directory") from exc
+    # Accept the new single-source root (storage/generated/) and the legacy
+    # demo-data/ root so historical tasks remain deletable.
+    allowed_roots = [
+        (ROOT / "storage" / "generated").resolve(),
+        (ROOT / "demo-data").resolve(),
+    ]
+    matched_root: Path | None = None
+    for root in allowed_roots:
+        try:
+            resolved.relative_to(root)
+        except ValueError:
+            continue
+        matched_root = root
+        break
+    if matched_root is None:
+        raise HTTPError(
+            400,
+            reason="task save_dir is outside storage/generated or demo-data",
+        )
 
-    if resolved == demo_root:
-        raise HTTPError(400, reason="refuse to delete demo root")
+    if resolved == matched_root:
+        raise HTTPError(400, reason="refuse to delete storage root")
 
     return resolved
 
@@ -1841,7 +1870,7 @@ class DownloadHandler(RequestHandler):
             _, manifest = _find_manifest(dialogue_id)
         except FileNotFoundError as exc:
             raise HTTPError(404, reason=str(exc)) from exc
-        save_dir = Path(manifest.get("save_dir") or ROOT / "demo-data")
+        save_dir = Path(manifest.get("save_dir") or ROOT / "storage" / "generated")
 
         if kind == "text":
             target = Path(manifest["text_path"])

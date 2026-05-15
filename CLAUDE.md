@@ -118,7 +118,30 @@ v2 数据存于 `output/training_v2/`，已完成部分：
 
 ## 🖥 Platform — Current Status (2026-05-16)
 
-**Phase: Live. 真人 TTS Phase 1 已上线。音色目录已单源化（runtime.yaml 为唯一权威）。支持在线管理（上传/删除）真人克隆音色。**
+**Phase: Live. 真人 TTS Phase 1 已上线。音色目录已单源化（runtime.yaml 为唯一权威）。支持在线管理（上传/删除）真人克隆音色。生成产物单源化（`storage/generated/<id>/` 一文件夹同时存对话文本 + manifest + 音频）。**
+
+### 近期变更（2026-05-16）— 生成产物单源到 `storage/generated/`
+
+| 文件 | 改动 |
+|------|------|
+| `src/demo_app/embedded_server_main.py` | `_generate_text_payload()` / `_create_manual_dialogue_payload()` 加 `save_dir: Path \| None = None` 参数，默认 `storage/generated/<dialogue_id>/`，不再写 `demo-data/<timestamp>/`；`_ensure_manifest_cache()` 改为双源扫描（`storage/generated/*/manifest.json` + 旧 `demo-data/*/manifest.json` 兼容历史任务）；`_resolve_audio_target` 和详情下载接口的兜底路径 `demo-data` → `storage/generated`；`_task_storage_dir` 允许两个根（storage/generated / demo-data）让旧任务仍可删除 |
+| `src/webapp/task_runner.py` | 调 `_generate_text_payload` 时显式传 `save_dir=storage/generated/<task_id>/`，文本生成直接落到任务目录；text_only 模式不再单独写 txt，复用 `result["text_path"]`（避免同目录两份 .txt） |
+| `CLAUDE.md` | 更新 Request lifecycle 描述与目录布局说明 |
+
+**目录结构（新）**：
+```
+storage/generated/
+├── <task_id>/                 ← 平台任务（16 字符 hex）
+│   ├── manifest.json
+│   ├── <主题>_<ts>.txt
+│   └── <主题>_<ts>.mp3
+└── <dialogue_id>/             ← legacy 模态框任务（8 字符）
+    ├── manifest.json
+    ├── <主题>.txt
+    └── <主题>.mp3
+```
+
+**向后兼容**：`demo-data/<timestamp>/` 历史任务保留不删，manifest cache 启动时一并扫描，legacy 模态框的任务详情/重播仍可正常打开。
 
 ### 近期变更（2026-05-16）— 音色管理 UI + 在线注册/删除接口
 
@@ -452,7 +475,12 @@ config/
   text_postprocess_rules.yaml      ← term-rewrite rules per language
 demo-data/
   training_long_dialogue/          ← few-shot corpus: 630 files, 14 domains × 9 languages × 5 variants
+  <timestamp>/                     ← legacy history pre-migration; manifest cache double-scans for back-compat
   README.md
+storage/
+  generated/<id>/                  ← **生成产物单源目录**：txt + manifest.json + mp3 同一文件夹
+                                       <id> = task_id (16 hex, 平台任务) 或 dialogue_id (8 字符, legacy 模态框)
+  uploaded/                        ← 用户上传的音频文件
 runtime/
   platform.db                      ← SQLite DB (gitignored; auto-created on first start)
   cache/                           ← bundle extraction cache (gitignored; regenerated at startup)
@@ -543,7 +571,7 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 4. Few-shot example injected: `get_topic_few_shot_example(template_label, language)` → 优先查 `output/training_v3/*/passed/`（v3 long tier 优先），回退到旧语料库 `demo-data/training_long_dialogue/`
 5. `_generate_long_dialogue_lines()` → calls bundle LLM, loops with dedup until word-count target is met
 6. Three post-processing passes: `repair_dialogue_quality` → `merge_keywords_into_lines` → `stabilize_dialogue_constraints`
-7. Written to `demo-data/{timestamp}/{basename}.txt` + `manifest.json`; registered in in-memory LRU cache (`_manifest_cache`, 500-entry cap)
+7. Written to `storage/generated/{dialogue_id}/{basename}.txt` + `manifest.json`（platform 任务则写入 `storage/generated/{task_id}/`）；registered in in-memory LRU cache (`_manifest_cache`, 500-entry cap). 旧任务在 `demo-data/{timestamp}/` 仍可访问——manifest cache 启动时双源扫描兼容历史数据。
 
 **Audio synthesis (`POST /api/synthesize_audio`)**
 1. Manifest looked up from cache/disk (`_find_manifest`)
