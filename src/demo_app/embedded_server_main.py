@@ -1106,7 +1106,8 @@ def _ensure_manifest_cache() -> None:
                 manifest = _read_json(manifest_path)
                 did = manifest.get("dialogue_id")
                 if did:
-                    _manifest_cache[did] = (manifest_path, manifest)
+                    # mtime 倒序遍历，setdefault 保证同 dialogue_id 重复时保留最新
+                    _manifest_cache.setdefault(did, (manifest_path, manifest))
             except Exception:
                 continue
         _manifest_cache_loaded = True

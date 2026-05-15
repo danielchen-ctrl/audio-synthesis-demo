@@ -561,6 +561,7 @@ async def _process_task(task_id: str) -> None:
     voice_map: dict[str, str] = json.loads(task.get("voice_map") or "{}")
     dialogue_id: str | None = None
     text_path_from_payload: str | None = None
+    basename_from_payload: str | None = None
 
     # ── Step 1: 生成文本 ───────────────────────────────────────────────────
     db.update_task_status(task_id, "generating_text")
@@ -597,6 +598,7 @@ async def _process_task(task_id: str) -> None:
                 raise RuntimeError(result.get("error") or "文本生成失败（未知错误）")
             dialogue_id = result["dialogue_id"]
             text_path_from_payload = result.get("text_path")
+            basename_from_payload = result.get("basename")
             line_tuples = _parse_lines(result["dialogue_text"])
             if not line_tuples:
                 raise RuntimeError("LLM 返回文本为空或格式错误")
@@ -656,7 +658,9 @@ async def _process_task(task_id: str) -> None:
 
     save_dir = ROOT / "storage" / "generated" / task_id
     save_dir.mkdir(parents=True, exist_ok=True)
-    basename = _safe_basename(topic)
+    # 优先复用 _generate_text_payload 写 txt/manifest 时的 basename，
+    # 保证同一 task 目录下 txt 与音频文件名一致（direct 模式没有 payload 时兜底）
+    basename = basename_from_payload or _safe_basename(topic)
 
     tts_provider = task.get("tts_provider") or "edge_tts"
 
