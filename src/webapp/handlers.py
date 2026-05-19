@@ -797,7 +797,7 @@ class VoiceCreateHandler(PlatformHandler):
             raise HTTPError(503, reason="CosyVoice API 未配置（runtime.yaml tts.real_human.api_url）")
 
         def _do_create():
-            import subprocess, tempfile, os
+            import subprocess, tempfile, os, shutil
             # ── 预处理：统一转为 16kHz mono WAV ──────────────────────────────
             # CosyVoice Speaker Encoder 要求单声道输入；双声道、高采样率或低码率
             # 的压缩格式（MP3 24kbps 等）均会导致 Embedding 提取失败（HTTP 500）。
@@ -810,7 +810,9 @@ class VoiceCreateHandler(PlatformHandler):
                     f.write(audio_bytes)
                     tmp_in = f.name
                 tmp_out = tmp_in + "_16k_mono.wav"
-                ffmpeg = _ffmpeg_path()
+                # 优先用 bin/ffmpeg.exe，回退到 PATH 上的 ffmpeg
+                _bin = Path(__file__).resolve().parents[2] / "bin" / "ffmpeg.exe"
+                ffmpeg = str(_bin) if _bin.exists() else shutil.which("ffmpeg") or "ffmpeg"
                 result_ff = subprocess.run(
                     [ffmpeg, "-y", "-i", tmp_in,
                      "-ar", "16000", "-ac", "1", "-f", "wav", tmp_out],
