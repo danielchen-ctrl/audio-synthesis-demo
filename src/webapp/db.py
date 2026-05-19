@@ -139,8 +139,9 @@ def create_task(data: dict) -> dict:
                  word_count, template, keywords, custom_prompt, input_text,
                  voice_map, output_format, include_scripts,
                  tts_provider, tts_fallback_strategy, voice_assignments,
+                 dialogue_id,
                  created_at, updated_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,
             (
                 tid,
@@ -160,6 +161,7 @@ def create_task(data: dict) -> dict:
                 data.get("tts_provider", "edge_tts"),
                 data.get("tts_fallback_strategy", "edge_then_bundle"),
                 va,
+                data.get("dialogue_id") or None,
                 now,
                 now,
             ),

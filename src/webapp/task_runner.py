@@ -672,7 +672,15 @@ async def _process_task(task_id: str) -> None:
     db.update_task_status(task_id, "synthesizing")
     logger.info("Task %s: synthesizing audio (%d lines)", task_id, len(line_tuples))
 
-    save_dir = ROOT / "storage" / "generated" / task_id
+    # direct 模式：若前端传来了 dialogue_id（文本已写入该目录），
+    # 优先用 dialogue_id 目录，保证 txt + manifest + 音频落在同一文件夹。
+    # llm 模式：_generate_text_payload 已写到 task_id 目录，继续用 task_id。
+    _pre_dialogue_id = dialogue_id or task.get("dialogue_id") or ""
+    _pre_dir = ROOT / "storage" / "generated" / _pre_dialogue_id if _pre_dialogue_id else None
+    if _pre_dir and _pre_dir.exists() and generation_mode == "direct":
+        save_dir = _pre_dir
+    else:
+        save_dir = ROOT / "storage" / "generated" / task_id
     save_dir.mkdir(parents=True, exist_ok=True)
     # 优先复用 _generate_text_payload 写 txt/manifest 时的 basename，
     # 保证同一 task 目录下 txt 与音频文件名一致（direct 模式没有 payload 时兜底）

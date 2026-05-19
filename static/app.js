@@ -2225,6 +2225,7 @@ async function submitRealHumanTask(workingText, dialogueId) {
       body: JSON.stringify({
         generation_mode: "direct",
         input_text: inputText,
+        dialogue_id: dialogueId || undefined,
         topic,
         language,
         people_count: speakerCountValue(),
@@ -2258,7 +2259,7 @@ async function submitRealHumanTask(workingText, dialogueId) {
  * 合成音色模式：把对话文本作为直接输入任务提交到平台任务队列。
  * 行为与 submitRealHumanTask 一致：关闭弹窗并跳转到生成任务页。
  */
-async function submitEdgeTtsTask(workingText) {
+async function submitEdgeTtsTask(workingText, dialogueId) {
   const topic = currentTitle() || "合成音色生成";
   const language = currentLanguageBackend();
   const voiceMap = gatherVoiceAssignments();
@@ -2281,6 +2282,7 @@ async function submitEdgeTtsTask(workingText) {
       body: JSON.stringify({
         generation_mode: "direct",
         input_text: inputText,
+        dialogue_id: dialogueId || undefined,
         topic,
         language,
         people_count: speakerCountValue(),
@@ -2340,7 +2342,7 @@ async function submitAudioGeneration() {
       showToast("err", "请先生成对话文本，再提交合成音色任务");
       return;
     }
-    await submitEdgeTtsTask(workingText);
+    await submitEdgeTtsTask(workingText, state.form.dialogueId);
     return;
   }
 
