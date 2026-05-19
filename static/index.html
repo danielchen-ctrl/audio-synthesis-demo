@@ -1590,12 +1590,13 @@ function renderDetail(f){
       const latency=s.latency_ms?s.latency_ms+'ms':'—';
       // 错误消息行（仅失败段落）
       const errRow=(!ok && s.error_msg)?`<tr>
-        <td colspan="5" style="padding:2px 8px 6px 32px;font-size:11px;color:var(--danger);font-family:monospace;word-break:break-all;opacity:.85">${esc(s.error_msg)}</td>
+        <td colspan="6" style="padding:2px 8px 6px 32px;font-size:11px;color:var(--danger);font-family:monospace;word-break:break-all;opacity:.85">${esc(s.error_msg)}</td>
       </tr>`:'';
-      const voiceLabel=s.voice_name?`<div style="font-size:10px;color:var(--text3);margin-top:1px">${esc(s.voice_name)}</div>`:'';
+      const voiceName=s.voice_name?esc(s.voice_name):'—';
       return`<tr>
         <td style="padding:4px 8px;font-size:12px">${icon}</td>
-        <td style="padding:4px 8px;font-size:12px">${esc(s.speaker||('段'+s.segment_idx))}${voiceLabel}</td>
+        <td style="padding:4px 8px;font-size:12px">${esc(s.speaker||('段'+s.segment_idx))}</td>
+        <td style="padding:4px 8px;font-size:12px;color:var(--text2)">${voiceName}</td>
         <td style="padding:4px 8px;font-size:12px;color:${ok?'var(--success)':'var(--warning)'}">${provider}</td>
         <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${esc(reason)}</td>
         <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${latency}</td>
@@ -1608,6 +1609,7 @@ function renderDetail(f){
           <thead><tr style="color:var(--text3)">
             <th style="padding:4px 8px;text-align:left;font-weight:500"></th>
             <th style="padding:4px 8px;text-align:left;font-weight:500">说话人</th>
+            <th style="padding:4px 8px;text-align:left;font-weight:500">音色</th>
             <th style="padding:4px 8px;text-align:left;font-weight:500">实际引擎</th>
             <th style="padding:4px 8px;text-align:left;font-weight:500">降级原因</th>
             <th style="padding:4px 8px;text-align:left;font-weight:500">耗时</th>
