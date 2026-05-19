@@ -1840,7 +1840,7 @@ def _prepare_chinese_dialogue_context(
     keywords: list[str],
     generation_context: dict[str, Any] | None,
 ) -> dict[str, Any]:
-    order = [f"Speaker {i}" for i in range(1, max(2, people_count) + 1)]
+    order = [f"Speaker {i}" for i in range(1, max(1, people_count) + 1)]
     topic = _context_topic_fragment(title, scenario, core_content, profile)
     medical = _is_medical_context(scenario, core_content, profile)
     context = _normalize_generation_context(generation_context)
