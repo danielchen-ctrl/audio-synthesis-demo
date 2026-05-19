@@ -1472,9 +1472,7 @@ function validateLlmBeforeGenerateText() {
   if (!el.llmLanguage.value) {
     return "请选择文本语言";
   }
-  if (speakerCountValue() < 2) {
-    return "LLM 生成对话时，说话人数至少需要 2 人";
-  }
+
   if (!Number.isInteger(wordCount) || wordCount < minWordCount || wordCount > maxWordCount) {
     return `字数限制需在 ${minWordCount} 到 ${maxWordCount} 之间`;
   }

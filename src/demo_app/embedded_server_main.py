@@ -672,7 +672,7 @@ def _load_preset_topics() -> list[dict[str, Any]]:
                 "scenario": scenario,
                 "core_content": core_content,
                 "template_label": template_label,
-                "people_count": max(2, min(10, int(item.get("people_count", 3)))),
+                "people_count": max(1, min(10, int(item.get("people_count", 3)))),
                 "word_count": min(5000, max(300, int(item.get("target_words", 1500)))),
                 "language": _canonical_language(str(item.get("language", "Chinese"))),
                 "profile": _preset_profile(label, topic_text, template_label),
@@ -865,7 +865,7 @@ def _generate_text_payload(
     profile, generation_context = _normalize_request_params(payload, language)
     scenario = str(payload.get("scenario") or "").strip()
     core_content = str(payload.get("core_content") or "").strip()
-    people_count = max(2, min(10, _safe_int(payload.get("people_count"), 3)))
+    people_count = max(1, min(10, _safe_int(payload.get("people_count"), 3)))
     word_count = min(50000, max(300, _safe_int(payload.get("word_count"), 1000)))
 
     title = str(
