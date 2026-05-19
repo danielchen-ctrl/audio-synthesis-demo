@@ -797,9 +797,49 @@ class VoiceCreateHandler(PlatformHandler):
             raise HTTPError(503, reason="CosyVoice API 未配置（runtime.yaml tts.real_human.api_url）")
 
         def _do_create():
+            import subprocess, tempfile, os
+            # ── 预处理：统一转为 16kHz mono WAV ──────────────────────────────
+            # CosyVoice Speaker Encoder 要求单声道输入；双声道、高采样率或低码率
+            # 的压缩格式（MP3 24kbps 等）均会导致 Embedding 提取失败（HTTP 500）。
+            # 不管上传什么格式，注册前统一转换，确保兼容性。
+            wav_bytes = audio_bytes  # 默认原始（转换失败时回退）
+            tmp_in = tmp_out = None
+            try:
+                suffix = os.path.splitext(audio_filename)[-1] or ".tmp"
+                with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as f:
+                    f.write(audio_bytes)
+                    tmp_in = f.name
+                tmp_out = tmp_in + "_16k_mono.wav"
+                ffmpeg = _ffmpeg_path()
+                result_ff = subprocess.run(
+                    [ffmpeg, "-y", "-i", tmp_in,
+                     "-ar", "16000", "-ac", "1", "-f", "wav", tmp_out],
+                    capture_output=True, timeout=60,
+                )
+                if result_ff.returncode == 0 and os.path.getsize(tmp_out) > 100:
+                    with open(tmp_out, "rb") as f:
+                        wav_bytes = f.read()
+                else:
+                    import logging
+                    logging.getLogger(__name__).warning(
+                        "[VoiceCreateHandler] ffmpeg 转换失败（returncode=%d），使用原始音频",
+                        result_ff.returncode,
+                    )
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(
+                    "[VoiceCreateHandler] 音频预处理异常，使用原始音频: %s", e)
+            finally:
+                for p in (tmp_in, tmp_out):
+                    if p:
+                        try:
+                            os.unlink(p)
+                        except Exception:
+                            pass
+            # ── 发送给 CosyVoice ──────────────────────────────────────────────
             resp = _rq.post(
                 f"{api_url}/v1/voices/create",
-                files={"audio": (audio_filename, audio_bytes)},
+                files={"audio": ("reference.wav", wav_bytes, "audio/wav")},
                 data={"name": name, "text": ref_text},
                 timeout=120,
             )
