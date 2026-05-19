@@ -485,9 +485,25 @@ async def _synthesize_with_real_human(
             fallback_reasons.append(f"seg{idx}:{rh_failure_reason}")
 
         req = synthesis_requests[idx]
+        # 查 voice_name：从 COSYVOICE_VOICE_CATALOG 按 voice_id 反查名称
+        _vid = req.voice_spec.voice_id if req.voice_spec else ""
+        _vname = ""
+        if _vid:
+            from demo_app.voice_resolver import COSYVOICE_VOICE_CATALOG
+            for _lang_voices in COSYVOICE_VOICE_CATALOG.values():
+                for _v in _lang_voices:
+                    if _v.get("voice_id") == _vid:
+                        _vname = _v.get("name", "")
+                        break
+                if _vname:
+                    break
+            if not _vname:
+                _vname = _vid  # 找不到名称时显示 voice_id 本身
         tts_meta.append({
             "segment_idx": idx,
             "speaker": req.speaker,
+            "voice_id": _vid,
+            "voice_name": _vname,
             "provider_used": result.provider_used if result else "edge_tts",
             "degraded": (rh_failure_reason is not None) or (result.degraded if result else True),
             "degraded_reason": rh_failure_reason or (result.degraded_reason if result else "no_provider"),

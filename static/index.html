@@ -1592,9 +1592,10 @@ function renderDetail(f){
       const errRow=(!ok && s.error_msg)?`<tr>
         <td colspan="5" style="padding:2px 8px 6px 32px;font-size:11px;color:var(--danger);font-family:monospace;word-break:break-all;opacity:.85">${esc(s.error_msg)}</td>
       </tr>`:'';
+      const voiceLabel=s.voice_name?`<div style="font-size:10px;color:var(--text3);margin-top:1px">${esc(s.voice_name)}</div>`:'';
       return`<tr>
         <td style="padding:4px 8px;font-size:12px">${icon}</td>
-        <td style="padding:4px 8px;font-size:12px">${esc(s.speaker||('段'+s.segment_idx))}</td>
+        <td style="padding:4px 8px;font-size:12px">${esc(s.speaker||('段'+s.segment_idx))}${voiceLabel}</td>
         <td style="padding:4px 8px;font-size:12px;color:${ok?'var(--success)':'var(--warning)'}">${provider}</td>
         <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${esc(reason)}</td>
         <td style="padding:4px 8px;font-size:12px;color:var(--text3)">${latency}</td>
