@@ -48,7 +48,16 @@ tts:
       - voice_id: 365689d1619b
         name: 青年-英文
         gender: male
+      - voice_id: 550c362e522f
+        name: 新闻联播-女声
+        gender: female
+      - voice_id: da1168ee514b
+        name: 康辉-新闻联播
+        gender: male
       English:
       - voice_id: ce4ac76b992f
         name: 中年-英文
+        gender: male
+      - voice_id: 89d0985d8f4f
+        name: 特朗普-总统音
         gender: male
