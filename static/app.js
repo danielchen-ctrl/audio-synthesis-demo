@@ -2788,7 +2788,6 @@ async function vmRefreshList() {
   try {
     const res = await fetchJson("/api/voice_catalog");
     const catalog = res.data || res || {};
-    // 展平所有语言的音色
     const allVoices = [];
     const LANG_CN = { Chinese:"中文", English:"英文", Japanese:"日语", Korean:"韩语" };
     for (const [lang, voices] of Object.entries(catalog)) {
@@ -2803,16 +2802,119 @@ async function vmRefreshList() {
     listEl.innerHTML = "";
     for (const v of allVoices) {
       const row = document.createElement("div");
-      row.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:6px;background:var(--bg2);gap:10px";
+      row.style.cssText = "display:flex;align-items:center;padding:8px 10px;border-radius:6px;background:var(--bg2);gap:8px;min-height:40px";
+
+      /* ── 信息区 ── */
       const info = document.createElement("div");
-      info.innerHTML = `<span style="font-weight:600;font-size:13px">${v.name}</span> `
-        + `<span style="font-size:11px;color:var(--text3);margin-left:6px">${v.langLabel} · ${v.gender === "male" ? "男" : "女"} · ${v.value}</span>`;
+      info.style.cssText = "flex:1;display:flex;align-items:center;gap:6px;min-width:0";
+
+      // 显示态：名字
+      const nameSpan = document.createElement("span");
+      nameSpan.style.cssText = "font-weight:600;font-size:13px;white-space:nowrap";
+      nameSpan.textContent = v.name;
+
+      // 编辑态：输入框（默认隐藏）
+      const nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.value = v.name;
+      nameInput.style.cssText = "display:none;font-weight:600;font-size:13px;border:1px solid var(--primary);border-radius:4px;padding:2px 7px;color:var(--text);background:var(--bg);width:130px;outline:none";
+
+      const metaSpan = document.createElement("span");
+      metaSpan.style.cssText = "font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
+      metaSpan.textContent = `${v.langLabel} · ${v.gender === "male" ? "男" : "女"} · ${v.value}`;
+
+      info.appendChild(nameSpan);
+      info.appendChild(nameInput);
+      info.appendChild(metaSpan);
+
+      /* ── 按钮区 ── */
+      // 编辑按钮（铅笔图标）
+      const editBtn = document.createElement("button");
+      editBtn.title = "修改名称";
+      editBtn.textContent = "✏️";
+      editBtn.style.cssText = "border:none;background:none;cursor:pointer;padding:2px 4px;font-size:14px;flex-shrink:0;opacity:.6";
+      editBtn.onmouseenter = () => editBtn.style.opacity = "1";
+      editBtn.onmouseleave = () => editBtn.style.opacity = ".6";
+
+      // 保存 / 取消（编辑态，默认隐藏）
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "保存";
+      saveBtn.style.cssText = "display:none;border:1px solid var(--primary);background:var(--primary);color:#fff;border-radius:4px;padding:3px 10px;font-size:12px;cursor:pointer;flex-shrink:0";
+
+      const cancelBtn = document.createElement("button");
+      cancelBtn.textContent = "取消";
+      cancelBtn.style.cssText = "display:none;border:1px solid var(--border);background:transparent;color:var(--text2);border-radius:4px;padding:3px 10px;font-size:12px;cursor:pointer;flex-shrink:0";
+
+      // 删除按钮
       const delBtn = document.createElement("button");
       delBtn.className = "btn btn-danger";
       delBtn.style.cssText = "padding:4px 10px;font-size:12px;flex-shrink:0";
       delBtn.textContent = "删除";
-      delBtn.onclick = () => vmDeleteVoice(v.value, v.name, row);
+      delBtn.onclick = () => vmDeleteVoice(v.value, nameSpan.textContent, row);
+
+      /* ── 进入编辑态 ── */
+      const enterEdit = () => {
+        nameSpan.style.display = "none";
+        nameInput.style.display = "inline-block";
+        nameInput.value = nameSpan.textContent;
+        editBtn.style.display = "none";
+        delBtn.style.display = "none";
+        saveBtn.style.display = "inline-block";
+        cancelBtn.style.display = "inline-block";
+        nameInput.focus();
+        nameInput.select();
+      };
+
+      /* ── 退出编辑态 ── */
+      const exitEdit = () => {
+        nameInput.style.display = "none";
+        nameSpan.style.display = "";
+        saveBtn.style.display = "none";
+        cancelBtn.style.display = "none";
+        editBtn.style.display = "";
+        delBtn.style.display = "";
+      };
+
+      /* ── 保存逻辑 ── */
+      const doSave = async () => {
+        const newName = nameInput.value.trim();
+        if (!newName) { showToast("err", "名称不能为空"); return; }
+        if (newName === nameSpan.textContent) { exitEdit(); return; }
+        saveBtn.disabled = true;
+        saveBtn.textContent = "保存中…";
+        try {
+          const r = await fetch(`/api/voice_catalog/${encodeURIComponent(v.value)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: newName }),
+          });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+          nameSpan.textContent = newName;
+          exitEdit();
+          await loadVoiceCatalog();
+          renderVoiceRows();
+          showToast("ok", `音色名称已更新为「${newName}」`);
+        } catch (e) {
+          showToast("err", `更新失败: ${e.message}`);
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "保存";
+        }
+      };
+
+      editBtn.onclick = enterEdit;
+      saveBtn.onclick = doSave;
+      cancelBtn.onclick = exitEdit;
+      nameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter")  { e.preventDefault(); doSave(); }
+        if (e.key === "Escape") { exitEdit(); }
+      });
+
       row.appendChild(info);
+      row.appendChild(editBtn);
+      row.appendChild(saveBtn);
+      row.appendChild(cancelBtn);
       row.appendChild(delBtn);
       listEl.appendChild(row);
     }
@@ -2853,7 +2955,7 @@ async function vmSubmit() {
 
   btn.disabled = true;
   btn.textContent = "上传中…";
-  if (statusEl) statusEl.textContent = "正在上传并克隆音色，请稍候（约10–60秒）…";
+  if (statusEl) statusEl.textContent = "正在上传并注册音色，随后自动验证合成可用性，请稍候（约 30–90 秒）…";
 
   try {
     const fd = new FormData();

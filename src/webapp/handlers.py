@@ -53,7 +53,7 @@ class PlatformHandler(RequestHandler):
     def set_default_headers(self) -> None:
         self.set_header("Content-Type", "application/json; charset=utf-8")
         self.set_header("Access-Control-Allow-Origin", "*")
-        self.set_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+        self.set_header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS")
         self.set_header("Access-Control-Allow-Headers", "Content-Type")
 
     def options(self, *args, **kwargs):
@@ -838,6 +838,63 @@ class VoiceCreateHandler(PlatformHandler):
         if not voice_id:
             raise HTTPError(502, reason=f"CosyVoice 未返回 voice_id，原始响应: {result}")
 
+        # ── 合成可用性验证 ─────────────────────────────────────────────────────
+        # 注册 API 永远返回 200，真正的质量检验在合成时（GPU 提取音色特征）。
+        # 这里用一句短文本做冒烟测试，失败则直接拦截，不写入目录。
+        _VERIFY_TEXTS: dict[str, str] = {
+            "Chinese":    "你好，这是音色合成测试。",
+            "English":    "Hello, this is a voice synthesis test.",
+            "Japanese":   "こんにちは、音声合成テストです。",
+            "Korean":     "안녕하세요, 음성 합성 테스트입니다.",
+            "Spanish":    "Hola, esta es una prueba de síntesis de voz.",
+            "French":     "Bonjour, ceci est un test de synthèse vocale.",
+            "German":     "Hallo, dies ist ein Sprachsynthesetest.",
+        }
+        verify_text = _VERIFY_TEXTS.get(language, "Hello, this is a voice synthesis test.")
+
+        def _do_verify():
+            resp = _rq.post(
+                f"{api_url}/v1/audio/speech",
+                json={
+                    "model": "cosyvoice-v3",
+                    "input": verify_text,
+                    "voice": voice_id,
+                    "response_format": "wav",
+                    "speed": 1.0,
+                },
+                timeout=60,
+            )
+            return resp.status_code, len(resp.content)
+
+        try:
+            verify_status, verify_size = await loop.run_in_executor(None, _do_verify)
+        except Exception as exc:
+            # 验证请求本身失败（网络超时等），回滚：尝试删除刚注册的无效音色
+            def _cleanup():
+                try:
+                    _rq.delete(f"{api_url}/v1/voices/{voice_id}", timeout=15)
+                except Exception:
+                    pass
+            await loop.run_in_executor(None, _cleanup)
+            raise HTTPError(502, reason=f"音色注册成功（ID={voice_id}），但合成验证请求失败: {exc}")
+
+        if verify_status != 200 or verify_size < 1000:
+            # 注册成功但合成失败 → 参考音频质量不足，拦截写入并清理
+            def _cleanup_invalid():
+                try:
+                    _rq.delete(f"{api_url}/v1/voices/{voice_id}", timeout=15)
+                except Exception:
+                    pass
+            await loop.run_in_executor(None, _cleanup_invalid)
+            raise HTTPError(
+                422,
+                reason=(
+                    f"音色注册成功（ID={voice_id}），"
+                    f"但合成测试失败（HTTP {verify_status}，{verify_size} bytes）。"
+                    "参考音频质量不足，请使用更清晰的录音：单人朗读、无背景噪音、10–30 秒。"
+                ),
+            )
+        # ── 验证通过，写入目录 ────────────────────────────────────────────────
         create_voice_in_catalog(language=language, voice_id=voice_id, name=name, gender=gender)
 
         self.set_status(201)
@@ -881,6 +938,18 @@ class VoiceDeleteHandler(PlatformHandler):
             raise HTTPError(404, reason=f"音色 {voice_id} 不在本地目录中")
 
         self.ok({"voice_id": voice_id, "deleted": True})
+
+    async def patch(self, voice_id: str) -> None:
+        """PATCH /api/voice_catalog/<voice_id> — 更新音色名称"""
+        from demo_app.voice_resolver import update_voice_in_catalog
+        data = self.body()
+        name = (data.get("name") or "").strip()
+        if not name:
+            raise HTTPError(400, reason="name 不能为空")
+        found = update_voice_in_catalog(voice_id=voice_id, name=name)
+        if not found:
+            raise HTTPError(404, reason=f"voice_id={voice_id} 不在本地目录中")
+        self.ok({"voice_id": voice_id, "name": name})
 
 
 # ── Legacy Demo Page ──────────────────────────────────────────────────────────

@@ -191,7 +191,7 @@ textarea.form-input{resize:vertical;min-height:100px;font-family:inherit}
 @keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 
 /* Confirm */
-.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20000;align-items:center;justify-content:center}
 .confirm-overlay.open{display:flex}
 .confirm-box{background:var(--bg2);border-radius:10px;border:1px solid var(--border);padding:24px;max-width:380px;width:100%;margin:16px}
 .confirm-title{font-size:15px;font-weight:700;margin-bottom:8px}
@@ -2184,7 +2184,9 @@ showConfirm = function(title,desc,onOk){
   _confirmCb=isCallbackStyle?(onOk||null):null;
   document.getElementById('confirm-title').textContent=title;
   document.getElementById('confirm-desc').textContent=desc||'';
-  document.getElementById('confirm-overlay').classList.add('open');
+  const _co=document.getElementById('confirm-overlay');
+  _co.style.zIndex='20000';
+  _co.classList.add('open');
   if(isCallbackStyle){
     document.getElementById('confirm-ok-btn').onclick=()=>{const cb=_confirmCb;closeConfirm();if(cb)cb();};
     document.getElementById('confirm-cancel-btn').onclick=()=>{closeConfirm();};
@@ -2196,7 +2198,7 @@ showConfirm = function(title,desc,onOk){
     });
   }
 };
-closeConfirm = function(){document.getElementById('confirm-overlay').classList.remove('open');_confirmCb=null;};
+closeConfirm = function(){const _co=document.getElementById('confirm-overlay');_co.classList.remove('open');_co.style.zIndex='';_confirmCb=null;};
 
 // ── Generate modal minimize / restore ────────────────────────────────────────
 let _miniPollTimer = null;

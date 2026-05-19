@@ -220,6 +220,32 @@ def delete_voice_from_catalog(voice_id: str) -> bool:
     return found
 
 
+def update_voice_in_catalog(voice_id: str, name: str) -> bool:
+    """更新指定音色的名称，保存 yaml，并热重载。返回是否找到并更新。"""
+    name = name.strip()
+    if not name:
+        return False
+    try:
+        import yaml
+        cfg = yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8")) or {}
+        catalog: dict = cfg.get("tts", {}).get("real_human", {}).get("voice_catalog", {}) or {}
+    except Exception:
+        return False
+
+    found = False
+    for lang in catalog:
+        for voice in catalog[lang]:
+            if str(voice.get("voice_id", "")) == voice_id:
+                voice["name"] = name
+                found = True
+
+    if found:
+        _save_voice_catalog_to_yaml(catalog)
+        reload_voice_catalog()
+        logger.info("[voice_resolver] 音色名称已更新: %s → %s", voice_id, name)
+    return found
+
+
 def get_voice_catalog_for_frontend() -> dict[str, list[dict]]:
     """
     生成前端友好格式：{language: [{value, label, gender, name}, ...]}
