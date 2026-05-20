@@ -116,9 +116,31 @@ v2 数据存于 `output/training_v2/`，已完成部分：
 
 ---
 
-## 🖥 Platform — Current Status (2026-05-16)
+## 🖥 Platform — Current Status (2026-05-20)
 
-**Phase: Live. 真人 TTS Phase 1 已上线。音色目录已单源化（runtime.yaml 为唯一权威）。支持在线管理（上传/删除）真人克隆音色。生成产物单源化（`storage/generated/<id>/` 一文件夹同时存对话文本 + manifest + 音频）。**
+**Phase: Live. 真人 TTS Phase 1 已上线。音色目录已单源化（runtime.yaml 为唯一权威）。支持在线管理（上传/删除）真人克隆音色。生成产物单源化（`storage/generated/<id>/` 一文件夹同时存对话文本 + manifest + 音频）。支持单人（1 speaker）对话文本生成与音频合成。**
+
+### 近期变更（2026-05-20）— 单人对话支持 + 目录合并修复 + 真人音色新增
+
+| 文件 | 改动 |
+|------|------|
+| `static/app.js` | 删除 `validateLlmBeforeGenerateText()` 中 `speakerCountValue() < 2` 的前端拦截，允许 1 人 LLM 模式生成；`submitRealHumanTask` / `submitEdgeTtsTask` payload 加 `dialogue_id` 字段；`submitEdgeTtsTask` 加 `dialogueId` 参数，调用点传 `state.form.dialogueId` |
+| `src/demo_app/embedded_server_main.py` | `_generate_text_payload()` 中 `max(2,...)` → `max(1,...)`，允许单人 LLM 生成；`_load_preset_topics()` 同步修改（preset 的 people_count 也允许为 1） |
+| `src/demo_app/multilingual_naturalness.py` | `_prepare_chinese_dialogue_context()` 中 `max(2, people_count)` → `max(1, people_count)`，防止中文稳定化步骤在单人任务里强行补 Speaker 2 台词（`_stabilize_chinese_dialogue` / `_rebuild_chinese_dialogue` / `_build_structured_chinese_dialogue` 三个调用方均同步修复） |
+| `src/webapp/db.py` | `create_task()` INSERT 加 `dialogue_id` 列，任务创建时即存储前端传入的 dialogue_id（之前只在任务完成时写入） |
+| `src/webapp/task_runner.py` | Step 2 合成音频前：`direct` 模式且 `dialogue_id` 对应目录已存在时，`save_dir` 指向 `dialogue_id` 目录（而非新建 `task_id` 目录），保证 txt + manifest + mp3 落在同一文件夹 |
+| `config/runtime.yaml` | 新增音色：新闻联播-女声（`550c362e522f`，中文）、康辉-新闻联播（`da1168ee514b`，中文）、特朗普-总统音（`89d0985d8f4f`，英文） |
+
+**单人对话边界说明：**
+- bundle LLM 以 `people_count=1` 生成时会输出 `Speaker 1: ...` 格式的 monologue 文本
+- 中文稳定化（`_stabilize_chinese_dialogue`）：1 人时 `order=["Speaker 1"]`，不会补 Speaker 2 行
+- `_rebuild_chinese_dialogue`：`secondary = order[1:] or [primary]` → 1 人时 secondary 退化为 `[primary]`，全部内容归属 Speaker 1
+- 非中文语言稳定化 `stabilize_dialogue_constraints` 对非中文 early return，不受影响
+- TTS / concat 管线：`_concat_audio_segments` 单片段已有快速路径（直接 transcode），无需改动
+
+**目录合并修复说明：**
+- 旧行为：弹窗生成文本 → `storage/generated/<dialogue_id>/`（txt+manifest），提交任务 → `storage/generated/<task_id>/`（仅 mp3），两个文件夹
+- 新行为：前端提交时携带 `dialogue_id`，task_runner 检测到 `dialogue_id` 目录已存在则将 mp3 写入同一目录，一个文件夹三个文件
 
 ### 近期变更（2026-05-16）— 生成产物单源到 `storage/generated/`
 
@@ -143,7 +165,7 @@ storage/generated/
 
 **向后兼容**：`demo-data/<timestamp>/` 历史任务保留不删，manifest cache 启动时一并扫描，legacy 模态框的任务详情/重播仍可正常打开。
 
-**已知边界**：direct 模式（用户在 manual 表单粘贴文本、不走 LLM）目录里只有 `.mp3`，没有 `.txt`/`manifest.json`——预存在行为，本次未引入也未修复。如需统一可让 task_runner 在 direct 路径也写一份 txt + manifest。
+**已知边界**：direct 模式且前端**未携带 dialogue_id**（如用户直接粘贴文本而未先走弹窗生成流程）时，task_runner 仍只有 `.mp3`，没有 `.txt`/`manifest.json`。当前弹窗流程（先生成文本得到 dialogue_id → 再提交 TTS 任务）已自动修复，txt + manifest + mp3 落在同一文件夹（2026-05-20 修复）。
 
 ### 近期变更（2026-05-16）— 音色管理 UI + 在线注册/删除接口
 
@@ -337,9 +359,12 @@ tools/
 |------|----------|------|------|------|
 | Chinese | `36d3429a3c98` | maryzhang | female | ✅ 可用 |
 | Chinese | `ed35d3674bb0` | lisi | male | ✅ 可用 |
-| Chinese | `06b1d3b50f22` | AI-男音 | male | ✅ 可用（2026-05-16 新增）|
+| Chinese | `365689d1619b` | 青年-中文 | male | ✅ 可用 |
+| Chinese | `550c362e522f` | 新闻联播-女声 | female | ✅ 可用（2026-05-20 新增）|
+| Chinese | `da1168ee514b` | 康辉-新闻联播 | male | ✅ 可用（2026-05-20 新增）|
 | English | `c3e9f75ae993` | willwu | male | ✅ 可用 |
-| English | `1d8c3af1d010` | AI-男音2 | male | ✅ 可用（2026-05-16 新增）|
+| English | `ce4ac76b992f` | 中年-英文 | male | ✅ 可用 |
+| English | `89d0985d8f4f` | 特朗普-总统音 | male | ✅ 可用（2026-05-20 新增）|
 
 **新增音色：** 只改 `config/runtime.yaml` 的 `tts.real_human.voice_catalog` → 重启服务器 → 刷新浏览器。后端 `voice_resolver._load_voice_catalog_from_yaml()` 启动时读 yaml；前端 `app.js` 启动时调 `/api/voice_catalog` 拉同一份数据。**三处副本时代已结束**（2026-05-13 单源化）。
 
@@ -589,12 +614,13 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 56 working voices across 13 languages (28 deprecated voices removed 2026-05-07). Backend auto-assignment uses `VOICE_CATALOG`; frontend dropdown uses `VOICE_LIBRARY` in `app.js`. Both were updated in the same audit.
 
 **Platform task generation (`POST /api/platform/tasks` → task worker)**
-1. Payload params stored as individual columns in DB (no params_json), status set to `queued`；`tts_provider`（edge_tts / real_human）、`voice_assignments`（JSON）同步写入
+1. Payload params stored as individual columns in DB (no params_json), status set to `queued`；`tts_provider`（edge_tts / real_human）、`voice_assignments`（JSON）、`dialogue_id`（前端传入）同步写入
 2. `src/webapp/task_runner.py` polling loop picks up queued tasks
-3. **edge_tts 路径**：调用 `_synthesize_audio_from_lines()`（legacy pipeline）
-4. **real_human 路径**（`tts_provider == "real_human"`）：调用 `_synthesize_with_real_human()` → `build_synthesis_requests` 合并段落 → asyncio.gather + Semaphore 并发合成 → WAV→MP3 格式统一 → ffmpeg concat
-5. On success: writes audio to `storage/generated/`，`tts_meta` JSON 写入 DB；if `audio_result["warning"]` is set, stores `error_msg="[TTS_WARN] ..."` 显示橙色降级警告
-6. On failure: stores error_msg, sets status `failed`
+3. **save_dir 决策**：`direct` 模式且 `dialogue_id` 目录已存在 → 使用 `storage/generated/<dialogue_id>/`（与 txt+manifest 同目录）；否则使用 `storage/generated/<task_id>/`
+4. **edge_tts 路径**：调用 `_synthesize_audio_from_lines()`（legacy pipeline）
+5. **real_human 路径**（`tts_provider == "real_human"`）：调用 `_synthesize_with_real_human()` → `build_synthesis_requests` 合并段落 → asyncio.gather + Semaphore 并发合成 → WAV→MP3 格式统一 → ffmpeg concat
+6. On success: writes audio to `save_dir`，`tts_meta` JSON 写入 DB；if `audio_result["warning"]` is set, stores `error_msg="[TTS_WARN] ..."` 显示橙色降级警告
+7. On failure: stores error_msg, sets status `failed`
 
 ### Key global state in `embedded_server_main.py`
 
