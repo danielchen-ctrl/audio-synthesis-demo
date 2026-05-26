@@ -45,19 +45,40 @@ tts:
     # AI-男音2 旧 ID（1d8c3af1d010）：合成返回 500，参考音频质量不足，已用 AI-MAN2.m4a 重新注册
     voice_catalog:
       Chinese:
-      - voice_id: 365689d1619b
-        name: 青年-英文
+      - voice_id: 49dcfedb52cd
+        name: 耿同学
         gender: male
-      - voice_id: 550c362e522f
+      - voice_id: 9523e9182011
+        name: 叨叨傅
+        gender: male
+      - voice_id: 2d72477d0651
         name: 新闻联播-女声
         gender: female
-      - voice_id: da1168ee514b
-        name: 康辉-新闻联播
+      - voice_id: 9481e3c20e63
+        name: 抖音主播-1
+        gender: male
+      - voice_id: a2998b2b7b02
+        name: 抖音主播-2
+        gender: female
+      - voice_id: '595088184610'
+        name: 罗振宇
         gender: male
       English:
-      - voice_id: ce4ac76b992f
-        name: 中年-英文
-        gender: male
       - voice_id: 89d0985d8f4f
-        name: 特朗普-总统音
+        name: 建国同志-总统音
+        gender: male
+      - voice_id: 260fba6cf1d3
+        name: 英语演讲音
+        gender: female
+      - voice_id: 1731d835a899
+        name: 英语广告音
+        gender: female
+      - voice_id: 5bcdff46d493
+        name: 英语广播音音
+        gender: female
+      - voice_id: d8e9e9226ea3
+        name: 雅思托福音（白宫发言人）
+        gender: female
+      - voice_id: 9cfb37d7c13f
+        name: 英伟达音（黄仁勋）
         gender: male

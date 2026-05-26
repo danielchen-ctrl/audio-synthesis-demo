@@ -4,118 +4,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## ⚡ Training Pipeline — Current Status (2026-05-08)
-
-**Phase: v3 训练全部完成 ✅。训练数据已推送到 GitHub 主分支。**
-
-### v3 训练方案（当前主线）
-
-v3 训练以每语言独立进程并行执行，替代了原 v2 的串行方案（v2 需 40 天，v3 约 5 小时完成 short tier）。训练数据位于 `output/training_v3/*/passed/`，已纳入版本管理。
-
-**Short tier 最终结果（2026-05-06 完成）：**
-
-| 语言 | 通过/总数 | 通过率 |
-|------|---------|--------|
-| 中文 | 330/330 | 100% |
-| 英语 | 330/330 | 100% |
-| 日语 | 175/198 | 88% |
-| 韩语 | 198/198 | 100% |
-| **合计** | **1033/1056** | **98%** |
-
-**Long tier 最终结果（2026-05-08 完成）：**
-
-| 语言 | 通过/总数 | 通过率 |
-|------|---------|--------|
-| 中文 | 393/440 | 89% |
-| 英语 | 395/440 | 90% |
-| 日语 | 59/132 | 45% |
-| 韩语 | 87/132 | 66% |
-| **合计** | **934/1144** | **82%** |
-
-> 日语 long tier 通过率低（45%）属于预期内：bundle 对 10k+ 字数日语每次调用仅生成约 300-800 字符，大字数目标被质量门禁（15% 阈值）过滤。
-
-**总计：1937 条高质量样本**，覆盖 22 个场景 × 4 语言 × 500–50000 字数。
-
-**运行命令：**
-```bash
-# Short tier（4语言并行，~30分钟）
-python tools/training/run_v3_parallel.py
-
-# Long tier（4语言并行，~5小时）
-python tools/training/run_v3_parallel.py --long
-
-# 断点续跑
-python tools/training/run_v3_parallel.py --long --resume
-```
-
-输出目录：`output/training_v3/{batch}/passed/`（已纳入版本管理，commit `14eebec9`）
-
-**Quick progress check:**
-```bash
-python -c "
-import json, os
-batches = {'chinese':'v3_long_chinese','english':'v3_long_english','japanese':'v3_long_japanese','korean':'v3_long_korean'}
-totals = {'chinese':440,'english':440,'japanese':132,'korean':132}
-for lang, batch in batches.items():
-    p = f'output/training_v3/{batch}/_index.jsonl'
-    if not os.path.exists(p): print(f'{lang}: not started'); continue
-    records = [json.loads(l) for l in open(p,encoding='utf-8') if l.strip()]
-    by_tid = {}
-    for r in records:
-        tid = r['task_id']
-        if tid not in by_tid or (not by_tid[tid]['passed'] and r['passed']): by_tid[tid] = r
-    done = len(by_tid); passed = sum(1 for r in by_tid.values() if r['passed'])
-    total = totals[lang]
-    print(f'{lang:10}: {done}/{total} ({done/total*100:.0f}%), {passed} passed ({passed/max(done,1)*100:.0f}%)')
-"
-```
-
-### 质量门禁规则
-
-`training/quality_scoring.py` 所有强制拦截规则（`severity="error"`，直接 fail）：
-
-| 规则 | 触发条件 | 拦截原因 |
-|------|---------|---------|
-| `language_mismatch` | 日语任务假名比例 < 8% | Bundle LLM 生成日语时退化为中文 |
-| `language_mismatch` | 韩语任务韩文比例 < 5% | 同上 |
-| `high_chinese_ratio` | 日语任务中文 > 30%（即使有足够假名）| 中文混入过多 |
-| `high_chinese_ratio` | 非CJK任务中文整体占比 > 15% | 大段中文内容渗入 |
-| `word_count_critical_short` | 日韩实际字数 < 目标 15%；其余 < 40% | 内容严重不足 |
-| `scenario_placeholder_artifact` | 非中文任务对话行中出现 `Scenario: [大写]` | Bundle 把 scenario 描述直接写入台词 |
-| `core_marker_artifact` | 对话输出中出现任意 `<<…>>` 标记 | Bundle 渲染残留 |
-| `chinese_role_name_leak` | 非CJK任务 >15% 的行含 >5% 中文字符 | 中文角色名渗漏到英/法/德等语言台词 |
-| `high_repetition_rate` | 唯一行率 < 60%（且总行数 > 5）| 内容高度重复，训练价值低 |
-
-**已知 bundle 限制**（无法从外部修复，只能靠门禁过滤）：
-- 英语输出：bundle 会把 `Scenario: A professional business discussion...` 嵌入台词
-- 日语输出：`<<コア:...>>` 标记未消化直接出现在台词里
-- 日语输出：中文角色名混入日语台词
-- 日语/韩语：每次 bundle 调用仅生成约 300-800 个字符，大字数目标靠分块累积
-
-### v2 训练数据（已锁定）
-
-v2 数据存于 `output/training_v2/`，已完成部分：
-- B0 中文：198/198 通过
-- B1 中文：360/361 通过
-- B0/B1 英语+日语：已清理（发现系统性质量问题）
-- B2–B5：未启动（已被 v3 方案取代）
-
----
-
-## 🔧 生成管线性能优化（2026-05-04 完成）
-
-以下优化已合并到 `src/demo_app/embedded_server_main.py` 和 `multilingual_naturalness.py`：
-
-| 编号 | 文件 | 改动 | 效果 |
-|------|------|------|------|
-| T3-1 | `embedded_server_main.py` | `_generate_long_dialogue_lines()` 并发生成：`ThreadPoolExecutor(max_workers=3)` 同时跑 N 段，顺序补充 | 长对话首段生成提速 ~3× |
-| T3-2 | `embedded_server_main.py` | `repair_dialogue_quality` 完整重建时跳过 `stabilize_dialogue_constraints` | 避免冗余的第三遍重建 |
-| T3-3 | `multilingual_naturalness.py` | `enforce_keywords_in_lines()` 预构建 `{speaker: [倒序位置]}` 字典，O(n×k) → O(n+k) | 关键词注入循环去掉内层扫描 |
-| T5-3 | `multilingual_naturalness.py` | 提取 `_prepare_chinese_dialogue_context()` helper，两个中文稳定化函数共用 | 消除 14 个上下文变量的重复计算 |
-| T5-4 | `embedded_server_main.py` | 提取 `_normalize_request_params(payload, language)` 封装三个 sanitize 调用 | 生成入口参数预处理统一化 |
-
----
-
 ## 🖥 Platform — Current Status (2026-05-20)
 
 **Phase: Live. 真人 TTS Phase 1 已上线。音色目录已单源化（runtime.yaml 为唯一权威）。支持在线管理（上传/删除）真人克隆音色。生成产物单源化（`storage/generated/<id>/` 一文件夹同时存对话文本 + manifest + 音频）。支持单人（1 speaker）对话文本生成与音频合成。**
@@ -138,136 +26,33 @@ v2 数据存于 `output/training_v2/`，已完成部分：
 - 非中文语言稳定化 `stabilize_dialogue_constraints` 对非中文 early return，不受影响
 - TTS / concat 管线：`_concat_audio_segments` 单片段已有快速路径（直接 transcode），无需改动
 
-**目录合并修复说明：**
-- 旧行为：弹窗生成文本 → `storage/generated/<dialogue_id>/`（txt+manifest），提交任务 → `storage/generated/<task_id>/`（仅 mp3），两个文件夹
-- 新行为：前端提交时携带 `dialogue_id`，task_runner 检测到 `dialogue_id` 目录已存在则将 mp3 写入同一目录，一个文件夹三个文件
+**目录合并行为：**
+- 弹窗生成文本 → `storage/generated/<dialogue_id>/`（txt+manifest），提交任务时携带 `dialogue_id`，task_runner 检测到目录已存在则将 mp3 写入同一目录，一个文件夹三个文件
+- 已知边界：direct 模式且前端**未携带 dialogue_id** 时，task_runner 仍只有 `.mp3`，没有 `.txt`/`manifest.json`
 
-### 近期变更（2026-05-16）— 生成产物单源到 `storage/generated/`
+### 近期变更（2026-05-16）— 生成产物单源 + 音色管理 UI + 在线注册/删除接口
 
 | 文件 | 改动 |
 |------|------|
-| `src/demo_app/embedded_server_main.py` | `_generate_text_payload()` / `_create_manual_dialogue_payload()` 加 `save_dir: Path \| None = None` 参数，默认 `storage/generated/<dialogue_id>/`，不再写 `demo-data/<timestamp>/`；`_ensure_manifest_cache()` 改为双源扫描（`storage/generated/*/manifest.json` + 旧 `demo-data/*/manifest.json` 兼容历史任务），并改用 `setdefault` 保证 mtime 倒序遍历下同 dialogue_id 重复时**最新条目胜出**；`_resolve_audio_target` 和详情下载接口的兜底路径 `demo-data` → `storage/generated`；`_task_storage_dir` 允许两个根（storage/generated / demo-data）让旧任务仍可删除 |
-| `src/webapp/task_runner.py` | 调 `_generate_text_payload` 时显式传 `save_dir=storage/generated/<task_id>/`，文本生成直接落到任务目录；**复用 `result["basename"]` 作为音频文件 basename**（修复 txt 与 mp3 同目录但 basename 不一致的 bug——之前 txt 用 bundle 生成的含 timestamp basename、mp3 用 `_safe_basename(topic)`）；text_only 模式不再单独写 txt，复用 `result["text_path"]`（避免同目录两份 .txt）；direct 输入模式保留 `_safe_basename(topic)` 兜底 |
-| `CLAUDE.md` | 更新 Request lifecycle 描述与目录布局说明 |
+| `src/demo_app/embedded_server_main.py` | `_generate_text_payload()` / `_create_manual_dialogue_payload()` 默认写 `storage/generated/<dialogue_id>/`，不再写 `demo-data/<timestamp>/`；`_ensure_manifest_cache()` 双源扫描（`storage/generated/` + `demo-data/` 兼容历史任务） |
+| `src/webapp/task_runner.py` | 调 `_generate_text_payload` 时显式传 `save_dir=storage/generated/<task_id>/`；复用 `result["basename"]` 作为音频文件 basename（修复 txt/mp3 basename 不一致问题） |
+| `static/index.html` | 新增 `#modal-voice-mgmt` 音色管理弹窗（上传参考音频、注册新音色；列出已注册音色并支持删除） |
+| `static/app.js` | 新增 `openVoiceMgmt()`、`vmHandleFile()`、`vmRefreshList()`、`vmDeleteVoice()`、`vmSubmit()`；音色目录从硬编码改为启动时调 `/api/voice_catalog` 拉取 |
+| `src/webapp/handlers.py` | 新增 `VoiceCatalogHandler`（GET）、`VoiceCreateHandler`（POST）、`VoiceDeleteHandler`（DELETE） |
+| `src/demo_app/voice_resolver.py` | `_load_voice_catalog_from_yaml()` 单源加载；`_save_voice_catalog_to_yaml()` 逐行替换保留注释；`create_voice_in_catalog()`；`delete_voice_from_catalog()` |
 
-**目录结构（新）**：
+**目录结构（当前）**：
 ```
 storage/generated/
 ├── <task_id>/                 ← 平台任务（16 字符 hex）
 │   ├── manifest.json
-│   ├── <basename>.txt         ← txt 与 mp3 共用同一 basename
+│   ├── <basename>.txt
 │   └── <basename>.mp3
 └── <dialogue_id>/             ← legacy 模态框任务（8 字符）
     ├── manifest.json
     ├── <basename>.txt
     └── <basename>.mp3
 ```
-
-**向后兼容**：`demo-data/<timestamp>/` 历史任务保留不删，manifest cache 启动时一并扫描，legacy 模态框的任务详情/重播仍可正常打开。
-
-**已知边界**：direct 模式且前端**未携带 dialogue_id**（如用户直接粘贴文本而未先走弹窗生成流程）时，task_runner 仍只有 `.mp3`，没有 `.txt`/`manifest.json`。当前弹窗流程（先生成文本得到 dialogue_id → 再提交 TTS 任务）已自动修复，txt + manifest + mp3 落在同一文件夹（2026-05-20 修复）。
-
-### 近期变更（2026-05-16）— 音色管理 UI + 在线注册/删除接口
-
-| 文件 | 改动 |
-|------|------|
-| `static/index.html` | 新增 `#modal-voice-mgmt` 音色管理弹窗（上传参考音频、填写名称/语言/性别、注册新音色；列出已注册音色并支持删除）；按钮从"管理音色"改名为"⚙️ 管理真人音色"并调整到中间位置（真人音色 → 管理真人音色 → 合成音色）；`.mo-overlay` z-index 200→700；`closeModal()` 同步清除内联 style；修复 `--border1`/`--text1` 未定义 CSS 变量（→ `--border`/`--text`） |
-| `static/app.js` | 新增 `openVoiceMgmt()`（强制内联 style z-index:9999，绕过 CSS 缓存）、`vmHandleFile()`、`vmRefreshList()`、`vmDeleteVoice()`、`vmSubmit()`；`voiceMgmtBtn` 加入 `el` 对象并在 `bindEvents()` 中以 `addEventListener` 绑定（双保险，兼容 onclick 属性） |
-| `src/webapp/handlers.py` | 新增 `VoiceCreateHandler`（`POST /api/voice_catalog/create`）：接收 multipart（audio/name/language/gender/text），代理到 CosyVoice `/v1/voices/create`，支持 3 种 voice_id 响应格式，返回 201；新增 `VoiceDeleteHandler`（`DELETE /api/voice_catalog/<voice_id>`）：可选 `delete_remote=1` 删除 CosyVoice 服务器端音色，始终从本地 catalog 删除 |
-| `src/webapp/routes.py` | 注册 `/api/voice_catalog/create`（specific，在 regex 路由前）和 `/api/voice_catalog/([^/]+)` |
-| `src/demo_app/voice_resolver.py` | 新增 `_get_cosyvoice_api_url()`（优先环境变量）；`_save_voice_catalog_to_yaml()`（逐行定位 `voice_catalog:` 块替换，**保留文件全部注释**）；`create_voice_in_catalog()`；`delete_voice_from_catalog()` |
-| `config/runtime.yaml` | 恢复 maryzhang（36d3429a3c98）到中文目录；移除失效音色 fcd231f52834（合成返回 500）；新增用户上传的 AI-男音（06b1d3b50f22，中文）和 AI-男音2（1d8c3af1d010，英文） |
-
-**音色管理 API（新增）：**
-```
-POST   /api/voice_catalog/create          ← multipart: audio(file) + name + language + gender + text(可选)
-DELETE /api/voice_catalog/<voice_id>      ← ?delete_remote=0|1（默认 0，仅删本地）
-GET    /api/voice_catalog                 ← 已有，返回前端格式 catalog
-```
-
-**CosyVoice 音色注册注意事项（2026-05-16 实测）：**
-- `/v1/voices/create` 成功（返回 voice_id）≠ 合成可用：注册 API 总是成功，但合成时可能返回 500
-- 失败原因通常是参考音频质量不足（录音有噪音/背景音/多人/时长不足）
-- 推荐参考音频：单人朗读、清晰无噪音、10–30 秒、无背景音乐
-- 工具脚本：`tools/test_voice_e2e.py`（完整 E2E：create → verify catalog → verify yaml → delete）
-
-### 近期变更（2026-05-13）— 音色目录单源化
-
-| 文件 | 改动 |
-|------|------|
-| `config/runtime.yaml` | `voice_catalog` 从 `tts.voice_catalog` 上挪到 `tts.real_human.voice_catalog`（4 格缩进，结构语义对称）；标注为**单一权威源**——新增音色只改这一处即可，无需同步前后端 |
-| `src/demo_app/voice_resolver.py` | 删除硬编码 `COSYVOICE_VOICE_CATALOG`；新增 `_load_voice_catalog_from_yaml()` 模块加载时读 yaml；`reload_voice_catalog()` 支持热加载；`get_voice_catalog_for_frontend()` 生成前端格式（含 `label` 字段）。`COSYVOICE_VOICE_CATALOG` 模块级变量保留作为向后兼容导入名，由 yaml 派生而非硬编码 |
-| `src/webapp/handlers.py` | 新增 `VoiceCatalogHandler` 处理 `GET /api/voice_catalog`，返回 `get_voice_catalog_for_frontend()` 结果 |
-| `src/webapp/routes.py` | 注册 `/api/voice_catalog` 路由 |
-| `static/app.js` | `COSYVOICE_VOICE_CATALOG` 从 `const` 改为 `let`（初值 `{}`）；新增 `loadVoiceCatalog()`，`init()` 中并发 fetch + await；删除所有硬编码音色数据 |
-| `tools/tts/cosyvoice_concurrency_probe.py` | 新增并发实测脚本（5 等级 × 3 轮 × 6 样本），实测报告写入 `runtime/cosyvoice_probe_full.json` |
-
-**关键结论 — CosyVoice 并发实测（2026-05-13）：** 服务端为单 GPU 队列，吞吐**恒定 6.1 cps**（所有并发等级），并发对总耗时无收益但显著恶化单段 p50（串行 3.5s → 8 并发 32.6s）。`max_concurrency=1` 是最优解。详见 `runtime/cosyvoice_probe_full.json` 和 `tools/tts/cosyvoice_concurrency_probe.py`。
-
-**扩音色流程（已验证）：**
-1. 编辑 `config/runtime.yaml` 的 `tts.real_human.voice_catalog` 加一条
-2. 重启服务器 → `voice_resolver` 模块加载时自动从 yaml 重读
-3. 浏览器刷新页面 → `init()` 调 `/api/voice_catalog` 拉到最新值
-
-### 近期变更（2026-05-10，第三批）
-
-| 文件 | 改动 |
-|------|------|
-| `src/webapp/task_runner.py` | `_concat_audio_segments()`：concat demuxer（`-f concat`）→ **filter_complex concat**（`[0:a][1:a]...concat=n=N:v=0:a=1[aout]`），全段先解码为 PCM 再拼接重编码，对输入格式/采样率差异完全兼容，消除拼接点爆音/跳帧；单片段路径补 `run_in_executor` 避免阻塞事件循环 |
-| `src/webapp/task_runner.py` | `_fallback_edge_tts()`：edge_tts 合成后新增 ffmpeg 重编码步骤（`-ar 44100 -ac 1`），统一降级片段与 real_human 片段的格式，避免 24kHz stereo 混入 44100Hz mono 拼接链；修复 `raw_path.rename()` 在 Windows 目标已存在时报 `FileExistsError`（改为 `replace()`）；修复 `with_suffix(".raw.mp3")` 在 Python 3.12+ 报 `ValueError`（改为 `parent / f"{stem}.raw.mp3"`）；全函数 `get_event_loop` → `get_running_loop` |
-| `src/webapp/task_runner.py` | `_convert_wav_to_mp3()`：重新启用 silenceremove，改用极保守阈值 **-65dB**（原 -40dB 阈值误删正常语音，本次修复）；`start_duration=0.05s`、`stop_duration=0.15s`，仅裁 CosyVoice 数字静音（~-90dB），不影响正常语音（> -40dB） |
-
-### 近期变更（2026-05-10，第二批）
-
-| 文件 | 改动 |
-|------|------|
-| `static/app.js` | 新增 `submitEdgeTtsTask()`：合成音色模式改为提交平台任务队列（非阻塞），与真人音色行为一致；`submitAudioGeneration()` 增加 edge_tts 分支；按钮文案 → "真人音色生成音频" / "合成音色生成音频" |
-| `static/app.js` | `gatherRealHumanVoiceAssignments()`：校验改为对**全局**注册音色验证（允许跨语言显式使用）；`ensureVoiceAssignmentsShape()`：`cycleVoices` 改为 maryzhang 固定排第一（任意语言任务 Speaker1=maryzhang，Speaker2=willwu），确保合成质量最好的音色优先分配给主说话人 |
-| `static/app.js` | 手动模式新增主题输入框：`el.manualTopic`、`readFormFromDom`、`syncFormToDom`、事件监听；`currentTitle()` 已有逻辑，提交时 `topic` 自动使用输入标题 |
-| `static/index.html` | `#manualSection` 新增 `id="manualTopic"` 输入框（主题标题，可选，提交后作为音频文件标题） |
-| `src/demo_app/voice_resolver.py` | `resolve_voice_spec()`：voice_id 校验改为对全局注册音色（跨所有语言），允许跨语言克隆音色显式使用 |
-| `src/webapp/task_runner.py` | `_synthesize_one_segment()`：WAV→MP3 失败时改为降级 edge_tts（不再保留 WAV 进 concat，避免 codec 混合导致逐字播放） |
-| `src/webapp/task_runner.py` | `_convert_wav_to_mp3()`：暂时移除 silenceremove（-40dB 误删正常语音，待后续以保守阈值重新引入） |
-
-### 近期变更（2026-05-10，第一批）
-
-| 文件 | 改动 |
-|------|------|
-| `src/demo_app/tts_provider.py` | 新增：VoiceSpec / SynthesisRequest / SynthesisResult / ProviderCapabilities 数据模型 + TTSProvider ABC |
-| `src/demo_app/real_human_tts.py` | 新增：RealHumanProvider（CosyVoice `/v1/audio/speech`），`_classify_error` 含异常类型名，`error_msg` 字段截断 300 字 |
-| `src/demo_app/voice_resolver.py` | 新增：COSYVOICE_VOICE_CATALOG + resolve_voice_spec + build_synthesis_requests（max_chars=500 段落合并）；`resolve_voice_spec` 初版加语言校验 |
-| `src/webapp/task_runner.py` | `_synthesize_with_real_human`：asyncio.gather 并发 + Semaphore 限流；`_synthesize_one_segment`：单段合成 + 超时重试 + WAV→MP3 转换；`_convert_wav_to_mp3`：`-ar 44100 -ac 1` 统一格式；`_concat_audio_segments`：`-ar 44100 -ac 1` 标准化输出；`list_tasks` JOIN audio_files 获取 file_duration |
-| `src/webapp/db.py` | `list_tasks()` 改为 `LEFT JOIN audio_files` 带回 `file_duration` 字段，任务卡片可显示音频时长 |
-| `config/runtime.yaml` | `tts.real_human.max_concurrency` 3→1（防并发响应串扰）；`timeout_sec` 120；`max_retries` 2；完整 voice_catalog 配置 |
-| `static/app.js` | 新增 `COSYVOICE_VOICE_CATALOG`（中/英）；`ttsEngine` 默认 `"real_human"`；`gatherRealHumanVoiceAssignments` 加语言目录校验；音色标签去掉语言后缀 |
-| `static/index.html` | 真人音色按钮置左并默认选中；tts_meta 诊断表格（含 `error_msg` 红字行）；进度条改为 `onmousedown` 支持拖拽（detail + mini player）；任务卡片显示 `⏱ 时长` |
-
-### 近期变更（2026-05-08，commit 14eebec9）
-
-| 文件 | 改动 |
-|------|------|
-| `src/demo_app/training_few_shot.py` | `_MIN_NEW_SAMPLE_SCORE` 70→65（覆盖全部 v3 通过样本）；`_MAX_EXCERPT_CHARS` 600→1200；long tier 样本 +15 分优先排序 |
-| `training/training_executor.py` | 超时从固定 300s 改为自适应 `max(300, word_count//50)`，修复大字数任务超时无记录问题 |
-| `server_platform.py` | 启动时调用 `invalidate_index()`，确保每次重启加载最新训练数据 |
-
-Few-shot 索引现有 **4115 条**（v3 long 934 + v3 short 1033 + v2 1203 + 旧语料 945），覆盖 176 个（场景×语言）组合。
-
-### 近期变更（2026-05-07，commit 9efbba27）
-
-| 文件 | 改动 |
-|------|------|
-| `src/demo_app/embedded_server_main.py` | VOICE_CATALOG 替换废弃音色：`en-US-DavisNeural`→`BrianNeural`，`ru-RU-DariyaNeural`→`SvetlanaNeural` |
-| `src/webapp/task_runner.py` | 合成完成后读取 `audio_result["warning"]`，写入 `error_msg="[TTS_WARN] ..."`，任务卡片正确显示⚠️备用引擎状态 |
-| `src/webapp/handlers.py` | `_import` 路径支持 `tts_warning` 字段写入 DB |
-| `static/app.js` | 全量音色审计：移除 28 个废弃 Neural 音色（日/韩/英/俄等），保留 56 个有效音色 |
-| `static/index.html` | 默认主题改为浅色；底部 LAN 分享栏；任务卡片 TTS 回退橙色警告；语言名称显示中文；首页统计卡等高铺满 |
-
-### 近期变更（2026-05-05）
-
-| 文件 | 改动 |
-|------|------|
-| `static/index.html` | 任务页改为每页 18 条 + 首/上/下/末分页控件；API 请求上限从 50 → 200 |
-| `static/app.js` | 生成开始/结束时调用 `window._incLegacyInProgress` / `_decLegacyInProgress`，使首页统计卡"进行中"数量正确反映 legacy 模态框的生成状态 |
 
 The corpus generation platform is a unified Tornado server combining the legacy dialogue/audio generation demo with a full file management platform.
 
@@ -329,44 +114,39 @@ Schema per entry:
 
 ---
 
-## 🎙 真人 TTS API 接入 — Phase 1 已完成（2026-05-10）
+## 🎙 真人 TTS — Phase 1 已完成
 
-**Phase: Phase 1 全部上线 ✅。CosyVoice `/v1/audio/speech` 端点已接入，中英文真人克隆音色可用。**
-
-### 已实现文件
-
-```
-src/demo_app/
-  tts_provider.py      ← VoiceSpec / SynthesisRequest / SynthesisResult / ProviderCapabilities 数据模型 + TTSProvider ABC
-  real_human_tts.py    ← RealHumanProvider（CosyVoice /v1/audio/speech 同步端点）
-  voice_resolver.py    ← 单源加载 voice_catalog (from runtime.yaml) + resolve_voice_spec + build_synthesis_requests
-  │                       + get_voice_catalog_for_frontend + create_voice_in_catalog + delete_voice_from_catalog
-  │                       + _save_voice_catalog_to_yaml（逐行替换，保留所有注释）
-src/webapp/
-  handlers.py          ← VoiceCatalogHandler (GET) + VoiceCreateHandler (POST) + VoiceDeleteHandler (DELETE)
-tools/
-  test_voice_e2e.py    ← E2E 测试：create → verify catalog → verify yaml → delete
-```
+**Phase: ✅ CosyVoice `/v1/audio/speech` 端点已接入，中英文真人克隆音色可用。**
 
 ### CosyVoice API 关键信息
 
 - **端点**：`POST /v1/audio/speech`（OpenAI-compatible，JSON body → WAV bytes 直接返回）
-- **废弃端点**：`/api/tts/async`（zero_shot 模式需要 `prompt_wav`，仅传 `spk_id` 报 "Invalid file: None"）
 - **请求格式**：`{"model": "cosyvoice-v3", "input": "<text>", "voice": "<voice_id>", "response_format": "wav", "speed": 1.0}`
-- **当前注册音色**（`GET /v1/voices/custom`，2026-05-16 更新；服务器还有 8 个同名"李四"，5 个可用、3 个返回 500，本平台仅挂载 created_at 最晚的 `ed35d3674bb0`，备用 voice_id 见 runtime.yaml 注释）：
+- **废弃端点**：`/api/tts/async`（仅传 `spk_id` 报 "Invalid file: None"，不要使用）
 
-| 语言 | voice_id | 名称 | 性别 | 状态 |
-|------|----------|------|------|------|
-| Chinese | `36d3429a3c98` | maryzhang | female | ✅ 可用 |
-| Chinese | `ed35d3674bb0` | lisi | male | ✅ 可用 |
-| Chinese | `365689d1619b` | 青年-中文 | male | ✅ 可用 |
-| Chinese | `550c362e522f` | 新闻联播-女声 | female | ✅ 可用（2026-05-20 新增）|
-| Chinese | `da1168ee514b` | 康辉-新闻联播 | male | ✅ 可用（2026-05-20 新增）|
-| English | `c3e9f75ae993` | willwu | male | ✅ 可用 |
-| English | `ce4ac76b992f` | 中年-英文 | male | ✅ 可用 |
-| English | `89d0985d8f4f` | 特朗普-总统音 | male | ✅ 可用（2026-05-20 新增）|
+**当前注册音色**（权威来源：`config/runtime.yaml` → `tts.real_human.voice_catalog`）：
 
-**新增音色：** 只改 `config/runtime.yaml` 的 `tts.real_human.voice_catalog` → 重启服务器 → 刷新浏览器。后端 `voice_resolver._load_voice_catalog_from_yaml()` 启动时读 yaml；前端 `app.js` 启动时调 `/api/voice_catalog` 拉同一份数据。**三处副本时代已结束**（2026-05-13 单源化）。
+| 语言 | voice_id | 名称 | 性别 |
+|------|----------|------|------|
+| Chinese | `36d3429a3c98` | maryzhang | female |
+| Chinese | `ed35d3674bb0` | lisi | male |
+| Chinese | `365689d1619b` | 青年-中文 | male |
+| Chinese | `550c362e522f` | 新闻联播-女声 | female |
+| Chinese | `da1168ee514b` | 康辉-新闻联播 | male |
+| English | `c3e9f75ae993` | willwu | male |
+| English | `ce4ac76b992f` | 中年-英文 | male |
+| English | `89d0985d8f4f` | 特朗普-总统音 | male |
+
+**扩音色流程：**
+1. 编辑 `config/runtime.yaml` 的 `tts.real_human.voice_catalog` 加一条
+2. 重启服务器 → `voice_resolver` 模块加载时自动从 yaml 重读
+3. 浏览器刷新页面 → `init()` 调 `/api/voice_catalog` 拉到最新值
+
+**CosyVoice 音色注册注意事项：**
+- `/v1/voices/create` 成功（返回 voice_id）≠ 合成可用：注册 API 总是成功，但合成时可能返回 500
+- 失败原因通常是参考音频质量不足（录音有噪音/背景音/多人/时长不足）
+- 推荐参考音频：单人朗读、清晰无噪音、10–30 秒、无背景音乐
+- E2E 测试脚本：`tools/test_voice_e2e.py`
 
 ### 真人 TTS 合成流程（`task_runner._synthesize_with_real_human`）
 
@@ -375,40 +155,17 @@ tools/
 3. 每段调用 `RealHumanProvider.synthesize()` → `_call_speech_v1()` 在 `run_in_executor` 线程中执行 HTTP 请求
 4. 超时时按 `max_retries` 重试（当前配置 2 次）
 5. 最终失败 → `_fallback_edge_tts()` 降级合成
-6. **WAV→MP3 + 静音裁剪**：real_human 成功后调用 `_convert_wav_to_mp3()`，`silenceremove` 过滤器去除头部（≥50ms）和过长尾部静音（保留最多 300ms），`-ar 44100 -ac 1` 统一格式
-7. **WAV→MP3 失败时**：不再保留 WAV 进入 concat（会导致 codec 混合 → 逐字播放），改为降级 edge_tts 确保格式统一
-8. `_concat_audio_segments()` 用 ffmpeg concat demuxer 拼接所有 MP3 片段，`-ar 44100 -ac 1` 标准化输出
+6. **WAV→MP3 + 静音裁剪**：`silenceremove` 阈值 **-65dB**（保守，仅裁 CosyVoice 数字静音），`-ar 44100 -ac 1` 统一格式
+7. **WAV→MP3 失败时**：降级 edge_tts（不保留 WAV 进 concat，避免 codec 混合 → 逐字播放）
+8. `_concat_audio_segments()` 用 ffmpeg filter_complex concat 拼接所有 MP3 片段
 
-### 并发安全注意事项
-
-- **`max_concurrency: 1`（当前默认）**：串行合成，防止 CosyVoice 服务器并发响应串扰（高并发时曾出现响应内容写入错误片段文件，导致音频重复）
-- 若要提速可调为 2，但 ≥3 时 CosyVoice 在负载下偶发响应混淆
-- WAV 和 MP3 **绝对不能混合** concat：ffmpeg concat demuxer 要求所有输入 codec 相同，WAV(pcm)/MP3 混合会导致逐字播放或噪音。WAV→MP3 失败时必须降级 edge_tts，不可将 WAV 放入 concat 列表
+**并发安全：** `max_concurrency=1` 防止 CosyVoice 响应串扰。WAV 和 MP3 **绝对不能混合** concat。
 
 ### voice_id 音色分配规则
 
-**自动分配（`ensureVoiceAssignmentsShape`）**：`cycleVoices` 优先从当前任务语言的目录循环，防止英语任务自动分配到中文音色（maryzhang 合成英文会逐字发音甚至输出中文）。当前语言无专属音色时扩展到全局。
+**自动分配（`ensureVoiceAssignmentsShape`）**：`cycleVoices` 优先从当前任务语言的目录循环，防止英语任务分配到中文音色。
 
-**显式选择验证（`gatherRealHumanVoiceAssignments` + `voice_resolver.resolve_voice_spec`）**：只要 voice_id 在全局注册音色中存在即合法（跨语言显式使用允许，如用 willwu 合成中文）。真正无效的 voice_id（未注册）才被替换为默认音色。
-
----
-
-## 🗂 仓库维护记录
-
-### Git 历史瘦身（2026-05-05）
-
-用 `git filter-repo` 从所有历史提交中永久删除了以下大文件，并 force push 覆盖了 GitHub：
-
-| 路径 | 原大小 | 说明 |
-|------|--------|------|
-| `build/DialogDemo/DialogDemo.pkg` | 108 MB | 老 Mac 二进制（通过 Git LFS 存储） |
-| `build/demo_app/PYZ-00.pyz` | 11.7 MB | PyInstaller 中间产物，不应提交 |
-| `demo/20260308_183515/*.wav` | 9.9 MB | 早期测试音频 |
-| `output/payment_5step/*.mp3` | 5.6 MB | 早期输出音频 |
-
-清理结果：`.git/` 从 **329 MB → 62 MB**（节省 267 MB）。
-
-> `.gitattributes` 中保留了 `build/DialogDemo/DialogDemo.pkg filter=lfs` 规则（历史遗留），该文件路径已不再存在，不影响任何功能。
+**显式选择验证**：只要 voice_id 在全局注册音色中存在即合法（跨语言显式使用允许）。
 
 ---
 
@@ -459,6 +216,19 @@ python scripts/run_multilingual_quality_checks.py
 ```bash
 pip install -r config/requirements.txt
 ```
+
+### Training pipeline (v3，已完成 1937 条样本)
+```bash
+# Short tier（4语言并行，~30分钟）
+python tools/training/run_v3_parallel.py
+
+# Long tier（4语言并行，~5小时）
+python tools/training/run_v3_parallel.py --long
+
+# 断点续跑
+python tools/training/run_v3_parallel.py --long --resume
+```
+输出目录：`output/training_v3/{batch}/passed/`（已纳入版本管理）。Few-shot 索引 4115 条，覆盖 176 个（场景×语言）组合。
 
 ## Branch and PR Workflow
 
@@ -521,7 +291,6 @@ output/training_v3/               ← v3 training output (committed to repo)
 tools/training/
   run_v3_parallel.py               ← v3 parallel runner (current main entry point)
   build_v3_jobs.py                 ← v3 job builder (short + long tier)
-  run_all_batches.py               ← B0→B5 sequential runner (v2, superseded)
 docs/
   PROJECT_EXPLANATION.md          ← project overview / file map / module deep dive
 ```
@@ -541,21 +310,12 @@ Three tables in `runtime/platform.db`:
 | Table | Key columns | Notes |
 |-------|-------------|-------|
 | `audio_files` | file_id, file_name, file_path, source, duration, language, speaker_count, scene, topic, folder_id, deleted, deleted_at | soft-delete via `deleted=1` |
-| `tasks` | task_id, status, generation_mode, topic, language, people_count, word_count, error_msg, file_id, voice_map, output_format, keywords, template, custom_prompt, input_text, include_scripts | statuses: queued → generating_text → synthesizing → completed / failed；参数拆列存储（无 params_json） |
+| `tasks` | task_id, status, generation_mode, topic, language, people_count, word_count, error_msg, file_id, voice_map, output_format, keywords, template, custom_prompt, input_text, include_scripts, tts_provider, tts_fallback_strategy, voice_assignments, dialogue_id | statuses: queued → generating_text → synthesizing → completed / failed |
 | `folders` | folder_id, name, parent_id | used to group files in 我的文件 view |
 
-**Phase 1 已新增列（`db._run_tts_migration()` 幂等执行）：**
+`tasks.voice_assignments` 格式：`{"1": {"provider":"real_human","voice_id":"36d3429a3c98"}}`
 
-| 表 | 列 | 说明 |
-|----|----|------|
-| `tasks` | `tts_provider` TEXT DEFAULT 'edge_tts' | 期望 provider（`edge_tts` / `real_human`） |
-| `tasks` | `tts_fallback_strategy` TEXT DEFAULT 'edge_then_bundle' | 降级策略 |
-| `tasks` | `voice_assignments` TEXT DEFAULT '{}' | 新格式音色参数 JSON，格式：`{"1": {"provider":"real_human","voice_id":"36d3429a3c98"}}` |
-| `audio_files` | `tts_meta` TEXT DEFAULT NULL | 逐段合成诊断 JSON（provider、latency、degraded_reason、error_msg 等） |
-
-`list_tasks()` 通过 `LEFT JOIN audio_files` 附带 `file_duration` 字段（用于任务卡片时长显示），不影响其他查询。
-
-`src/webapp/db.py` provides all helpers; `src/webapp/task_runner.py` polls for queued tasks and drives them through the status machine.
+`list_tasks()` 通过 `LEFT JOIN audio_files` 附带 `file_duration` 字段（用于任务卡片时长显示）。
 
 ### Static file serving
 
@@ -580,13 +340,12 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 **LLM mode** (`source_mode: "llm"`) — AI generates dialogue text then synthesises audio:
 - User picks a preset theme from `templateSelect` (18 industry scenarios from `config/online_audio_ui.json`)
 - Optionally inputs a free-text topic (`llmTopic`) or selects from 22 saved preset topics (`config/preset_topics.json`)
-- Configures language, word count, keywords, speaker count
+- Configures language, word count, keywords, speaker count (min 1)
 - Backend calls the bundle LLM, runs three post-processing passes, then synthesises audio
 
 **Manual mode** (`source_mode: "manual"`) — User pastes dialogue text directly:
 - Selects language and speaker count
 - Pastes pre-written dialogue in `Speaker N: …` format
-- No topic field; `title` and `scenario` in the payload default to `"直接输入"`
 - Backend skips text generation, goes straight to audio synthesis
 
 ### Request lifecycle
@@ -598,27 +357,14 @@ Generation modal (`modal-generate`) embeds the legacy `app.js` state machine. Op
 4. Few-shot example injected: `get_topic_few_shot_example(template_label, language)` → 优先查 `output/training_v3/*/passed/`（v3 long tier 优先），回退到旧语料库 `demo-data/training_long_dialogue/`
 5. `_generate_long_dialogue_lines()` → calls bundle LLM, loops with dedup until word-count target is met
 6. Three post-processing passes: `repair_dialogue_quality` → `merge_keywords_into_lines` → `stabilize_dialogue_constraints`
-7. Written to `storage/generated/{dialogue_id}/{basename}.txt` + `manifest.json`（platform 任务则写入 `storage/generated/{task_id}/`）；registered in in-memory LRU cache (`_manifest_cache`, 500-entry cap). 旧任务在 `demo-data/{timestamp}/` 仍可访问——manifest cache 启动时双源扫描兼容历史数据。
-
-**Audio synthesis (`POST /api/synthesize_audio`)**
-1. Manifest looked up from cache/disk (`_find_manifest`)
-2. Each dialogue line assigned an edge_tts voice (`_voice_for_speaker` → `VOICE_CATALOG`)
-3. Phase 0: `asyncio.gather` with `Semaphore(5)` fans out concurrent `edge_tts.Communicate.save()` calls
-4. Phase 0b: failed segments retried sequentially; Phase 0c: still-failed → raise → bundle fallback
-5. `pydub` probes segment durations (read-then-discard, no accumulation)
-6. `subprocess.run(ffmpeg -f concat …)` stitches segments; temp `.mp3` files cleaned up in `finally`
-7. Returns `warning: "edge_tts_fallback:..."` if bundle fallback was used
-
-**TTS voice catalog (`VOICE_CATALOG` in `embedded_server_main.py`)**
-
-56 working voices across 13 languages (28 deprecated voices removed 2026-05-07). Backend auto-assignment uses `VOICE_CATALOG`; frontend dropdown uses `VOICE_LIBRARY` in `app.js`. Both were updated in the same audit.
+7. Written to `storage/generated/{dialogue_id}/{basename}.txt` + `manifest.json`；registered in in-memory LRU cache (`_manifest_cache`, 500-entry cap). 旧任务在 `demo-data/{timestamp}/` 仍可访问——manifest cache 启动时双源扫描兼容历史数据。
 
 **Platform task generation (`POST /api/platform/tasks` → task worker)**
-1. Payload params stored as individual columns in DB (no params_json), status set to `queued`；`tts_provider`（edge_tts / real_human）、`voice_assignments`（JSON）、`dialogue_id`（前端传入）同步写入
+1. Payload params stored as individual columns in DB, status set to `queued`；`tts_provider`、`voice_assignments`、`dialogue_id` 同步写入
 2. `src/webapp/task_runner.py` polling loop picks up queued tasks
 3. **save_dir 决策**：`direct` 模式且 `dialogue_id` 目录已存在 → 使用 `storage/generated/<dialogue_id>/`（与 txt+manifest 同目录）；否则使用 `storage/generated/<task_id>/`
 4. **edge_tts 路径**：调用 `_synthesize_audio_from_lines()`（legacy pipeline）
-5. **real_human 路径**（`tts_provider == "real_human"`）：调用 `_synthesize_with_real_human()` → `build_synthesis_requests` 合并段落 → asyncio.gather + Semaphore 并发合成 → WAV→MP3 格式统一 → ffmpeg concat
+5. **real_human 路径**（`tts_provider == "real_human"`）：调用 `_synthesize_with_real_human()` → `build_synthesis_requests` 合并段落 → asyncio.gather + Semaphore 并发合成 → WAV→MP3 格式统一 → ffmpeg filter_complex concat
 6. On success: writes audio to `save_dir`，`tts_meta` JSON 写入 DB；if `audio_result["warning"]` is set, stores `error_msg="[TTS_WARN] ..."` 显示橙色降级警告
 7. On failure: stores error_msg, sets status `failed`
 
@@ -654,14 +400,27 @@ The restoration script (after `<script src="/static/app.js">`) overrides `showCo
 - 路径：`output/training_v3/*/passed/`（已纳入版本管理）
 - 1937 条通过样本：22 场景 × 4 语言（zh/en/ja/ko）× 500–50000 字
 - Long tier（10k-50k 字）样本得分 +15 加成，排序优先
-- 最低分门槛 65（覆盖所有 passed 样本），excerpt 长度 1200 字符
+- 最低分门槛 65，excerpt 长度 1200 字符
 
 **旧语料库**（回退来源）
 - 路径：`demo-data/training_long_dialogue/`（force-tracked）
 - 630 个文件：14 domains × 9 languages × 5 speaker variants（spk2–spk6）
-- `few_shot_selector.py` 通过 `_DOMAIN_TO_ID` / `_LANG_TO_SHORT` 映射查找
 
 索引在服务器启动时清除（`invalidate_index()`），首次请求时懒加载重建。
+
+### Training quality gates (`training/quality_scoring.py`)
+
+强制拦截规则（`severity="error"`，直接 fail）：
+
+| 规则 | 触发条件 |
+|------|---------|
+| `language_mismatch` | 日语假名比例 < 8%；韩语韩文比例 < 5% |
+| `high_chinese_ratio` | 日语任务中文 > 30%；非CJK任务中文整体占比 > 15% |
+| `word_count_critical_short` | 日韩实际字数 < 目标 15%；其余 < 40% |
+| `scenario_placeholder_artifact` | 非中文任务对话行中出现 `Scenario: [大写]` |
+| `core_marker_artifact` | 对话输出中出现任意 `<<…>>` 标记 |
+| `chinese_role_name_leak` | 非CJK任务 >15% 的行含 >5% 中文字符 |
+| `high_repetition_rate` | 唯一行率 < 60%（且总行数 > 5）|
 
 ### YAML rules and caching
 
@@ -676,7 +435,7 @@ powershell build/build_win.ps1
 # macOS
 bash build/build_mac.sh
 ```
-Spec file: `build/demo_app.spec`. The built binaries (`build/demo_app/SceneDialogueDemo.exe` on Windows, `build/demo_app/SceneDialogueDemo.pkg` on macOS) are committed to the repo and required for LLM capability. Build intermediates (`.toc`, `.pyz`, `.zip`, `warn-*.txt`, `xref-*.html`) are gitignored and should not be committed. The embedded smoke test in the pre-release gate is skipped with a warning if the binaries are absent.
+Spec file: `build/demo_app.spec`. The built binaries (`build/demo_app/SceneDialogueDemo.exe` on Windows) are committed to the repo and required for LLM capability. Build intermediates (`.toc`, `.pyz`, `.zip`, `warn-*.txt`, `xref-*.html`) are gitignored.
 
 ### ffmpeg dependency
 
