@@ -680,15 +680,54 @@ async def _process_task(task_id: str) -> None:
                 "template_label": task.get("template") or "",
                 "keyword_terms": json.loads(task.get("keywords") or "[]"),
             }
-            bundle_server = load_bundle_server()
             task_save_dir = ROOT / "storage" / "generated" / task_id
             loop = asyncio.get_running_loop()
-            result: dict = await loop.run_in_executor(
-                None,
-                lambda: _generate_text_payload(
-                    bundle_server, payload, save_dir=task_save_dir
-                ),
-            )
+
+            # ── 云 LLM 分支：runtime.yaml llm.provider 非空时启用 ──────────────
+            cfg_llm = _load_runtime_cfg().get("llm") or {}
+            use_cloud = bool((cfg_llm.get("provider") or "").strip())
+
+            if use_cloud:
+                logger.info(
+                    "Task %s: 使用云 LLM 生成文本 (provider=%s)",
+                    task_id, cfg_llm.get("provider"),
+                )
+                try:
+                    from demo_app.services.cloud_generation import generate_text_cloud_llm
+                    result = await loop.run_in_executor(
+                        None,
+                        lambda: generate_text_cloud_llm(payload, task_save_dir),
+                    )
+                except Exception as cloud_exc:
+                    # 质量门禁触发（QualityGateError）→ 直接 fail，不降级
+                    from demo_app.services.cloud_generation import QualityGateError
+                    if isinstance(cloud_exc, QualityGateError):
+                        raise
+                    # 其他云 LLM 错误：按配置决定是否降级到 bundle
+                    if cfg_llm.get("use_bundle_fallback", True):
+                        logger.warning(
+                            "Task %s: 云 LLM 失败 (%s)，降级到 bundle",
+                            task_id, cloud_exc,
+                        )
+                        bundle_server = load_bundle_server()
+                        result = await loop.run_in_executor(
+                            None,
+                            lambda: _generate_text_payload(
+                                bundle_server, payload, save_dir=task_save_dir
+                            ),
+                        )
+                    else:
+                        raise
+            else:
+                # ── 原有 bundle 路径（未配置云 LLM 时）────────────────────────
+                bundle_server = load_bundle_server()
+                result = await loop.run_in_executor(
+                    None,
+                    lambda: _generate_text_payload(
+                        bundle_server, payload, save_dir=task_save_dir
+                    ),
+                )
+
             if not result.get("ok"):
                 raise RuntimeError(result.get("error") or "文本生成失败（未知错误）")
             dialogue_id = result["dialogue_id"]

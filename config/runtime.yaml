@@ -9,6 +9,26 @@ backends:
   text_bundle_fallback: enabled
   audio_bundle_fallback: enabled
 
+# ── 云 LLM 配置 ─────────────────────────────────────────────────────────────
+# provider 留空 → 使用本地 Bundle LLM（默认行为，向后兼容）
+# provider 非空 → 优先使用云 LLM；use_bundle_fallback=true 时云 LLM 失败可降级到 bundle
+#
+# 支持的 provider：
+#   deepseek  base_url 默认 https://api.deepseek.com/v1   model 默认 deepseek-chat
+#   openai    base_url 默认 https://api.openai.com/v1     model 默认 gpt-4o
+#   anthropic 直接调 Anthropic Messages API               model 默认 claude-sonnet-4-5
+#   custom    需填写 base_url（OpenAI 兼容协议）和 model
+#
+# api_key 优先读环境变量 LLM_API_KEY，其次读此处的 api_key 字段（建议走环境变量）
+llm:
+  provider: ""                             # 留空 = 使用 bundle；填写后重启生效
+  api_key: ""                              # 建议设环境变量 LLM_API_KEY，不要明文写这里
+  base_url: "https://api.deepseek.com/v1"  # 仅 deepseek/openai/custom 需要
+  model: "deepseek-chat"
+  timeout_sec: 60
+  max_tokens: 4096
+  use_bundle_fallback: true                # 云 LLM 连接失败时是否自动降级到 bundle
+
 # ── 任务队列配置 ────────────────────────────────────────────────────────────
 task_queue:
   max_concurrent: 3              # 平台同时进行中任务上限（queued+generating_text+synthesizing）。
