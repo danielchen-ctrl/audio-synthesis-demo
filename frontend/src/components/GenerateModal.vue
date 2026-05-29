@@ -8,6 +8,7 @@ import {
   type TaskCreatePayload, type VoiceAssignment,
 } from '@/api/tasks'
 import { errorMessage } from '@/api/client'
+import VoiceManageModal from '@/components/VoiceManageModal.vue'
 
 const props = defineProps<{ show: boolean }>()
 const emit = defineEmits<{
@@ -18,6 +19,7 @@ const emit = defineEmits<{
 const message = useMessage()
 const submitting = ref(false)
 const previewing = ref(false)
+const showVoiceMgmt = ref(false)
 
 // 配置
 const generationMode = ref<'llm' | 'manual'>('llm')
@@ -367,7 +369,14 @@ watch(generationMode, () => {
 
         <!-- ============ 语音配置 ============ -->
         <div class="ms-sec">
-          <div class="ms-sec-title">语音配置</div>
+          <div class="ms-sec-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>语音配置</span>
+            <button class="btn btn-secondary btn-sm" style="font-size:12px"
+                    @click="showVoiceMgmt = true">⚙️ 管理真人音色</button>
+          </div>
+
+          <!-- 音色管理弹窗 -->
+          <VoiceManageModal v-model:show="showVoiceMgmt" @updated="refreshVoices" />
 
           <div class="form-group">
             <label class="form-label">音色配置<span class="req">*</span></label>

@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-from app.api.v1 import admin, auth, files, folders, meta, tasks
+from app.api.v1 import admin, auth, files, folders, meta, tasks, voices
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.providers.storage.minio_client import ensure_bucket
@@ -20,6 +20,12 @@ async def lifespan(app: FastAPI):
     setup_logging()
     logger.info(f"Starting {settings.APP_NAME} (env={settings.APP_ENV})")
     ensure_bucket()
+    # 启动时尝试初始化音色目录（失败只 warning，不阻断启动）
+    try:
+        from app.scripts.init_voice_catalog import init_voice_catalog_if_empty
+        init_voice_catalog_if_empty()
+    except Exception as exc:
+        logger.warning(f"Voice catalog init skipped (CosyVoice unavailable?): {exc}")
     yield
     logger.info("Shutting down")
 
@@ -52,3 +58,4 @@ app.include_router(files.router, prefix="/api/v1/files", tags=["files"])
 app.include_router(folders.router, prefix="/api/v1/folders", tags=["folders"])
 app.include_router(meta.router, prefix="/api/v1/meta", tags=["meta"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
+app.include_router(voices.router, prefix="/api/v1/voices", tags=["voices"])

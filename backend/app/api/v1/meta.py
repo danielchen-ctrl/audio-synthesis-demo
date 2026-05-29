@@ -5,8 +5,7 @@ from fastapi import APIRouter, Query
 
 from app.api.deps import CurrentUser, DbSession
 from app.models import Tag
-from app.providers.tts import VoiceSpec, get_tts_provider
-from app.providers.tts.factory import get_fallback_voices
+from app.providers.tts import VoiceSpec, get_tts_provider  # noqa: F401 (kept for other uses)
 
 router = APIRouter()
 
@@ -91,14 +90,31 @@ def list_tags(
 
 
 @router.get("/voices")
-def list_voices(language: str | None = Query(None, description="按语言过滤")) -> list[dict]:
-    """从 CosyVoice 拉音色目录；失败时返回回退列表。"""
-    provider = get_tts_provider()
-    voices: list[VoiceSpec] = provider.list_voices(language=language)
+def list_voices(
+    language: str | None = Query(None, description="按语言过滤"),
+    current_user: CurrentUser = ...,
+    db: DbSession = ...,
+) -> list[dict]:
+    """从 DB voice_catalog 读取音色目录（DB 为唯一权威来源）。
+
+    原来动态拉取 CosyVoice /v1/voices/custom 的逻辑已迁移到
+    GET /api/v1/voices，此端点保持原 URL 兼容，内部改为读 DB。
+    """
+    from app.models.voice_catalog import VoiceCatalog
+    q = db.query(VoiceCatalog).filter_by(is_deleted=False)
+    if language:
+        q = q.filter_by(language=language)
+    voices = q.order_by(VoiceCatalog.created_at).all()
+
+    # DB 为空时回退到 CosyVoice 动态拉取（过渡兼容）
     if not voices:
-        voices = get_fallback_voices()
+        from app.providers.tts.factory import get_fallback_voices
+        fallback = get_fallback_voices()
         if language:
-            voices = [v for v in voices if v.language == language]
+            fallback = [v for v in fallback if v.language == language]
+        return [{"voice_id": v.voice_id, "name": v.name, "language": v.language, "gender": v.gender}
+                for v in fallback]
+
     return [
         {
             "voice_id": v.voice_id,
