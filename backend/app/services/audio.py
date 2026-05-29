@@ -23,12 +23,13 @@ def synthesize_lines(
     voice_assignments: dict[str, dict],
     language: str,
     output_format: str = "mp3",
-) -> tuple[bytes, float, list[dict]]:
+    fallback_tts: TTSProvider | None = None,
+) -> tuple[bytes, float, list[dict], bool]:
     """按 (speaker_id, text) 顺序合成所有段，拼成最终音频。
 
-    返回 (audio_bytes, total_duration_sec, segments)
+    返回 (audio_bytes, total_duration_sec, segments, degraded)
       segments = [{speaker_id, text, start_time, end_time}, ...]
-      时间累加自每段实测 duration（PRD §12 段级时间码）。
+      degraded  = True 表示至少一段触发了 edge_tts 降级
     """
     _check_ffmpeg()
 
@@ -44,6 +45,7 @@ def synthesize_lines(
             merged.append((sid, text))
 
     work = Path(tempfile.mkdtemp(prefix="audio_synth_"))
+    degraded = False
     try:
         segment_files: list[Path] = []
         segment_durations: list[float] = []
@@ -61,10 +63,26 @@ def synthesize_lines(
             )
             result = tts.synthesize(req)
             if not result.success or not result.audio_bytes:
-                raise RuntimeError(
-                    f"第 {idx + 1} 段合成失败 (speaker={sid}): "
-                    f"{result.error_code} / {result.error_message}"
-                )
+                if fallback_tts:
+                    logger.warning(
+                        f"CosyVoice 失败，降级 edge_tts (speaker={sid}): {result.error_code}"
+                    )
+                    fallback_req = SynthesisRequest(
+                        text=text,
+                        # 通过方法调用，不直接引用 provider 内部 dict
+                        voice_id=fallback_tts.default_voice_for(language),
+                        language=language,
+                        response_format="wav",
+                    )
+                    result = fallback_tts.synthesize(fallback_req)
+                    if not result.success:
+                        raise RuntimeError(f"降级合成也失败: {result.error_message}")
+                    degraded = True
+                else:
+                    raise RuntimeError(
+                        f"第 {idx + 1} 段合成失败 (speaker={sid}): "
+                        f"{result.error_code} / {result.error_message}"
+                    )
 
             # CosyVoice 直接返回 wav；先落盘
             wav_path = work / f"seg_{idx:04d}.wav"
@@ -98,16 +116,21 @@ def synthesize_lines(
             })
             cursor += seg_dur
 
-        return final_path.read_bytes(), total_duration, segments
+        return final_path.read_bytes(), total_duration, segments, degraded
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
 
 def _ffmpeg_normalize(src: Path, dst: Path) -> None:
-    """统一格式: 44.1kHz mono mp3。"""
+    """统一格式 44.1kHz mono mp3 + 裁剪 CosyVoice 数字静音（-65dB 保守阈值）。"""
     cmd = [
         "ffmpeg", "-y", "-loglevel", "error",
         "-i", str(src),
+        # silenceremove：仅裁 ~-90dB 数字静音，不影响正常语音（>-40dB）
+        "-af", (
+            "silenceremove=start_periods=1:start_duration=0.05:start_threshold=-65dB"
+            ":stop_periods=1:stop_duration=0.15:stop_threshold=-65dB"
+        ),
         "-ar", "44100", "-ac", "1",
         "-codec:a", "libmp3lame", "-b:a", "128k",
         str(dst),

@@ -65,6 +65,14 @@ class Settings(BaseSettings):
     COSYVOICE_MAX_RETRIES: int = 2
     COSYVOICE_MAX_CONCURRENCY: int = 1
 
+    # --- Edge TTS 降级 ---
+    EDGE_TTS_ENABLED: bool = True
+    EDGE_TTS_FALLBACK_ON_FAILURE: bool = True
+
+    # --- LLM 后处理 ---
+    LLM_POSTPROCESS_ENABLED: bool = True
+    LLM_POSTPROCESS_MODE: str = "lite"   # lite=3A精简
+
     # --- 业务限制 ---
     MAX_UPLOAD_SIZE_MB: int = 500
     MAX_CONCURRENT_TASKS_PER_USER: int = 3

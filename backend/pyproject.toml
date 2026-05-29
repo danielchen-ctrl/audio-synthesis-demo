@@ -39,6 +39,7 @@ dependencies = [
 
     # Audio
     "pydub>=0.25.1",
+    "edge-tts>=6.1.9",            # edge_tts 降级备用 TTS
 
     # Logging
     "loguru>=0.7.2",

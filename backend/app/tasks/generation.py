@@ -96,14 +96,23 @@ def run_generation_task(self, task_id: str) -> dict:
         logger.info(f"Task {task_id}: synthesizing {len(lines)} lines via CosyVoice")
 
         try:
+            from app.core.config import get_settings
+            from app.providers.tts.edge_tts_provider import EdgeTTSProvider
+            _settings = get_settings()
+            fallback_tts = EdgeTTSProvider() if _settings.EDGE_TTS_FALLBACK_ON_FAILURE else None
+
             tts = get_tts_provider()
-            audio_bytes, duration_sec, segments = synthesize_lines(
+            audio_bytes, duration_sec, segments, degraded = synthesize_lines(
                 tts=tts,
                 lines=lines,
                 voice_assignments=voice_assignments,
                 language=language,
                 output_format=audio_format,
+                fallback_tts=fallback_tts,
             )
+            if degraded:
+                task.error_message = "[TTS_WARN] 部分片段降级为 edge_tts"
+                db.commit()
         except Exception as e:  # noqa: BLE001
             logger.exception(f"Task {task_id}: synthesis failed")
             _mark_failed(db, task, "synthesis_failed", str(e))
