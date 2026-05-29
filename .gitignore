@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Env / secrets
+.env
+.env.local
+*.pem
+*.key
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Local data（锚定根目录，避免误伤代码模块如 app/providers/storage/）
+/runtime/
+/storage/
+*.db
+*.sqlite
+
+# Logs
+logs/
+*.log
+
+# Few-shot 训练样本（57MB，从老 demo 拷贝；生产环境用 volume 挂载或重新同步）
+backend/app/data/few_shot/
