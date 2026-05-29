@@ -9,6 +9,12 @@ backends:
   text_bundle_fallback: enabled
   audio_bundle_fallback: enabled
 
+# ── 任务队列配置 ────────────────────────────────────────────────────────────
+task_queue:
+  max_concurrent: 3              # 平台同时进行中任务上限（queued+generating_text+synthesizing）。
+                                 # 超过时提交/重试返回 429。修改后需重启服务器生效。
+                                 # worker 数量（_MAX_WORKERS）在 task_runner.py 启动时读取此值。
+
 # ── 真人 TTS (CosyVoice) 配置 ──────────────────────────────────────────────
 # api_url 优先从环境变量 REAL_HUMAN_TTS_API_URL 读取；
 # 环境变量未设置时使用此处的 api_url（留空则真人 TTS 不可用）。

@@ -124,6 +124,30 @@ def _safe_basename(topic: str) -> str:
 
 # ── 真人 TTS 合成辅助函数 ──────────────────────────────────────────────────────
 
+def _build_srt(segments: list[dict]) -> str:
+    """将 timed_segments 列表转为标准 SRT 字幕字符串。
+    每段格式：
+        序号
+        HH:MM:SS,mmm --> HH:MM:SS,mmm
+        Speaker N: 文本
+        （空行）
+    """
+    def _fmt(sec: float) -> str:
+        ms_total = int(sec * 1000)
+        h, rem = divmod(ms_total, 3_600_000)
+        m, rem = divmod(rem, 60_000)
+        s, ms = divmod(rem, 1000)
+        return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+    lines: list[str] = []
+    for i, seg in enumerate(segments, 1):
+        lines.append(str(i))
+        lines.append(f"{_fmt(seg['start_time'])} --> {_fmt(seg['end_time'])}")
+        lines.append(f"{seg['speaker']}: {seg['text']}")
+        lines.append("")
+    return "\n".join(lines)
+
+
 async def _fallback_edge_tts(req: Any, output_path: Path) -> Any:
     """
     用 edge_tts 合成一个 SynthesisRequest，作为 real_human 降级路径。
@@ -393,7 +417,20 @@ async def _synthesize_one_segment(
             rh_failure_reason = "provider_error"
             rh_error_msg = str(exc)[:300]
 
-    return idx, result, seg_file, rh_failure_reason, rh_error_msg
+    # 合成结束后探测片段实际时长（用于时间码累加）。
+    # 在 semaphore 释放后执行，不占用并发槽位。
+    seg_duration_sec = 0.0
+    if seg_file and seg_file.exists():
+        try:
+            from demo_app.embedded_server_main import _probe_duration_secs
+            _loop = asyncio.get_running_loop()
+            seg_duration_sec = await _loop.run_in_executor(
+                None, lambda: _probe_duration_secs(seg_file)
+            )
+        except Exception:
+            seg_duration_sec = 0.0
+
+    return idx, result, seg_file, rh_failure_reason, rh_error_msg, seg_duration_sec
 
 
 async def _synthesize_with_real_human(
@@ -403,6 +440,7 @@ async def _synthesize_with_real_human(
     basename: str,
     task: dict,
     output_format: str = "mp3",
+    include_scripts: bool = False,
 ) -> dict:
     """
     使用 RealHumanProvider (CosyVoice) 并发合成所有段落。
@@ -479,7 +517,8 @@ async def _synthesize_with_real_human(
     tts_meta: list[dict] = []
     fallback_reasons: list[str] = []
 
-    for idx, result, seg_file, rh_failure_reason, rh_error_msg in raw_results:
+    # ── 注意：_synthesize_one_segment 现在返回 6 元组，第 6 个是实测时长 ──────
+    for idx, result, seg_file, rh_failure_reason, rh_error_msg, _seg_dur in raw_results:
         seg_files.append(seg_file)
         if rh_failure_reason:
             fallback_reasons.append(f"seg{idx}:{rh_failure_reason}")
@@ -514,6 +553,24 @@ async def _synthesize_with_real_human(
             "poll_count": result.poll_count if result else None,
         })
 
+    # ── 时间码累加（在现有 tts_meta 循环之后、拼接之前新增的独立循环） ────────
+    # 从 raw_results 的第 6 个元素（seg_duration_sec）提取各段实测时长，
+    # 累加 cursor 得到每段 start_time / end_time。
+    timed_segments: list[dict] = []
+    cursor = 0.0
+    for (idx, _result, _seg_file, _rh_fail, _rh_msg, seg_dur), req in zip(
+        raw_results, synthesis_requests
+    ):
+        start_t = round(cursor, 3)
+        end_t = round(cursor + seg_dur, 3)
+        timed_segments.append({
+            "speaker": req.speaker,
+            "text": "".join(req.segments),
+            "start_time": start_t,
+            "end_time": end_t,
+        })
+        cursor += seg_dur
+
     # ── 拼接所有片段 ─────────────────────────────────────────────────────────
     final_ext = f".{output_format}"
     final_path = save_dir / f"{basename}{final_ext}"
@@ -530,6 +587,28 @@ async def _synthesize_with_real_human(
                 except Exception:
                     pass
 
+    # ── 写 segments.json + .srt（include_scripts=True 时） ───────────────────
+    segments_json_path: str | None = None
+    transcript_srt_path: str | None = None
+    if include_scripts and timed_segments:
+        try:
+            seg_json_file = save_dir / f"{basename}_transcript.json"
+            seg_json_file.write_text(
+                json.dumps(timed_segments, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            segments_json_path = str(seg_json_file)
+
+            srt_file = save_dir / f"{basename}_transcript.srt"
+            srt_file.write_text(_build_srt(timed_segments), encoding="utf-8")
+            transcript_srt_path = str(srt_file)
+            logger.info(
+                "[task_runner] 时间码脚本已写入: %s  %s",
+                seg_json_file.name, srt_file.name,
+            )
+        except Exception as exc:
+            logger.warning("[task_runner] 写时间码脚本失败（不影响主流程）: %s", exc)
+
     # ── 构造返回值 ────────────────────────────────────────────────────────────
     warn = ""
     if fallback_reasons:
@@ -542,8 +621,8 @@ async def _synthesize_with_real_human(
         "output_format": output_format,
         "warning": warn,
         "tts_meta": json.dumps(tts_meta, ensure_ascii=False),
-        "segments_json_path": None,
-        "transcript_srt_path": None,
+        "segments_json_path": segments_json_path,
+        "transcript_srt_path": transcript_srt_path,
     }
 
 
@@ -693,6 +772,7 @@ async def _process_task(task_id: str) -> None:
             audio_result: dict = await _synthesize_with_real_human(
                 line_tuples, language, save_dir, basename, task,
                 output_format=output_format,
+                include_scripts=include_scripts,
             )
         else:
             bundle_server = load_bundle_server()
@@ -802,7 +882,9 @@ def enqueue(task_id: str) -> None:
     loop.call_soon_threadsafe(_task_queue.put_nowait, task_id)
 
 
-_MAX_WORKERS = 3  # 与 handlers.py 中的并发限制（count_active_tasks >= 3）保持一致
+# _MAX_WORKERS 在服务启动时（import 阶段）从 runtime.yaml 读取，之后不再更新。
+# 修改 runtime.yaml 的 task_queue.max_concurrent 后须重启服务器才生效。
+_MAX_WORKERS = int(_load_runtime_cfg().get("task_queue", {}).get("max_concurrent", 3))
 
 
 def _recover_stuck_tasks() -> int:

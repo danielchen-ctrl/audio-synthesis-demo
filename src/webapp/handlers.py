@@ -47,6 +47,20 @@ import src.webapp.db as db
 from src.webapp.task_runner import enqueue, _guess_scene
 
 
+def _get_max_concurrent() -> int:
+    """从 runtime.yaml 读取任务并发上限；读取失败时默认 3。
+    注意：每次调用都重新读文件（无缓存），以便修改配置后重启即生效。
+    handlers.py 不 import task_runner 的私有函数，避免循环依赖。
+    """
+    try:
+        import yaml
+        cfg_path = ROOT / "config" / "runtime.yaml"
+        cfg = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
+        return int(cfg.get("task_queue", {}).get("max_concurrent", 3))
+    except Exception:
+        return 3
+
+
 # ── 基类 ──────────────────────────────────────────────────────────────────────
 
 class PlatformHandler(RequestHandler):
@@ -133,9 +147,10 @@ class TasksHandler(PlatformHandler):
         if mode == "direct" and not data.get("input_text"):
             raise HTTPError(400, reason="直接输入模式需提供 input_text")
 
-        # 并发限制
-        if db.count_active_tasks() >= 3:
-            raise HTTPError(429, reason="当前进行中任务已达上限（3个），请稍后再试")
+        # 并发限制（上限从 runtime.yaml task_queue.max_concurrent 读取，默认 3）
+        _limit = _get_max_concurrent()
+        if db.count_active_tasks() >= _limit:
+            raise HTTPError(429, reason=f"当前进行中任务已达上限（{_limit}个），请稍后再试")
 
         task = db.create_task(data)
         enqueue(task["task_id"])
@@ -181,8 +196,9 @@ class TaskHandler(PlatformHandler):
             raise HTTPError(404, reason="任务不存在")
         if task["status"] != "failed":
             raise HTTPError(400, reason="只有失败的任务才能重试")
-        if db.count_active_tasks() >= 3:
-            raise HTTPError(429, reason="当前进行中任务已达上限（3个）")
+        _limit = _get_max_concurrent()
+        if db.count_active_tasks() >= _limit:
+            raise HTTPError(429, reason=f"当前进行中任务已达上限（{_limit}个）")
         updated = db.retry_task(task_id)
         if updated:
             enqueue(task_id)

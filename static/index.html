@@ -1534,6 +1534,34 @@ function renderDetail(f){
       URL.revokeObjectURL(url);
     }catch(e){showToast('err','下载失败');}
   };
+
+  // SRT / JSON 时间码脚本下载按钮（仅 include_scripts=true 时生成，用 start_time 判断）
+  // transcript_json 始终不为空（无时间码时 start_time=null），不能用它控制显示
+  let _hasTimestamps=false;
+  try{const _segs=JSON.parse(f.transcript_json||'[]');_hasTimestamps=_segs.length>0&&_segs[0].start_time!==null;}catch(e){}
+  // 动态插入两个下载按钮（如已存在则先移除，避免重复渲染）
+  ['detail-dl-json','detail-dl-srt'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();});
+  if(_hasTimestamps||f.transcript_srt){
+    const hdrActions=document.querySelector('#page-detail .hdr-actions');
+    if(_hasTimestamps){
+      const btnJson=document.createElement('a');
+      btnJson.id='detail-dl-json';
+      btnJson.className='btn btn-ghost btn-sm';
+      btnJson.href='/api/platform/files/'+f.file_id+'/transcript?type=json';
+      btnJson.download='';
+      btnJson.textContent='📋 JSON 脚本';
+      hdrActions.insertBefore(btnJson,document.getElementById('detail-del-btn'));
+    }
+    if(f.transcript_srt){
+      const btnSrt=document.createElement('a');
+      btnSrt.id='detail-dl-srt';
+      btnSrt.className='btn btn-ghost btn-sm';
+      btnSrt.href='/api/platform/files/'+f.file_id+'/transcript?type=srt';
+      btnSrt.download='';
+      btnSrt.textContent='🎬 SRT 字幕';
+      hdrActions.insertBefore(btnSrt,document.getElementById('detail-del-btn'));
+    }
+  }
   document.getElementById('detail-del-btn').onclick=()=>showConfirm('删除此文件？','文件将移入回收站。',async()=>{try{await API.del('/api/platform/files/'+f.file_id);showToast('ok','已移入回收站');goTo(_detailBack);}catch(e){showToast('err','删除失败');}});
 
   const fileUrl='/api/platform/files/'+f.file_id+'/download';
