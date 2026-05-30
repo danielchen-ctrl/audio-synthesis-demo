@@ -26,10 +26,12 @@ def get_current_user(
         )
     try:
         payload = decode_access_token(token)
-        user_id = payload.get("sub")
-        if not user_id:
+        user_id_str = payload.get("sub")
+        if not user_id_str:
             raise JWTError("missing sub")
-    except JWTError as e:
+        import uuid as _uuid
+        user_id = _uuid.UUID(user_id_str)   # MySQL Uuid 列需要 uuid.UUID 对象，不能用字符串
+    except (JWTError, ValueError) as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid token: {e}",
