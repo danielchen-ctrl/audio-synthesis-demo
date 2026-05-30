@@ -119,7 +119,13 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
           </td>
         </tr>
         <tr v-else v-for="row in tasks" :key="row.task_id">
-          <td>{{ row.topic || '-' }}</td>
+          <td>
+            <span v-if="row.status === 'succeeded' && row.file_id"
+                  class="topic-link" @click="gotoDetail(row.file_id!)">
+              {{ row.topic || '-' }}
+            </span>
+            <span v-else>{{ row.topic || '-' }}</span>
+          </td>
           <td>{{ row.generation_mode === 'llm' ? 'LLM 生成' : '手动输入' }}</td>
           <td>{{ langName[row.language || ''] || row.language || '-' }}</td>
           <td>{{ row.speaker_count ?? '-' }}</td>
@@ -151,3 +157,15 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
     </table>
   </div>
 </template>
+
+<style scoped>
+.topic-link {
+  color: var(--primary, #3B82F6);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.topic-link:hover {
+  opacity: 0.75;
+}
+</style>
