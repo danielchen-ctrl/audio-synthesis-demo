@@ -86,7 +86,10 @@ function fmtMS(s: number) {
   const m = Math.floor(s / 60), sec = Math.round(s % 60)
   return `${m}:${sec.toString().padStart(2, '0')}`
 }
-function fmtTime(s: string) { return new Date(s).toLocaleString('zh-CN', { hour12: false }) }
+function fmtTime(s: string) {
+  const utc = s.endsWith('Z') || s.includes('+') ? s : s + 'Z'
+  return new Date(utc).toLocaleString('zh-CN', { hour12: false })
+}
 
 function onDownload() { if (downloadUrl.value) window.open(downloadUrl.value, '_blank') }
 

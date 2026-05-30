@@ -65,7 +65,12 @@ function onDelete(row: TaskListItem) {
 }
 
 function gotoDetail(fileId: string) { router.push(`/detail/${fileId}`) }
-function fmtTime(s: string | null) { return s ? new Date(s).toLocaleString('zh-CN', { hour12: false }) : '-' }
+function fmtTime(s: string | null) {
+  if (!s) return '-'
+  // 后端返回 UTC 时间但无 Z 后缀，手动补上让浏览器正确转为本地时间
+  const utc = s.endsWith('Z') || s.includes('+') ? s : s + 'Z'
+  return new Date(utc).toLocaleString('zh-CN', { hour12: false })
+}
 const langName: Record<string, string> = {
   zh: '中文', en: '英语', ja: '日语', ko: '韩语', es: '西语', fr: '法语',
   de: '德语', pt: '葡语', it: '意语', ru: '俄语', ar: '阿语', id: '印尼语',

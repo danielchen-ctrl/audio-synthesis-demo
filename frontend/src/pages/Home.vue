@@ -134,7 +134,10 @@ function onDelete(row: AudioFile) {
 }
 
 function gotoDetail(fileId: string) { router.push(`/detail/${fileId}`) }
-function fmtTime(s: string) { return new Date(s).toLocaleString('zh-CN', { hour12: false }) }
+function fmtTime(s: string) {
+  const utc = s.endsWith('Z') || s.includes('+') ? s : s + 'Z'
+  return new Date(utc).toLocaleString('zh-CN', { hour12: false })
+}
 function fmtDuration(sec: number | null) {
   if (!sec) return '-'
   const m = Math.floor(sec / 60), s = Math.round(sec % 60)
