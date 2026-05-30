@@ -38,10 +38,10 @@ curl -s http://localhost:8000/api/v1/health >nul 2>&1
 if %errorlevel% neq 0 goto wait_backend
 echo       Backend ready
 
-:: 4. Start Celery worker
+:: 4. Start Celery worker (run directly without helper bat to avoid encoding issues)
 echo [4/5] Starting Celery worker...
-start "V2-Celery" "%ROOT%\run\_run_celery.bat"
-timeout /t 3 /nobreak >nul
+start "V2-Celery" cmd /k "cd /d %ROOT% && set PYTHONPATH=%ROOT%\backend && backend\.venv\Scripts\celery -A app.celery_app worker --loglevel=info -Q default,audio_synth -c 2"
+timeout /t 5 /nobreak >nul
 echo       Celery started
 
 :: 5. Start frontend
