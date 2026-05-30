@@ -35,4 +35,5 @@ echo ============================================
 echo   All services stopped.
 echo ============================================
 echo.
-pause
+echo   Window closing in 3 seconds...
+timeout /t 3 /nobreak >nul
