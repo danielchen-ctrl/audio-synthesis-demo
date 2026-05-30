@@ -31,7 +31,7 @@ echo       MySQL / Redis / MinIO ready
 
 :: 3. Start backend
 echo [3/5] Starting backend (http://localhost:8000)...
-start "V2-Backend" "%ROOT%\_run_backend.bat"
+start "V2-Backend" "%ROOT%\run\_run_backend.bat"
 :wait_backend
 timeout /t 2 /nobreak >nul
 curl -s http://localhost:8000/api/v1/health >nul 2>&1
@@ -40,13 +40,13 @@ echo       Backend ready
 
 :: 4. Start Celery worker
 echo [4/5] Starting Celery worker...
-start "V2-Celery" "%ROOT%\_run_celery.bat"
+start "V2-Celery" "%ROOT%\run\_run_celery.bat"
 timeout /t 3 /nobreak >nul
 echo       Celery started
 
 :: 5. Start frontend
 echo [5/5] Starting frontend (http://localhost:5173)...
-start "V2-Frontend" "%ROOT%\_run_frontend.bat"
+start "V2-Frontend" "%ROOT%\run\_run_frontend.bat"
 :wait_frontend
 timeout /t 2 /nobreak >nul
 curl -s http://localhost:5173 >nul 2>&1
