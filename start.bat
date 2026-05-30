@@ -50,9 +50,22 @@ curl -s http://localhost:8000/api/v1/health >nul 2>&1
 if %errorlevel% neq 0 goto wait_backend
 echo       Backend ready
 
-:: 4. Start frontend in new window
-echo [4/4] Starting frontend (http://localhost:5173)...
+:: 4. Start Celery worker in new window
+:: 必须从项目根目录启动（.env 在根目录），同时设置 PYTHONPATH 指向 backend
+echo [4/5] Starting Celery worker...
+start "V2-Celery" cmd /k "cd /d %ROOT% && set PYTHONPATH=%ROOT%\backend && backend\.venv\Scripts\celery -A app.celery_app worker --loglevel=info -Q default,audio_synth -c 2"
+
+:: 5. Start frontend in new window
+echo [5/5] Starting frontend (http://localhost:5173)...
 start "V2-Frontend" cmd /k "cd /d %ROOT%\frontend && npm run dev"
+
+:: Wait for frontend then open browser
+echo       Waiting for frontend...
+:wait_frontend
+timeout /t 2 /nobreak >nul
+curl -s http://localhost:5173 >nul 2>&1
+if %errorlevel% neq 0 goto wait_frontend
+start "" "http://localhost:5173"
 
 echo.
 echo ============================================
@@ -63,6 +76,7 @@ echo   Backend  : http://localhost:8000
 echo   API Docs : http://localhost:8000/docs
 echo   MinIO    : http://localhost:9001
 echo              (minioadmin / minioadmin)
+echo   Celery   : window "V2-Celery"
 echo ============================================
 echo.
 echo   To stop all services, run stop.bat
