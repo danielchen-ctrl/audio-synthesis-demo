@@ -193,6 +193,11 @@ onMounted(fetchFile)
     <div style="font-size:16px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
       {{ file?.file_name || '文件详情' }}
     </div>
+    <!-- 顶部操作按钮 -->
+    <div v-if="file" style="display:flex;gap:8px;flex-shrink:0">
+      <button class="btn btn-secondary btn-sm" @click="onDownload">⬇ 下载</button>
+      <button v-if="isOwner" class="btn btn-danger-ol btn-sm" @click="onDelete">🗑 删除</button>
+    </div>
   </div>
 
   <div v-if="file" class="detail-grid">
@@ -351,19 +356,16 @@ onMounted(fetchFile)
         </div>
       </div>
 
-      <!-- 文件操作 -->
-      <div class="card">
+      <!-- 脚本下载（JSON/SRT，仅有脚本时显示）-->
+      <div v-if="jsonDownloadUrl || srtDownloadUrl" class="card">
         <div class="cs">
-          <div class="sec-title">文件操作</div>
+          <div class="sec-title">脚本下载</div>
           <div class="op-list">
-            <button class="btn btn-secondary btn-sm" @click="onDownload">⬇ 下载音频</button>
             <a v-if="jsonDownloadUrl" :href="jsonDownloadUrl"
                class="btn btn-secondary btn-sm" target="_blank" download>⬇ JSON</a>
             <a v-if="srtDownloadUrl" :href="srtDownloadUrl"
                class="btn btn-secondary btn-sm" target="_blank" download>⬇ SRT</a>
-            <button v-if="isOwner" class="btn btn-danger-ol btn-sm" @click="onDelete">🗑 删除</button>
           </div>
-          <div v-if="!isOwner" class="mt8 text-sm">非创建者仅显示下载按钮</div>
         </div>
       </div>
     </div>
