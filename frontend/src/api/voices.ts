@@ -38,6 +38,12 @@ export async function registerVoice(
   return resp.data
 }
 
+/** 修改音色名称（仅创建者可操作） */
+export async function renameVoice(voiceId: string, name: string): Promise<Voice> {
+  const resp = await client.patch(`/voices/${voiceId}?name=${encodeURIComponent(name)}`)
+  return resp.data
+}
+
 /** 删除音色（仅创建者可操作） */
 export async function deleteVoice(voiceId: string, deleteRemote = false): Promise<void> {
   await client.delete(`/voices/${voiceId}?delete_remote=${deleteRemote}`)

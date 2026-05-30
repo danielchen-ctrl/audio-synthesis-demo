@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useMessage } from 'naive-ui'
-import { listVoicesFromDB, registerVoice, deleteVoice, type Voice } from '@/api/voices'
+import { listVoicesFromDB, registerVoice, renameVoice, deleteVoice, type Voice } from '@/api/voices'
 import { errorMessage } from '@/api/client'
 
 const props = defineProps<{ show: boolean }>()
@@ -87,6 +87,35 @@ async function submitRegister() {
   }
 }
 
+// ── 内联重命名 ─────────────────────────────────────────────────────────────
+const editingId = ref<string | null>(null)
+const editingName = ref('')
+
+function startEdit(v: Voice) {
+  editingId.value = v.voice_id
+  editingName.value = v.name
+}
+
+function cancelEdit() {
+  editingId.value = null
+  editingName.value = ''
+}
+
+async function confirmEdit(v: Voice) {
+  const newName = editingName.value.trim()
+  if (!newName) { message.warning('名称不能为空'); return }
+  if (newName === v.name) { cancelEdit(); return }
+  try {
+    await renameVoice(v.voice_id, newName)
+    message.success(`已重命名为「${newName}」`)
+    cancelEdit()
+    await refreshList()
+    emit('updated')
+  } catch (e) {
+    message.error(errorMessage(e))
+  }
+}
+
 async function handleDelete(v: Voice) {
   try {
     await deleteVoice(v.voice_id)
@@ -127,11 +156,31 @@ function close() { emit('update:show', false) }
           <div v-else-if="voices.length === 0" class="vm-hint">暂无注册音色</div>
           <div v-else class="vm-list">
             <div v-for="v in voices" :key="v.voice_id" class="vm-item">
-              <div class="vm-item-info">
-                <span class="vm-item-name">{{ v.name }}</span>
-                <span class="vm-item-meta">{{ v.language }}{{ v.gender ? ` · ${v.gender}` : '' }}</span>
-              </div>
-              <button class="vm-del-btn" title="删除" @click="handleDelete(v)">🗑</button>
+              <!-- 编辑状态 -->
+              <template v-if="editingId === v.voice_id">
+                <input
+                  v-model="editingName"
+                  class="vm-edit-input"
+                  @keyup.enter="confirmEdit(v)"
+                  @keyup.escape="cancelEdit"
+                  autofocus
+                />
+                <div class="vm-edit-btns">
+                  <button class="vm-confirm-btn" title="确认" @click="confirmEdit(v)">✓</button>
+                  <button class="vm-cancel-btn" title="取消" @click="cancelEdit">✕</button>
+                </div>
+              </template>
+              <!-- 普通状态 -->
+              <template v-else>
+                <div class="vm-item-info">
+                  <span class="vm-item-name">{{ v.name }}</span>
+                  <span class="vm-item-meta">{{ v.language }}{{ v.gender ? ` · ${v.gender}` : '' }}</span>
+                </div>
+                <div class="vm-item-actions">
+                  <button class="vm-edit-btn" title="重命名" @click="startEdit(v)">✏️</button>
+                  <button class="vm-del-btn" title="删除" @click="handleDelete(v)">🗑</button>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -237,11 +286,27 @@ function close() { emit('update:show', false) }
 .vm-item-info { display: flex; flex-direction: column; gap: 2px; }
 .vm-item-name { font-size: 13px; font-weight: 500; }
 .vm-item-meta { font-size: 11px; color: #999; }
-.vm-del-btn {
+.vm-item-actions { display: flex; gap: 4px; align-items: center; }
+.vm-edit-btn, .vm-del-btn {
   background: none; border: none; cursor: pointer;
-  font-size: 14px; opacity: .5; padding: 2px 4px;
+  font-size: 14px; opacity: .45; padding: 2px 4px;
 }
-.vm-del-btn:hover { opacity: 1; }
+.vm-edit-btn:hover, .vm-del-btn:hover { opacity: 1; }
+.vm-edit-input {
+  flex: 1; padding: 4px 8px; border: 1px solid #3B82F6;
+  border-radius: 6px; font-size: 13px; outline: none;
+}
+.vm-edit-btns { display: flex; gap: 4px; margin-left: 6px; }
+.vm-confirm-btn {
+  background: #3B82F6; color: #fff; border: none; border-radius: 5px;
+  padding: 3px 8px; cursor: pointer; font-size: 13px;
+}
+.vm-confirm-btn:hover { background: #2563eb; }
+.vm-cancel-btn {
+  background: #e5e7eb; color: #555; border: none; border-radius: 5px;
+  padding: 3px 8px; cursor: pointer; font-size: 13px;
+}
+.vm-cancel-btn:hover { background: #d1d5db; }
 .vm-divider { border: none; border-top: 1px solid #eee; margin: 12px 0 0; }
 .vm-upload-area {
   border: 2px dashed #d0d0d0; border-radius: 8px;

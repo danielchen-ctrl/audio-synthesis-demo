@@ -200,6 +200,29 @@ async def create_voice(
     )
 
 
+@router.patch("/{voice_id}", response_model=VoiceOut)
+def rename_voice(
+    voice_id: str,
+    name: str = Query(..., description="新音色名称"),
+    current_user: CurrentUser = ...,
+    db: DbSession = ...,
+) -> VoiceOut:
+    """修改音色名称（仅创建者可操作）。"""
+    name = name.strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="音色名称不能为空")
+    voice = db.query(VoiceCatalog).filter_by(voice_id=voice_id, is_deleted=False).first()
+    if not voice:
+        raise HTTPException(status_code=404, detail="音色不存在")
+    if voice.created_by != current_user.user_id:
+        raise HTTPException(status_code=403, detail="只能修改自己注册的音色")
+    voice.name = name
+    db.commit()
+    db.refresh(voice)
+    logger.info(f"Voice renamed: voice_id={voice_id} new_name={name} by user={current_user.user_id}")
+    return voice
+
+
 @router.delete("/{voice_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_voice(
     voice_id: str,
