@@ -89,6 +89,34 @@ def run_generation_task(self, task_id: str) -> dict:
             )
             return {"ok": False, "error": "speaker_count_mismatch"}
 
+        # ===== 2.5 精简后处理 + 质量门禁（LLM 模式）=====
+        if mode == "llm":
+            from app.core.config import get_settings as _get_settings
+            _cfg = _get_settings()
+            if _cfg.LLM_POSTPROCESS_ENABLED:
+                # V2 参数体系：target_duration_sec → 换算为字数（150字/分钟）
+                _target_words = max(50, int(params.get("target_duration_sec", 60) * 2.5))
+                from app.services.postprocess import apply_postprocess
+                lines = apply_postprocess(
+                    lines,
+                    language=language,
+                    keywords=params.get("keywords", []),
+                    speaker_count=speaker_count,
+                    title=topic,
+                    scenario=params.get("template", ""),
+                    core_content=params.get("custom_prompt", ""),
+                    target_word_count=_target_words,
+                )
+            else:
+                _target_words = max(50, int(params.get("target_duration_sec", 60) * 2.5))
+
+            try:
+                from app.services.quality_check import QualityCheckError, check_quality
+                check_quality(lines, language, _target_words)
+            except QualityCheckError as e:
+                _mark_failed(db, task, e.code, str(e))
+                return {"ok": False, "error": e.code}
+
         # ===== 3. 音频合成 =====
         task.status = TaskStatus.SYNTHESIZING.value
         task.progress = 50
