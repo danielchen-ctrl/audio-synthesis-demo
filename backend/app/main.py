@@ -15,6 +15,42 @@ from app.providers.storage.minio_client import ensure_bucket
 settings = get_settings()
 
 
+def _start_task_worker() -> None:
+    """后台线程：轮询 DB queued 任务并直接执行（不依赖 Celery worker 进程）。
+
+    Windows 环境下 Celery worker 进程启动不稳定，改为在 uvicorn 进程内
+    起一个线程轮询，与 V1 的 task_runner 设计思路一致。
+    """
+    import time
+    import threading
+    from app.core.db import SessionLocal
+    from app.models.task import Task, TaskStatus
+    from app.tasks.generation import run_generation_task
+
+    def _loop():
+        logger.info("[task_worker] Background task worker started")
+        while True:
+            try:
+                with SessionLocal() as db:
+                    task = (
+                        db.query(Task)
+                        .filter(Task.status == TaskStatus.QUEUED.value)
+                        .order_by(Task.queued_at.asc())
+                        .first()
+                    )
+                if task:
+                    logger.info(f"[task_worker] Picking up task {task.task_id}")
+                    run_generation_task(str(task.task_id))
+                else:
+                    time.sleep(3)  # 没有任务时 3 秒轮询一次
+            except Exception as exc:
+                logger.warning(f"[task_worker] Error: {exc}")
+                time.sleep(5)
+
+    t = threading.Thread(target=_loop, daemon=True, name="task-worker")
+    t.start()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
@@ -26,6 +62,8 @@ async def lifespan(app: FastAPI):
         init_voice_catalog_if_empty()
     except Exception as exc:
         logger.warning(f"Voice catalog init skipped (CosyVoice unavailable?): {exc}")
+    # 启动内建任务工作线程（替代独立 Celery worker 进程）
+    _start_task_worker()
     yield
     logger.info("Shutting down")
 
