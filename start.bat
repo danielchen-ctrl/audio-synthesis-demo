@@ -1,70 +1,70 @@
 @echo off
-chcp 65001 >nul
-title V2 音频语料平台
+title V2 Audio Platform
+
+set ROOT=%~dp0
+set ROOT=%ROOT:~0,-1%
 
 echo.
-echo ========================================
-echo   V2 音频语料生成平台 启动中...
-echo ========================================
+echo ============================================
+echo   V2 Audio Platform - Starting...
+echo ============================================
 echo.
 
-:: ── 切到脚本所在目录 ──────────────────────────────────────────────────────
-cd /d "%~dp0"
-
-:: ── 1. 检查 Docker 是否运行 ───────────────────────────────────────────────
+:: 1. Check Docker
 docker info >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Docker Desktop 未启动，请先打开 Docker Desktop 再运行此脚本。
+    echo [ERROR] Docker Desktop is not running. Please start Docker Desktop first.
     pause
     exit /b 1
 )
-echo [1/4] Docker 已就绪
+echo [1/4] Docker is running
 
-:: ── 2. 启动 MySQL / Redis / MinIO ────────────────────────────────────────
-echo [2/4] 启动依赖服务（MySQL / Redis / MinIO）...
-docker compose -f docker-compose.dev.yml up -d >nul 2>&1
+:: 2. Start MySQL / Redis / MinIO
+echo [2/4] Starting MySQL / Redis / MinIO...
+docker compose -f "%ROOT%\docker-compose.dev.yml" up -d
 if %errorlevel% neq 0 (
-    echo [ERROR] Docker 容器启动失败，请检查 docker-compose.dev.yml。
+    echo [ERROR] Failed to start containers.
     pause
     exit /b 1
 )
-:: 等待 MySQL 就绪
-echo       等待 MySQL 就绪...
+
+:: Wait for MySQL
+echo       Waiting for MySQL...
 :wait_mysql
 docker exec audio_mysql mysqladmin ping -h localhost --silent >nul 2>&1
 if %errorlevel% neq 0 (
     timeout /t 2 /nobreak >nul
     goto wait_mysql
 )
-echo       MySQL / Redis / MinIO 已就绪 ✓
+echo       MySQL / Redis / MinIO ready
 
-:: ── 3. 启动后端（FastAPI + uvicorn，新窗口）──────────────────────────────
-echo [3/4] 启动后端 API（http://localhost:8000）...
-start "V2 后端 API" cmd /k "cd /d "%~dp0" && backend\.venv\Scripts\uvicorn app.main:app --reload --port 8000 --app-dir backend"
+:: 3. Start backend in new window
+echo [3/4] Starting backend (http://localhost:8000)...
+start "V2-Backend" cmd /k "cd /d %ROOT% && backend\.venv\Scripts\uvicorn app.main:app --reload --port 8000 --app-dir backend"
 
-:: 等待后端就绪
-echo       等待后端启动...
+:: Wait for backend
+echo       Waiting for backend...
 :wait_backend
 timeout /t 2 /nobreak >nul
 curl -s http://localhost:8000/api/v1/health >nul 2>&1
 if %errorlevel% neq 0 goto wait_backend
-echo       后端已就绪 ✓
+echo       Backend ready
 
-:: ── 4. 启动前端（Vite dev，新窗口）──────────────────────────────────────
-echo [4/4] 启动前端（http://localhost:5173）...
-start "V2 前端" cmd /k "cd /d "%~dp0\frontend" && npm run dev"
+:: 4. Start frontend in new window
+echo [4/4] Starting frontend (http://localhost:5173)...
+start "V2-Frontend" cmd /k "cd /d %ROOT%\frontend && npm run dev"
 
-:: ── 完成 ──────────────────────────────────────────────────────────────────
 echo.
-echo ========================================
-echo   启动完成！
-echo ----------------------------------------
-echo   前端:  http://localhost:5173
-echo   后端:  http://localhost:8000
-echo   API文档: http://localhost:8000/docs
-echo   MinIO:  http://localhost:9001  (minioadmin/minioadmin)
-echo ========================================
+echo ============================================
+echo   All services started!
+echo --------------------------------------------
+echo   Frontend : http://localhost:5173
+echo   Backend  : http://localhost:8000
+echo   API Docs : http://localhost:8000/docs
+echo   MinIO    : http://localhost:9001
+echo              (minioadmin / minioadmin)
+echo ============================================
 echo.
-echo   关闭所有服务：运行 stop.bat
+echo   To stop all services, run stop.bat
 echo.
 pause
