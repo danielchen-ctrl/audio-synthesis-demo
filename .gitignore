@@ -41,3 +41,4 @@ logs/
 
 # Few-shot 训练样本（57MB，从老 demo 拷贝；生产环境用 volume 挂载或重新同步）
 backend/app/data/few_shot/
+.playwright-mcp/
