@@ -332,7 +332,15 @@ def generate_text_cloud_llm(payload: dict, save_dir: Path) -> dict:
     lines = _apply_lite_postprocess(lines, payload)
 
     # ── 重建对话文本 ─────────────────────────────────────────────────────────
-    dialogue_text = "\n".join(f"Speaker {sp}: {txt}" for sp, txt in lines)
+    # sp 可能是纯数字 "1"（_parse_dialogue 返回）或完整 "Speaker 1"（postprocess 返回）
+    # 统一规范化为 "Speaker N: txt" 格式
+    def _fmt(sp: str, txt: str) -> str:
+        sp = sp.strip()
+        if sp.startswith("Speaker"):
+            return f"{sp}: {txt}"
+        return f"Speaker {sp}: {txt}"
+
+    dialogue_text = "\n".join(_fmt(sp, txt) for sp, txt in lines)
 
     # ── 写文件 ───────────────────────────────────────────────────────────────
     dialogue_id = uuid.uuid4().hex[:8]
