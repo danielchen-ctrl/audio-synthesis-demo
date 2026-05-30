@@ -138,6 +138,7 @@ export interface TranscriptResponse {
   has_srt: boolean
   json_download_url?: string | null
   srt_download_url?: string | null
+  voice_names?: Record<string, string>  // speaker_id -> voice_name
 }
 
 export async function getTranscript(fileId: string): Promise<TranscriptResponse> {

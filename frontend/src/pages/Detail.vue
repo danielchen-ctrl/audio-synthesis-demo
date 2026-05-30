@@ -23,6 +23,7 @@ const currentTime = ref(0)
 const totalTime = ref(0)
 const transcript = ref<TranscriptLine[]>([])
 const hasTranscript = ref(false)
+const voiceNames = ref<Record<string, string>>({})
 const jsonDownloadUrl = ref<string | null>(null)
 const srtDownloadUrl = ref<string | null>(null)
 
@@ -57,6 +58,7 @@ async function fetchFile() {
     const tr = await getTranscript(fileId.value)
     hasTranscript.value = tr.has_transcript
     transcript.value = tr.lines
+    voiceNames.value = tr.voice_names ?? {}
     jsonDownloadUrl.value = tr.json_download_url ?? null
     srtDownloadUrl.value = tr.srt_download_url ?? null
   } catch (e) { message.error(errorMessage(e)) }
@@ -225,9 +227,14 @@ onMounted(fetchFile)
           </div>
           <div v-else>
             <div v-for="(line, i) in transcript" :key="i" class="tr-line">
-              <div class="sp-badge"
-                   :style="{ background: speakerColor(line.speaker_id), color: '#000' }">
-                {{ line.speaker_id }}
+              <div class="sp-info">
+                <div class="sp-badge"
+                     :style="{ background: speakerColor(line.speaker_id), color: '#000' }">
+                  {{ line.speaker_id }}
+                </div>
+                <div v-if="voiceNames[line.speaker_id]" class="sp-voice-name">
+                  {{ voiceNames[line.speaker_id] }}
+                </div>
               </div>
               <div class="tr-text">
                 <span v-if="line.start_time != null" class="tr-time">
@@ -368,6 +375,15 @@ onMounted(fetchFile)
 </template>
 
 <style scoped>
+.sp-info {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  min-width: 44px;
+}
+.sp-voice-name {
+  font-size: 10px; color: var(--gray-500);
+  text-align: center; white-space: nowrap;
+  max-width: 56px; overflow: hidden; text-overflow: ellipsis;
+}
 .tr-time {
   display: inline-block;
   font-family: 'Courier New', monospace;

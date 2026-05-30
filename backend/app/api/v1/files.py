@@ -428,6 +428,19 @@ def get_transcript(
     if not f or f.deleted_at is not None:
         raise HTTPException(status_code=404, detail="文件不存在")
 
+    # 从关联任务提取 voice_names（speaker_id -> voice_name）
+    def _get_voice_names(task_id) -> dict[str, str]:
+        if not task_id:
+            return {}
+        try:
+            tk = db.query(Task).filter(Task.task_id == task_id).first()
+            if not tk:
+                return {}
+            assignments = (tk.params or {}).get("voice_assignments") or {}
+            return {sid: v.get("voice_name", "") for sid, v in assignments.items() if v.get("voice_name")}
+        except Exception:
+            return {}
+
     # 优先：transcripts 表（合成时记录了段级 timing）
     t = db.query(Transcript).filter(Transcript.file_id == file_id).first()
     if t and t.segments:
@@ -454,6 +467,7 @@ def get_transcript(
                 get_presigned_download_url(t.srt_storage_key, expires_sec=600)
                 if t.srt_storage_key else None
             ),
+            voice_names=_get_voice_names(f.task_id),
         )
 
     # 降级：解析 task.dialogue_text（老数据，无时间码）
@@ -467,7 +481,10 @@ def get_transcript(
     except ValueError:
         return TranscriptResponse(file_id=file_id, has_transcript=False, lines=[])
     lines = [TranscriptLine(speaker_id=sid, text=text) for sid, text in parsed]
-    return TranscriptResponse(file_id=file_id, has_transcript=True, lines=lines)
+    return TranscriptResponse(
+        file_id=file_id, has_transcript=True, lines=lines,
+        voice_names=_get_voice_names(f.task_id),
+    )
 
 
 @router.delete("/{file_id}", status_code=status.HTTP_204_NO_CONTENT)

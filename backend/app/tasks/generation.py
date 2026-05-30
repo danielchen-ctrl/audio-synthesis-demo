@@ -95,7 +95,7 @@ def run_generation_task(self, task_id: str) -> dict:
             _cfg = _get_settings()
             if _cfg.LLM_POSTPROCESS_ENABLED:
                 # V2 参数体系：target_duration_sec → 换算为字数（150字/分钟）
-                _target_words = max(50, int(params.get("target_duration_sec", 60) * 2.5))
+                _target_words = max(50, int(params.get("target_duration_sec", 60) * 4))
                 from app.services.postprocess import apply_postprocess
                 lines = apply_postprocess(
                     lines,
@@ -108,7 +108,7 @@ def run_generation_task(self, task_id: str) -> dict:
                     target_word_count=_target_words,
                 )
             else:
-                _target_words = max(50, int(params.get("target_duration_sec", 60) * 2.5))
+                _target_words = max(50, int(params.get("target_duration_sec", 60) * 4))
 
             try:
                 from app.services.quality_check import QualityCheckError, check_quality

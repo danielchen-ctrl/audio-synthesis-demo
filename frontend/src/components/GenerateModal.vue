@@ -61,7 +61,7 @@ const isCustomTemplate = computed(() => template.value === 'custom')
 watch(template, (newCode) => {
   const t = templates.value.find((x) => x.code === newCode)
   if (!t || newCode === 'custom') return
-  if (t.example_topic && !topic.value) topic.value = t.example_topic
+  if (t.example_topic) topic.value = t.example_topic
   if (t.default_speaker_count) speakerCount.value = t.default_speaker_count
   // 不强行覆盖用户已填的关键词
 })

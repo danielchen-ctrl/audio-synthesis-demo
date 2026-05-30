@@ -65,3 +65,6 @@ class TranscriptResponse(BaseModel):
     has_srt: bool = False
     json_download_url: str | None = None
     srt_download_url: str | None = None
+    # speaker_id -> voice_name 映射，供前端在对话文本里展示音色名称
+    # 格式: {"1": "耿同学", "2": "叨叨傅"}
+    voice_names: dict[str, str] = {}

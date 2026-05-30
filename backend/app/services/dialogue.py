@@ -48,8 +48,8 @@ def build_prompt(
       作为上下文喂给 LLM
     """
     lang_name = _LANG_NAMES.get(language, language)
-    # 按 150 字/分钟估算
-    target_chars = max(50, int(target_duration_sec * 2.5))
+    # 按 240 字/分钟估算（对话语速）
+    target_chars = max(100, int(target_duration_sec * 4))
 
     preset = None if template == "custom" else get_preset_by_id(template)
 
