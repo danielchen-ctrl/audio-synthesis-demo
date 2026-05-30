@@ -76,13 +76,46 @@ async def create_voice(
     base_url = settings.COSYVOICE_BASE_URL.rstrip("/")
     audio_bytes = await audio.read()
 
-    # ── 步骤 1：调 CosyVoice 注册音色 ──────────────────────────────────────
+    # ── 预处理：任何格式统一转为 16kHz mono WAV ───────────────────────────────
+    # CosyVoice Speaker Encoder 要求单声道输入，MP4/MP3 双声道压缩格式会导致
+    # Embedding 提取失败（HTTP 500）。移植自 V1 VoiceCreateHandler 的预处理逻辑。
+    import os, subprocess, tempfile, shutil as _shutil
+    wav_bytes = audio_bytes  # 转换失败时回退原始
+    _tmp_in = _tmp_out = None
     try:
-        async with httpx.AsyncClient(timeout=60) as client:
+        _suffix = os.path.splitext(audio.filename or "audio.mp4")[-1] or ".tmp"
+        with tempfile.NamedTemporaryFile(suffix=_suffix, delete=False) as f:
+            f.write(audio_bytes)
+            _tmp_in = f.name
+        _tmp_out = _tmp_in + "_16k_mono.wav"
+        _ffmpeg = _shutil.which("ffmpeg") or "ffmpeg"
+        _r = subprocess.run(
+            [_ffmpeg, "-y", "-i", _tmp_in, "-ar", "16000", "-ac", "1", "-f", "wav", _tmp_out],
+            capture_output=True, timeout=60,
+        )
+        if _r.returncode == 0 and os.path.getsize(_tmp_out) > 100:
+            with open(_tmp_out, "rb") as f:
+                wav_bytes = f.read()
+            logger.info("Voice audio converted to 16kHz mono WAV (%d bytes)", len(wav_bytes))
+        else:
+            logger.warning("ffmpeg conversion failed (rc=%d), using raw audio", _r.returncode)
+    except Exception as _e:
+        logger.warning("Audio preprocessing failed, using raw audio: %s", _e)
+    finally:
+        for _p in (_tmp_in, _tmp_out):
+            if _p:
+                try:
+                    os.unlink(_p)
+                except Exception:
+                    pass
+
+    # ── 步骤 1：调 CosyVoice 注册音色（发送转换后的 WAV）──────────────────────
+    try:
+        async with httpx.AsyncClient(timeout=120) as client:
             resp = await client.post(
                 f"{base_url}/v1/voices/create",
-                files={"audio": (audio.filename or "audio.wav", audio_bytes, "audio/wav")},
-                data={"name": name, "language": language, **({"text": reference_text} if reference_text else {})},
+                files={"audio": ("reference.wav", wav_bytes, "audio/wav")},
+                data={"name": name, **({"text": reference_text} if reference_text else {})},
             )
         resp.raise_for_status()
     except Exception as exc:
@@ -94,11 +127,24 @@ async def create_voice(
     voice_id = (
         data.get("voice_id")
         or data.get("id")
+        or (data.get("voice") or {}).get("id")
         or data.get("data", {}).get("voice_id")
         or ""
     )
+    # voice_id 兜底：从 /v1/voices/custom 取最新一条（V1 同款兜底逻辑）
     if not voice_id:
-        raise HTTPException(status_code=502, detail=f"CosyVoice 返回了未知格式: {resp.text[:300]}")
+        try:
+            async with httpx.AsyncClient(timeout=15) as client:
+                r = await client.get(f"{base_url}/v1/voices/custom")
+            r.raise_for_status()
+            voices_list = r.json().get("voices", [])
+            if voices_list:
+                voice_id = voices_list[-1].get("id") or voices_list[-1].get("voice_id") or ""
+                logger.info("voice_id resolved from /v1/voices/custom: %s", voice_id)
+        except Exception as _e:
+            logger.warning("Fallback voice_id lookup failed: %s", _e)
+    if not voice_id:
+        raise HTTPException(status_code=502, detail=f"CosyVoice 未返回 voice_id，原始响应: {resp.text[:300]}")
 
     # ── 步骤 2：E2E 验证 — 立即合成一句短文本确认音色可用 ──────────────────
     verify_text = _VERIFY_TEXT.get(language, _VERIFY_TEXT["zh"])
