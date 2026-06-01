@@ -132,6 +132,35 @@ function flatTree(nodes: FolderNode[], depth = 0): Array<FolderNode & { _depth: 
   return out
 }
 const flatFolders = computed(() => flatTree(folderStore.folders))
+
+// ===== 复制分享链接 =====
+const shareTooltip = ref('')
+async function copyShareLink() {
+  let url = window.location.origin
+  // 如果当前是 localhost，尝试从后端拿局域网 IP
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    try {
+      const resp = await fetch('/api/v1/admin/server-info', {
+        headers: { Authorization: `Bearer ${auth.token}` },
+      })
+      if (resp.ok) {
+        const data = await resp.json()
+        if (data.lan_ips?.length) {
+          url = `http://${data.lan_ips[0]}:${window.location.port || data.frontend_port}`
+        }
+      }
+    } catch { /* 失败则用当前 origin */ }
+  }
+  try {
+    await navigator.clipboard.writeText(url)
+    shareTooltip.value = '已复制 ✓'
+    message.success(`分享链接已复制：${url}`)
+  } catch {
+    // 兜底：prompt
+    window.prompt('复制此分享链接：', url)
+  }
+  setTimeout(() => { shareTooltip.value = '' }, 2000)
+}
 </script>
 
 <template>
@@ -207,6 +236,12 @@ const flatFolders = computed(() => flatTree(folderStore.folders))
         </div>
         <div class="sb-item" :class="{ active: isActive('/trash').value }" @click="go('/trash')">
           <span>🗑</span> 回收站
+        </div>
+
+        <!-- 分享链接 -->
+        <div class="sb-share" @click="copyShareLink" :title="shareTooltip || '复制局域网访问链接，分享给同事'">
+          <span>🔗</span>
+          <span>{{ shareTooltip || '复制分享链接' }}</span>
         </div>
       </aside>
 
@@ -307,4 +342,22 @@ const flatFolders = computed(() => flatTree(folderStore.folders))
   transition: transform .15s;
 }
 .sb-chevron.collapsed { transform: rotate(-90deg); }
+
+.sb-share {
+  display: flex; align-items: center; gap: 8px;
+  margin: 8px 10px 12px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  border: 1px dashed var(--gray-300);
+  color: var(--gray-500);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  user-select: none;
+}
+.sb-share:hover {
+  background: var(--gray-100);
+  color: var(--primary, #3B82F6);
+  border-color: var(--primary, #3B82F6);
+}
 </style>

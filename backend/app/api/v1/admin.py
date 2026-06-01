@@ -16,6 +16,30 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+@router.get("/server-info")
+def server_info(current_user: CurrentUser) -> dict:
+    """返回服务器局域网 IP，供前端生成可分享的访问链接。"""
+    import socket
+    ips = []
+    try:
+        # 连接外部地址获取出口 IP（不发送数据）
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            ips.append(s.getsockname()[0])
+    except Exception:
+        pass
+    # 兜底：getaddrinfo
+    try:
+        hostname = socket.gethostname()
+        for info in socket.getaddrinfo(hostname, None, socket.AF_INET):
+            ip = info[4][0]
+            if not ip.startswith("127.") and ip not in ips:
+                ips.append(ip)
+    except Exception:
+        pass
+    return {"lan_ips": ips, "frontend_port": 5173}
+
+
 @router.get("/few-shot/stats")
 def few_shot_stats(current_user: CurrentUser) -> dict:
     """Few-shot 索引概览：总数 / 分数分布 / 按语言/按主题分组。"""
